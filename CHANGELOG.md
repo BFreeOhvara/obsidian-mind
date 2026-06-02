@@ -13,6 +13,10 @@
 - migrate ShardMind hooks to split bootstrap/personalize lifecycle (#75)
 - correct Codex skill discovery path (.agents/skills/ not .codex/agents/)
 
+### Changed
+- migrate ShardMind hooks to split bootstrap/personalize lifecycle (#75)
+- correct Codex skill discovery path (.agents/skills/ not .codex/agents/)
+
 ## v6.1 — 2026-05-18
 
 ### Changed
