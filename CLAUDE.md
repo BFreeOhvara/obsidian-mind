@@ -354,3 +354,34 @@ Five lifecycle hooks in `.claude/settings.json`:
 - Always check for and suggest connections between notes.
 - Every note must have a `description` field (~150 chars). Claude fills this automatically.
 - **Zero data loss**: when reorganizing, always use `git mv`. Never delete without explicit user confirmation.
+
+---
+
+## Ohvara Context
+
+This vault is the external brain for **Ohvara** — a two-vertical SMB automation business run by Brayden.
+
+### Session Start Protocol
+
+1. Read `brain/North Star.md` — who we are, what phase we're in, what success looks like
+2. Read `brain/Memories.md` — hard-won lessons, never repeat a logged mistake
+3. Read `DESIGN.md` if touching any UI
+4. State what's relevant before writing code
+
+### Session End Protocol
+
+1. Append a new entry to `brain/Memories.md` Session Log:
+   - Date, task, what broke, root cause, fix, one-line lesson, status
+2. Update `work/Index.md` if new work notes were created
+3. Never end a session without logging — partial logs beat no logs
+
+### Active Repos (BFreeOhvara on GitHub)
+
+- `ohvara-dashboard` — main outreach dashboard (React + Supabase + Vercel)
+- `obsidian-mind` — this vault
+- `Scraper` — Google Maps lead scraper (fallback source)
+
+### Key Infrastructure (stored in .env.local in each repo — never hardcode)
+
+- Supabase: `jjextitmbptoaolacocs.supabase.co`
+- Dashboard: `ohvara-dashboard.vercel.app`
