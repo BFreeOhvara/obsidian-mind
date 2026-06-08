@@ -106,6 +106,14 @@ Subagents run in isolated context windows via `.claude/agents/`. They don't poll
 | PreCompact | Before context compaction | Back up session transcript to `thinking/session-logs/` |
 | Stop | End of session | Checklist: archive, update indexes, check orphans |
 
+## Project Skills
+
+Reusable skill files for specific project domains. Located in `skills/`.
+
+| Skill | File | Purpose |
+|-------|------|---------|
+| Premium Animated UI | [[premium-ui-animations]] | Glass morphism, animated orbs, countup KPIs, staggered rows — full dark UI system for Ohvara dashboard |
+
 ## Semantic Search (QMD)
 
 If QMD is installed (`npm install -g @tobilu/qmd`), the vault has semantic search. Every command takes `--index <name>` where `<name>` is `vault-manifest.json`'s `qmd_index` field (default: `obsidian-mind`):
