@@ -108,6 +108,44 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 - Add `GOOGLE_MAPS_API_KEY` to Supabase → Edge Functions → Secrets for maps-scraper to function
 - Verify live Vercel URL after auto-deploy triggers from push to master
 
+## 2026-06-07 | Business Decisions Finalized
+
+### Packages Locked
+
+- Basic: `$497` setup + `$497/mo`
+- Pro: `$497` setup + `$797/mo`
+- Premium: `$497` setup + `$1,297/mo`
+- Elite: `$497` setup + `$1,797/mo`
+- Every package has `$497` one-time setup fee — no exceptions
+
+### Team Structure Locked
+
+- One confirmed closer: Nate
+- All reps work Profile A only (trades & field services)
+- Profile B/C/D expand when second closer confirmed
+
+### Niche Strategy
+
+- Not locking to specific niches — targeting language profiles instead
+- Profile A covers highest Indeed lead volume
+- Same pitch framework works across all trades
+- AI scripts adapt tone per niche within the profile
+
+### Pricing Logic
+
+- `$1,797` for Elite beats `$1,997` (crosses $2K barrier) and `$1,597` (too close to Premium)
+- Staircase: `$497` → `$797` → `$1,297` → `$1,797` — each step `$300`–`$500`
+- ROI anchor: always compare to cost of human hire, not to competitors
+
+### Rules Added
+
+- AI recommendation engine uses labor cost + pain points + business size to pick tier
+- Setup fee (`$497`) always presented as one-time, separate from monthly
+- Closer only pitches Profile A — no context switching until second closer confirmed
+- Two Stripe links generated per close: setup fee link + monthly subscription link
+
+**Status:** Complete
+
 ---
 
 ## Recent Context

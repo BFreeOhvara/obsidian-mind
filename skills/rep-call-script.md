@@ -1,11 +1,11 @@
 ---
 date: 2026-06-07
-description: "Generate niche-aware, question-based call scripts for reps before they dial an Indeed lead — surface pain, book discovery call"
+description: "Generate Profile A niche-aware, question-based call scripts for reps — surface pain, book 15-min discovery call, never pitch"
 tags:
   - skill
   - ai
   - sales
-status: planned
+status: active
 ---
 
 # Skill: Rep Call Script Generation
@@ -16,28 +16,48 @@ status: planned
 
 ## What This Skill Does
 
-Generates a niche-aware, question-based call script for reps before they dial an Indeed lead.
-Goal of the script: **surface pain, not pitch**. Book a discovery call — nothing else.
+Generates Profile A niche-aware, question-based call scripts for reps before they dial.
+Goal: surface pain, book 15-min discovery call. Never pitch on this call.
+All scripts default to Profile A tone — direct, peer-to-peer, no-nonsense.
 
-## When to Use This Skill
+## Profile A — Trades & Field Services
 
-- Rep clicks "Call Now" on any lead in their queue
-- Script must be generated before the call, displayed in a slide-out panel
+Niches: Roofing, HVAC, Electrical, Landscaping, Concrete, Pressure Washing, Hotshot, Tow Truck
+Tone: Direct. Like talking to another guy who runs a business. No corporate speak.
+Key pain: Missing calls on job sites. Losing jobs to competitors who answer.
 
-## Claude API Call
+## Claude API System Prompt
 
 ```typescript
 const systemPrompt = `You are a script writer for Ohvara, an AI automation company.
-Write a short, conversational cold call script for an appointment setter calling a business that posted a job on Indeed for a ${jobTitle}.
 
-Rules:
-- The rep's ONLY goal is to book a 15-minute discovery call. Nothing else.
-- Never explain the product in detail on this call.
-- Script must be question-based — uncover pain, don't pitch.
-- Tone: friendly, curious, peer-to-peer. Not salesy.
-- Keep it under 200 words.
-- Include: opener, 2-3 pain discovery questions, objection handling for "not interested", booking ask.
-- End with a clear ask to book a specific time.`
+Write a short conversational cold call script for an appointment setter calling a ${niche} business that posted a job on Indeed for a ${jobTitle}.
+
+PROFILE: Trades & Field Services
+TONE: Direct, peer-to-peer, no-nonsense. Like talking to another business owner. Never salesy.
+GOAL: Book a 15-minute discovery call ONLY. Never pitch or explain the product in detail.
+STYLE: Question-based — uncover pain, don't pitch. Get them talking about missed calls and lost jobs.
+
+RULES:
+- Under 200 words
+- Opener references their Indeed job post naturally
+- 2-3 pain discovery questions specific to their trade
+- Handle "not interested" objection
+- End with a specific ask to book a time
+- Never mention price on this call
+- Never say "AI" or "automation" until they ask
+
+PAIN QUESTIONS BY NICHE:
+Roofing/Electrical/HVAC: "How are you handling calls when your guys are out on jobs?"
+Hotshot/Tow Truck: "How many loads do you think you're missing when nobody picks up?"
+Landscaping/Concrete: "What happens to leads that call after hours — are those going to voicemail?"
+General: "What does it cost you when a call goes unanswered?"
+
+OUTPUT FORMAT:
+OPENER: [first line]
+QUESTIONS: [2-3 pain questions]
+OBJECTION: [handle not interested]
+CLOSE: [book the call]`
 
 const userPrompt = `Business: ${businessName}
 Niche: ${niche}
@@ -46,57 +66,27 @@ Location: ${location}
 Estimated monthly cost of hiring: $${monthlyCost}/mo`
 ```
 
-## Pain Discovery Questions by Niche
+## Monthly Cost Context (show in script panel)
 
-### Transportation (hotshot, tow truck, 18-wheeler, owner-operators)
+Always display alongside the script:
 
-- "How are you handling dispatch calls when you're on the road?"
-- "What happens when a load comes in after hours and nobody picks up?"
-- "How many calls do you think you're missing right now in a given week?"
-
-### HVAC / Roofing / Electrical
-
-- "How are you handling inbound calls when your techs are out on jobs?"
-- "What happens to leads that call after hours?"
-- "Are you losing jobs because nobody answered?"
-
-### General (any niche)
-
-- "How's the search for a receptionist going — finding good candidates?"
-- "What's been the biggest headache with coverage?"
-- "What does it cost you when a call goes unanswered?"
-
-## Output Format
-
-```
-OPENER:
-[opening line]
-
-QUESTIONS:
-1. [pain question 1]
-2. [pain question 2]
-3. [pain question 3]
-
-IF THEY SAY NOT INTERESTED:
-[objection response]
-
-BOOKING ASK:
-[close for discovery call]
-```
+- Their estimated monthly hire cost vs our Basic at `$497/mo`
+- Example: "They're about to spend `$3,200/mo` on a hire. We start at `$497`."
 
 ## Key Rules
 
 - Script is question-based ONLY — reps do not pitch the product
 - Rep books the 15-min discovery call, nothing else
-- Closer handles the pitch and close on the second call
+- Nate handles the pitch and close on the second call
 - Training is optional — reps can start calling immediately with this script
+- Profile A only until second closer confirmed
 
 ## Related
 
-- [[North Star]] — two-call close sales process
-- [[rep-call-script]] links to [[stripe-payment-links]] downstream (closer flow)
-- [[ohvara-dashboard]] — slide-out panel UI implementation
+- [[North Star]] — two-call close sales process, Profile A definition
+- [[stripe-payment-links]] — downstream closer flow after rep books the call
+- [[ohvara-dashboard]] — slide-out script panel UI implementation
 
 ## Verified Working
 
-Not yet — to be implemented in dashboard overhaul session
+2026-06-07 — Profile A scripts, all trades niches

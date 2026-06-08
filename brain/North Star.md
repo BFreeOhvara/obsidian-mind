@@ -32,24 +32,91 @@ aliases:
 Sell AI phone agents to small businesses as a recurring monthly subscription.
 Replace the receptionist or dispatcher they're actively trying to hire.
 
-| Tier | Includes | Price |
-|------|----------|-------|
-| Starter | AI Receptionist + Missed Call Text Back | `$497/mo` |
-| Growth | Starter + Review Generation + Lead Follow-Up | `$797/mo` |
-| Full Stack | Everything + Website | `$1,297/mo` |
+> **Core insight:** Indeed leads are warm leads. They are already problem-aware and actively trying to solve it by hiring. We are a faster, cheaper solution to the exact problem they just posted about.
 
-**Priority niche:** Transportation — hotshot trucking, tow trucks, 18-wheelers, owner-operators. Cast wide across all niches.
-**All niches:** Roofing, HVAC, Electrical, Landscaping, Pressure Washing, Concrete, Hotshot Trucking, Oilfield Services, Towing, Transportation
+**Target niches (Profile A):** Roofing, HVAC, Electrical, Landscaping, Pressure Washing, Concrete, Hotshot Trucking, Towing, Oilfield Services, Transportation
 **Geographic market:** Anywhere in the US
 **Lead source:** Businesses hiring receptionists/dispatchers on Indeed and Google Maps
-
-> **Core insight:** Indeed leads are warm leads. They are already problem-aware and actively trying to solve it by hiring. We are a faster, cheaper solution to the exact problem they just posted about.
 
 ### Vertical 2 — Web Agency
 
 Single-file HTML/CSS/JS websites for small businesses.
 Lead source: Google Maps businesses with no website, fewer than 50 reviews.
-Bundled into Full Stack tier or standalone.
+Bundled into the Elite package or standalone.
+
+---
+
+## The Four Packages
+
+All packages include a **`$497` one-time setup fee**.
+
+| Package | Setup Fee | Monthly | Best For |
+|---------|-----------|---------|---------|
+| Basic | `$497` | `$497/mo` | Owner-operators missing calls, need basic coverage |
+| Pro | `$497` | `$797/mo` | Growing businesses that want reviews + follow-up too |
+| Premium | `$497` | `$1,297/mo` | Established businesses ready to automate the full front office |
+| Elite | `$497` | `$1,797/mo` | Everything — full automation + website + multiple agents |
+
+### What's Included Per Package
+
+**Basic — `$497/mo`**
+- AI Receptionist (24/7 inbound call handling)
+- Missed Call Text Back
+
+**Pro — `$797/mo`**
+- AI Receptionist (24/7)
+- Missed Call Text Back
+- Review Generation
+- Lead Follow-Up Automation
+- Appointment Reminders
+
+**Premium — `$1,297/mo`**
+- AI Receptionist (24/7)
+- Missed Call Text Back
+- Review Generation
+- Lead Follow-Up Automation
+- Appointment Reminders
+- AI Dispatcher
+- SMS Marketing
+
+**Elite — `$1,797/mo`**
+- Everything in Premium
+- Professional Website
+- Multiple AI agents (up to 5 lines)
+- Priority support
+- Custom reporting dashboard
+
+### ROI Anchor (use in every close)
+
+- Basic replaces a `$2,800+/mo` receptionist
+- Pro replaces a `$3,500+/mo` receptionist + marketing assistant
+- Premium replaces a `$4,500+/mo` receptionist + dispatcher
+- Elite replaces `$6,000+/mo` full office staff
+
+---
+
+## Current Team Structure
+
+### Closer
+
+- **Nate** — only confirmed closer, handles all Profile A appointments
+- **Jordan** — on standby, added when confirmed
+
+### Profile Assignment
+
+**All reps and Nate work Profile A only until second closer is confirmed.**
+
+Profile A — Trades & Field Services:
+- Roofing, HVAC, Electrical, Landscaping, Concrete, Pressure Washing
+- Tone: direct, no-nonsense, peer-to-peer
+- Key pain: missing calls while on job sites, losing jobs to competitors who answer
+- Opening question: "How many calls do you think you're missing while your guys are out on jobs?"
+
+### Rep Commission
+
+- `$150`–`$250` per closed deal
+- Recruited via Facebook groups (posts + DMs) via Jahandad
+- 3–5 reps working Profile A simultaneously
 
 ---
 
@@ -58,19 +125,18 @@ Bundled into Full Stack tier or standalone.
 **Two-call close. Reps gather pain only — they never pitch.**
 
 ### Rep Call (Call 1)
+
 - Rep's only goal: book a 15-minute discovery call. Nothing else.
 - Script is question-based and pain-surfacing — never a pitch
 - Rep does NOT explain the product or mention pricing
 - Rep asks pain discovery questions, surfaces the cost of the problem, books the call
 
 ### Closer Call (Call 2)
-- Closer (Jordan or Nate) handles the pitch and close
+
+- Nate handles the pitch and close
 - Reviews the pain gathered by the rep
 - Gets AI briefing + stack recommendation for the business
-- Stripe payment link is auto-generated the moment a tier is recommended — send it immediately
-
-**Closers:** Jordan and Nate — both ready to close now
-**Commission:** Reps earn `$150`–`$250` per closed deal
+- Stripe payment link (setup fee + monthly) auto-generated the moment a tier is recommended — send immediately
 
 ### Rep Onboarding Flow
 
@@ -81,7 +147,6 @@ Admin creates account → Rep logs in → 150 leads already loaded → Rep start
 Target: rep is calling within 60 seconds of first login.
 
 - Training is optional — available anytime, not required before calling
-- Rep recruiting channel: Facebook groups (posts + DMs) via Jahandad
 
 ### Dialer
 
@@ -115,6 +180,7 @@ TBD — do not hardcode any dialer assumption anywhere in the codebase.
 ### Medium-term (This Half)
 
 - Proven rep onboarding playbook
+- Second closer confirmed → unlock Profile B/C/D
 - Expand to Phase 2: larger AI automation deals (`$5K`–`$15K`)
 
 ### Long-term (This Year+)
@@ -139,7 +205,7 @@ TBD — do not hardcode any dialer assumption anywhere in the codebase.
 | Vercel | Dashboard (`ohvara-dashboard.vercel.app`) |
 | Twilio | SMS reminders |
 | Anthropic Claude API | AI briefings, rep scripts, stack recommendations |
-| Stripe | Payment link auto-generation on close recommendation |
+| Stripe | Two payment links per close (setup fee + monthly subscription) |
 | Indeed MCP | Lead scraping (primary) |
 | Google Maps | Lead scraping (fallback) |
 | GitHub: BFreeOhvara | All repos |
@@ -160,8 +226,10 @@ TBD — do not hardcode any dialer assumption anywhere in the codebase.
 9. When blocked, state blocker + two options
 10. Log every mistake — mistakes written down don't repeat
 11. Never hardcode any dialer assumption
-12. Stripe link must be auto-generated the moment a closer selects a tier — never deferred
+12. Generate TWO Stripe links on close (setup fee + monthly) — never deferred
 13. AI scripts are question-based and pain-surfacing — never a pitch
+14. All reps and Nate on Profile A only until second closer confirmed
+15. Setup fee (`$497`) always presented as one-time, separate from monthly
 
 ---
 
@@ -170,4 +238,5 @@ TBD — do not hardcode any dialer assumption anywhere in the codebase.
 | Date | Shift | Reason |
 |------|-------|--------|
 | 2026-06-07 | Initialized North Star | Ohvara vault setup |
-| 2026-06-07 | Full business context upgrade | Added sales process detail, warm lead insight, rep onboarding flow, commission, dialer TBD, geo market, transportation priority niche, Stripe auto-link rule, training optional |
+| 2026-06-07 | Full business context upgrade | Added sales process detail, warm lead insight, rep onboarding flow, commission, dialer TBD, geo market, Stripe auto-link rule, training optional |
+| 2026-06-07 | Packages, team structure, niche profiles locked | Finalized 4 packages with setup fee, confirmed Nate as sole closer, Profile A only, ROI anchors |
