@@ -213,3 +213,47 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 **Commit:** `a050dc4` — 20 files changed, 466 insertions, 264 deletions
 **Build:** `✓ 1.05s` — zero errors
 **Status:** Complete — deployed via git push → Vercel auto-deploy
+
+---
+
+## 2026-06-08 | Closer Dashboard + Auto-Provisioning + Client Portal
+
+**Task:** AI recommendation engine, mark-closed workflow, auto-agent build, client PWA
+
+**New Edge Functions:**
+- `recommend-stack` — rich AI recommendation (headline, roi_argument, pain_points, why_pitch_this, talking_points, pushback_response, upsell_path) — uses `claude-sonnet-4-6`
+- `provision-client` — fires on close: creates `clients` + `onboarding` records, fires admin notification
+- `build-agent` — Retell agent creation + Twilio number purchase (graceful stub if keys not set)
+
+**New DB tables:** `clients`, `onboarding`, `notifications` (migration 012)
+
+**New repo:** `ohvara-client-portal` — Vite React PWA, mobile-first dark design
+- Onboarding flow: one question at a time, type-aware inputs, fires build-agent on submit
+- Portal home: AI number display, KPI stats, tier-gated features
+
+**New components:** `NotificationBell`, `useNotifications` hook
+
+**Flow:** Closer reviews AI recommendation → clicks Mark Closed → `provision-client` fires → onboarding URL generated → client fills form → `build-agent` fires → Retell agent + Twilio number provisioned → admin notified
+
+**Lessons:**
+- One question at a time on mobile onboarding — never show a long form. The `type-aware` input pattern (select → radio cards, textarea → resizable, phone → tel input) is correct on mobile.
+- `recommend-stack` is a separate function from `generate-ai-script` — clean separation: scripts/briefings stay in generate-ai-script, sales intelligence lives in recommend-stack.
+- `provision-client` uses the SERVICE_ROLE_KEY — never the anon key — for cross-table writes. Always check this before deploying.
+- `build-agent` gracefully skips Retell/Twilio if keys not set — never throw on missing optional integrations.
+- Notification bell: 15s polling is fine for a small team. Use `refetchInterval` on the query, not a manual `setInterval`.
+- Client portal repo: `gh` CLI not installed in Claude Code env — must push manually: `git remote add origin ... && git push -u origin main`.
+
+**Packages used in recommend-stack:** Basic $497/mo, Pro $797/mo, Premium $1,297/mo, Elite $1,797/mo + $497 setup on all
+**Model used:** `claude-sonnet-4-6` (NOT `claude-sonnet-4-20250514` which was in the task spec — date suffixes are wrong)
+
+**Commits:**
+- Dashboard: `0c98040` — 8 files, 1365 insertions
+- Client portal: initial commit (local only — push manually)
+
+**Deploy pending:**
+- Run migration 012 in Supabase SQL editor
+- Create GitHub repo `BFreeOhvara/ohvara-client-portal` and push
+- Set `CLIENT_PORTAL_URL` in Supabase Edge Function secrets
+- Set `RETELL_API_KEY`, `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` when ready
+
+**Status:** Dashboard complete and deployed via Vercel. Client portal built, awaiting GitHub push + Vercel setup.
