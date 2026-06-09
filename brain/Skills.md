@@ -108,11 +108,21 @@ Subagents run in isolated context windows via `.claude/agents/`. They don't poll
 
 ## Project Skills
 
-Reusable skill files for specific project domains. Located in `skills/`.
+Reusable skill files for Ohvara-specific domains. Located in `skills/`. Full index → [[skills/Index]].
 
 | Skill | File | Purpose |
 |-------|------|---------|
-| Premium Animated UI | [[premium-ui-animations]] | Glass morphism, animated orbs, countup KPIs, staggered rows — full dark UI system for Ohvara dashboard |
+| Rep Call Script | [[rep-call-script]] | Profile A question-based scripts, pain surfacing, booking |
+| Stripe Payments | [[stripe-payments]] | Two links per close: setup fee ($497) + monthly sub |
+| Auto Knowledge Capture | [[auto-knowledge-capture]] | Scan sessions for decisions, auto-log to brain |
+| UI Animations | [[ui-animations]] | Glass morphism, animated orbs, countup KPIs, staggered rows |
+| Claude Mastery | [[claude-mastery]] | 6-level framework, traps to avoid, "less is more" rule |
+| Claude Agents | [[claude-agents]] | 147-agent library — install sales-deal-strategist |
+| Claude Mem | [[claude-mem]] | Automatic memory compression — evaluate as upgrade |
+| Stitch MCP Workflow | [[stitch-mcp-workflow]] | Google Stitch → MCP → Claude Code for UI sessions |
+| Claude Repos Top 10 | [[claude-repos-top10]] | Top 10 GitHub repos for Claude Code |
+| Claude 10x Tools | [[claude-10x-tools]] | Top tools from @chase.h.ai Part 1 |
+| Social Media Research | [[social-media-research]] | Apify MCP + TribeV2 + Modal GPU (Phase 2–3) |
 
 ## Semantic Search (QMD)
 

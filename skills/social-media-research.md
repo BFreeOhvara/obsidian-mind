@@ -154,6 +154,6 @@ Focus is outreach + sales machine. Don't install Apify or TribeV2 yet.
 ## Related
 
 - [[North Star]] — Phase 2–3 roadmap, web agency vertical
-- [[google-stitch-mcp-workflow]] — another design/content tool for when Phase 1 is running
-- [[claude-code-mastery-levels]] — Level 4 (Integrator) tool — surgical MCP selection applies here
+- [[stitch-mcp-workflow]] — another design/content tool for when Phase 1 is running
+- [[claude-mastery]] — Level 4 (Integrator) tool — surgical MCP selection applies here
 - [[skills/Index]] — check skill count before adding Apify MCP (stay under 30)

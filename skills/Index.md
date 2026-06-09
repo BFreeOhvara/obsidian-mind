@@ -22,9 +22,9 @@ These are purpose-built for Ohvara operations.
 | Skill | Category | What It Does | Status |
 |-------|----------|-------------|--------|
 | [[rep-call-script]] | AI / Sales | Generate Profile A niche-aware call scripts — surface pain, book discovery call | ✅ Active |
-| [[stripe-payment-links]] | Payments | Generate two Stripe links per close (setup fee + monthly) | ✅ Active |
+| [[stripe-payments]] | Payments | Generate two Stripe links per close (setup fee + monthly) | ✅ Active |
 | [[auto-knowledge-capture]] | Memory | Scan sessions for decisions and auto-log to brain at session end | ✅ Active |
-| [[premium-ui-animations]] | UI / Design | Glass morphism, animated orbs, counting KPIs, staggered animations | ✅ Active |
+| [[ui-animations]] | UI / Design | Glass morphism, animated orbs, counting KPIs, staggered animations | ✅ Active |
 
 ---
 
@@ -34,13 +34,13 @@ Reference guides and tools for improving Claude Code workflows.
 
 | Skill | Category | What It Does | Status |
 |-------|----------|-------------|--------|
-| [[top-10-claude-github-repos]] | Reference | 10 most impactful GitHub repos for Claude Code — Ohvara status on each | ✅ Reference |
-| [[10x-claude-code-part1]] | Reference | Top 5 tools from @chase.h.ai Part 1 — Codex plugin, obsidian-skills, autoresearch, skill-creator, notebooklm-py | ✅ Reference |
-| [[claude-code-mastery-levels]] | Framework | 6-level mastery framework — where Ohvara sits, traps to avoid, "less is more" rule | ✅ Reference |
-| [[claude-specialist-agents]] | Agents | 147-agent library (wshobson/agents) — install sales-deal-strategist for closer flow | 🔲 Install needed |
-| [[claude-mem-memory]] | Memory | Automatic persistent memory compression — evaluate as Memories.md upgrade | 🔲 Evaluate |
-| [[google-stitch-mcp-workflow]] | Design | Google Stitch → MCP → Claude Code — higher fidelity than DESIGN.md alone | 🔲 Try next UI session |
-| [[social-media-neuroscientist]] | Research / Content | Apify MCP + TribeV2 brain model + Modal GPU — neuroscience content analysis | 🔜 Phase 2–3 |
+| [[claude-repos-top10]] | Reference | 10 most impactful GitHub repos for Claude Code — Ohvara status on each | ✅ Reference |
+| [[claude-10x-tools]] | Reference | Top 5 tools from @chase.h.ai Part 1 — Codex plugin, obsidian-skills, autoresearch, skill-creator, notebooklm-py | ✅ Reference |
+| [[claude-mastery]] | Framework | 6-level mastery framework — where Ohvara sits, traps to avoid, "less is more" rule | ✅ Reference |
+| [[claude-agents]] | Agents | 147-agent library (wshobson/agents) — install sales-deal-strategist for closer flow | 🔲 Install needed |
+| [[claude-mem]] | Memory | Automatic persistent memory compression — evaluate as Memories.md upgrade | 🔲 Evaluate |
+| [[stitch-mcp-workflow]] | Design | Google Stitch → MCP → Claude Code — higher fidelity than DESIGN.md alone | 🔲 Try next UI session |
+| [[social-media-research]] | Research / Content | Apify MCP + TribeV2 brain model + Modal GPU — neuroscience content analysis | 🔜 Phase 2–3 |
 
 ---
 

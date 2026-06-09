@@ -84,7 +84,7 @@ Always display alongside the script:
 ## Related
 
 - [[North Star]] — two-call close sales process, Profile A definition
-- [[stripe-payment-links]] — downstream closer flow after rep books the call
+- [[stripe-payments]] — downstream closer flow after rep books the call
 - [[ohvara-dashboard]] — slide-out script panel UI implementation
 
 ## Verified Working

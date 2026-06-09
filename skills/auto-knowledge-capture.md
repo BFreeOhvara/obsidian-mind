@@ -59,7 +59,7 @@ BUSINESS CONTEXT    → brain/North Star.md
 TECHNICAL LESSON    → brain/Memories.md + relevant skill file
 NEW SKILL PATTERN   → skills/[skill-name].md
 TEAM/PROCESS CHANGE → brain/North Star.md
-PRODUCT/PRICING     → brain/North Star.md + stripe-payment-links skill
+PRODUCT/PRICING     → brain/North Star.md + stripe-payments skill
 RULED OUT           → brain/Memories.md (prevents re-suggesting bad ideas)
 ```
 
@@ -83,7 +83,7 @@ Append to `brain/Memories.md`:
 
 Don't just log to Memories — update the actual source-of-truth files:
 
-- Pricing changed → update North Star AND stripe-payment-links skill
+- Pricing changed → update North Star AND stripe-payments skill
 - Process changed → update North Star
 - Technical pattern → update or create skill file
 - Ruled out → add to Memories AND add "never do this" to CLAUDE.md if technical
@@ -147,7 +147,7 @@ Don't just log to Memories — update the actual source-of-truth files:
 - Elite at $1,997 — crosses $2K psychological barrier
 - Elite at $1,597 — too close to Premium, weakens upsell
 - Locking to specific niches — language profiles are the right frame
-**Files updated:** North Star.md, Memories.md, rep-call-script.md, stripe-payment-links.md
+**Files updated:** North Star.md, Memories.md, rep-call-script.md, stripe-payments.md
 ```
 
 ---
@@ -163,7 +163,7 @@ Don't just log to Memories — update the actual source-of-truth files:
 
 - [[North Star]] — primary source-of-truth for business context
 - [[Memories]] — session log and hard-won lessons
-- [[stripe-payment-links]] — pricing source file
+- [[stripe-payments]] — pricing source file
 - [[rep-call-script]] — sales process source file
 
 ## Verified Working

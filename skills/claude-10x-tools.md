@@ -128,7 +128,7 @@ Search their profile for "10X Claude Code Part 2" and download it the same way.
 
 ## Related
 
-- [[top-10-claude-github-repos]] — companion reference from @raycfu
+- [[claude-repos-top10]] — companion reference from @raycfu
 - [[auto-knowledge-capture]] — our version of the skill-creator concept
 - [[North Star]] — Ohvara infrastructure decisions
 - [[Memories]] — session log

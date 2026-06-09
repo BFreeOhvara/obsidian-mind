@@ -82,7 +82,7 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 - AI scripts must always be question-based and pain-surfacing. Never a pitch on the rep call.
 - Stripe link must be auto-generated when closer marks a recommendation.
 
-**Skills created:** [[stripe-payment-links]], [[rep-call-script]]
+**Skills created:** [[stripe-payments]], [[rep-call-script]]
 **Status:** Complete
 
 ### 2026-06-08 | World Class Overhaul + In-Dashboard Scrapers
@@ -151,10 +151,10 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 ## 2026-06-07 | Instagram Video Batch — 5 Videos Processed
 
 **Videos analyzed:**
-1. Google Stitch MCP export workflow — use MCP not DESIGN.md alone for UI sessions → [[google-stitch-mcp-workflow]]
-2. 6 Levels Claude Code mastery — we're at Level 3–4, target Level 5 → [[claude-code-mastery-levels]]
-3. 147 specialist agents — install `sales-deal-strategist` immediately → [[claude-specialist-agents]]
-4. Claude-Mem — automatic memory compression, evaluate as upgrade → [[claude-mem-memory]]
+1. Google Stitch MCP export workflow — use MCP not DESIGN.md alone for UI sessions → [[stitch-mcp-workflow]]
+2. 6 Levels Claude Code mastery — we're at Level 3–4, target Level 5 → [[claude-mastery]]
+3. 147 specialist agents — install `sales-deal-strategist` immediately → [[claude-agents]]
+4. Claude-Mem — automatic memory compression, evaluate as upgrade → [[claude-mem]]
 5. Anthropic staff engineer CLAUDE.md — Rule 1: always plan, never skip tests
 
 **Key insight from all 5 videos:**

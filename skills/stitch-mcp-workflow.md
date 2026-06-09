@@ -90,4 +90,4 @@ Not yet used — flagged for next dashboard UI session.
 
 - [[DESIGN]] — design token rules, anti-rules (still applies alongside Stitch)
 - [[North Star]] — dashboard as #1 priority
-- [[top-10-claude-github-repos]] — companion tool reference
+- [[claude-repos-top10]] — companion tool reference

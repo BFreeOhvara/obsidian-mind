@@ -90,4 +90,4 @@ npm install -g claude-mem
 
 - [[auto-knowledge-capture]] — our current memory skill (manual, end-of-session)
 - [[Memories]] — the vault's memory file
-- [[claude-code-mastery-levels]] — memory is a Level 3 skill (Context Engineering)
+- [[claude-mastery]] — memory is a Level 3 skill (Context Engineering)

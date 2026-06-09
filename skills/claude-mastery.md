@@ -110,6 +110,6 @@ Progress toward Level 5:
 ## Related
 
 - [[auto-knowledge-capture]] — our Level 5 skill system
-- [[top-10-claude-github-repos]] — tool selection (Level 4 material)
-- [[10x-claude-code-part1]] — companion video series
+- [[claude-repos-top10]] — tool selection (Level 4 material)
+- [[claude-10x-tools]] — companion video series
 - [[North Star]] — CLAUDE.md rules and session protocols

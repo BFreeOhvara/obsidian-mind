@@ -13,10 +13,10 @@ status: active
 
 ## Active Projects
 
-- [[ohvara-dashboard]] — Main outreach dashboard (React + Supabase + Vercel)
-- [[indeed-scraper]] — Lead generation pipeline (primary source, 150+ leads/day target)
-- [[google-maps-scraper]] — Fallback lead source (active at `Desktop/Scraper`)
-- [[retell-agents]] — AI receptionist/dispatcher builds
+- **ohvara-dashboard** — Main outreach dashboard (React + Supabase + Vercel) — `github.com/BFreeOhvara/ohvara-dashboard`
+- **indeed-scraper** — Lead generation pipeline (primary source, 150+ leads/day target) — Edge Functions inside dashboard repo
+- **google-maps-scraper** — Fallback lead source — `github.com/BFreeOhvara/Scraper` (active at `Desktop/Scraper`)
+- **Retell AI** — AI receptionist/dispatcher (Phase 1, active)
 
 ## Quick Links
 

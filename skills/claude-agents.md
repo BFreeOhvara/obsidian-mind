@@ -92,13 +92,13 @@ After installation, the sales-deal-strategist agent will be available in every C
 ## Notes
 
 - Repo: https://github.com/wshobson/agents
-- Same repo referenced in [[top-10-claude-github-repos]] (#8 — wshobson/agents)
-- Level 4 tool per the [[claude-code-mastery-levels]] framework — be surgical, only install what you'll use
+- Same repo referenced in [[claude-repos-top10]] (#8 — wshobson/agents)
+- Level 4 tool per the [[claude-mastery]] framework — be surgical, only install what you'll use
 
 ---
 
 ## Related
 
-- [[top-10-claude-github-repos]] — same repo, different angle
-- [[claude-code-mastery-levels]] — agent use is Level 4 (Integrator)
+- [[claude-repos-top10]] — same repo, different angle
+- [[claude-mastery]] — agent use is Level 4 (Integrator)
 - [[North Star]] — closer dashboard AI recommendation flow
