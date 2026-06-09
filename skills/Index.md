@@ -40,6 +40,7 @@ Reference guides and tools for improving Claude Code workflows.
 | [[claude-specialist-agents]] | Agents | 147-agent library (wshobson/agents) — install sales-deal-strategist for closer flow | 🔲 Install needed |
 | [[claude-mem-memory]] | Memory | Automatic persistent memory compression — evaluate as Memories.md upgrade | 🔲 Evaluate |
 | [[google-stitch-mcp-workflow]] | Design | Google Stitch → MCP → Claude Code — higher fidelity than DESIGN.md alone | 🔲 Try next UI session |
+| [[social-media-neuroscientist]] | Research / Content | Apify MCP + TribeV2 brain model + Modal GPU — neuroscience content analysis | 🔜 Phase 2–3 |
 
 ---
 
@@ -52,6 +53,7 @@ Reference guides and tools for improving Claude Code workflows.
 | 🔲 Install needed | Documented, action required |
 | 🔲 Evaluate | Needs evaluation before adopting |
 | 🔲 Try next session | Ready to try, not yet used |
+| 🔜 Phase 2–3 | Documented now, install when phase begins |
 
 ---
 
