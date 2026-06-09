@@ -432,3 +432,25 @@ ETH Zurich study: LLM-generated context files made agents **worse** in 5/8 setti
 **Top lesson:** Anthropic credits depleted breaks recommend-stack (no fallback) but NOT generate-ai-script (has 3-layer fallback). Always add fallbacks to AI-powered edge functions. Credits at console.anthropic.com.
 
 **Status:** Complete — vault synced
+
+---
+
+## 2026-06-09 | Brain Janitor — Vault Cleanup
+
+**Task:** Full vault cleanup — rename skills, fix all references, trim CLAUDE.md, add media index
+
+**What was done:**
+- Renamed 9 skills files to shorter, consistent names (e.g., `10x-claude-code-part1` → `claude-10x-tools`)
+- Fixed all 26 stale wikilink references across 9 files
+- Trimmed vault CLAUDE.md from 387 lines to 63 lines (lean Ohvara-specific version)
+- Expanded `brain/Skills.md` Project Skills section to list all 11 skills + pointer to `skills/Index`
+- Fixed 4 broken wikilinks in `work/Ohvara.md` (replaced with plain repo refs — no stub notes created)
+- Created `media/index.md` with video inventory table (8 videos → 7 skills extracted)
+- Deleted 4 stray root files: `2026-06-08.md`, `Untitled.canvas`, `ohvara-dashboard.md`, `retell-agents.md`
+- Committed and pushed: `ae188dd`
+
+**Root cause of CRLF noise:** `sed -i` on Windows Git Bash converts LF → CRLF on every touched file. Fix: restored unintended files with `git checkout --` before staging.
+
+**Lesson:** Bulk sed on all `*.md` is safe on Linux/Mac but triggers CRLF conversion on Windows. Scope sed to specific files or restore non-target files before committing.
+
+**Status:** Complete. Vault is clean, all refs valid.
