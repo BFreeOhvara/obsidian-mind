@@ -9,11 +9,29 @@ External brain for **Ohvara** — SMB automation business. This file loads on to
 3. Read [[DESIGN]] if touching any UI
 4. State what's relevant before writing code
 
+### Token Awareness Check
+Count approximate exchanges so far. If 15+:
+State: "⚠️ This chat is getting long — consider a fresh chat after this task for better performance."
+
 ## Session End
 
 1. Append entry to [[Memories]] Session Log: date, task, what broke, root cause, fix, lesson, status
 2. Update [[work/Ohvara]] index if new notes were created
 3. Never end without logging — partial logs beat no logs
+
+### Auto-Handoff (runs when session is long OR switching chats)
+Before closing any session that covered 3+ topics OR when Brayden says "new chat":
+1. Write handoff entry to [[Memories]] with exact resume prompt
+2. Commit and push vault
+3. Tell Brayden: "Handoff saved. Start new chat and paste: `Read brain/Memories.md and North Star.md — continuing Ohvara work`"
+
+## Token Efficiency Rules
+
+- Answer first, explain only if needed
+- No filler phrases or restating what Brayden said
+- Create files for anything over 50 lines — never paste in chat
+- Keep confirmations to one line
+- Never summarize decisions back to Brayden — he knows
 
 ## Rules
 

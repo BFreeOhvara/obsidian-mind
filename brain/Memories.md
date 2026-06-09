@@ -454,3 +454,67 @@ ETH Zurich study: LLM-generated context files made agents **worse** in 5/8 setti
 **Lesson:** Bulk sed on all `*.md` is safe on Linux/Mac but triggers CRLF conversion on Windows. Scope sed to specific files or restore non-target files before committing.
 
 **Status:** Complete. Vault is clean, all refs valid.
+
+---
+
+## 2026-06-07 | Session Handoff — Optimization Hub Chat
+
+**Session length:** Very long — 200K+ tokens
+**Topics covered:**
+- Obsidian brain setup and vault organization
+- Dashboard full overhaul (UI, scrapers, auth)
+- Premium UI with glass morphism + animations
+- AI stack engine (4 tiers: Basic/Pro/Premium/Elite)
+- Package pricing finalized ($497/$797/$1,297/$1,797 + $497 setup)
+- Commission structure finalized
+- Rep training system (100 flashcards, 7 videos, voice roleplay)
+- Instagram video processing workflow established
+- 8+ Instagram videos processed into skill files
+- Call Now popup flow designed
+- Indeed job title targeting finalized (13 titles)
+- Question-based script rules finalized
+- Google Maps automated outreach planned
+- Auto-handoff skill created
+- Brain janitor skill created
+
+**Decisions made:**
+- Setter: 50% setup fee ($248/close)
+- Nate: 50% setup fee + 50% monthly recurring
+- Brayden: 0% setup fee + 50% monthly recurring
+- Only target 13 job titles that map to our stack
+- Scripts 100% question-based, never pitch on rep call
+- Call Now = popup modal, not new page
+- Google Maps leads = website + Basic AI bundle ($297 + $497/mo)
+- Profile A niches only for all outreach
+
+**Current state:**
+Dashboard at 15/24 features working per rep-readiness report.
+Rep can log in, see 150 leads, and call now. 4 broken items need
+API keys (Twilio, Retell). 5 partial items need quick fixes.
+Brain fully synced. All decisions documented.
+
+**Next priority:**
+Fix 4 broken + 5 partial dashboard items. Then test full rep flow end-to-end as apex11.
+
+**Blocked on:**
+- Anthropic credits (affects AI script quality)
+- RETELL_API_KEY (voice roleplay)
+- TWILIO_* secrets (SMS reminders)
+
+**Resume prompt:**
+Paste into new chat:
+"Read ~/obsidian-mind/brain/Memories.md and ~/obsidian-mind/brain/North Star.md before doing anything. I'm continuing Ohvara dashboard work.
+
+Current state: Dashboard 15/24 features working. Need to fix 4 broken + 5 partial items then test full rep onboarding flow.
+
+Fix these in dashboard Claude Code chat:
+1. Switch AI scripts to claude-haiku-4-5-20251001 (cheaper)
+2. Add fallback to AI stack analysis
+3. Fix daily batch cron to auto-run at 6am
+4. Add Coming Soon states for voice roleplay and SMS
+5. Replace placeholder YouTube IDs with real video searches
+6. Implement Call Now popup modal with script + Start Call button
+7. Update Indeed scraper to use only 13 approved job titles
+8. Rewrite scripts to be 100% question-based
+
+Then test full rep flow as apex11."
