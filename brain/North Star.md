@@ -114,9 +114,42 @@ Profile A — Trades & Field Services:
 
 ### Rep Commission
 
-- `$150`–`$250` per closed deal
 - Recruited via Facebook groups (posts + DMs) via Jahandad
 - 3–5 reps working Profile A simultaneously
+
+---
+
+## Commission Structure (FINAL)
+
+| Role | Setup Fee (`$497`) | Monthly Recurring |
+|------|-------------------|------------------|
+| Appointment Setter | 50% (`$248`) | 0% |
+| Nate (Closer) | 50% (`$248`) | 50% |
+| Brayden (Backend) | 0% | 50% |
+
+- Setter only paid on **closed deals** — not just bookings
+- Nate owns client relationship from close forward — handles all client questions and issues
+- Brayden owns all tech — income is 100% recurring, zero setup fee cut
+
+### Monthly Recurring Per Package
+
+| Package | Monthly | Brayden | Nate |
+|---------|---------|---------|------|
+| Basic | `$497` | `$248` | `$248` |
+| Pro | `$797` | `$398` | `$398` |
+| Premium | `$1,297` | `$648` | `$648` |
+| Elite | `$1,797` | `$898` | `$898` |
+
+### Full Payout Per Close (Pro — `$797/mo`)
+
+- Setup fee (`$497`): Setter `$248` + Nate `$248` + Brayden `$0`
+- Monthly recurring (`$797`): Brayden `$398` + Nate `$398` **forever**
+
+### At Scale — 20 Pro Clients
+
+- Brayden MRR: `$7,970/mo`
+- Nate MRR: `$7,970/mo` + setup fees on new closes
+- Setter at 3 closes/week: ~`$3,000/mo`
 
 ---
 

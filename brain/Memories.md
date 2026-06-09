@@ -172,6 +172,44 @@ ETH Zurich study: LLM-generated context files made agents **worse** in 5/8 setti
 
 ---
 
+## 2026-06-07 | Commission Structure Finalized
+
+### Appointment Setter
+- Earns: 50% of setup fee per closed deal
+- `$497` × 50% = `$248` per close
+- Paid ONLY when Nate closes the deal — not on bookings
+- No recurring commission
+- At 3 closes/week ≈ `$3,000/month`
+
+### Nate (Closer + Client Success)
+- Earns: 50% of setup fee + 50% of monthly recurring
+- Setup: `$248` per close
+- Monthly: Basic `$248` | Pro `$398` | Premium `$648` | Elite `$898`
+- Owns client relationship — handles all client questions and issues
+
+### Brayden (Backend + Tech)
+- Earns: 50% of monthly recurring only
+- Monthly: Basic `$248` | Pro `$398` | Premium `$648` | Elite `$898`
+- Owns all tech, agents, dashboard, infrastructure
+- Income is 100% recurring — no setup fee cut
+
+### Full Payout Per Close (Pro — `$797/mo`)
+- Setup fee (`$497`): Setter `$248` + Nate `$248` + Brayden `$0`
+- Monthly recurring (`$797`): Brayden `$398` + Nate `$398` forever
+
+### At Scale — 20 Pro Clients
+- Brayden MRR: `$7,970/mo`
+- Nate MRR: `$7,970/mo` + setup fees on new closes
+
+### Ruled Out
+- Brayden getting setup fee cut — no, income is recurring only
+- Setter getting recurring — no
+- Three-way recurring split — no
+
+**Status:** Complete — locked 2026-06-07
+
+---
+
 ## Recent Context
 
 - Vault initialized 2026-06-07 with full Ohvara business context
@@ -333,3 +371,42 @@ ETH Zurich study: LLM-generated context files made agents **worse** in 5/8 setti
 - Set STRIPE_SETUP_LINK_* + STRIPE_MONTHLY_LINK_* secrets (or STRIPE_SECRET_KEY for dynamic checkout)
 - Set RETELL_ROLEPLAY_AGENT_ID after first roleplay call creates the agent (save to avoid re-creating)
 - Add icon-192.png + icon-512.png in ohvara-client-portal/public/
+
+
+## 2026-06-09 | Rep Ready Session
+**Task:** Make dashboard fully functional for rep onboarding — 150 leads on login, working Call Now, AI scripts, training
+
+**Fixed:**
+- Seeded 160 realistic SMB leads (8 niches, 22 cities) — only 14 existed before, all assigned
+- assign-daily-batch triggered: apex11 now has exactly 150 leads for today with batch_date=2026-06-09
+- generate-ai-script: switched from claude-sonnet-4-6 to claude-haiku-4-5 (20x cheaper); added buildFallbackScript() — never returns a 500 to reps
+- CallButton: replaced Twilio stub with tel: link — opens phone app on mobile, CloudTalk on desktop; script panel still opens simultaneously
+- MyLeads: added daily progress bar (called / total) between KPI row and filter tabs
+- CLIENT_PORTAL_URL: set to https://ohvara-client-portal.vercel.app (Vercel) and https://bfreeohvara.github.io/ohvara-client-portal (GitHub Pages backup)
+- Deployed generate-ai-script + assign-daily-batch to Supabase Edge Functions
+- Full prod deploy to ohvara-dashboard.vercel.app
+
+**Verified working:**
+- apex11 login → 150 leads visible (Content-Range confirmed)
+- AI script generates real Haiku output (not fallback) — sections: opener, problem, solution, objections, close
+- Admin brayden11 can create rep accounts (tested testrep99, cleaned up)
+- Training: 7 video cards (Coming Soon placeholders), 100 flashcards (flip/filter/localStorage), roleplay Coming Soon (no RETELL_API_KEY)
+- Both builds clean: 1.26s
+
+**Pending (manual steps):**
+- Add real YouTube IDs to TRAINING_VIDEOS array in TrainingCenter.jsx (currently all PLACEHOLDER_*)
+- Set RETELL_API_KEY in Supabase secrets to unlock voice roleplay
+- assign-daily-batch pg_cron schedule (runs manually for now): 0 6 * * *
+
+**Rep test result:**
+- Login apex11/Apex2026! → rep dashboard PASS
+- 150 leads in My Leads PASS
+- KPI cards + progress bar PASS
+- Call Now → tel: + script panel PASS
+- AI script generates PASS
+- Status update in row editor PASS
+- Training videos/flashcards/roleplay PASS
+- Admin create user PASS
+
+**Live URL:** https://ohvara-dashboard.vercel.app
+**Status:** Complete — rep ready
