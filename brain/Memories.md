@@ -148,6 +148,30 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ---
 
+## 2026-06-07 | Instagram Video Batch — 5 Videos Processed
+
+**Videos analyzed:**
+1. Google Stitch MCP export workflow — use MCP not DESIGN.md alone for UI sessions → [[google-stitch-mcp-workflow]]
+2. 6 Levels Claude Code mastery — we're at Level 3–4, target Level 5 → [[claude-code-mastery-levels]]
+3. 147 specialist agents — install `sales-deal-strategist` immediately → [[claude-specialist-agents]]
+4. Claude-Mem — automatic memory compression, evaluate as upgrade → [[claude-mem-memory]]
+5. Anthropic staff engineer CLAUDE.md — Rule 1: always plan, never skip tests
+
+**Key insight from all 5 videos:**
+Less is more. Bloated CLAUDE.md, too many MCPs, too many skills all hurt performance.
+20–30 curated skills beats 1,000 generic. Audit vault periodically.
+ETH Zurich study: LLM-generated context files made agents **worse** in 5/8 settings.
+
+**Immediate actions:**
+- Audit `CLAUDE.md` for bloat (ETH Zurich trap)
+- Install `wshobson/agents` `sales-deal-strategist.md`
+- Evaluate claude-mem
+- Use Stitch MCP export for next UI session
+
+**Status:** Skills created, not yet acted on
+
+---
+
 ## Recent Context
 
 - Vault initialized 2026-06-07 with full Ohvara business context
@@ -257,3 +281,55 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 - Set `RETELL_API_KEY`, `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` when ready
 
 **Status:** Dashboard complete and deployed via Vercel. Client portal built, awaiting GitHub push + Vercel setup.
+
+---
+
+## 2026-06-08 | Full Audit + Training System
+
+**Task:** System audit (all features pass/fail), Training Center build, audit failure fixes
+
+**Audit Results:**
+- ✅ Auth & routing, all role protections, logout — all pass
+- ✅ Rep dashboard: lead table, KPI cards, filter tabs, script panel — all pass
+- ✅ Admin dashboard: KPI row, rep table, bookings feed, users page — all pass
+- ✅ Closer dashboard: AppointmentCard, AI recommendation, provision-client, Stripe links — all pass
+- ❌ FIXED: jordan22/nate44/apex11 seed accounts missing → migration 013 added
+- ❌ FIXED: Admin Overview no charts → recharts AreaChart (7-day trend) + BarChart (pipeline)
+- ❌ FIXED: `generate-stripe-links` Edge Function called but didn't exist → built + deployed
+- ✅ Client portal confirmed exists at ohvara-client-portal (audit agent was wrong)
+
+**Training Center (TrainingCenter.jsx full rewrite):**
+- Tab 1 Videos: 7 video cards in 3-col responsive grid, YouTube embed modal, localStorage completion
+- Tab 2 Flashcards: 100-card deck with CSS perspective flip, 4 category filters, shuffle, mastered tracking
+- Tab 3 AI Roleplay: Retell Web SDK + `create-roleplay-call` edge function, live transcript, Claude scoring
+
+**New Edge Functions (deployed):**
+- `generate-stripe-links` — env-var payment links OR dynamic Stripe checkout sessions
+- `create-roleplay-call` — Retell v2 web call, HVAC owner persona (Mike, Dallas)
+- `score-roleplay` — Claude sonnet-4-6 post-call scoring, 5 axes, 12-point scale
+
+**Flashcard breakdown:** 35 objection handling (IDs 1–35), 35 scripts/openers (36–70), 30 product knowledge (71–100)
+
+**Roleplay persona:** Mike Johnson, HVAC owner Dallas, 4-person crew, gruff but genuine pain. Throws 1 objection. Scores rep inline at call end.
+
+**Lessons:**
+- RetellWebClient should be stored in a `useRef` — never re-created on re-render
+- `call_ended` event fires automatically when prospect hangs up — no need to poll
+- CSS perspective flip cards: `transform-style: preserve-3d` + `backface-visibility: hidden` — the back face needs `position: absolute` + `transform: rotateY(180deg)` to overlay the front
+- recharts in dark themes: pass hex/var() to `stroke`/`fill`, use custom `content={<ChartTooltip />}` to match design system, `CartesianGrid strokeDasharray="3 3"` with low opacity
+- `retell-client-js-sdk` npm package name is exact — installs clean, dynamic import works fine in Vite
+
+**Packages added:** recharts, retell-client-js-sdk
+
+**Commit:** `fa686c6` — 10 files, 2858 insertions
+
+**Status:** Complete and deployed via Vercel auto-deploy.
+
+**Remaining manual steps (unchanged from prior session):**
+- Run migration 012 in Supabase SQL editor (clients/onboarding/notifications tables)
+- Run migration 013 in Supabase SQL editor (jordan22/nate44/apex11 seed accounts)
+- Create BFreeOhvara/ohvara-client-portal GitHub repo and push
+- Set RETELL_API_KEY, TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, CLIENT_PORTAL_URL in Supabase secrets
+- Set STRIPE_SETUP_LINK_* + STRIPE_MONTHLY_LINK_* secrets (or STRIPE_SECRET_KEY for dynamic checkout)
+- Set RETELL_ROLEPLAY_AGENT_ID after first roleplay call creates the agent (save to avoid re-creating)
+- Add icon-192.png + icon-512.png in ohvara-client-portal/public/
