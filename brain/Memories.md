@@ -410,3 +410,25 @@ ETH Zurich study: LLM-generated context files made agents **worse** in 5/8 setti
 
 **Live URL:** https://ohvara-dashboard.vercel.app
 **Status:** Complete — rep ready
+
+
+## 2026-06-09 | Full Brain Sync
+**Task:** Full codebase audit → build ohvara-dashboard.md knowledge doc → commit vault
+
+**Audit findings:**
+- 13 migrations: 001–013, all correct, 012+013 add clients table and closer/rep seed accounts
+- 17 edge functions: all ACTIVE; recommend-stack returns 500 (Anthropic credits depleted); generate-ai-script returns fallback silently
+- Root cause of recommend-stack 500: `"Your credit balance is too low"` from Anthropic API — not a code bug
+- generate-ai-script triple-layer fallback works: credits depleted → returns template script, never 500s to reps
+- DB counts: leads=224, profiles=4, appointments=1, calls=8, clients=0
+- Secrets: ANTHROPIC_API_KEY set but credits empty; RETELL/TWILIO/STRIPE_SECRET_KEY missing
+- All 4 login tests passed: brayden11, apex11, jordan22, nate44
+- 15 features working / 4 broken / 5 partial
+- Training: 100 flashcards working; 7 video cards render (PLACEHOLDER_* IDs); roleplay needs RETELL_API_KEY
+- Twilio: STUB_MODE=true in twilio.js, Call Now bypasses via tel: link — correct
+
+**Created:** work/active/ohvara-dashboard.md — full architecture/schema/function/feature-status brain doc
+
+**Top lesson:** Anthropic credits depleted breaks recommend-stack (no fallback) but NOT generate-ai-script (has 3-layer fallback). Always add fallbacks to AI-powered edge functions. Credits at console.anthropic.com.
+
+**Status:** Complete — vault synced
