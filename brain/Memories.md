@@ -518,3 +518,59 @@ Fix these in dashboard Claude Code chat:
 8. Rewrite scripts to be 100% question-based
 
 Then test full rep flow as apex11."
+
+---
+
+## 2026-06-09 | Full Operational Readiness
+
+**Task:** Make all 24 dashboard features work end-to-end
+
+**Architecture changes:**
+
+### Secrets Infrastructure
+- `secrets` table: AES-256-GCM encrypted, admin-only RLS, audit_log jsonb
+- `fetch-secrets` edge function: GET → `{capabilities}` for all users, `{capabilities, secrets[]}` for admin; POST/DELETE admin-only secret management; raw keys never sent to client
+- `SecretsContext.jsx`: wraps entire app (inside `<AuthProvider>`), exposes `useCapability(key)` hook
+- Capability flags: `has_anthropic`, `has_retell`, `has_twilio`, `has_stripe`, `has_google_maps`, `has_indeed`
+
+### Call Tracking
+- Migration 014: `calls` table gets `call_outcome`, `call_notes`, `recording_url`, `retell_call_id`, `updated_at`
+- `call_outcome` enum: interested/not_interested/callback/no_answer/voicemail
+- RLS: reps see own calls, closers/admin see all
+
+### CallModal (replaces direct tel: link)
+- Phase flow: `pre` → `dialing` → `post` → `done`
+- Pre: shows lead info + opener preview + optional Retell coach toggle
+- Post: outcome picker + notes textarea → saves to `calls` table
+- `CallButton.jsx` now just opens CallModal, no DB writes of its own
+
+### Commission Tracking
+- `commissions` table: recipient_id, commission_type (setup/recurring), tier, amount, status (pending/approved/paid/voided)
+- RLS: recipient sees own, closers/admin see all
+- `Commissions.jsx`: per-rep expandable breakdown, generate-from-closed-deal flow, mark-paid button
+- Routes: `/admin/commissions` + `/closer/commissions` (same component)
+- Commission logic: Rep=50% setup ($248.50), Closer=50% setup + 50% recurring, Admin=0% setup + 50% recurring
+
+### Edge Functions
+- `recommend-stack`: now uses `claude-haiku-4-5` + inner try/catch → always returns fallback, never 500
+- `indeed-scraper`: added 13-title allowlist filter (isTitleAllowed + ALLOWED_JOB_TITLES constant)
+- `create-lead-call`: new — Retell web call with sales coach agent (not prospect persona)
+- All 4 deployed: fetch-secrets, create-lead-call, recommend-stack, indeed-scraper
+
+### TrainingCenter
+- 7 real YouTube IDs replacing PLACEHOLDER_* values
+
+**Commit:** `ef147ac` — 12 files, 1546 insertions
+
+**Manual steps still required:**
+1. Run migration 014 in Supabase SQL editor (`supabase/migrations/014_secrets_calls_commissions.sql`)
+2. Enable `pg_cron` extension in Supabase dashboard, then run commented cron SQL from migration 014
+3. Set `SECRETS_ENCRYPTION_KEY` in Supabase Edge Function secrets (any 32-char random string)
+4. Set `RETELL_API_KEY`, `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` in Supabase secrets
+5. Set `RETELL_COACH_AGENT_ID` after first create-lead-call creates the agent (prevents re-creation)
+
+**Lesson:** Never return 500 from AI-powered edge functions — always wrap `anthropic.messages.create()` in a try/catch with a meaningful fallback. Credits deplete silently and the rep's experience breaks.
+
+**Lesson:** Secrets → capabilities pattern is the right one. Never send API keys to the React client. `fetch-secrets` returns boolean flags only; raw keys stay in Edge Function env vars.
+
+**Status:** Complete — deployed to Vercel via master push
