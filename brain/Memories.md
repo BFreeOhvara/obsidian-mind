@@ -794,3 +794,32 @@ Next action: top up Anthropic credits, then set RETELL_API_KEY / TWILIO secrets 
 ## 2026-06-11 | Naming Convention — CC
 
 Brayden calls Claude Code **"CC"** — always recognize CC as referring to Claude Code in all future sessions.
+
+---
+
+## 2026-06-11 | Session Handoff — Wrap-Up Protocol v2 + CC Convention (Eagle)
+
+**Session length:** Short — 2 topics since last handoff
+**Topics covered:**
+- [[auto-handoff]] wrap-up protocol upgraded to two-output handoff: on "wrap up" → session log → commit/push Atlas → give (1) new CC session prompt + (2) context-load instruction — the new CC session's first job is to read Atlas and generate a clean Eagle chat context block (North Star summary, latest session log + blockers, [[ohvara-dashboard]] state, [[skills/Index]] routing table)
+- CC naming convention logged — Brayden says "CC" for Claude Code
+
+**Decisions made:**
+- Handoff now produces two outputs so the Eagle claude.ai chat and CC always start from identical Atlas state
+
+**Current state:**
+All vault changes committed and pushed through `96f3d46`. No dashboard code changes. Dashboard unchanged: rep-ready, call flow v2 live, self-healing daily batch cron live.
+
+**Blocked on (unchanged):**
+- Anthropic credits — AI script quality + recommend-stack
+- RETELL_API_KEY — voice roleplay + call coach
+- TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN — SMS reminders
+- INDEED_MCP_TOKEN — Indeed scraper
+
+**Resume prompt:**
+Paste into new CC session:
+"Read ~/obsidian-mind/brain/Memories.md and ~/obsidian-mind/brain/North Star.md before doing anything. I'm continuing Ohvara work.
+
+Current state: Eagle/Falcon/Atlas live, two-output wrap-up protocol active, dashboard rep-ready; blockers are the four missing API keys/credits.
+
+Next action: generate a clean Eagle chat context load from Atlas, then top up Anthropic credits and set RETELL_API_KEY / TWILIO secrets."
