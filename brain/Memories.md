@@ -866,3 +866,48 @@ Paste into new CC session:
 Current state: tool shelf stocked (Exa MCP + Firecrawl + own scrapers), context alarm + cc-prompt-format live, vault pushed through the 2026-06-11 evening handoff. Firecrawl auth may still be pending.
 
 Next action: clear the 4 blockers — take the API keys/credits as I paste them, set Supabase secrets, then run the full end-to-end rep test as apex11."
+
+---
+
+## 2026-06-11 (late) | Rep Dashboard v3 — Persistence, Live Stats, Real Training Videos
+
+**Task:** 7-item build: state persistence on tab switch, internal table scroll, dual note fields, New back in dropdown, modal close rules, real-time My Stats + chart, real YouTube IDs
+
+**Built (commit 89d8628 on master, migration 018 applied):**
+- sessionStorage persistence: My Leads filter + internal-table scroll position, My Stats period — all survive tab switches
+- Leads table scrolls inside a viewport-height container (page scrollHeight == viewport, zero page scroll)
+- CallModal: Pre-Call Notes (under Pain Points) + Call Notes (below Status), saved to separate columns on Done (leads.pre_call_notes added)
+- Dropdown order: New (blue) first, then Appointment Booked (green), No Answer (gray), Not Interested (red), Follow-Up (amber)
+- Click-outside disabled; X = discard, Done = save; Done disabled + "Select a status to finish" hint until a status is picked
+- My Stats live: every outcome logs a calls row (rep flow had stopped inserting calls after v2, freezing stats); ['stats'] invalidated on change; bookings counted from call outcomes not appointments; 7-day calls+bookings recharts bar chart with animations
+- Training videos: all 8 IDs are real now — found via web search, every ID validated through YouTube oEmbed (e.g. 30MPC for objections, Sell Better for tonality, live-call walkthrough by Pavlo, Connor Murray for numbers/discovery)
+
+**Verification:** Browser as apex11 — filter "New" + scrollTop 1500 restored after navigating to Training/Stats and back; click-outside did nothing; Done blocked until status picked then closed; Total Dials ticked 8→9 and Booked 1 (11.1%) immediately after booking a lead; chart rendered with Calls/Bookings legend. DB: pre_call_notes and notes saved as separate values, follow_up_at 2026-06-13T14:00Z + reason saved, calls rows logged with outcomes. Zero console errors, clean build.
+
+**Lesson:** innerText.indexOf('CALL NOTES') matches inside 'PRE-CALL NOTES' — substring assertions on UI text need exact-label matching (compare whole trimmed labels, not indexOf).
+
+**Lesson:** YouTube oEmbed (youtube.com/oembed?url=...watch?v=ID) is a free no-key way to verify a video ID is real and embeddable — returns title + channel, 404s on fakes. Validate every AI-searched video ID this way before shipping.
+
+**Status:** Complete — pushed to master, Vercel auto-deploy triggered
+
+---
+
+## 2026-06-11 | SESSION WRAP-UP — Full Rep Dashboard Build Day (Eagle)
+
+**Scope:** One continuous session, 2026-06-10 evening → 2026-06-11. Five build waves on ohvara-dashboard, all pushed to master, all verified in-browser as apex11 plus service-role DB checks. Detailed per-wave entries above; this is the consolidated record.
+
+**Commits (ohvara-dashboard, oldest→newest):**
+- f06124d — Rep dashboard overhaul: fixed 240px sidebar, Call Now modal with AI script, lead detail panel, Training Script tab, AI Roleplay coming-soon, migration 015 (Callback enum)
+- c490f53 — Modal portal fix (rowSlideIn fill-mode made rows containing blocks), Done bubbling fix, floating button removed, tab order Script-first, 8th video card
+- a37ecae — Redesign: detail sidebar deleted, single two-column Call Now modal (info+status left, color-coded AI script right)
+- 2e44abf — Migration 016: self-healing daily batch. assign_daily_batches() on pg_cron at 00:05 UTC (job 4) — fixed the recurring "apex11 has 0 leads" (batch_date never advanced past UTC midnight; hit two days running)
+- c6b5f65 — Call flow v2: row-click opens modal, 4 color-coded outcomes, No Answer re-queue (trigger stamps no_answer_at; pg_cron job 5 every 15 min flips 4h-old No Answers back to New, batch_date=today), Follow-Up scheduling, call notes, Indeed scraper 13 titles + hard Profile A niche filter (migration 017)
+- 89d8628 — v3: sessionStorage persistence (filter/scroll/period), leads table scrolls internally, Pre-Call Notes + Call Notes (migration 018), New back in dropdown (blue), click-outside disabled + Done gated on status selection, live My Stats (outcomes log calls rows; 7-day recharts bar chart), all 8 training videos now real oEmbed-verified YouTube IDs
+
+**Also fixed this session:** apex11 empty dashboard (twice — root-caused and permanently fixed by 016), brayden11 login (password reset via admin API; Ohvara2026!), .env.local created locally for dev (correct anon key — the one in .env.example is truncated/corrupt).
+
+**Production DB state:** migrations 001–018 applied. pg_cron jobs: daily-batch-assign (00:05 UTC daily), requeue-no-answer (*/15 min). lead_status enum now includes Callback, Appointment Booked, Follow-Up. leads has no_answer_at, follow_up_at, follow_up_notes, pre_call_notes. Unassigned lead pool: 0 (reps recycle their own leads via the cron fallback until scrapers run).
+
+**Verification stack used all day:** Claude Preview MCP against local Vite (DOM assertions; screenshots unusable — tool reloads into the auth spinner), service-role REST for DB truth, RLS-scoped logins for rep-eye views, one-off edge-function runners (SUPABASE_DB_URL) for DDL.
+
+**Status:** All waves complete and live. Handoff note generated for next instance (Falcon).
