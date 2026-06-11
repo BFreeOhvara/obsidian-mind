@@ -823,3 +823,46 @@ Paste into new CC session:
 Current state: Eagle/Falcon/Atlas live, two-output wrap-up protocol active, dashboard rep-ready; blockers are the four missing API keys/credits.
 
 Next action: generate a clean Eagle chat context load from Atlas, then top up Anthropic credits and set RETELL_API_KEY / TWILIO secrets."
+
+---
+
+## 2026-06-11 (evening) | Session Handoff — Tooling Sprint: Skills Reorg, Context Alarm, Exa, Firecrawl (Eagle + CC)
+
+**Session length:** Long — multiple workflow upgrades + two tool installs
+**Topics covered:**
+- Skills Index reorganized: Active (6 routed Phase 1 skills) / Dormant ([[skills/Index]] → `skills/dormant/` with Wake When column) / Pending Action ([[claude-agents]], [[claude-mem]]). Nothing deleted, all moves via git mv. Commit `f2f0694`.
+- Context alarm rule live in CC: canonical copy in `~/.claude/CLAUDE.md` (loads every session), mirror in [[auto-handoff]]. ~70% context → warning appended to EVERY message until "wrap up"; ~90% → critical escalation, no new large tasks.
+- [[cc-prompt-format]] skill created + routed: Eagle delivers every CC-bound prompt as a single clean artifact (prompt only, one per prompt, descriptive names). Rule travels inside every OHVARA CONTEXT LOAD block via the [[auto-handoff]] Thing 2 template.
+- Exa MCP installed at user scope in `~/.claude.json` (web_search_exa, web_search_advanced_exa, web_fetch_exa) — tools verified live after restart. [[company-research]] skill created + routed. Commit `85edacc`.
+- Firecrawl: plugin enabled (`firecrawl@claude-plugins-official` in `~/.claude/settings.json` enabledPlugins — commands appear after next CC restart); `firecrawl-cli` v1.19.6 installed globally. **Auth pending — Brayden's action.**
+- Scraper repo: pre-existing work shipped as PR #1 (BFreeOhvara/maps-scraper, branch add-google-maps-scraper) — Playwright Maps scraper + Indeed East docs. `.claude/` + `supabase/.temp/` gitignored.
+
+**Decisions made:**
+- Wrap-up always commits + pushes ALL repos — no uncommitted work left behind, ever (baked into [[auto-handoff]] + global CLAUDE.md).
+- Solo dev: ignore PR buttons, habit is commit-and-push.
+- Old chats (Eagle + CC) are deletable once work is committed and handoff has run — chats are scratch paper; Atlas + git are the memory.
+- Tool shelf is STOCKED (Exa = find, Firecrawl = extract, own scrapers = leads). No more tool collecting until the sales machine runs.
+- Fable 5 free on Pro until 2026-06-22, then burns usage credits — use for big builds before then; Sonnet/Opus for routine installs/config edits.
+- Dynamic workflows left ON — save for one big pre-launch dashboard audit; confirm-before-run protects against accidents.
+
+**Current state:**
+Vault pushed through `85edacc` (+ this entry). Dashboard unchanged: rep-ready, call flow v2 live, self-healing daily batch cron live. Both repos verified clean and in sync.
+
+**Open loops:**
+1. **Firecrawl auth (Brayden):** run `firecrawl login --browser` (or `--api-key` from firecrawl.dev/app/api-keys), tell CC "logged in" → CC runs `firecrawl --status`, adds Index row ("Scraping or crawling a website" → Firecrawl plugin, results save to `.firecrawl/`), commits, test-scrapes.
+2. **GitHub PAT lacks `workflow` scope:** four `.github/workflows/*.yml` in the vault can't push (intact on disk, untracked). Fix: regenerate PAT with workflow scope, update stored token, push.
+
+**Blocked on (unchanged — next session's ONLY agenda):**
+- Anthropic credits — console.anthropic.com → Billing
+- RETELL_API_KEY — retell.ai → API Keys
+- TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN (+ phone number) — console.twilio.com
+- INDEED_MCP_TOKEN
+Paste each key into CC → it sets them via `npx supabase secrets set --project-ref jjextitmbptoaolacocs`. Then: **full end-to-end rep test as apex11.**
+
+**Resume prompt:**
+Paste into new CC session:
+"Read ~/obsidian-mind/brain/Memories.md and ~/obsidian-mind/brain/North Star.md before doing anything. I'm continuing Ohvara work.
+
+Current state: tool shelf stocked (Exa MCP + Firecrawl + own scrapers), context alarm + cc-prompt-format live, vault pushed through the 2026-06-11 evening handoff. Firecrawl auth may still be pending.
+
+Next action: clear the 4 blockers — take the API keys/credits as I paste them, set Supabase secrets, then run the full end-to-end rep test as apex11."
