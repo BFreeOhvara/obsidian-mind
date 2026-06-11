@@ -966,3 +966,14 @@ Paste into new CC session:
 Current state: dashboard rep-ready through commit 89d8628 (call flow v3 + live stats + real training videos). Blockers verified live: Anthropic key set but credits empty; Retell/Twilio/Indeed secrets missing. Stripe MCP now available in CC.
 
 Next action: clear the 4 blockers — take the API keys/credits as I paste them, set Supabase secrets, then run the full end-to-end rep test as apex11."
+
+---
+
+## 2026-06-11 | Eagle Strategy Session — Indeed Title Expansion + Review Agent Strategy
+
+Eagle strategy session — expanded Indeed titles from 13 to 28 (full stack coverage), added review-agent standalone lead strategy to brain/strategy/.
+
+- `indeed-scraper` ALLOWED_JOB_TITLES: 13 → 28. Every stack product now has Indeed demand signals: review gen (titles 14-16), lead follow-up (17-18), appointment reminders (19-22), AI dispatcher variants for hotshot/towing/oilfield (23-26), SMS reactivation (27-28). Rationale kept as code comments. Deployed to production (verified 401-gated live) + pushed (ohvara-dashboard `05adefd`).
+- Created [[review-agent-leads]] (`brain/strategy/`): low-review/low-rating Profile A businesses are warm leads regardless of hiring; Maps scraper review-count filter is the Phase 2 lever — park until Vertical 1 has 5+ recurring clients.
+
+**Status:** Complete — both repos committed and pushed
