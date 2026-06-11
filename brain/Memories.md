@@ -609,3 +609,143 @@ Then test full rep flow as apex11."
 - Anthropic credits → recommend-stack uses fallback until topped up
 
 **Status:** Complete — infrastructure fully live in production
+
+---
+
+## 2026-06-10 | Rep Dashboard Overhaul + apex11/brayden11 Fixes
+
+**Task:** Fix two account regressions, then rebuild 5 rep dashboard features (fixed sidebar, Call Now modal, clickable lead rows, Script tab, AI Roleplay coming-soon)
+
+**Account fixes (morning):**
+- apex11 saw 0 leads: UTC date rolled to 2026-06-10 but all leads had batch_date=2026-06-09; useMyLeads filters batch_date = today. Fixed by PATCHing 150 leads to today's date via service-role REST. Verified: apex11 login sees exactly 150 leads through RLS.
+- brayden11 login broken: password hash in auth.users no longer matched Ohvara2026! (drifted during testing). Reset via admin API PUT /auth/v1/admin/users/{id}. Login + admin profile load verified.
+
+**Rep dashboard build (commit f06124d on master):**
+- Sidebar: position fixed, 240px wide, 44px-tall nav buttons / 14px text. DashboardLayout offsets main content with ml-[240px].
+- Call Now: centered modal with lead name/business/phone + AI discovery script from generate-ai-script edge function; static personalized fallback if it fails. No dialing.
+- My Leads: rows clickable, right-side detail panel with full lead info + status dropdown (New, Contacted, Interested, Callback, Not Interested) saving to DB instantly on change.
+- Training Center: new Script tab (before AI Roleplay) with 5 static sections: Opener, Problem Discovery, Pain Amplification, Objection Handling, Close/Book.
+- AI Roleplay: dead Start Practice Call flow replaced with intentional Coming Soon state gated on RETELL_API_KEY.
+- Migration 015: added 'Callback' to lead_status enum.
+
+**Lesson:** ALTER TYPE on a hosted Supabase DB without the DB password: deploy a one-off edge function that runs the DDL via SUPABASE_DB_URL (auto-injected env), invoke with service-role JWT, then delete the function. Works fully from CLI.
+
+**Lesson:** --bg-surface is rgba(255,255,255,0.04) — fine for in-page cards, but modals/side panels over content need a solid background (#0E0E1A) or the page bleeds through.
+
+**Lesson:** PowerShell 5.1 Set-Content corrupts UTF-8 source files (mojibake on em-dashes, checkmarks). Use the Write tool for any file containing non-ASCII; never round-trip JSX through Get-Content/Set-Content.
+
+**Lesson:** Claude Preview MCP works well for local Vite testing (eval/inspect/click against the dev server), but preview_screenshot reloads the page — component-local state (open modals, active tabs) won't survive into the screenshot. Verify transient UI via preview_eval DOM checks instead.
+
+**Verification:** Logged in as apex11 in a real browser session — 150 leads render, modal generates a personalized script (hotshot trucking opener), status change to Callback persisted to DB (confirmed via service-role query), Script tab shows all 5 sections, Roleplay shows Coming Soon. Zero console errors. Production build clean.
+
+**Status:** Complete — pushed to master, Vercel auto-deploy triggered
+
+---
+
+## 2026-06-10 (later) | Rep Dashboard Bug Fixes — Modal Portal + Training Polish
+
+**Task:** Fix 5 rep dashboard issues: modal rendering inside table row, Done opening the side panel, floating Call Now button, tab order, 8th video card
+
+**Root cause (3 of 5 issues):** .table-row-animated uses rowSlideIn with animation-fill-mode: forwards, so the final transform stays applied permanently. A transformed element becomes the containing block for position:fixed descendants — the Call Now modal rendered relative to its row, clicks landed on the wrong elements, and the panel footer button appeared to float bottom-right.
+
+**Fixes (commit c490f53 on master):**
+- CallModal renders via createPortal(document.body), z-index 1000, with stopPropagation on the overlay so React-tree bubbling cannot reach the row click handler
+- Done now closes the modal only — verified the detail panel does not open
+- Removed the Call Now button from the lead detail panel footer; Call Now exists only in table rows (verified 0 .btn-call outside rows after scrolling full list)
+- Training Center tabs reordered: Script, Videos, Flashcards, AI Roleplay — Script is the default tab
+- Added 8th video "The Numbers Game" (placeholder youtubeId until recorded) and tightened grid to minmax(240px) so 8 cards render 4 per row x 2 rows at desktop width (verified at 1440px viewport)
+
+**Lesson:** animation-fill-mode: forwards keeps the keyframe transform forever, silently turning every animated element into a position:fixed containing block. Any modal opened from inside animated content must portal to document.body.
+
+**Lesson:** React portals move DOM but NOT event bubbling — synthetic events still propagate through the React component tree, so a portaled modal inside a clickable row still needs stopPropagation.
+
+**Lesson:** PowerShell 5.1 mangles git commit -m messages containing inner double quotes (pathspec errors); write the message to a temp file and use git commit -F. Out-File utf8 adds a BOM that leaks into the commit subject — cosmetic only.
+
+**Verification:** All via Claude Preview DOM assertions against the live dev server as apex11 — modal portaled to body and centered at scrollY 2000, Done closed without opening the panel, zero call buttons outside rows, tab order and Script default confirmed, 8 videos at 4-per-row confirmed. Production build clean.
+
+**Status:** Complete — pushed to master, Vercel auto-deploy triggered
+
+---
+
+## 2026-06-10 (evening) | Rep Lead Flow Redesign — Single Call Now Modal
+
+**Task:** Remove the lead detail sidebar entirely; make Call Now the one full interaction surface
+
+**Built (commit a37ecae on master):**
+- Lead rows are display-only — no click handler, no cursor change, nothing opens
+- CallModal is now a 960px two-column modal (portaled to body, z-index 1000, dark blurred overlay):
+  - Left: contact / niche / city / phone / source fields, pain points (amber callout), notes, status dropdown with all 8 enum statuses (New, Contacted, Interested, Callback, No Answer, Voicemail, Not Interested, Booked) saving to DB on change, and a Call Now tel: link
+  - Right: AI discovery script in 5 color-coded sections — Opener purple (accent), Problem Discovery blue (info), Pain Amplification amber (warning), Objection Handling red (danger), Close green (success) — with Regenerate at the bottom
+  - Footer: Done closes the modal
+
+**Verification (Claude Preview DOM assertions as apex11, 1440px viewport):**
+- Row click opens nothing; cursor stays default
+- Modal opens centered and covers the viewport from BOTH the first row (scrollY 0) and the last row (scrollY 8765) — no positioning bugs
+- All 8 status options present; change New to Contacted showed Saved and persisted to DB (verified via service-role query on Permian Basin Hotshot Freight)
+- tel: link renders as tel:4326183890; 5 script sections each have a distinct computed color; Regenerate and Done present; Done closes
+- Production build clean; only console errors were stale refresh-token noise from a previous dev-server session, unrelated to the change
+
+**Lesson:** textContent ignores CSS text-transform — when asserting against on-screen text that uses uppercase transforms, compare with innerText (rendered) or the original casing, not the uppercase visual.
+
+**Lesson:** [System.IO.File]::WriteAllText writes UTF-8 without BOM in PS 5.1 — use it instead of Out-File for git commit -F message files (Out-File leaks a BOM into the commit subject).
+
+**Status:** Complete — pushed to master, Vercel auto-deploy triggered
+
+---
+
+## 2026-06-11 | Permanent Fix: Self-Healing Daily Batch via pg_cron
+
+**Task:** apex11 had no leads AGAIN (second day running). Diagnose, re-assign 150, and fix the root cause permanently.
+
+**Diagnosis:** UTC rolled to 2026-06-11 at midnight; apex11's leads still carried batch_date 2026-06-10 (150) and 2026-06-09 (74); unassigned pool was 0. useMyLeads filters batch_date = UTC today, and nothing in the system ever advanced batch_date — manual re-dating was a band-aid that broke every midnight.
+
+**Permanent fix (commit 2e44abf, migration 016, applied to production):**
+- Postgres function assign_daily_batches(batch_size default 150) — fully date-relative via CURRENT_DATE, no hardcoded dates. Per active rep: (1) count today's batch, (2) roll over the rep's own unworked New leads from prior days, (3) top up from the unassigned pool, (4) if the pool is dry, re-surface the rep's most recent non-Booked leads so the dashboard is never empty.
+- pg_cron job 'daily-batch-assign' (job id 4) runs it at 00:05 UTC daily — minutes after the date the dashboard queries changes, so leads can never disappear overnight.
+- Applied via the one-off edge-function runner pattern (SUPABASE_DB_URL + service-role gate, deploy/invoke/delete). First run assigned apex11 exactly 150 for server date 2026-06-11.
+
+**Verification:** RLS-scoped REST query as apex11 (real anon-key login) returned exactly 150 leads for 2026-06-11; browser test as apex11 showed 150 rows rendered, "150 leads assigned" header, Batch Total KPI 150.
+
+**Lesson:** Any client query filtered on "today" needs a server-side process that rolls data forward on the same clock the client uses. The dashboard queries by UTC date, so the cron fires at 00:05 UTC — scheduling it at 9 AM UTC would have left a 9-hour window of empty dashboards.
+
+**Status:** Complete — cron live in production, migration pushed to master
+
+---
+
+## 2026-06-11 (later) | Rep Call Flow v2 — Outcomes, Re-Queue, Follow-Ups, Scraper Filters
+
+**Task:** 8-item rep dashboard build: row-click modal, scroll lock, 4-outcome status redesign, No Answer re-queue, follow-up scheduling, call notes, Indeed title expansion, Profile A niche filtering
+
+**Built (commit c6b5f65 on master, migration 017 applied to production):**
+- Row click anywhere opens the Call Now modal (state lifted to MyLeads; CallButton untouched for closer/LeadCard consumers)
+- Scroll lock: html + body overflow hidden while modal open, restored on close
+- Status dropdown: custom (not native select) with exactly 4 always-visible color-coded outcomes — Appointment Booked green, No Answer gray, Not Interested red, Follow-Up amber. Saves on change.
+- No Answer re-queue: DB trigger stamps leads.no_answer_at on transition; requeue_no_answer_leads() runs via pg_cron (job 5, every 15 min) flipping 4-hour-old No Answers back to New with batch_date = current_date — leads recycle instead of needing fresh scrapes
+- Follow-Up: datetime-local + reason fields appear in-modal, saved to follow_up_at / follow_up_notes on Done
+- Call Notes textarea on every call, saved to leads.notes on Done
+- Indeed scraper: 13 Profile A job titles, broadened search query, hard niche filter (13 Profile A niches; 'other' dropped; requested niches clamped). Deployed; returns healthy notConfigured until INDEED_MCP_TOKEN is set.
+
+**Verification (browser as apex11 + service-role DB checks):**
+- Row click opened modal; dropdown showed 4 options with exact colors (rgb verified); Follow-Up fields appeared; Done persisted notes + follow_up_at + follow_up_notes (Golden Air Conditioning row verified in DB)
+- Trigger stamped no_answer_at via plain REST status change; backdated 5h → rpc requeue returned 1 → lead back to New, batch_date today, no_answer_at cleared
+- Scroll: html/body overflow hidden while open, scrolling restored after close
+
+**Lesson:** overflow:hidden on body alone does NOT lock the page — the documentElement scroller still moves. Lock both html and body. Also: programmatic window.scrollTo still works under overflow:hidden (spec: hidden blocks user scroll, not script scroll) — don't use scrollTo as the lock test; assert the computed styles.
+
+**Lesson:** Postgres functions in public schema are callable via PostgREST /rest/v1/rpc/<name> with the service key — handy for testing cron-target functions without SQL access.
+
+**Status:** Complete — pushed to master, Vercel auto-deploy triggered
+
+---
+
+## 2026-06-10 | Eagle + Falcon + Atlas System Established
+
+- This Claude Code instance is named **Eagle** (claude.ai account 2 — new Pro account)
+- The other Claude chat instance is named **Falcon** (claude.ai account 1 — original account)
+- The Obsidian vault (`~/obsidian-mind`) is named **Atlas**
+- Eagle and Falcon both plug into Atlas as their shared memory
+- **Workflow:** work with Eagle or Falcon → session writes back to Atlas → other instance picks up seamlessly
+- **Handoff trigger:** say "wrap up" → Eagle/Falcon writes session log to Atlas → paste resume prompt into next account
+- Eagle is wired: reads [[North Star]] + [[Memories]] every session, writes back on wrap up
+
+**Status:** Complete — naming system live
