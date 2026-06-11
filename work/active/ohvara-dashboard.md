@@ -311,7 +311,7 @@ All deployed to `https://jjextitmbptoaolacocs.supabase.co/functions/v1/`
 
 | Username | Role | Password | Email (internal) |
 |----------|------|---------|-----------------|
-| brayden11 | admin | Brayden2026! | brayden11@ohvara.internal |
+| brayden11 | admin | Ohvara2026! | brayden11@ohvara.internal |
 | rep_sarah | rep | Sarah2026! | rep_sarah@ohvara.internal |
 | apex11 | rep | Apex2026! | apex11@ohvara.internal |
 | jordan22 | closer | Jordan2026! | jordan22@ohvara.internal |

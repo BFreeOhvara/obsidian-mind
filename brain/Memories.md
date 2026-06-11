@@ -932,6 +932,39 @@ Next action: clear the 4 blockers — take the API keys/credits as I paste them,
 
 ---
 
+## 2026-06-11 | SESSION WRAP-UP — Blockers 1+2 Cleared, Pipeline v2, Closer 4-Package View (CC → Falcon)
+
+**Session length:** Long — blocker clearing + three dashboard build waves
+
+**What got done:**
+- **Blocker 1 CLEARED — Anthropic credits:** topped up `$25`, auto-reload enabled (`$10` threshold → `$50` reload) on console.anthropic.com (Falcon's account, key ending uQAA). AI scripts and recommend-stack are live on real model output.
+- **Blocker 2 CLEARED — RETELL_API_KEY:** set and verified — 14 agents on the account. Voice roleplay and AI call coach now unlocked. Follow-up: after first roleplay + coach runs, grab agent IDs and set `RETELL_ROLEPLAY_AGENT_ID` and `RETELL_COACH_AGENT_ID` as secrets (prevents agent re-creation).
+- **Training Center color coding shipped (commit `eb6f1e4`):** all 5 Script tab sections match Call Now modal colors exactly. Three opener variations added: phone/receptionist, dispatcher/coordinator, Maps/no-website.
+- **Closer dashboard 4-package view shipped (commit `de4665a`):** all 4 tiers expanded by default, itemized product checklists, directional labels (upsell/fallback), Stripe links on all 4, closer notes moved above packages. Phase B (dynamic contents) was waiting on credits — now live.
+- **Lead pipeline rebuilt (commit `340031f`, migration 019, 686 insertions):**
+  - No Answer → 24hr shared pool → randomized redistribution to any active rep → old 4hr same-rep requeue removed
+  - Follow-Up → same rep → returns on chosen date → amber badge with reason
+  - Not Interested → permanent do-not-contact → `assign_daily_batches` patched to never resurface them → scraper dedup live (Indeed: name+city, Maps: place_id first then name+city)
+  - Admin pipeline page (`/admin/pipeline`) rebuilt: 4 tabs — No Answer Queue, Follow-Up Queue, Not Interested Archive, Booked
+  - Modal outcome buttons updated with routing subtext per outcome
+- **brayden11 password corrected in Atlas:** Ohvara2026! (brain doc [[ohvara-dashboard]] had stale Brayden2026!)
+
+**Still open:**
+- **Blocker 3 — TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN / phone number:** account needs to be created at twilio.com. Unlocks SMS reminders + No Answer outreach text.
+- **Blocker 4 — INDEED_MCP_TOKEN:** source TBD; scraper returns notConfigured until set.
+- **Firecrawl auth:** Brayden runs `firecrawl login --browser` in terminal, tells CC "logged in"
+- **Retell agent IDs:** set `RETELL_ROLEPLAY_AGENT_ID` + `RETELL_COACH_AGENT_ID` after first roleplay/coach run
+- **Rep onboarding gate (strategy in progress, not yet built):** video completion tracking, flashcard quiz with score threshold (85%+/B+), AI roleplay grading; gate blocks first lead batch until all three passed. Flashcards need full content update for new pricing/pipelines/opener variations.
+- **GitHub PAT workflow scope** (low priority — vault `.github/workflows/` still untracked)
+- **Dynamic stack pricing** (Phase 2 — after 5 recurring clients)
+- **Twilio No Answer outreach text** (fires during the 24hr pool wait — needs Twilio first)
+
+**Resume prompt:**
+Paste into new chat:
+"Load Atlas. Two remaining blockers: Twilio (create account at twilio.com, grab SID + Auth Token + phone number, paste into CC) and Indeed token (source TBD). After both are set, run full end-to-end rep test as apex11. Also: rep onboarding gate needs a build prompt — video completion tracking, flashcard quiz (85%+ threshold), AI roleplay grading, gate blocks first batch until all three passed."
+
+---
+
 ## 2026-06-11 (night) | Session Handoff — Falcon Startup + Blocker Verification (Falcon)
 
 **Session length:** Short — startup, verification, context load
