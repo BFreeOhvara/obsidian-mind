@@ -15,6 +15,26 @@ status: active
 
 ---
 
+## Quick Routing — Go Here First
+
+| Task | Go To |
+|------|-------|
+| Writing or fixing UI | [[DESIGN]] + [[ui-animations]] |
+| Writing a rep call script | [[rep-call-script]] |
+| Closing a deal / Stripe links | [[stripe-payments]] |
+| Session start / loading context | [[eagle-startup]] |
+| Ending a session / handoff | [[auto-handoff]] |
+| Capturing knowledge from a session | [[auto-knowledge-capture]] |
+| Building or fixing dashboard features | [[ohvara-dashboard|work/active/ohvara-dashboard]] |
+| Finding tools to improve Claude Code | [[claude-repos-top10]] + [[claude-10x-tools]] |
+| Leveling up the Claude workflow | [[claude-mastery]] |
+| Installing specialist agents | [[claude-agents]] |
+| Evaluating memory upgrades | [[claude-mem]] |
+| High-fidelity UI design from mockups | [[stitch-mcp-workflow]] |
+| Social media / content research (Phase 2–3) | [[social-media-research]] |
+
+---
+
 ## Ohvara Core Skills
 
 These are purpose-built for Ohvara operations.
