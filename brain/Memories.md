@@ -965,6 +965,36 @@ Paste into new chat:
 
 ---
 
+## 2026-06-11 (night) | Rep Dashboard v4 — Training Gate, Booking Rate, EOD Pipeline, Appointment Times (Falcon/CC)
+
+**Task:** 8-item autonomous build (commit `dfd46ce` on master, migration 020 applied to production)
+
+**Built:**
+1. **Booking Rate KPI** (was Connect Rate): booked ÷ total calls today from the `calls` table with a UTC-midnight cutoff — all three counters (calls/bookings/rate) reset at 00:00 UTC. Verified: 2 booked / 8 calls = 25%.
+2. **No Answer tab fixed**: the pipeline trigger no longer nulls batch_date on No Answer — the lead stays visible in the rep's No Answer tab while waiting in the 24h pool. Verified in-browser + DB (batch_date kept, queue row pending).
+3. **EOD auto-pipeline**: `eod_pipeline_sweep()` on pg_cron at 23:55 UTC — New → tomorrow's batch, No Answer/Follow-Up → their queues (Follow-Up defaults to +1 day if no date), Not Interested → out of batch. **Verified with the LIVE cron firing in production**: 139 New leads carried to 06-12, booked/No Answer stayed, Follow-Up/NI routed out.
+4. **Appointment time**: `leads.appointment_at` + datetime picker in the Call Now modal when Appointment Booked is selected; shows under the status badge in the table (mono green); trigger auto-syncs a pending `appointments` row for the closer pipeline. Verified end-to-end.
+5. **Tab reload fixed**: root cause was useAuth refetching the profile on every auth event (TOKEN_REFRESHED fires on tab return) → loading=true → app swapped for spinner → full remount. Now same-user events update the session silently (profileUserId ref guard); visibilitychange listener manages token auto-refresh; React Query refetchOnWindowFocus off. Verified: visibility cycle with modal open → no reload, modal intact.
+6. **My Stats**: Day view default; bar chart replaced with a stock-style dual AreaChart (smooth monotone curves, gradient fills, calls purple / bookings green).
+7. **Rep onboarding gate** (migration 020, `training_progress` table, rep-own RLS): My Leads locked behind 3 checks — 8 videos watched (synced to DB), 20-question quiz auto-generated from flashcards at 85%+, AI roleplay graded B+ or higher (9/12). Locked state shows progress + CTA; unlock is automatic. Training Center: gate banner with clickable step chips, new Quiz tab, live Retell roleplay (call Mike, live transcript, Claude scorecard with grade + dimension bars). apex11 verified: locked → videos via UI → quiz mechanics via UI (feedback colors, results, retry) → unlock → 146 leads. Quiz pass + roleplay grade injected via service role (real pass needs domain clicks/mic); apex11 left unlocked in production.
+8. **Flashcards refreshed**: all 100 rewritten — 4-status pipeline routing, $497/$797/$1,297/$1,797 + $497 setup, commission splits, 3 opener variations. Verified: 100 cards, 35/35/30.
+
+**Bonus fix:** `SecretsContext` invoked fetch-secrets without a method → POST → admin-only branch → capabilities silently always false for reps. Now GET. This was why AI Roleplay showed Coming Soon even with RETELL_API_KEY set.
+
+**Lessons:**
+- `supabase.functions.invoke()` defaults to POST — any function whose read path is GET-only returns the wrong branch silently. Always pass `{ method: 'GET' }` for reads.
+- Supabase fires TOKEN_REFRESHED (and replays SIGNED_IN) on tab-visibility return — any auth listener that sets a loading flag on every event remounts the whole app. Guard with a "same user already loaded" ref.
+- One-off DDL runner gate: don't string-match the request JWT against `SUPABASE_SERVICE_ROLE_KEY` env (key formats can differ) — platform verify_jwt already validates the signature, so decoding the payload and checking `role === 'service_role'` is sufficient and robust.
+- Scheduling a cron at 23:55 UTC and building at 23:50 = free live verification window.
+
+**Production state:** migrations 001–020 applied. pg_cron now: daily-batch-assign (00:05), process-lead-queues (hourly), eod-pipeline-sweep (23:55), process-reminders, trigger-re-engagement, + legacy assign-daily-batch (06:00). training_progress live with apex11 fully passed. Vercel auto-deploy from `dfd46ce`.
+
+**Note for new reps:** the gate is LIVE — a fresh rep account sees locked leads until they pass all three checks. rep_sarah (test account) is currently locked.
+
+**Status:** Complete — all 8 items verified in Chrome as apex11, pushed to master
+
+---
+
 ## 2026-06-11 (night) | Session Handoff — Falcon Startup + Blocker Verification (Falcon)
 
 **Session length:** Short — startup, verification, context load
