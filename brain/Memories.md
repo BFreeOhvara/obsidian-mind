@@ -749,3 +749,42 @@ Then test full rep flow as apex11."
 - Eagle is wired: reads [[North Star]] + [[Memories]] every session, writes back on wrap up
 
 **Status:** Complete — naming system live
+
+---
+
+## 2026-06-10 | Session Handoff — Eagle Onboarding + Atlas Wiring (Eagle)
+
+**Session length:** Long — 12+ exchanges, 6+ topics
+**Topics covered:**
+- Full vault export assembled as paste-able context block for a Claude chat
+- Eagle/Falcon/Atlas naming system established and logged to Atlas
+- CLAUDE.md upgraded: Identity section, Session Start/End aligned to Eagle protocol, context-limit warning message, Code Discipline section, token rule additions
+- [[eagle-startup]] skill created (Ohvara summary, stack, blockers, state-check rule, resume prompt format) + registered in [[skills/Index]]
+- Quick Routing table added to top of [[skills/Index]] — task → skill mapping for all 13 skills
+- Skills folder audited: 7 active instructions vs 7 passive references (the 5 Instagram-derived claude-* notes are archive candidates per the less-is-more rule)
+- [[claude-mem]] evaluated against live sources: verdict — optional safety net for Eagle only; writes to its own local SQLite store so Falcon can't read it; Atlas stays the shared memory. Correct install is `npx claude-mem install` (NOT `npm install -g`, which skips the hooks). Not installed.
+- External CLAUDE.md mining: ruvnet/ruflo → 6 generic rules merged (nothing-more-nothing-less, edit-over-create, read-before-edit, no secrets, batch parallel ops, tiered model routing); juliusbrussee/caveman → 2 lines merged (compress output never reasoning, ≤50-char commit subjects). All repo-specific tooling rejected.
+
+**Decisions made:**
+- Eagle = Claude Code on claude.ai account 2; Falcon = chat on account 1; Atlas = this vault, shared memory for both
+- Eagle session-end protocol: append session log to Memories + update [[ohvara-dashboard]] if dashboard code changed
+- Context-limit warning fires at 15+ exchanges OR 3+ topics with the standard wrap-up message
+- claude-mem: try-if-curious, never a replacement for Atlas
+- External CLAUDE.md content is curated hard — generic principles only, no tool-specific bloat (ETH Zurich trap)
+
+**Current state:**
+All vault changes committed and pushed (5 commits, 555b3ca → cfc0817). No dashboard code changes this session — dashboard state unchanged from the 2026-06-11 entries (call flow v2 live, self-healing daily batch cron live).
+
+**Blocked on (unchanged):**
+- Anthropic credits — AI script quality + recommend-stack
+- RETELL_API_KEY — voice roleplay + call coach
+- TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN — SMS reminders
+- INDEED_MCP_TOKEN — Indeed scraper
+
+**Resume prompt:**
+Paste into new chat:
+"Read ~/obsidian-mind/brain/Memories.md and ~/obsidian-mind/brain/North Star.md before doing anything. I'm continuing Ohvara work.
+
+Current state: Eagle/Falcon/Atlas system is live, CLAUDE.md and skills are wired. Dashboard is rep-ready with self-healing daily batches; blockers are the four missing API keys/credits.
+
+Next action: top up Anthropic credits, then set RETELL_API_KEY / TWILIO secrets to unlock voice roleplay and SMS reminders."

@@ -37,3 +37,7 @@ _(Claude appends session summaries here)_
 ### 2026-06-07
 
 Vault initialized. North Star, Memories, DESIGN, and this index created. Ohvara context wired into CLAUDE.md session protocols.
+
+### 2026-06-10
+
+Eagle/Falcon/Atlas naming system established. CLAUDE.md upgraded (identity, session protocols, code discipline). New skill: [[eagle-startup]]. Quick Routing table added to [[skills/Index]]. No dashboard code changes.
