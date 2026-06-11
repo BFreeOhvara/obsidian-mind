@@ -788,3 +788,9 @@ Paste into new chat:
 Current state: Eagle/Falcon/Atlas system is live, CLAUDE.md and skills are wired. Dashboard is rep-ready with self-healing daily batches; blockers are the four missing API keys/credits.
 
 Next action: top up Anthropic credits, then set RETELL_API_KEY / TWILIO secrets to unlock voice roleplay and SMS reminders."
+
+---
+
+## 2026-06-11 | Naming Convention — CC
+
+Brayden calls Claude Code **"CC"** — always recognize CC as referring to Claude Code in all future sessions.
