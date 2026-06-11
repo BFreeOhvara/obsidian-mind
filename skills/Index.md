@@ -23,6 +23,7 @@ Active Phase 1 skills only. If a task isn't covered here, check the Dormant tabl
 |------|-------|
 | Session start / loading context | [[eagle-startup]] |
 | Ending a session / handoff | [[auto-handoff]] |
+| Context window filling up / when to warn | [[session-management]] |
 | Capturing knowledge mid-session | [[auto-knowledge-capture]] |
 | Writing a rep call script | [[rep-call-script]] |
 | Closing a deal / Stripe links | [[stripe-payments]] |
@@ -41,6 +42,7 @@ Purpose-built for Phase 1 Ohvara operations. These live in `skills/` and appear 
 |-------|----------|-------------|--------|
 | [[eagle-startup]] | Memory / Session | Startup briefing for new chats — Ohvara summary, stack, blockers, state-check rule, resume prompt format | ✅ Active |
 | [[auto-handoff]] | Memory / Session | Preserve context across long sessions — handoff protocol + token efficiency rules | ✅ Active |
+| [[session-management]] | Memory / Session | CC self-monitors context — 60%+ full appends a wrap-up warning to every response | ✅ Active |
 | [[auto-knowledge-capture]] | Memory | Scan sessions for decisions and auto-log to brain at session end | ✅ Active |
 | [[rep-call-script]] | AI / Sales | Generate Profile A niche-aware call scripts — surface pain, book discovery call | ✅ Active |
 | [[stripe-payments]] | Payments | Generate two Stripe links per close (setup fee + monthly) | ✅ Active |

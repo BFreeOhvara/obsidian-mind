@@ -45,6 +45,10 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 - Google Maps fallback for niches/markets where Indeed is thin
 - Flag no-website businesses as web agency candidates
 
+### Model Routing
+
+- Use **Sonnet 4.6** for small fixes and routine tasks; **Fable 5** for big autonomous builds only
+
 ### General
 
 - Read [[North Star]] and [[Memories]] before writing code
@@ -911,3 +915,17 @@ Next action: clear the 4 blockers — take the API keys/credits as I paste them,
 **Verification stack used all day:** Claude Preview MCP against local Vite (DOM assertions; screenshots unusable — tool reloads into the auth spinner), service-role REST for DB truth, RLS-scoped logins for rep-eye views, one-off edge-function runners (SUPABASE_DB_URL) for DDL.
 
 **Status:** All waves complete and live. Handoff note generated for next instance (Falcon).
+
+---
+
+## 2026-06-11 | Session Management Skill — 60% Context Alarm + Model Routing (Falcon/CC)
+
+**Task:** Create [[session-management]] skill (CC warns at 60% context full) + log model routing rule
+
+**What was done:**
+- Created `skills/session-management.md`: CC self-monitors context; at ~60% full appends exact warning ("⚠️ Context at 60%+ — wrap up this session soon. Run the session wrap-up skill and start a fresh CC chat.") to the end of every response until wrap-up; 90%+ critical escalation unchanged
+- 60% supersedes the old 70% threshold — aligned all three copies so no conflicting standing rules: canonical `~/.claude/CLAUDE.md`, [[auto-handoff]] mirror, and the new skill (vault source of truth for wording)
+- Registered [[session-management]] in [[skills/Index]] (routing table + Active Skills)
+- Added Model Routing rule under Hard-Won Lessons: Sonnet 4.6 for small fixes/routine tasks, Fable 5 for big autonomous builds only
+
+**Status:** Complete — vault committed and pushed

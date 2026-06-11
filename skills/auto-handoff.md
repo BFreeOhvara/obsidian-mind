@@ -57,11 +57,11 @@ When Brayden says **"wrap up"**, before the session ends:
 
 ---
 
-## Context Alarm (standing rule — canonical copy in `~/.claude/CLAUDE.md`)
+## Context Alarm (standing rule — canonical copy in `~/.claude/CLAUDE.md`, full skill in [[session-management]])
 
 1. Continuously self-monitor context fullness (long conversation, many file reads, large outputs).
-2. At roughly **70% full or more**, append to the END of the message, exactly:
-   > ⚠️ CONTEXT ALERT: This session is getting full. Say "wrap up" to run the handoff protocol before quality degrades or we lose state.
+2. At roughly **60% full or more**, append to the END of the message, exactly:
+   > ⚠️ Context at 60%+ — wrap up this session soon. Run the session wrap-up skill and start a fresh CC chat.
 3. Once fired ONCE, repeat at the end of EVERY subsequent message — no exceptions, even short replies — until Brayden says "wrap up."
 4. On **"wrap up"** (exact phrase): immediately run the full Handoff Protocol above — commit and push ALL repo changes, write session state to Atlas, produce the two-output wrap-up.
 5. At roughly **90%+ full**, escalate to: "🚨 CONTEXT CRITICAL: Wrap up NOW or work may be lost." and stop starting any new large tasks.
