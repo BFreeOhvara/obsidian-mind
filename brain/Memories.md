@@ -977,3 +977,34 @@ Eagle strategy session — expanded Indeed titles from 13 to 28 (full stack cove
 - Created [[review-agent-leads]] (`brain/strategy/`): low-review/low-rating Profile A businesses are warm leads regardless of hiring; Maps scraper review-count filter is the Phase 2 lever — park until Vertical 1 has 5+ recurring clients.
 
 **Status:** Complete — both repos committed and pushed
+
+---
+
+## 2026-06-11 (evening/night) | SESSION STATE SAVE — Strategy + Instance Rules Sprint (Eagle + CC)
+
+**What got done:**
+- Save/Resume/Reload commands added to [[shared-instance-rules]] and [[eagle-startup]] — reserved words, instant artifact response, work identically in Eagle and Falcon; "wrap up" after a context alarm = RELOAD (commit `7ddf65c`)
+- Indeed scraper expanded from 13 to 28 job titles covering the full stack — review gen, follow-up, reminders, dispatcher variants, SMS reactivation all now have Indeed demand signals. Deployed to production (ohvara-dashboard commit `05adefd`)
+- Review agent standalone lead strategy saved to [[review-agent-leads]] (`brain/strategy/`, commit `c25d292`)
+- [[shared-instance-rules]] created — all 6 instance rules (cc-prompt-format, context alarm awareness, freshness check, state-check, scratch-paper, token efficiency) now travel to both Eagle and Falcon identically (commit `7e21d12`)
+- Context Freshness Check added to [[eagle-startup]] — stale signals → auto-generate CC refresh prompt as artifact, no asking
+- Exa MCP installed and verified at user scope ([[company-research]] skill routed in Index)
+- Firecrawl plugin + CLI installed (auth still pending — Brayden runs `firecrawl login --browser`)
+- Dynamic stack pricing idea captured in [[dynamic-stack-pricing]] (`brain/strategy/`) — same four price points, tier contents built per-lead by recommend-stack; park until 5+ recurring clients
+
+**Still open:**
+- **THE 4 BLOCKERS (unchanged, still the only real agenda):**
+  1. Anthropic credits → console.anthropic.com → Billing (key already set — credits only)
+  2. RETELL_API_KEY → retell.ai → API Keys
+  3. TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN → console.twilio.com
+  4. INDEED_MCP_TOKEN
+  Paste each into CC → `npx supabase secrets set --project-ref jjextitmbptoaolacocs`
+- Firecrawl auth: Brayden runs `firecrawl login --browser`, tells CC "logged in" → CC verifies, routes in Index, test-scrapes
+- GitHub PAT `workflow` scope (4 `.github/workflows/*.yml` untracked in vault — low priority)
+- Maps scraper PR #1 (`add-google-maps-scraper` branch) — ready to merge, solo dev just merge it
+
+**Resume prompt:**
+Paste into new CC session:
+"Load Atlas context. Priority 1: clear the 4 blockers (credits + 3 keys), paste into CC, set Supabase secrets. Priority 2: run full end-to-end rep test as apex11. Everything else is parked until the machine runs."
+
+**Status:** State saved — all repos committed and pushed
