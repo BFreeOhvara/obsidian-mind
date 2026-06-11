@@ -929,3 +929,40 @@ Next action: clear the 4 blockers — take the API keys/credits as I paste them,
 - Added Model Routing rule under Hard-Won Lessons: Sonnet 4.6 for small fixes/routine tasks, Fable 5 for big autonomous builds only
 
 **Status:** Complete — vault committed and pushed
+
+---
+
+## 2026-06-11 (night) | Session Handoff — Falcon Startup + Blocker Verification (Falcon)
+
+**Session length:** Short — startup, verification, context load
+**Topics covered:**
+- Falcon instance booted on CC (Eagle + CC hit session limits tonight; Falcon picked up the baton on Fable 5)
+- Full access verification: Atlas vault ✓, Supabase CLI ✓, git/GitHub ✓, Exa MCP ✓, Stripe MCP ✓ (newly connected in CC)
+- Live Supabase secrets audit against the 4 blockers: `ANTHROPIC_API_KEY` IS set (blocker a is purely credits at console.anthropic.com — no key paste needed); `RETELL_API_KEY`, `TWILIO_ACCOUNT_SID`/`TWILIO_AUTH_TOKEN`, `INDEED_MCP_TOKEN` all confirmed MISSING
+- Anomaly found: two malformed secret names in Supabase (`brayden11@ohvara.internal`, `ohvara-dashboard`) — leftover from a swapped-args `secrets set` call. Harmless; delete during cleanup.
+- Generated fresh OHVARA CONTEXT LOAD block (current through `89d8628` + tonight's live verification) for pasting into new Eagle/Falcon chats — includes the cc-prompt-format rule line per [[auto-handoff]] Thing 2
+
+**Decisions made:**
+- None — verification session only. No blockers cleared (no keys were pasted this session).
+
+**Current state:**
+No code changes. Dashboard unchanged: rep-ready at ohvara-dashboard.vercel.app, call flow v3 live (`89d8628`, migration 018 — persistence, live stats, real training videos), self-healing daily batch cron live. Atlas is the only repo touched.
+
+**Blocked on (unchanged — still the ONLY agenda):**
+- Anthropic credits — console.anthropic.com → Billing (key already set, just add credits; verify by invoking `recommend-stack` → 200 = live)
+- RETELL_API_KEY — retell.ai → API Keys
+- TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN (+ phone number) — console.twilio.com
+- INDEED_MCP_TOKEN
+Paste each into CC → `npx supabase secrets set --project-ref jjextitmbptoaolacocs`. Then: **full end-to-end rep test as apex11.**
+
+**Open loops (unchanged):**
+1. Firecrawl auth — Brayden runs `firecrawl login --browser`, tells CC "logged in"
+2. GitHub PAT lacks `workflow` scope — four `.github/workflows/*.yml` untracked in vault until regenerated
+
+**Resume prompt:**
+Paste into new CC session:
+"Read ~/obsidian-mind/brain/Memories.md and ~/obsidian-mind/brain/North Star.md before doing anything. I'm continuing Ohvara work.
+
+Current state: dashboard rep-ready through commit 89d8628 (call flow v3 + live stats + real training videos). Blockers verified live: Anthropic key set but credits empty; Retell/Twilio/Indeed secrets missing. Stripe MCP now available in CC.
+
+Next action: clear the 4 blockers — take the API keys/credits as I paste them, set Supabase secrets, then run the full end-to-end rep test as apex11."
