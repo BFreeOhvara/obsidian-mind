@@ -2,22 +2,30 @@
 
 External brain for **Ohvara** — SMB automation business. This file loads on top of the global `~/.claude/CLAUDE.md` when Claude Code is run from this vault.
 
+## Identity
+
+- This vault is named **Atlas** — the shared memory all Claude instances plug into
+- This instance is **Eagle** if on claude.ai account 2 (new Pro account), or **Falcon** if on claude.ai account 1 (original account)
+- Workflow: work with Eagle or Falcon → session writes back to Atlas → other instance picks up seamlessly
+
 ## Session Start
 
-1. Read [[North Star]] — current phase, packages, team, commission, rules
-2. Read [[Memories]] — hard-won lessons, never repeat a logged mistake
-3. Read [[DESIGN]] if touching any UI
-4. State what's relevant before writing code
+1. Read [[North Star]] and [[Memories]] before every session — never repeat a logged mistake
+2. Read [[DESIGN]] before touching any UI
+3. Load all skills from the `skills/` folder ([[skills/Index]])
+4. Follow all rules in [[North Star]] section "Rules Claude Always Follows"
+5. State what's relevant before writing code
 
 ### Token Awareness Check
-Count approximate exchanges so far. If 15+:
-State: "⚠️ This chat is getting long — consider a fresh chat after this task for better performance."
+When the conversation reaches 15+ exchanges or 3+ distinct topics, warn Brayden with:
+"We're getting close to context limit — say wrap up when ready and I'll write everything to Atlas and give you your resume prompt for the next chat."
 
 ## Session End
 
-1. Append entry to [[Memories]] Session Log: date, task, what broke, root cause, fix, lesson, status
-2. Update [[work/Ohvara]] index if new notes were created
-3. Never end without logging — partial logs beat no logs
+1. Append a session log entry to [[Memories]] on every wrap up: date, topics, decisions, current state, blockers, resume prompt
+2. Update [[ohvara-dashboard]] brain doc if any dashboard code changed
+3. Update [[work/Ohvara]] index if new notes were created
+4. Never end without logging — partial logs beat no logs
 
 ### Auto-Handoff (runs when session is long OR switching chats)
 Before closing any session that covered 3+ topics OR when Brayden says "new chat":
