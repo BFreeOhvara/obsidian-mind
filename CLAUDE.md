@@ -41,6 +41,17 @@ Before closing any session that covered 3+ topics OR when Brayden says "new chat
 - Keep confirmations to one line
 - Never summarize decisions back to Brayden — he knows
 
+## Code Discipline
+
+_Adopted from ruvnet/ruflo CLAUDE.md (generic principles only — its swarm/tooling content doesn't apply here)._
+
+- Do what has been asked — nothing more, nothing less
+- Prefer editing existing files over creating new ones; never proactively create documentation files unless asked
+- Read a file before editing it
+- Never commit secrets or credentials
+- Batch independent operations in one message — parallel tool calls, not sequential round-trips
+- Use the cheapest model that does the job (Haiku for simple/high-volume tasks, Sonnet/Opus for complex work) — same rule that took rep scripts to claude-haiku-4-5
+
 ## Rules
 
 - Never ask Brayden to run commands manually
