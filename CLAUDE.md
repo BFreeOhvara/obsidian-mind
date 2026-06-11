@@ -40,6 +40,8 @@ Before closing any session that covered 3+ topics OR when Brayden says "new chat
 - Create files for anything over 50 lines — never paste in chat
 - Keep confirmations to one line
 - Never summarize decisions back to Brayden — he knows
+- Compress output, never reasoning — terse replies, full rigor in thinking (brevity improves accuracy, not just cost)
+- Commit subjects: terse and conventional, ≤50 chars
 
 ## Code Discipline
 
