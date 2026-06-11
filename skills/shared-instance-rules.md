@@ -47,6 +47,49 @@ Answer first, explain only if asked. No filler phrases. Never restate what Brayd
 
 ---
 
+## Session Commands
+
+These three words are reserved commands. When Brayden says any of these (exact word, any case), the instance responds immediately with the correct artifact — no clarification needed, no preamble.
+
+### SAVE
+Brayden said: "Save"
+Instance does:
+1. Briefly acknowledges in chat: "Saving — here's the CC prompt."
+2. Immediately outputs a clean CC artifact titled "cc-save-session" containing:
+
+```
+Read brain/Memories.md in the obsidian-mind vault. Then do a full state save:
+1. Update brain/Memories.md with a complete current session log entry including: what was done this session, all open loops, current blocker statuses, any decisions made, and a resume prompt for the next session.
+2. Commit and push ALL repos (obsidian-mind + any other repos with uncommitted changes).
+3. Confirm: show me the commit hash, confirm all repos are clean, and say "State saved. Safe to close or switch instances."
+```
+
+### RESUME
+Brayden said: "Resume"
+Instance does:
+1. Briefly acknowledges in chat: "Resuming — here's the CC prompt."
+2. Immediately outputs a clean CC artifact titled "cc-resume-session" containing:
+
+```
+Read brain/Memories.md in the obsidian-mind vault — get the latest session entry.
+Generate a fresh OHVARA CONTEXT LOAD block as a single clean artifact titled "ohvara-context-load-[date]" that Brayden can paste into a new Eagle or Falcon chat to resume exactly where we left off.
+The block must include: phase/focus, team/roles, packages/commissions, 90-day targets, dashboard state, blocker statuses (current), latest session log, active skill routing table, standing rules, shared instance rules summary, and the cc-prompt-format reminder.
+Output it as one clean artifact — nothing else.
+```
+
+### RELOAD
+Brayden said: "Reload"
+This is Save + Resume back to back. Instance does:
+1. Acknowledges: "Reloading — Save first, then Resume."
+2. Outputs the cc-save-session artifact (same as Save above).
+3. Then immediately outputs the cc-resume-session artifact (same as Resume above).
+Brayden gives Save to CC first, waits for confirmation, then gives Resume to CC. The output of Resume gets pasted into the new chat as the context load.
+
+### When the context alarm fires (60%+)
+The alarm warning already fires automatically. When Brayden says "wrap up" after an alarm, that is equivalent to RELOAD — run Save then Resume in sequence, then the instance goes quiet.
+
+---
+
 ## Related
 
 - [[eagle-startup]] — session-start briefing that loads this rulebook

@@ -44,6 +44,8 @@ status: active
 
 Never prompt blind. The state lives in [[ohvara-dashboard]] (architecture, schema, feature status) and [[Memories]] (session logs, lessons, what broke last). A 30-second state check beats a 30-minute rebuild of something that already works.
 
+Session commands ([[shared-instance-rules]]): "Save" = save state to Atlas, "Resume" = generate fresh context load, "Reload" = both. Respond immediately with the correct artifact.
+
 ## Context Freshness Check (runs every session start)
 
 When Eagle loads a context block, it must immediately assess whether the state might be stale.
