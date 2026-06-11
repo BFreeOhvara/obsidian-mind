@@ -1,6 +1,6 @@
 ---
 date: 2026-06-07
-description: "Master index of all Ohvara skills — what each does, category, and status"
+description: "Master index of all Ohvara skills — Active (Phase 1 routing) vs Dormant (parked in skills/dormant/ until needed)"
 tags:
   - index
   - moc
@@ -17,52 +17,55 @@ status: active
 
 ## Quick Routing — Go Here First
 
+Active Phase 1 skills only. If a task isn't covered here, check the Dormant table before building anything new.
+
 | Task | Go To |
 |------|-------|
-| Writing or fixing UI | [[DESIGN]] + [[ui-animations]] |
-| Writing a rep call script | [[rep-call-script]] |
-| Closing a deal / Stripe links | [[stripe-payments]] |
 | Session start / loading context | [[eagle-startup]] |
 | Ending a session / handoff | [[auto-handoff]] |
-| Capturing knowledge from a session | [[auto-knowledge-capture]] |
+| Capturing knowledge mid-session | [[auto-knowledge-capture]] |
+| Writing a rep call script | [[rep-call-script]] |
+| Closing a deal / Stripe links | [[stripe-payments]] |
 | Building or fixing dashboard features | [[ohvara-dashboard|work/active/ohvara-dashboard]] |
-| Finding tools to improve Claude Code | [[claude-repos-top10]] + [[claude-10x-tools]] |
-| Leveling up the Claude workflow | [[claude-mastery]] |
-| Installing specialist agents | [[claude-agents]] |
-| Evaluating memory upgrades | [[claude-mem]] |
-| High-fidelity UI design from mockups | [[stitch-mcp-workflow]] |
-| Social media / content research (Phase 2–3) | [[social-media-research]] |
+| Writing or fixing UI | [[DESIGN]] + [[ui-animations]] |
+| Writing a prompt for CC | [[cc-prompt-format]] |
 
 ---
 
-## Ohvara Core Skills
+## Active Skills
 
-These are purpose-built for Ohvara operations.
+Purpose-built for Phase 1 Ohvara operations. These live in `skills/` and appear in the routing table above.
 
 | Skill | Category | What It Does | Status |
 |-------|----------|-------------|--------|
+| [[eagle-startup]] | Memory / Session | Startup briefing for new chats — Ohvara summary, stack, blockers, state-check rule, resume prompt format | ✅ Active |
+| [[auto-handoff]] | Memory / Session | Preserve context across long sessions — handoff protocol + token efficiency rules | ✅ Active |
+| [[auto-knowledge-capture]] | Memory | Scan sessions for decisions and auto-log to brain at session end | ✅ Active |
 | [[rep-call-script]] | AI / Sales | Generate Profile A niche-aware call scripts — surface pain, book discovery call | ✅ Active |
 | [[stripe-payments]] | Payments | Generate two Stripe links per close (setup fee + monthly) | ✅ Active |
-| [[auto-knowledge-capture]] | Memory | Scan sessions for decisions and auto-log to brain at session end | ✅ Active |
-| [[auto-handoff]] | Memory / Session | Preserve context across long sessions — handoff protocol + token efficiency rules | ✅ Active |
-| [[eagle-startup]] | Memory / Session | Startup briefing for new chats — Ohvara summary, stack, blockers, state-check rule, resume prompt format | ✅ Active |
 | [[ui-animations]] | UI / Design | Glass morphism, animated orbs, counting KPIs, staggered animations | ✅ Active |
+| [[cc-prompt-format]] | Session / Workflow | Eagle delivers every CC-bound prompt as its own clean, named artifact — prompt only, commentary stays in chat | ✅ Active |
 
----
-
-## Claude Performance & Tools
-
-Reference guides and tools for improving Claude Code workflows.
+### Pending Action (in `skills/`, not routed)
 
 | Skill | Category | What It Does | Status |
 |-------|----------|-------------|--------|
-| [[claude-repos-top10]] | Reference | 10 most impactful GitHub repos for Claude Code — Ohvara status on each | ✅ Reference |
-| [[claude-10x-tools]] | Reference | Top 5 tools from @chase.h.ai Part 1 — Codex plugin, obsidian-skills, autoresearch, skill-creator, notebooklm-py | ✅ Reference |
-| [[claude-mastery]] | Framework | 6-level mastery framework — where Ohvara sits, traps to avoid, "less is more" rule | ✅ Reference |
 | [[claude-agents]] | Agents | 147-agent library (wshobson/agents) — install sales-deal-strategist for closer flow | 🔲 Install needed |
 | [[claude-mem]] | Memory | Automatic persistent memory compression — evaluate as Memories.md upgrade | 🔲 Evaluate |
-| [[stitch-mcp-workflow]] | Design | Google Stitch → MCP → Claude Code — higher fidelity than DESIGN.md alone | 🔲 Try next UI session |
-| [[social-media-research]] | Research / Content | Apify MCP + TribeV2 brain model + Modal GPU — neuroscience content analysis | 🔜 Phase 2–3 |
+
+---
+
+## Dormant Skills
+
+Parked in `skills/dormant/` — not needed for Phase 1. Nothing deleted; promote back when a phase or task requires them.
+
+| Skill | Why Dormant | Wake When |
+|-------|-------------|-----------|
+| [[social-media-research]] | Phase 2–3 only — Apify MCP + TribeV2 + Modal GPU content analysis | Phase 2 begins |
+| [[stitch-mcp-workflow]] | Only needed for new UI built from mockups | A from-mockup UI session starts |
+| [[claude-repos-top10]] | Reference — 10 GitHub repos for Claude Code | Hunting for new tooling |
+| [[claude-10x-tools]] | Reference — top tools from @chase.h.ai Part 1 | Hunting for new tooling |
+| [[claude-mastery]] | Reference — 6-level mastery framework | Reviewing the Claude workflow |
 
 ---
 
@@ -71,11 +74,8 @@ Reference guides and tools for improving Claude Code workflows.
 | Symbol | Meaning |
 |--------|---------|
 | ✅ Active | In use, verified working |
-| ✅ Reference | Reference guide, no install needed |
 | 🔲 Install needed | Documented, action required |
 | 🔲 Evaluate | Needs evaluation before adopting |
-| 🔲 Try next session | Ready to try, not yet used |
-| 🔜 Phase 2–3 | Documented now, install when phase begins |
 
 ---
 
@@ -85,6 +85,8 @@ Reference guides and tools for improving Claude Code workflows.
 - Every new skill needs: frontmatter with `description`, at least one `## Related` link
 - Skills that haven't been used in 90 days → archive or delete
 - Reference skills count against the limit — don't hoard
+
+Dormant skills live in `skills/dormant/` — promote back to this table when a phase or task requires them.
 
 ## Related
 

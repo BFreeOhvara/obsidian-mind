@@ -34,13 +34,15 @@ When Brayden says **"wrap up"**, before the session ends:
    - Current state (what's done, what's broken, what's partial)
    - Blocked on (API keys, credits, etc.)
 
-2. **Commit and push Atlas:**
+2. **Commit and push ALL repo changes — no uncommitted work left behind, ever.** Atlas first, then every code repo touched this session (ohvara-dashboard, Scraper, client portal, etc.):
    ```bash
    cd ~/obsidian-mind
    git add .
    git commit -m "Session handoff: [brief topic summary]"
    git push
+   # then repeat for every other repo with uncommitted changes
    ```
+   A wrap-up is not complete while `git status` is dirty in any repo this session touched.
 
 3. **Give Brayden TWO things:**
 
@@ -51,13 +53,18 @@ When Brayden says **"wrap up"**, before the session ends:
 
    **Thing 2 — Context load instruction.** The new Claude Code session's **first job** is to read Atlas and generate a clean Eagle chat context load — a single paste-able text block containing: North Star summary (phase, focus, goals), latest Memories session log + blockers, active project state from [[ohvara-dashboard]], and the routing table from [[skills/Index]]. Brayden pastes that block into the Eagle claude.ai chat so both surfaces start from the same state.
 
+   Every OHVARA CONTEXT LOAD block must include this line so the rule travels with Eagle: *"CC prompt rule ([[cc-prompt-format]]): deliver every prompt meant for CC as its own single, descriptively-named artifact containing ONLY the prompt — one artifact per prompt, all commentary stays in chat."*
+
 ---
 
-## Token Awareness Check
+## Context Alarm (standing rule — canonical copy in `~/.claude/CLAUDE.md`)
 
-At **session start**, count approximate exchanges already in context. If 15+:
-
-> "⚠️ This chat is getting long — consider a fresh chat after this task for better performance."
+1. Continuously self-monitor context fullness (long conversation, many file reads, large outputs).
+2. At roughly **70% full or more**, append to the END of the message, exactly:
+   > ⚠️ CONTEXT ALERT: This session is getting full. Say "wrap up" to run the handoff protocol before quality degrades or we lose state.
+3. Once fired ONCE, repeat at the end of EVERY subsequent message — no exceptions, even short replies — until Brayden says "wrap up."
+4. On **"wrap up"** (exact phrase): immediately run the full Handoff Protocol above — commit and push ALL repo changes, write session state to Atlas, produce the two-output wrap-up.
+5. At roughly **90%+ full**, escalate to: "🚨 CONTEXT CRITICAL: Wrap up NOW or work may be lost." and stop starting any new large tasks.
 
 ---
 
