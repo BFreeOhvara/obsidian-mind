@@ -11,6 +11,7 @@ status: active
 # Eagle Startup
 
 > Load this at the start of any new Eagle or Falcon chat. Everything here points back to [[Memories]] and [[North Star]] in Atlas.
+> **Always load [[shared-instance-rules]] alongside this note** — the one rulebook that applies identically to Eagle AND Falcon (CC prompt format, context alarm awareness, freshness check, state-check, scratch-paper principle). Neither instance may have rules the other doesn't.
 
 ---
 
@@ -42,6 +43,26 @@ status: active
 > **Before writing any prompt for Claude Code, ask Claude Code to return the current state of the relevant file or feature from Atlas first.**
 
 Never prompt blind. The state lives in [[ohvara-dashboard]] (architecture, schema, feature status) and [[Memories]] (session logs, lessons, what broke last). A 30-second state check beats a 30-minute rebuild of something that already works.
+
+## Context Freshness Check (runs every session start)
+
+When Eagle loads a context block, it must immediately assess whether the state might be stale.
+
+Stale signals include:
+- Session log references work done by Falcon or CC that Eagle has no detail on
+- Blocker status is unclear (e.g. "keys pending" but no confirmation either way)
+- Brayden says anything like "we did stuff since that context" or "just got back from CC/Falcon"
+- The context block has no timestamp or is from a previous date
+
+When ANY stale signal is present, Eagle must:
+1. Acknowledge it briefly in chat ("My context may be behind — generating a refresh prompt for CC.")
+2. Immediately output a CC prompt as a clean artifact (per the [[cc-prompt-format]] rule) that tells CC to:
+   - Read `brain/Memories.md` in the obsidian-mind vault
+   - Get the latest session entry and any recent updates
+   - Generate a fresh OHVARA CONTEXT LOAD block including: phase/focus, team/roles, packages/commissions, 90-day targets, dashboard state, blocker statuses (updated), latest session log, active skill routing table, standing rules, and the cc-prompt-format reminder
+   - Output it as a single clean artifact Brayden can paste into Eagle
+
+Eagle does NOT ask Brayden whether to do this — it just generates the artifact automatically when stale signals are present.
 
 ## Resume Prompt Format
 

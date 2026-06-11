@@ -31,6 +31,7 @@ Active Phase 1 skills only. If a task isn't covered here, check the Dormant tabl
 | Writing or fixing UI | [[DESIGN]] + [[ui-animations]] |
 | Writing a prompt for CC | [[cc-prompt-format]] |
 | Researching a prospect / company / competitor | [[company-research]] |
+| Rules that apply to all Claude instances (Eagle + Falcon) | [[shared-instance-rules]] |
 
 ---
 
@@ -49,6 +50,7 @@ Purpose-built for Phase 1 Ohvara operations. These live in `skills/` and appear 
 | [[ui-animations]] | UI / Design | Glass morphism, animated orbs, counting KPIs, staggered animations | ✅ Active |
 | [[cc-prompt-format]] | Session / Workflow | Eagle delivers every CC-bound prompt as its own clean, named artifact — prompt only, commentary stays in chat | ✅ Active |
 | [[company-research]] | Research / Sales | Exa-powered company/prospect research — Task-agent isolation, advanced search only, structured output | ✅ Active |
+| [[shared-instance-rules]] | Session / Workflow | One rulebook for Eagle + Falcon — CC prompt format, context alarm awareness, freshness check, state-check, scratch-paper principle | ✅ Active |
 
 ### Pending Action (in `skills/`, not routed)
 

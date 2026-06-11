@@ -53,7 +53,7 @@ When Brayden says **"wrap up"**, before the session ends:
 
    **Thing 2 — Context load instruction.** The new Claude Code session's **first job** is to read Atlas and generate a clean Eagle chat context load — a single paste-able text block containing: North Star summary (phase, focus, goals), latest Memories session log + blockers, active project state from [[ohvara-dashboard]], and the routing table from [[skills/Index]]. Brayden pastes that block into the Eagle claude.ai chat so both surfaces start from the same state.
 
-   Every OHVARA CONTEXT LOAD block must include this line so the rule travels with Eagle: *"CC prompt rule ([[cc-prompt-format]]): deliver every prompt meant for CC as its own single, descriptively-named artifact containing ONLY the prompt — one artifact per prompt, all commentary stays in chat."*
+   Every OHVARA CONTEXT LOAD block must include a **Shared Instance Rules** section carrying the full rulebook from [[shared-instance-rules]] — CC prompt format ([[cc-prompt-format]]: every CC-bound prompt is its own single, descriptively-named artifact containing ONLY the prompt), context alarm awareness (CC warns at ~60%, "wrap up" triggers this protocol), the context freshness check (stale context → auto-generate a refresh prompt for CC as an artifact, without asking), the state-check rule (ask CC for current state before prompting), and the scratch-paper principle (chats deletable once committed; Atlas + git are the memory). This applies identically whether the block is pasted into Eagle or Falcon — the two instances always carry the same rules.
 
 ---
 
