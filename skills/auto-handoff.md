@@ -25,27 +25,31 @@ Trigger automatically when **any** of these are true:
 
 ## Handoff Protocol
 
-When triggered, before the session ends:
+When Brayden says **"wrap up"**, before the session ends:
 
-1. **Write handoff entry** to [[Memories]] with:
+1. **Write session log** to [[Memories]] with:
    - Date + session label
    - Topics covered (bullet list)
    - Decisions made (bullet list, specific)
    - Current state (what's done, what's broken, what's partial)
    - Blocked on (API keys, credits, etc.)
-   - Exact resume prompt Brayden can paste into the next chat
 
-2. **Commit and push** the vault:
+2. **Commit and push Atlas:**
    ```bash
    cd ~/obsidian-mind
    git add .
-   git commit -m "chore: session handoff — [brief topic summary]"
+   git commit -m "Session handoff: [brief topic summary]"
    git push
    ```
 
-3. **Tell Brayden:**
-   > "Handoff saved. Start new chat and paste:
-   > `Read ~/obsidian-mind/brain/Memories.md and ~/obsidian-mind/brain/North Star.md before doing anything. I'm continuing Ohvara work. [insert last 'Current state' bullet]`"
+3. **Give Brayden TWO things:**
+
+   **Thing 1 — New Claude Code session prompt.** A prompt to paste into a fresh Claude Code session:
+   > "Read ~/obsidian-mind/brain/Memories.md and ~/obsidian-mind/brain/North Star.md before doing anything. I'm continuing Ohvara work.
+   > Current state: [last session's current state]
+   > Next action: [exact next task in 1–2 sentences]"
+
+   **Thing 2 — Context load instruction.** The new Claude Code session's **first job** is to read Atlas and generate a clean Eagle chat context load — a single paste-able text block containing: North Star summary (phase, focus, goals), latest Memories session log + blockers, active project state from [[ohvara-dashboard]], and the routing table from [[skills/Index]]. Brayden pastes that block into the Eagle claude.ai chat so both surfaces start from the same state.
 
 ---
 
