@@ -72,7 +72,7 @@ a chat instance can absorb in one read, with the CC prompt rule from
 
 ## Recon-First Rule (non-trivial tasks)
 
-Before writing any CC implementation prompt for a task that touches existing files, always query CC first to get the actual current code. Do not write prompts based on assumptions or memory.
+Before writing any CC implementation prompt for a task that touches existing files, always query CC first to get the actual current code. Do not write prompts based on screenshots, assumptions, or memory.
 
 Standard recon prompt:
 
