@@ -10,7 +10,7 @@ tags:
 
 > **This is the ONE file any session reads to become fully operational.** It is a CURRENT-STATE document — overwritten on every update, not appended to. [[Memories]] remains the historical append-only log; this file is "what is true right now."
 
-**Last updated:** 2026-06-12 00:20 (CC) — added standing rule 9 (CHAT UPDATE relay)
+**Last updated:** 2026-06-12 01:30 (CC) — 8-item rep dashboard fix batch shipped (`d84f011`, migration 022)
 
 ---
 
@@ -30,8 +30,9 @@ For deeper history or grounding, [[Memories]] (full session logs) and [[North St
 
 *(verified live as of 2026-06-12, ~00:15 local)*
 
-- **Dashboard** ([BFreeOhvara/ohvara-dashboard](https://github.com/BFreeOhvara/ohvara-dashboard)) live at ohvara-dashboard.vercel.app, master = origin at `9f16459`, tree clean. Rep-ready: login → 150 leads → Call Now modal (AI script) → 4-outcome status flow, all verified as apex11.
-- **Production DB:** migrations 001–021 applied. pg_cron: daily-batch-assign (00:05 UTC), process-lead-queues (hourly), eod-pipeline-sweep (23:55 UTC), plus legacy HTTP crons (assign-daily-batch 06:00, trigger-re-engagement 06:15, process-reminders every minute).
+- **Dashboard** ([BFreeOhvara/ohvara-dashboard](https://github.com/BFreeOhvara/ohvara-dashboard)) live at ohvara-dashboard.vercel.app, master = origin at `d84f011`, tree clean. Rep-ready: login → 150 leads → Call Now modal (AI script) → status flow, all verified as apex11.
+- **Call Now modal is save-on-Done (2026-06-12, `d84f011`):** status selection is local until Done commits everything; X discards. Appointment Booked / Follow-Up cannot save without a date/time. Calls Today / Booked Today are NET (one calls row per lead per rep per UTC day, deleted on revert to New) and move with the progress bar. Reverting out of Appointment Booked deletes the pending closer-pipeline appointment + clears appointment_at (migration 022 trigger). 0-row updates surface as a visible error (session-expiry guard). Rep dashboard also has: Commission Earned KPI ($248/closed deal from the commissions table), color-coded Activity feed, real oEmbed-verified video durations, and "Phoenix" as the roleplay grading persona (model unchanged: claude-haiku).
+- **Production DB:** migrations 001–022 applied. pg_cron: daily-batch-assign (00:05 UTC), process-lead-queues (hourly), eod-pipeline-sweep (23:55 UTC), plus legacy HTTP crons (assign-daily-batch 06:00, trigger-re-engagement 06:15, process-reminders every minute).
 - **Lead pipelines are pure Postgres — zero Twilio dependency, fully functional now** (code-audited + live-data-verified 2026-06-12). No Answer: trigger → 24h pool → hourly cron redistributes to a random active rep; lead stays visible in the rep's tab intraday. Follow-Up: trigger → same-rep queue → returns on chosen date (no date = visible until EOD sweep queues it for +1 day). Not Interested: permanent do-not-contact + scraper dedup, archived by the EOD sweep.
 - **Training gate LIVE:** new reps locked out of leads until 8 videos + quiz 85%+ (from the 48-card setter deck) + Retell roleplay graded B+. apex11 unlocked; rep_sarah locked.
 - **AI live on real model output** — Anthropic credits topped up with auto-reload ($10 → $50). generate-ai-script (haiku, triple fallback) and recommend-stack both healthy.
@@ -58,7 +59,7 @@ For deeper history or grounding, [[Memories]] (full session logs) and [[North St
 
 *(priority order per Phase 1)*
 
-1. **Blocker — Twilio secrets** (TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN / phone number from console.twilio.com → paste into CC → `npx supabase secrets set --project-ref jjextitmbptoaolacocs`). **Confirmed NOT a Phase 1 blocker for the rep flow** — only gates appointment-reminder SMS (cleanly stubbed, silent no-op) and future outreach texts.
+1. **Blocker — Twilio secrets** (TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN / phone number from console.twilio.com → paste into CC → `npx supabase secrets set --project-ref jjextitmbptoaolacocs`). **Confirmed NOT a Phase 1 blocker for the rep flow / apex11 test** — only gates appointment-reminder SMS (cleanly stubbed, silent no-op) and future outreach texts. **NOT descoped from the packages** (Manager-chat decision 2026-06-12): SMS reminders remain required before delivering Pro+ tiers to real clients — deprioritized relative to the apex11 test, not removed.
 2. **Blocker — INDEED_MCP_TOKEN** (source TBD) — Indeed scraper returns notConfigured until set; Maps scraper is the working fallback.
 3. **Full end-to-end rep test as apex11** — does NOT need to wait on Twilio.
 4. Set RETELL_COACH_AGENT_ID after the first coach call runs (prevents agent re-creation).
@@ -71,16 +72,18 @@ For deeper history or grounding, [[Memories]] (full session logs) and [[North St
 
 *(most recent first, last ~10–15 — full detail in [[Memories]])*
 
-1. **2026-06-12 — Zombie re-engagement cron.** trigger-re-engagement (day-one legacy) still fires nightly, writing SMS/email rows to re_engagement_log that NOTHING sends (6 rows stuck pending). Decoupled from pipeline v2, harmless, flagged for unscheduling (logged `a02cbb0`).
-2. **2026-06-12 — Twilio "descope" false memory.** Believed descoped; verified NO such decision exists in vault, git history, or secrets. Resolution: Twilio stays blocker 3 as written, but code audit confirmed the pipelines never depended on it — the rep test can run without it.
-3. **2026-06-12 — Retell v2 coach/roleplay fix.** Root cause: missing agent-ID secrets + broken dynamic fallback (invalid voice id; general_prompt passed straight to create-agent — Retell v2 requires create-retell-llm + response_engine). Fixed both functions; roleplay verified live; create-lead-call deployed v5 (04:16 UTC, fix confirmed in deployed source).
-4. **2026-06-11 — OneDrive "Delete 673 items?" popup.** Git auto-gc repacked loose objects in OneDrive-synced repos; correct answer is "Delete all items" ([[Gotchas]]).
-5. **2026-06-11 — fetch-secrets capabilities always false for reps.** `supabase.functions.invoke()` defaults to POST → admin-only branch. Fixed by passing `{ method: 'GET' }` — this was why roleplay showed Coming Soon with the key set.
-6. **2026-06-11 — Tab switch reloaded the whole app.** Supabase fires TOKEN_REFRESHED on tab return; auth listener set loading=true on every event → full remount. Fixed with same-user ref guard + refetchOnWindowFocus off.
-7. **2026-06-11 — apex11 saw 0 leads (twice).** batch_date never advanced past UTC midnight. Permanent fix: assign_daily_batches() on pg_cron at 00:05 UTC (migration 016).
-8. **2026-06-10 — Call Now modal rendered inside its table row.** animation-fill-mode:forwards made rows containing blocks for position:fixed. Fixed by portaling the modal to document.body (+ stopPropagation — portals move DOM, not React event bubbling).
-9. **2026-06-09 — recommend-stack 500s.** Anthropic credits depleted; generate-ai-script survived via triple fallback. Lesson: every AI edge function needs a fallback; credits now auto-reload.
-10. **2026-06-09 — PowerShell 5.1 file corruption.** Set-Content/Out-File mangle UTF-8 (mojibake, BOM in commit subjects). Use the Write tool for non-ASCII files; `git commit -F` with `[System.IO.File]::WriteAllText` for messages.
+1. **2026-06-12 — Call Now modal silently saved on X.** Root cause: status wrote to the DB immediately on dropdown selection, so "discard" was impossible and stats counted gross status changes. Fixed by making Done the only commit path (X discards), with date validation for Booked/Follow-Up and net calls-table sync. Migration 022 cleans up the ghost pending appointment on revert.
+2. **2026-06-12 — Verification trap: duplicate lead names.** Seeded data has duplicate business names ("CrystalBlue Pool" ×2 + "CrystalBlue Pool LLC"); a DB check against `[0]` of a name query read the WRONG duplicate and produced a false "save failed" diagnosis. Always verify by lead id, never by business name. Bonus artifact: hidden preview tabs never fire rAF, so count-up KPI numbers stay 0 — assert the data layer, not the animated number.
+3. **2026-06-12 — Zombie re-engagement cron.** trigger-re-engagement (day-one legacy) still fires nightly, writing SMS/email rows to re_engagement_log that NOTHING sends (6 rows stuck pending). Decoupled from pipeline v2, harmless, flagged for unscheduling (logged `a02cbb0`).
+4. **2026-06-12 — Twilio "descope" false memory.** Believed descoped; verified NO such decision exists in vault, git history, or secrets. Resolution: Twilio stays a tracked blocker, but code audit confirmed the pipelines never depended on it — the rep test can run without it. Manager chat then clarified: required for Pro+ fulfillment, deprioritized for Phase 1 testing.
+5. **2026-06-12 — Retell v2 coach/roleplay fix.** Root cause: missing agent-ID secrets + broken dynamic fallback (invalid voice id; general_prompt passed straight to create-agent — Retell v2 requires create-retell-llm + response_engine). Fixed both functions; roleplay verified live; create-lead-call deployed v5 (04:16 UTC, fix confirmed in deployed source).
+6. **2026-06-11 — OneDrive "Delete 673 items?" popup.** Git auto-gc repacked loose objects in OneDrive-synced repos; correct answer is "Delete all items" ([[Gotchas]]).
+7. **2026-06-11 — fetch-secrets capabilities always false for reps.** `supabase.functions.invoke()` defaults to POST → admin-only branch. Fixed by passing `{ method: 'GET' }` — this was why roleplay showed Coming Soon with the key set.
+8. **2026-06-11 — Tab switch reloaded the whole app.** Supabase fires TOKEN_REFRESHED on tab return; auth listener set loading=true on every event → full remount. Fixed with same-user ref guard + refetchOnWindowFocus off.
+9. **2026-06-11 — apex11 saw 0 leads (twice).** batch_date never advanced past UTC midnight. Permanent fix: assign_daily_batches() on pg_cron at 00:05 UTC (migration 016).
+10. **2026-06-10 — Call Now modal rendered inside its table row.** animation-fill-mode:forwards made rows containing blocks for position:fixed. Fixed by portaling the modal to document.body (+ stopPropagation — portals move DOM, not React event bubbling).
+11. **2026-06-09 — recommend-stack 500s.** Anthropic credits depleted; generate-ai-script survived via triple fallback. Lesson: every AI edge function needs a fallback; credits now auto-reload.
+12. **2026-06-09 — PowerShell 5.1 file corruption.** Set-Content/Out-File mangle UTF-8 (mojibake, BOM in commit subjects). Use the Write tool for non-ASCII files; `git commit -F` with `[System.IO.File]::WriteAllText` for messages.
 
 ---
 
