@@ -1112,3 +1112,5 @@ Paste into new CC session:
 ---
 
 [CC | 2026-06-11 22:37] — Created /reload skill (skills/reload.md), added CC auto-log rule to cc-prompt-format, added Rules subsection to Memories Hard-Won Lessons, registered reload in skills/Index
+
+[CC | 2026-06-11 22:39] — Generated fresh OHVARA CONTEXT LOAD block for new Eagle/Falcon chat (state current through dashboard `dfd46ce` / migrations 001–020 / training gate live; blockers 3+4 outstanding: Twilio + INDEED_MCP_TOKEN)
