@@ -63,6 +63,21 @@ a chat instance can absorb in one read, with the CC prompt rule from
 
 ---
 
+## Recon-First Rule (non-trivial tasks)
+
+Before writing any CC implementation prompt for a task that touches existing files, always query CC first to get the actual current code. Do not write prompts based on assumptions or memory.
+
+Standard recon prompt:
+
+> "Read and return the full contents of [relevant files]. Also run ls on any directories needed to understand the structure."
+
+Build the implementation prompt only after CC returns real file contents.
+
+**Applies to:** UI changes, bug fixes, schema changes, new features in existing components.
+**Does NOT apply to:** greenfield files, pure content rewrites, or tasks where structure is fully known from the context doc.
+
+---
+
 ## Related
 
 - [[cc-prompt-format]] — auto-log rule that keeps Atlas fresh for /reload

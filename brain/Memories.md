@@ -1114,3 +1114,10 @@ Paste into new CC session:
 [CC | 2026-06-11 22:37] — Created /reload skill (skills/reload.md), added CC auto-log rule to cc-prompt-format, added Rules subsection to Memories Hard-Won Lessons, registered reload in skills/Index
 
 [CC | 2026-06-11 22:39] — Generated fresh OHVARA CONTEXT LOAD block for new Eagle/Falcon chat (state current through dashboard `dfd46ce` / migrations 001–020 / training gate live; blockers 3+4 outstanding: Twilio + INDEED_MCP_TOKEN)
+
+[CC | 2026-06-12] — Five-task dashboard build, each pushed to master incrementally:
+1. `ee802ec` — Not Interested now mirrors No Answer: stays in the rep's list until the EOD sweep archives it (migration 021 applied to production via one-off runner; trigger no longer nulls batch_date intraday; CallModal note updated). Verified as apex11 via RLS REST.
+2. `deaff38` — Training video cards show real YouTube thumbnails (hqdefault.jpg flush with card top, CSS play overlay, watched ✓ badge). Verified via preview DOM assertions.
+3. `db38014` — Flashcard deck rewritten setter-only: 48 cards / 6 categories (pipeline, discovery, objections, booking, niches, mindset); all pricing/commission/closer content removed; quiz verified generating 20 questions from new deck.
+4. `69cbbb5` — Voice roleplay FIXED: root cause was missing RETELL_ROLEPLAY_AGENT_ID + broken dynamic fallback (invalid voice id, general_prompt passed straight to create-agent; Retell v2 needs create-retell-llm + response_engine). Created "Mike - HVAC Owner" agent (agent_c08d332c255a8fdbd78eede5a0, 11labs-Adrian), set the secret, fixed the fallback, redeployed both functions. Verified: create-roleplay-call returns access_token as apex11; UI shows live Start Practice Call. NOTE: no coach agent exists yet — create-lead-call has the same broken fallback (follow-up flagged); RETELL_COACH_AGENT_ID still unset.
+5. Recon-first rule added to [[reload]] (this commit) — Eagle queries CC for real file contents before writing implementation prompts that touch existing files.
