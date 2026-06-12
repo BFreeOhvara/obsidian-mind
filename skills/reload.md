@@ -32,12 +32,19 @@ Both surfaces fully current — work continues
 
 ---
 
-## What CC Does on /reload
+## Primary Convention (2026-06-12) — LIVE_STATE.md First
+
+**[[LIVE_STATE]] (`brain/LIVE_STATE.md`) is now the single current-state doc.** When Brayden types **/reload** in any session (Eagle, Falcon, chat, or CC), that session reads LIVE_STATE.md and responds with (a) an operational summary covering its four sections (current state, standing rules, open threads, problems/resolutions), and (b) if requested, a condensed paste-back block for handing off to a different session/platform. Memories.md and North Star.md remain the deep references.
+
+---
+
+## What CC Does on /reload (full chain flow)
 
 When Brayden types **/reload**, CC prints exactly ONE prompt — no commentary before or after it, formatted as a single copyable block. The prompt is:
 
 ```
-Read ~/obsidian-mind/brain/Memories.md and ~/obsidian-mind/brain/North Star.md
+Read ~/obsidian-mind/brain/LIVE_STATE.md first, then
+~/obsidian-mind/brain/Memories.md and ~/obsidian-mind/brain/North Star.md
 in full before doing anything else. I'm continuing Ohvara work.
 
 Get fully current on all of Ohvara:
