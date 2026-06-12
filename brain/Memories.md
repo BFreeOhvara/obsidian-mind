@@ -49,6 +49,11 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 - Use **Sonnet 4.6** for small fixes and routine tasks; **Fable 5** for big autonomous builds only
 
+### Rules
+
+- CC auto-logs every completed task to Atlas tagged `[CC | date]` — entry appended to [[Memories]], committed and pushed immediately (rule lives in [[cc-prompt-format]])
+- /reload flow: old CC prints prompt → paste into new CC → new CC reads Atlas → new CC prints context summary → paste into new Claude chat → done (skill: [[reload]])
+
 ### General
 
 - Read [[North Star]] and [[Memories]] before writing code
@@ -1103,3 +1108,7 @@ Paste into new CC session:
 **Resume prompt:**
 Paste into new CC session:
 "Load Atlas context. Two blockers left: Twilio (SID + token + phone number from twilio.com) and INDEED_MCP_TOKEN. Take them as I paste them, set Supabase secrets, then run the full end-to-end rep test as apex11. Dashboard is at v4 with the training gate live."
+
+---
+
+[CC | 2026-06-11 22:37] — Created /reload skill (skills/reload.md), added CC auto-log rule to cc-prompt-format, added Rules subsection to Memories Hard-Won Lessons, registered reload in skills/Index
