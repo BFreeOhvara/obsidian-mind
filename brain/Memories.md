@@ -1164,3 +1164,36 @@ Paste into new CC session:
 **Top lessons this session:** (1) functions.invoke() has no timeout and "never-500" fallbacks don't cover stalled requests or malformed-200s — normalize payloads and race a timeout; (2) one error boundary at the modal level is the difference between a retry card and a black page; (3) verify by lead id, never by business name (seeded dupes); (4) hidden preview tabs: no rAF, ResponsiveContainer width=0 — assert data, not pixels.
 
 **Status:** All three repos committed + pushed. Next session agenda unchanged: Twilio + Indeed secrets → full e2e rep test as apex11.
+
+---
+
+## 2026-06-12 | Session Handoff — /reload Relay + Falcon Manager Onboarding (CC)
+
+**Session length:** Medium — context-relay session, zero code changes
+**Topics covered:**
+- /reload executed per [[LIVE_STATE]] convention — operational summary delivered (current state, rules 1-9, open threads, P&R)
+- Falcon Manager context-load prompt generated (full Ohvara brief: who/what, packages, built/verified state, open threads, Falcon operating rules 1-6, pointed at the apex11 e2e test as next action)
+- Recon for Falcon: LIVE_STATE.md + eagle-startup.md + shared-instance-rules.md returned verbatim; Memories.md tail (lines 1115–1167) returned; "Eagle" found in 11 vault files
+- Chunked verbatim relay of Memories.md begun for Falcon: chunk 1 of ~5 (lines 1–262) delivered; chunks 2-5 NOT delivered — context alarm fired, wrap-up called
+
+**Decisions made:**
+- None — relay/recon only. No deploys, migrations, secrets, or protocol changes (LIVE_STATE intentionally not touched).
+
+**Findings:**
+- [[eagle-startup]] "Current Blockers" section is STALE — still lists Anthropic credits + RETELL_API_KEY as blockers though both cleared 2026-06-11. LIVE_STATE is authoritative; eagle-startup needs a blocker-section refresh (small fix, next session).
+- Relaying Memories.md (~65k tokens) through CC chat is context-prohibitive — for full-file handoffs, paste the file into the chat directly from Obsidian instead of chunking through CC.
+
+**Current state:**
+Unchanged from the 2026-06-12 03:15 wrap-up: dashboard at `ff2e7be` rep-ready, migrations 001–022, training gate live, pipelines Twilio-free, scrapers as logged. All repos clean and pushed (vault `.github/workflows/` untracked on purpose — PAT scope).
+
+**Blocked on (unchanged):**
+- TWILIO_* secrets (deprioritized, not descoped) and INDEED_MCP_TOKEN
+- Neither blocks the next action: **full e2e rep test as apex11**
+
+**Resume prompt:**
+Paste into new CC session:
+"Read ~/obsidian-mind/brain/LIVE_STATE.md first, then ~/obsidian-mind/brain/Memories.md latest entries. I'm continuing Ohvara work.
+
+Current state: dashboard rep-ready at ff2e7be, all repos clean. Falcon Manager chat may still need Memories.md chunks 2-5 (lines 263–1114) — if asked, recommend pasting the file directly instead.
+
+Next action: run the full end-to-end rep test as apex11, then fix the stale Current Blockers section in skills/eagle-startup.md."
