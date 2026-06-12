@@ -1071,3 +1071,35 @@ Paste into new CC session:
 "Load Atlas context. Priority 1: clear the 4 blockers (credits + 3 keys), paste into CC, set Supabase secrets. Priority 2: run full end-to-end rep test as apex11. Everything else is parked until the machine runs."
 
 **Status:** State saved — all repos committed and pushed
+
+---
+
+## 2026-06-11 (late night) | RELOAD CHECKPOINT — Post-Falcon Consolidated State (Eagle/CC)
+
+**Purpose:** Save+Resume after Falcon's build sessions. No new code this entry — consolidates the verified state of everything above for the next instance. Detailed logs: "Blockers 1+2 Cleared, Pipeline v2, Closer 4-Package View" + "Rep Dashboard v4" entries above.
+
+**Verified current state (pulled fresh, both repos in sync with origin):**
+- Dashboard at master `dfd46ce` (rep dashboard v4), vault at `26c5aae` before this entry
+- Production DB: migrations 001–020 applied. pg_cron: daily-batch-assign (00:05 UTC), process-lead-queues (hourly), eod-pipeline-sweep (23:55 UTC), process-reminders, trigger-re-engagement, legacy assign-daily-batch (06:00)
+- **Rep onboarding gate LIVE** — new reps see locked leads until: 8 videos + quiz 85%+ + roleplay B+. apex11 unlocked; rep_sarah locked
+- Lead pipeline v2/v4: No Answer → 24h pool → random rep (lead stays visible in rep's No Answer tab while waiting); Follow-Up → same rep on chosen date (amber badge); Not Interested → permanent do-not-contact + scraper dedup (Indeed name+city, Maps place_id)
+- AI is live on real model output (credits + auto-reload active); Retell verified (14 agents); voice roleplay + call coach unlocked
+
+**Blocker scoreboard:**
+1. ✅ Anthropic credits — $25 + auto-reload ($10 → $50), account ending uQAA
+2. ✅ RETELL_API_KEY — set + validated
+3. ❌ TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN / phone number — create account at twilio.com
+4. ❌ INDEED_MCP_TOKEN — source TBD
+
+**Open loops (carried):**
+- Twilio + Indeed token (the last 2 blockers) → then **full end-to-end rep test as apex11**
+- Retell agent IDs: set `RETELL_ROLEPLAY_AGENT_ID` + `RETELL_COACH_AGENT_ID` after first roleplay/coach runs
+- Firecrawl auth: `firecrawl login --browser`, tell CC "logged in"
+- Twilio No Answer outreach text (fires during 24h pool wait — needs blocker 3)
+- Supabase secrets cleanup: delete malformed `brayden11@ohvara.internal` + `ohvara-dashboard` entries
+- GitHub PAT `workflow` scope (vault `.github/workflows/` untracked); Maps scraper PR #1 ready to merge
+- [[dynamic-stack-pricing]] + [[review-agent-leads]] parked until 5+ recurring clients
+
+**Resume prompt:**
+Paste into new CC session:
+"Load Atlas context. Two blockers left: Twilio (SID + token + phone number from twilio.com) and INDEED_MCP_TOKEN. Take them as I paste them, set Supabase secrets, then run the full end-to-end rep test as apex11. Dashboard is at v4 with the training gate live."
