@@ -33,9 +33,11 @@ status: active
 
 ## Current Blockers
 
-- **Anthropic credits depleted** — AI scripts fall back to templates; recommend-stack 500s. Fix at console.anthropic.com
-- **RETELL_API_KEY missing** — blocks voice roleplay training + AI call coach + build-agent
-- **TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN missing** — blocks SMS appointment reminders
+> **[[LIVE_STATE]] is authoritative for blocker status** — check its Open Threads section before trusting this list. Snapshot as of 2026-06-12:
+
+- ✅ ~~Anthropic credits~~ — CLEARED 2026-06-11 ($25 + auto-reload $10 → $50). AI scripts + recommend-stack live on real model output.
+- ✅ ~~RETELL_API_KEY~~ — CLEARED 2026-06-11. Voice roleplay live ("Mike - HVAC Owner" agent); create-lead-call coach deployed v5.
+- **TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN missing** — gates SMS appointment reminders only (cleanly stubbed). Deprioritized for Phase 1 testing, NOT descoped — required before delivering Pro+ tiers to real clients.
 - **INDEED_MCP_TOKEN missing** — Indeed scraper returns notConfigured (Google Maps scraper is the working fallback)
 
 ## The One Rule
@@ -71,7 +73,7 @@ Eagle does NOT ask Brayden whether to do this — it just generates the artifact
 Paste into any new chat to continue work:
 
 ```
-Read ~/obsidian-mind/brain/Memories.md and ~/obsidian-mind/brain/North Star.md before doing anything. I'm continuing Ohvara work.
+Read ~/obsidian-mind/brain/LIVE_STATE.md first, then ~/obsidian-mind/brain/Memories.md latest entries. I'm continuing Ohvara work.
 
 Current state: [last "Current state" from the newest Memories session log]
 
