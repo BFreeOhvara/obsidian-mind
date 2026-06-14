@@ -48,6 +48,8 @@ Non-CC sessions (Manager chats, no filesystem) re-ground from the most recent pa
 - **Supabase secrets state:** ANTHROPIC, RETELL_API_KEY, RETELL_ROLEPLAY_AGENT_ID, GOOGLE_MAPS_API_KEY, all STRIPE_*_LINK_*, SECRETS_ENCRYPTION_KEY, CLIENT_PORTAL_URL set. Missing: TWILIO_*, INDEED_MCP_TOKEN, RETELL_COACH_AGENT_ID (expected — set after first coach call), STRIPE_SECRET_KEY (static links work).
 - **Client portal** deployed (ohvara-client-portal.vercel.app); close → provision-client → onboarding → build-agent chain in place.
 
+- **STRATEGY / PHASE (decided 2026-06-14 — [[ohvara-pricing-packaging-strategy]]):** Phase 1 niche = **Problem #1 (missed inbound calls & scheduling), targeting DENTAL + adjacent appointment-based healthcare** (chiro/med spa/PT/vet/optometry; same Receptionist/Front-Desk job cluster), sourced via Indeed (volume ~15-20x HVAC; self-filters to non-AI practices). 4-phase roadmap: **P1 appointment-setter dashboard (ACTIVE)** → P2 closer dashboard + booking handoff → P3 admin dashboard (niche-performance board) + client-portal merge → P4 hire 5-7 setters. Pricing: keep $497 setup; recurring → custom per-client monthly (anchored on Indeed salary signal + stack), uncapped. **Two NEW Phase-1 build requirements this creates:** (1) Training Center content rewrite HVAC/Mike → dental/healthcare; (2) My Leads must surface the job-posting title/snippet per lead (for the "I saw you're hiring for X" opener) — *Phase-1 recon to confirm if the lead record carries this field today.*
+
 ## STANDING RULES / SKILLS
 
 *(every session follows these — sources linked)*
