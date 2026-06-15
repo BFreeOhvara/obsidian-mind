@@ -1,9 +1,12 @@
 # Ohvara — Problem-First Packaging & Pricing Strategy
 
-*Living doc. Last major revision: 2026-06-14, session 2 — niche decision
-revised (dental → vet) following HIPAA/single-closer findings, plus
-multi-niche model, comp structure (partial), and several Phase 1 build
-requirements identified.*
+*Living doc. Last major revision: 2026-06-15 — final 7-setter niche lineup
+locked (vet + 6 trades), HIPAA/medical re-examined from ~6 angles
+(conclusion unchanged: excluded), future candidate niches recorded (legal,
+real estate), warm-not-cold training framing added, vet TAM sized, and the
+INDEED_MCP_TOKEN given a measurable definition of done. Builds on the
+2026-06-14 session-2 revision (dental → vet, multi-niche model, partial
+comp structure, Phase 1 build requirements).*
 
 ## Core thesis
 
@@ -35,12 +38,31 @@ the pipeline is uniform.
   doesn't add closer-side complexity, as long as problem-type stays #1.
 
 **First validated niche: veterinary** (receptionist/client-care-coordinator
-cluster). Reasoning below. Additional niches for setters #2-7 are open —
-each candidate niche needs the same two checks vet passed: (a) viable
-Indeed volume (low-thousands+ nationally is the rough bar vet cleared), and
-(b) HIPAA-clean (see below). Candidates not yet checked: trades/HVAC
-(original default, known-clean, lower volume), legal-office receptionist,
-real estate, auto repair, salons.
+cluster). Reasoning below.
+
+### FINAL niche lineup — LOCKED (7 setters, 2026-06-15)
+
+**vet** (setter #1) + **HVAC, electrical, roofing, landscaping, pressure
+washing, tow truck** (setters #2-7). All seven pass the two checks vet set:
+viable Indeed volume + HIPAA-clean (non-healthcare).
+
+**Tow truck — verified, NOT dropped.** 523 national "Tow Truck Dispatcher"
+postings + 292 remote, and the job content is genuinely customer-facing:
+"receive and respond to incoming calls from drivers in need of towing
+services… dispatch… promptly." Arguably the *purest* "answer every call"
+example found. "Immediate dispatch" vs. "scheduled appointment" is a
+framing nuance for training content, not a fit problem.
+
+**Considered and dropped / excluded (record so they aren't re-suggested):**
+- **Oilfield services** — considered (530 national "Oil Field Dispatcher"
+  postings, decent raw volume) but **DROPPED**: job content is internal
+  fleet/crew dispatch (GPS routing, rig-up/rig-down scheduling, 12hr
+  shifts), not customer-facing scheduling — doesn't match the Problem #1
+  pitch despite the volume.
+- **Plumbing, auto repair, salon, restaurant** — excluded: Maps-only in
+  the current seed data (12 each), not Indeed-exclusive.
+- **Pest control, pool service** — excluded: 0 unassigned (fully assigned
+  already).
 
 ### Why vet (and why not dental/healthcare)
 
@@ -81,6 +103,50 @@ comparable to the entire current snapshot pool. Combined with the
 already-implemented recycling lifecycle (below), a month's runway is
 comfortable even if the pool estimate is off by 30-40%.
 
+### HIPAA / medical — re-examined from ~6 angles, conclusion UNCHANGED (excluded)
+
+This resurfaced repeatedly in the 2026-06-15 session. Reasoning recorded
+clearly so it does not get re-litigated without *genuinely new*
+information:
+
+- **Why "Receptionist" keeps surfacing healthcare:** 84% of all US
+  receptionist jobs are healthcare — offices of physicians 32.4%,
+  hospitals 31.3%, outpatient care centers 20.2% (BLS / DataUSA). The
+  category is structurally dominated by healthcare, which is *why* it kept
+  appearing in searches — not a signal that healthcare is the right niche.
+- **"Scoped AI (booking only) + live-transfer for medical questions"
+  does NOT avoid PHI.** Identity + appointment-time + provider-name **is**
+  PHI under HIPAA's definition, regardless of clinical content. Holds even
+  for "name / phone / time-slot only, zero clinical detail."
+- **Market-structure check fails too.** "HIPAA-fear keeps competitors away,
+  market is open" does **not** hold — dental AI-receptionist competitors
+  (Arini, Dentina) already operate with BAA-included as standard /
+  table-stakes. HIPAA likely filters out the *weaker* competitors, leaving
+  better-resourced ones — the opposite of open space for a small entrant.
+- **"Medical broadly, not just dental" changes nothing.** Same binary
+  infrastructure cost regardless of which / how-many healthcare niches are
+  served, and healthcare AI is one of the hottest VC categories — likely
+  *more* competition, not less.
+
+Net: the binary infra-level BAA cost (established session 2) plus all four
+checks above keep healthcare **excluded entirely**, not minimized.
+
+## Future candidate niches (not in the current 7; strong if more slots open)
+
+- **Legal / law-firm intake & receptionist** — the biggest non-vet,
+  non-healthcare find this session: ~345-408 in Texas alone for "Legal /
+  Law Firm Receptionist"; "Entry Level Legal Assistant" showing 466 in
+  Houston alone. Excellent fit — "intake" is literally call-capture,
+  personal-injury / family-law cases are high-value, and repeated
+  bilingual-staffing asks suggest real understaffing pain. **Not** a HIPAA
+  covered entity — no BAA / infrastructure issue, only a lighter "sensitive
+  personal info" consideration (divorce / injury details). Flagged as the
+  strongest candidate for a *second* branded product later (see Vet TAM).
+- **Real estate / leasing-office receptionist** — ~324 in TX, ~231-417
+  nationally depending on phrasing. Solid, but some postings skew toward
+  larger property-management / leasing-office operations (more corporate)
+  vs. small brokerages.
+
 ## Lead lifecycle & recycling — CONFIRMED IMPLEMENTED (not conceptual)
 
 Phase 1 recon (2026-06-14) confirmed this is real, not aspirational:
@@ -112,6 +178,13 @@ N parallel niche-specific tracks.
 Dallas) is industry-specific, which doesn't match "same skills, different
 niche." A generic small-business-owner persona (not tied to one industry)
 fits better than a like-for-like HVAC→vet swap.
+
+**"Warm, not cold" — concrete confidence-building fact for setter training
+(NEW 2026-06-15).** Ties into the Training Center rewrite item. Indeed
+leads are **not** cold calls: the business already self-identified the
+missed-call / understaffing problem by posting the job. This belongs in
+setter training as a *factual* confidence builder ("they told you they have
+this problem"), not just motivational framing.
 
 ## Pre-call brief (Nate) — NEW SPEC
 
@@ -194,6 +267,21 @@ account-management/agent-team motion, not something setters pitch during
 outreach. Feeds the "uncapped stack" pricing idea: the stack grows
 additively over the client relationship.
 
+## Vet TAM — for a future paid-ads / branded play ("Ohvara for Veterinary Clinics")
+
+The à-la-Arini-for-dental branded product. **~28,000-32,000 total US vet
+practices; ~15,000-22,500 independent / addressable** (corporate chains —
+Banfield ~800 locations, VCA ~600 — likely run centralized systems, not a
+per-clinic ad target). Smaller than dental's TAM (~200,000+) but big enough:
+even low-single-digit-% capture = hundreds of clients = real recurring
+revenue.
+
+**Legal is the strongest candidate for a *second* branded product** (see
+Future candidate niches) — to be spun up once a legal-niche setter generates
+real conversation data the same way vet's setter #1 is expected to inform
+"Ohvara for Veterinary Clinics" positioning / landing-page copy. Branded
+products follow the setter data, not the other way around.
+
 ## Build roadmap (4 phases)
 
 One platform (`ohvara-dashboard`), four roles via login: appointment
@@ -216,8 +304,9 @@ role remains Phase 3/4.
   the pre-call brief to Nate, call recording for Nate's calls (QA).
 - **Phase 3**: admin dashboard + integration across all three roles —
   niche-performance admin board (below), client-portal merge.
-- **Phase 4**: hire 5-7 appointment setters, each assigned one niche (vet
-  first; additional niches TBD per the volume/HIPAA bar above).
+- **Phase 4**: hire 7 appointment setters, each assigned one niche — vet
+  first, then HVAC, electrical, roofing, landscaping, pressure washing,
+  tow truck (lineup LOCKED 2026-06-15, see Final niche lineup above).
 
 ## Admin board: niche performance tracking (future item)
 
@@ -227,15 +316,25 @@ useful under the multi-niche model — this is how additional niches (for
 setters #2-7) get validated/prioritized with real data rather than
 estimates. Not yet scoped — Phase 3.
 
+## Lead supply: INDEED_MCP_TOKEN — concrete definition of done
+
+Still the **top infrastructure priority** (from the prior sync) — this gives
+it a measurable target. **Definition of done: ~2 months of Indeed postings
+per niche, ongoing — for all 7 niches** — not just "more leads eventually."
+The current 12-14/niche seed batches are *starter* batches only: at 150
+dials/day with recycling, that's days-to-low-weeks of runway, not 2 months.
+Unblocking this token is what closes that gap across the whole lineup.
+
 ## Open questions / things to nail down
 
 - **Comp structure** (see above): PENDING Nate clarification on the 10%
   proposal — one-time vs. ongoing, departure handling.
 - **`closer_notes` field**: confirm whether repurposable for the AI-generated
   pre-call brief, or whether a new field/table is needed.
-- **Additional niches for setters #2-7**: which ones, checked against the
-  vet bar (volume + HIPAA-clean). Candidates: trades/HVAC, legal-office
-  receptionist, real estate, auto repair, salons.
+- ~~**Additional niches for setters #2-7**~~: RESOLVED 2026-06-15 — lineup
+  LOCKED to vet + HVAC, electrical, roofing, landscaping, pressure washing,
+  tow truck. Oilfield dropped (internal dispatch, not customer-facing).
+  Legal + real estate parked as future candidates / branded-play seeds.
 - **No-answer routing**: strict original-caller vs. any-same-niche-setter —
   decide at build time.
 - **Real pool-size query** (vet, and any additional niches): still a
