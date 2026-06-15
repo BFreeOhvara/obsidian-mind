@@ -1,293 +1,245 @@
-# Ohvara — Problem-First Packaging & Pricing Strategy (Draft)
+# Ohvara — Problem-First Packaging & Pricing Strategy
 
-*Working draft, captured from a brainstorm on 2026-06-14. This is a
-starting framework, not a finalized model — open questions are flagged
-throughout.*
+*Living doc. Last major revision: 2026-06-14, session 2 — niche decision
+revised (dental → vet) following HIPAA/single-closer findings, plus
+multi-niche model, comp structure (partial), and several Phase 1 build
+requirements identified.*
 
 ## Core thesis
 
-Right now the pitch is spread across too many angles. The proposal is to
-narrow to a small set of core problems that AI can solve for small
-trades/local businesses — "people are missing too many calls" being the
-clearest example so far.
+The underlying product is mostly the same regardless of framing — a voice
+agent that answers/books calls. What changes per niche is positioning, not
+the build. "Niche" = an Indeed job-category cluster (e.g., Receptionist /
+Client Care Coordinator / CSR — all the same underlying problem).
 
-The key insight underneath this: **the underlying product is mostly the
-same regardless of framing.** A "dispatcher" and a "receptionist" are, from
-the AI agent's perspective, the same core capability with different
-labeling depending on which role/problem the buyer relates to. The product
-doesn't need to fragment — the *pitch* does, but the *build* doesn't.
+## Problem focus
 
-**"Niche" = Indeed job-category.** A niche is defined by the cluster of job
-titles a business posts when it has a given problem — e.g. Receptionist /
-Dispatcher / Appointment Setter / CSR are all the *same* niche (same
-underlying problem, different titles for it), not different niches.
+**Problem #1 — missed inbound calls & scheduling** is the current and only
+active focus ("receptionist/AI-answering stacks"). Problems #2 (outbound
+follow-up) and a healthcare-adjacent #3 candidate remain documented
+possibilities for future expansion but are not active.
 
-## The three problems (working list)
+## Niche model: DECIDED — multi-niche, one per setter
 
-**#1 — Missed inbound calls & scheduling (solid).** Job titles:
-Receptionist, Dispatcher, Appointment Setter, Customer Service Rep / CSR.
-The pain: the phone rings, nobody answers, the appointment doesn't get
-booked. Voice agent answers calls. Currently the main focus — well
-represented on Indeed across HVAC, plumbing, electrical, dental, and more.
+Each appointment setter specializes in **one niche** (for lead-pool
+allocation and lingo-depth), but all setters sell the **same problem**
+(#1). This is the "doctor" framing: Nate (closer) diagnoses and prescribes
+the fix regardless of which "patient" (niche) it came from — his side of
+the pipeline is uniform.
 
-**#2 — Outbound follow-up on leads/past customers (solid).** Job titles:
-Telemarketer, SDR, Outbound Sales Rep, Lead Generation Specialist. The
-pain: the business has a list of old quotes, leads, or past customers that
-nobody is calling back — lead leakage. Same voice agent, but making calls
-instead of taking them. Common Indeed category across home services,
-insurance, real estate, solar.
+**Two-axis model**:
+- **Niche** = setter axis. Per-setter, for lead-pool allocation. Not a
+  training/content axis (see Training below).
+- **Problem-type** = closer axis. Currently just #1, uniform for Nate.
+  Nate's capacity isn't capped by niche — adding niches for new setters
+  doesn't add closer-side complexity, as long as problem-type stays #1.
 
-**#3 — TBD.** Candidate: Insurance Verification Specialist (dental, chiro,
-med spa, physical therapy — "we're on hold with insurance companies for
-hours" pain). Real Indeed signal, but healthcare-leaning and narrower than
-#1/#2. Alternative: leave this slot open and fill it once #1 and #2 have
-traction and real conversion data (see Admin Board below) suggests what's
-missing.
+**First validated niche: veterinary** (receptionist/client-care-coordinator
+cluster). Reasoning below. Additional niches for setters #2-7 are open —
+each candidate niche needs the same two checks vet passed: (a) viable
+Indeed volume (low-thousands+ nationally is the rough bar vet cleared), and
+(b) HIPAA-clean (see below). Candidates not yet checked: trades/HVAC
+(original default, known-clean, lower volume), legal-office receptionist,
+real estate, auto repair, salons.
 
-**On industry lingo:** each problem-niche naturally clusters into a related
-set of industries — #1's dispatcher postings cluster around HVAC/plumbing/
-electrical; #2's SDR/lead-gen postings cluster around home services/
-insurance/real estate. A rep specializing in one niche ends up learning
-lingo for a *bounded* industry cluster through repetition, rather than
-needing to cover everything. This resolves the lingo question as a side
-effect of the niche split — no separate training track needed for it.
+### Why vet (and why not dental/healthcare)
 
-## Lead lifecycle & recycling
+Two findings drove this, both from 2026-06-14 session 2:
 
-Confirmed lifecycle: a lead keeps getting dialed/recycled until it reaches
-a terminal outcome.
+**HIPAA is real and binary at the infrastructure level.** Every dental
+AI-receptionist competitor (Arini, Dentina, etc.) markets a signed Business
+Associate Agreement as "non-negotiable" / "table stakes" — introducing an
+AI receptionist into a healthcare practice's phone workflow makes the
+vendor a HIPAA business associate. This isn't a per-client cost that scales
+down with fewer healthcare clients — on shared infrastructure, BAA
+compliance is effectively all-or-nothing for the whole stack (Retell,
+Supabase, every sub-processor). Decision: avoid healthcare niches entirely,
+not just minimize them.
 
-- **New** → dialed
-- **No answer** → recycled for follow-up, repeats until answered
-- **Answered** → either:
-  - **Booked** → proceeds toward closed-won
-  - **Said no** → closed-lost
+**The single-closer constraint reinforces this.** With one closer (Nate)
+handling all deals, a healthcare niche would mean *every* close involves a
+BAA/compliance conversation — exactly the "different sales process"
+complexity the model is designed to avoid. Non-healthcare niches keep
+Nate's side uniform regardless of how many niches setters cover.
 
-This loop is what makes a high daily-dial number sustainable from a modest
-lead pool — most dials are re-attempts within this loop, not first
-contacts.
+**Vet passed both checks vet was checked against:**
+- Volume: "Veterinary Client Care Coordinator" ~1,826 nationally, "Front
+  Desk & Veterinary Receptionist" ~2,018 nationally — roughly half of
+  dental's pool (~6,700) but 5-8x HVAC's (~360). Texas alone: ~774 openings
+  for vet receptionist roles. Same job-title cluster pattern as dental
+  (Receptionist / Client Care Coordinator / CSR).
+- HIPAA: animal health records are not PHI under HIPAA — vet clinics are
+  not covered entities. Zero exposure, for Ohvara's infrastructure and for
+  Nate's sales conversations.
+- Minor honest tradeoff vs. dental: pet insurance is less universal than
+  human health insurance, so the "insurance verification bundled into the
+  stack" bonus that dental had is weaker for vet (lighter, not absent).
 
-## Lead volume & feasibility
+**One-month volume check (vet)**: pool ~2,000-3,500 nationally, ~30-day
+posting lifespan implies ~70-120 new postings/day → ~2,100-3,600/month —
+comparable to the entire current snapshot pool. Combined with the
+already-implemented recycling lifecycle (below), a month's runway is
+comfortable even if the pool estimate is off by 30-40%.
 
-Spot-checked Indeed posting counts (2026-06-14 snapshot; narrow query
-phrasings, so likely an undercount of the true universe of relevant
-titles): "HVAC Receptionist" ~360 openings nationally, "HVAC Dispatcher"
-~616, "Plumbing/HVAC Receptionist" ~559, "Plumbing Receptionist" ~259,
-"Receptionist HVAC" in Dallas alone ~43. Order of magnitude: low-thousands
-of active postings nationally across HVAC/plumbing/electrical
-receptionist-dispatcher-type titles, likely more once broader title
-variants (Office Manager, Service Coordinator, Front Desk, etc.) are
-included.
+## Lead lifecycle & recycling — CONFIRMED IMPLEMENTED (not conceptual)
 
-**Why this is enough:** because of the recycling lifecycle above, a working
-list doesn't need hundreds of fresh postings appearing every single day to
-support several reps at high daily-dial volume — most dials are
-follow-ups on an existing list. A pool in the low-thousands, refreshed
-weekly as postings expire and new ones appear, comfortably feeds multiple
-reps' working lists.
+Phase 1 recon (2026-06-14) confirmed this is real, not aspirational:
+`leads.status` tracks New → No Answer → Follow-Up → Appointment Booked →
+Not Interested, backed by `no_answer_queue`/follow-up queue tables and
+hourly/daily crons (migrations 019-026). My Leads passed an e2e test using
+this flow.
 
-If precise current numbers matter for planning, a small script against the
-actual target title/geography set (could extend the existing Scraper infra)
-would give a live, ongoing count — flagged as a possible future build item,
-not done yet.
+**New Phase 1 requirement — niche-aware no-answer routing**: under the
+multi-niche model, a No-Answer lead currently gets redistributed (hourly)
+to *whoever's* in rotation — but a vet lead redistributed to a setter who
+covers trades/legal-receptionist loses the original caller's
+niche-accumulated context. Fix: niche-specific leads on No-Answer should
+route back to the original caller (or another same-niche setter), not the
+general redistribution pool. Implementation detail (strict
+"original-caller-only" vs. "any same-niche setter") TBD at build time —
+either way, the routing needs to become niche-aware, not pure round-robin.
 
-## Phase 1 niche selection: DECIDED — dental & adjacent appointment-based healthcare
+## Training: universal, not per-niche
 
-**Decision**: Problem #1 (missed inbound calls & scheduling), targeting
-dental and adjacent appointment-based healthcare (chiro, med spa, PT, vet,
-optometry — all post the same Receptionist/Scheduling Coordinator/Front
-Desk cluster for the same pain), sourced via Indeed.
+Clarified 2026-06-14 session 2: all setters learn the **same** product
+training (pitch, missed-calls problem, objection handling, working an
+Indeed lead) regardless of niche. Niche-specific knowledge a setter picks
+up is organic/incidental — not something Ohvara builds curriculum for. This
+**simplifies** Phase 1's Training Center scope back to **one rewrite**, not
+N parallel niche-specific tracks.
 
-**Why**: dental-front-desk Indeed volume dwarfs HVAC by roughly 15-20x
-("Dental Receptionist" ~6,698 openings nationally vs. "HVAC Receptionist"
-~360), and widening to adjacent appointment-based healthcare extends that
-pool further — directly addressing the "5-7 reps for a prolonged period"
-concern. Indeed-sourcing self-filters toward practices that haven't adopted
-an AI receptionist yet (they're still posting to hire a human), so the
-crowded-competitor concern matters less here than it would for paid ads.
-Dental postings frequently bundle insurance verification with scheduling —
-naturally folding the Problem #3 candidate into this niche's stack rather
-than needing it as a separate problem. Lingo holds together across these
-adjacent specialties as one niche (patient/appointment/insurance/provider).
+**Implication for AI Roleplay**: the current scenario (Mike, HVAC owner,
+Dallas) is industry-specific, which doesn't match "same skills, different
+niche." A generic small-business-owner persona (not tied to one industry)
+fits better than a like-for-like HVAC→vet swap.
 
-**Two concrete Phase 1 requirements this creates**:
-- Training Center content (scripts, flashcards, quiz, AI Roleplay scenario)
-  needs a rewrite from HVAC/Mike to dental/healthcare-adjacent.
-- The highest-leverage opener identified: reference the business's own job
-  posting directly ("I saw you're hiring for a [Front Desk Coordinator]...")
-  plus a low-commitment ask (a free 15-minute call to see if AI could handle
-  it instead of hiring) and 1-2 objection-handlers. For this to work, **My
-  Leads needs to surface the specific job-posting title/snippet** that
-  generated the lead — a data requirement for the Phase 1 recon to confirm
-  (does the lead record carry this today, or does it need adding).
+## Pre-call brief (Nate) — NEW SPEC
 
-**Not yet verified, recommended before scaling to 5-7 hires**: a real
-pool-size count for dental+adjacent-healthcare titles/geography — everything
-so far is estimates stacked on estimates. Not blocking the dashboard recon,
-but worth doing before committing to hiring against this.
+When a setter's discovery call results in a booked appointment, the AI
+should generate, before Nate's call:
 
-## Pricing signal from Indeed postings
+- **Three-tier stack recommendation**: "perfect fit" / a scaled-down
+  alternative / (third tier per original framing — likely an upsell tier).
+  Each tier carries built-in *reasoning* — why this component is included,
+  how it compounds with the core system (e.g., "we added X because it works
+  with the AI system and saves/earns more") — functioning as pre-loaded
+  objection handlers Nate can use verbatim.
+- **Recommended price**: the AI's "maximum doable" setup-fee figure, with
+  reasons justifying it (for holding firm) and separately, reasons it could
+  go *higher* (for upselling).
+- **Built from**: the setter's discovery-call findings (the questions
+  asked, pain points surfaced) — and, once call recording exists (below),
+  actual transcripts rather than manual outcome-log notes.
 
-Leads are sourced from Indeed job postings. The framing: if a business is
-actively posting for a role (receptionist, dispatcher, etc.), that's a
-double signal —
+**Possible implementation home**: `appointments.closer_notes` (confirmed to
+exist in schema by Phase 1 recon) — needs confirming whether this is
+intended for Nate's own notes, or repurposable/extendable for an
+AI-generated brief.
 
-1. **They have the problem** (they're trying to solve it by hiring a human
-   for it).
-2. **They've already told you what they're willing to pay** — the posted
-   salary/wage is a real, business-stated number for the cost of solving
-   that problem with a human.
+## Call recording — promoted from blocked to active
 
-That salary figure becomes the anchor for the pricing conversation: the AI
-solution is framed relative to what they're already budgeting for a human
-to do the job.
+Phase 1 recon had flagged this as deprioritized/Twilio-gated ("no
+click-to-call or call capture... blocks the 'record + AI-grade real calls'
+idea"). Now active, for two reasons:
 
-## Indeed vs. Maps/no-website leads: complementary, not competing
+1. **QA/coaching**: extend Phoenix's grading (currently roleplay-only) to
+   real calls — for setters (Phase 1) and Nate (Phase 2).
+2. **Pre-call brief input**: real transcripts give the AI richer material
+   for the stack/price recommendation than manual outcome-log notes.
 
-Indeed-sourced leads carry two signals Maps/no-website leads don't: the
-business has told you it has the problem (posting to hire for it), and it's
-told you what it's willing to pay (the posted wage). That should make them
-close more easily — pitching a fix to a problem they're already trying to
-solve — regardless of how crowded the AI-vendor *paid-ads* space is for
-that niche, since a warm pitch to a known pain point isn't the same motion
-as competing for ad placement.
+**Practical considerations**: dialer/recording platforms (Twilio-type)
+typically charge per-seat, so cost scales with headcount (5-7 setters +
+Nate). Indeed-sourced leads span all-party-consent states (CA, FL, etc.) —
+standard fix is an automated "this call may be recorded" disclosure at call
+start, baked into the dialer config.
 
-Maps/no-website leads are the opposite profile: no explicit signal, a
-colder pitch — but also likely the lowest competitive exposure of any lead
-source discussed, since AI-vendor competitors mostly find prospects via
-ads/SEO/content, channels a no-website business essentially doesn't appear
-in.
+**Scope**: spans Phase 1 (setter-side recording + brief input) and Phase 2
+(Nate's calls for QA).
 
-These aren't really substitutes — Indeed gives priced/warm leads at a cost
-that scales with the niche's visibility; Maps gives cold leads with minimal
-competitive exposure regardless of niche.
+## Compensation structure
 
-## Modular delivery — the "stack"
+**Setup fee** (one-time): AI-recommended "maximum doable" price; Nate can
+negotiate higher.
 
-The core agent stays the same, but each client gets a **custom stack** —
-the specific set of integrations/features relevant to their business. The
-stack is shaped by what the appointment-setter learns during discovery
-(the qualifying questions on the initial call), so it reflects the actual
-issue the business has, not a generic template.
+**Original split** (as designed): setters get **20% of the setup fee**
+only (one-time, tied to what they sourced). Monthly recurring split between
+Brayden (ongoing profit/admin) and Nate (retention commission for managing
+the client relationship month-over-month). Setters get nothing from
+recurring — they never interact with the client again post-booking.
 
-## Pricing model
+**Nate's counter-proposal** (relayed 2026-06-14, status: PENDING — not
+decided): setters get **10% of "the whole deal"** = setup fee + monthly
+payment. **Unresolved ambiguity**, needs a follow-up conversation with
+Nate:
+- Is the 10%-of-monthly component a **one-time calculation** (e.g., 10% of
+  one month's recurring, paid once at close alongside the setup-fee cut —
+  same payout *schedule* as the original model, different *formula*)? Or
+  **ongoing/residual** (10% of recurring every month, for as long as the
+  client stays)?
+- If ongoing: does it survive a setter leaving the company? (Real long-term
+  liability question if yes.)
+- Whether 10% (setup+monthly-based) nets higher or lower than 20%
+  (setup-only) depends entirely on the setup-to-recurring ratio for a
+  typical deal — unknown without real figures.
 
-- **Setup fee**: keep the existing **$497 one-time** setup fee — unchanged.
-- **Recurring**: move to a **custom monthly price per client**, not a fixed
-  tier. Priced based on:
-  - The Indeed-sourced salary signal (what they're already paying/willing
-    to pay a human for this role).
-  - The specific stack being delivered (more integrations/complexity →
-    higher price).
-- **Uncapped**: no fixed ceiling — pricing should scale with the client's
-  willingness-to-pay rather than being capped by a tier structure.
+**Do not build comp logic against this until resolved.**
 
-## Rep specialization by problem
+## Stack expansion / SEO upsell (future, post-onboarding)
 
-Instead of every rep being able to pitch every angle, each rep owns **one
-problem-niche** and becomes the specialist for it:
-
-- Deeper pattern recognition — they hear the same objections repeatedly and
-  get sharper at handling them.
-- No context-switching between pitches mid-day.
-- Easier onboarding/training per rep, since training content can be scoped
-  to one problem instead of the full breadth.
-- Industry lingo is naturally bounded per niche (see above) — no extra
-  training burden.
-
-This has a direct tie-in to the rep dashboard's Training Center — if this
-model goes forward, training content (scripts, flashcards, quiz questions,
-AI Roleplay scenarios) would eventually need to be organized **per
-problem-niche**, not just generically.
-
-## Growth model: Indeed as bootstrap capital → reinvestment
-
-Indeed-sourced revenue in Phase 1 is treated as **temporary, bootstrap
-capital** — 100% reinvested into Phase 2 (inbound/paid ads, or an
-agency-partnership motion) rather than kept as ongoing lead-gen
-indefinitely.
-
-**Open structural question**: does Phase 2 reinvestment target the *same*
-niche the Indeed revenue came from, or a *different* one? If that niche's
-paid-ads landscape turns out to be crowded (as the dental case suggests it
-could be for a high-volume niche), there's an argument for decoupling — use
-a high-volume niche as a pure cash engine via Indeed, but direct the
-durable paid-ads investment toward a less-crowded niche. Not resolved yet.
-
-### Phase 2 candidates (gated, not current)
-
-Both ideas below are explicitly gated on Phase 2 being viable (paid ads
-working, or a partnership motion in place) — not pursued now, but worth
-capturing:
-
-- **Marketing agencies** (likely as a channel/reseller, not end-user):
-  partner with agencies that already manage many small-business clients —
-  one relationship gives access to a whole client roster, white-labeled or
-  bundled as an add-on to the agency's existing services. A distribution
-  multiplier rather than one-business-at-a-time.
-- **Oil & gas / oilfield services** (Texas-relevant): oilfield service
-  companies (well servicing, equipment hauling, drilling support) are
-  dispatch-heavy — same Problem #1 shape — but higher contract value and a
-  more enterprise-y sales motion than a small HVAC shop.
+Once a client is in the portal — "part of their business runs through us"
+— the AI-agent-team can build/offer *additional* agents (e.g., an SEO
+agent, if discovery reveals a weak Google presence) as expansion revenue.
+This is separate from the initial setter/closer pipeline — an
+account-management/agent-team motion, not something setters pitch during
+outreach. Feeds the "uncapped stack" pricing idea: the stack grows
+additively over the client relationship.
 
 ## Build roadmap (4 phases)
 
 One platform (`ohvara-dashboard`), four roles via login: appointment
-setter, closer, admin, client. Closer and admin roles reportedly already
-exist (different logins) but aren't yet fully built out — confirming this
-is part of the pending Phase 1 recon. `ohvara-client-portal` is intended to
-eventually be absorbed into `ohvara-dashboard` as the "client" role rather
-than living separately — not yet scoped, Phase 3/4 territory.
+setter, closer, admin, client. Phase 1 recon confirmed closer (7 routes:
+deals/revenue/reps/scraper/call-leads/pipeline) and admin roles already
+exist/partially scaffolded. `ohvara-client-portal` merge into the "client"
+role remains Phase 3/4.
 
-- **Phase 1** (current/active): appointment-setter dashboard, fully
-  functional. Recon prompt ready/pending.
-- **Phase 2**: closer dashboard + appointment-setter↔closer integration
-  (booking handoff — what happens to a booked appointment, who picks it up).
+- **Phase 1** (active): appointment-setter dashboard, fully functional.
+  Recon complete (My Leads/Commissions/Activity all real and working).
+  Remaining Phase 1 scope, as of this revision:
+  - Add `posting_title`/`posting_snippet` (+`source_url`) to `leads`,
+    populate from Indeed scraper, surface in My Leads (for the "I saw
+    you're hiring for X" opener — confirmed gap).
+  - Training Center rewrite — ONE universal rewrite (not per-niche),
+    including a generic (non-industry-specific) AI Roleplay persona.
+  - Niche-aware no-answer routing (see Lead lifecycle above).
+  - Call recording (setter-side) + pre-call brief generation.
+- **Phase 2**: closer dashboard + setter↔closer integration — delivering
+  the pre-call brief to Nate, call recording for Nate's calls (QA).
 - **Phase 3**: admin dashboard + integration across all three roles —
-  includes the niche-performance admin board concept above, and the
-  client-portal merge.
-- **Phase 4**: onboard real appointment setters (5-7 hires) against the
-  decided niche (dental & adjacent healthcare).
+  niche-performance admin board (below), client-portal merge.
+- **Phase 4**: hire 5-7 appointment setters, each assigned one niche (vet
+  first; additional niches TBD per the volume/HIPAA bar above).
 
 ## Admin board: niche performance tracking (future item)
 
-An admin-only view (different login, same platform — an admin role already
-exists in `ohvara-dashboard`, not yet examined by CC) that shows, **per
-niche**:
-
-- What share of total leads belong to this niche.
-- What % of this niche's leads currently sit in each lifecycle stage
-  (new/recycling, answered-pending, booked, closed-won, closed-lost).
-- How those percentages trend over time.
-
-This is the data source that would tell you which niche(s) actually convert
-best — directly informs where to put more reps, and validates (or
-invalidates) the #3 problem choice empirically instead of by guesswork.
-
-Not yet scoped as a build — CC hasn't looked at the existing admin view or
-the lead-data schema yet.
+Per-niche conversion-by-stage tracking (new/recycling, answered-pending,
+booked, closed-won, closed-lost), trended over time. Now more directly
+useful under the multi-niche model — this is how additional niches (for
+setters #2-7) get validated/prioritized with real data rather than
+estimates. Not yet scoped — Phase 3.
 
 ## Open questions / things to nail down
 
-- **Phase 2 reinvestment target**: same niche as Phase 1's Indeed revenue,
-  or a different (less-crowded) one for the paid-ads/agency push?
-- **Problem #3 (insurance verification)**: now largely folded into Phase 1's
-  niche as a stack component (see decision above) rather than a separate
-  problem to choose — revisit only if #1/#2 traction + admin-board data
-  suggests a genuinely separate #3 is still needed.
-- **Admin board build**: needs CC recon on the existing admin view + lead
-  data schema before it can be scoped.
-- **AI Roleplay randomization** (separate idea, parked): "roll" a random
-  persona/scenario per practice call instead of the fixed Mike/HVAC
-  scenario. Related to the per-niche training content idea above, but needs
-  its own scoping (persona pool design, grading-rubric generalization)
-  before it's CC-ready.
-- **Indeed → lead → price pipeline**: is the salary-signal lookup manual per
-  lead, or could Scraper-style infra help automate it?
-- **Stack → price translation**: pricing framework/rubric for reps to quote
-  confidently in real time, or case-by-case with manager sign-off?
-- **Rep specialization rollout**: how does this affect current rep
-  assignments / dashboard (profile, lead filtering by niche)?
-- **Training content restructuring**: per-problem-niche organization for
-  Training Center content (scripts/flashcards/quiz/roleplay) — future build
-  item, not urgent yet.
+- **Comp structure** (see above): PENDING Nate clarification on the 10%
+  proposal — one-time vs. ongoing, departure handling.
+- **`closer_notes` field**: confirm whether repurposable for the AI-generated
+  pre-call brief, or whether a new field/table is needed.
+- **Additional niches for setters #2-7**: which ones, checked against the
+  vet bar (volume + HIPAA-clean). Candidates: trades/HVAC, legal-office
+  receptionist, real estate, auto repair, salons.
+- **No-answer routing**: strict original-caller vs. any-same-niche-setter —
+  decide at build time.
+- **Real pool-size query** (vet, and any additional niches): still a
+  "nice to have before scaling hiring," not blocking.
+- **Rep specialization rollout / niche assignment**: leads already have a
+  `niche` field (per Phase 1 recon) but no per-rep niche assignment or
+  filtering yet — needed for the multi-niche model.
