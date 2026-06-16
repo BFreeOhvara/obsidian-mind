@@ -20,3 +20,7 @@ thinking/session-logs/
 # Node typecheck deps (CI + local dev only; runtime is zero-deps)
 node_modules/
 .claude/scripts/node_modules/
+
+# Upstream template CI (manifest-check/pr-title/test/release) — not used by this
+# personal vault fork, and blocks pushes (PAT lacks workflow scope). Kept on disk.
+.github/
