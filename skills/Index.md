@@ -22,7 +22,9 @@ Active Phase 1 skills only. If a task isn't covered here, check the Dormant tabl
 | Task | Go To |
 |------|-------|
 | Session start / loading context | [[eagle-startup]] |
-| Ending a session / handoff | [[auto-handoff]] |
+| Switching Manager chats / ending a session ("distill") | [[chat-distill]] |
+| Operating rules for the Eagle/Falcon Manager chat | [[manager-chat-skills]] |
+| Ending a session / handoff (legacy — superseded by distill) | [[auto-handoff]] |
 | Context window filling up / when to warn | [[session-management]] |
 | /reload — fresh CC + chat context chain | [[reload]] |
 | Capturing knowledge mid-session | [[auto-knowledge-capture]] |
@@ -43,7 +45,9 @@ Purpose-built for Phase 1 Ohvara operations. These live in `skills/` and appear 
 | Skill | Category | What It Does | Status |
 |-------|----------|-------------|--------|
 | [[eagle-startup]] | Memory / Session | Startup briefing for new chats — Ohvara summary, stack, blockers, state-check rule, resume prompt format | ✅ Active |
-| [[auto-handoff]] | Memory / Session | Preserve context across long sessions — handoff protocol + token efficiency rules | ✅ Active |
+| [[chat-distill]] | Memory / Session | Session handoff — "distill" logs net-new Manager-chat knowledge to Atlas + outputs a context load artifact; replaces wrap-up | ✅ Active |
+| [[manager-chat-skills]] | Session / Workflow | Operating rules for the Eagle/Falcon Manager chat (check-before-acting, artifact-per-prompt, batch prompts, prompt tracking, model routing, response style) — delivered in every context load artifact | ✅ Active |
+| [[auto-handoff]] | Memory / Session | Preserve context across long sessions — handoff protocol + token efficiency rules (legacy — superseded by [[chat-distill]]) | ✅ Active |
 | [[session-management]] | Memory / Session | CC self-monitors context — 60%+ full appends a wrap-up warning to every response | ✅ Active |
 | [[reload]] | Memory / Session | /reload — old CC prints one prompt; new CC reads Atlas and prints a context summary for a new Claude chat | ✅ Active |
 | [[auto-knowledge-capture]] | Memory | Scan sessions for decisions and auto-log to brain at session end | ✅ Active |

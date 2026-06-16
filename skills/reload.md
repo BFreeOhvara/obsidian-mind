@@ -43,6 +43,7 @@ A single clean artifact (per [[cc-prompt-format]]) titled **`ohvara-context-load
 - Open threads (full list, current priority order)
 - Standing rules 1–9 summary
 - Shared instance rules summary
+- Manager Chat Skills (from [[manager-chat-skills]])
 - cc-prompt-format reminder
 
 **This artifact is the whole point of reload** — it's what Brayden pastes into a new Falcon or Eagle chat to resume. It is ALWAYS generated automatically as step 3, **never on-request only**. Asking "want the paste-back block?" is a bug.
