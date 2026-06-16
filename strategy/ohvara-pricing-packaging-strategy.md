@@ -174,6 +174,11 @@ up is organic/incidental — not something Ohvara builds curriculum for. This
 **simplifies** Phase 1's Training Center scope back to **one rewrite**, not
 N parallel niche-specific tracks.
 
+The canonical setter call script for that one rewrite is
+[[ohvara-setter-discovery-script]] — the question-based diagnostic model
+(setter as intake nurse; never pitches/prices; Opener → Vitals → Pain
+Amplification → Handoff → Objections), niche-agnostic by design.
+
 **Implication for AI Roleplay**: the current scenario (Mike, HVAC owner,
 Dallas) is industry-specific, which doesn't match "same skills, different
 niche." A generic small-business-owner persona (not tied to one industry)
