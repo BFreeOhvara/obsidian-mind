@@ -11,6 +11,7 @@ team: Ohvara
 # Ohvara Dashboard — Full Brain Sync
 
 > Last synced: **2026-06-09** by Claude Brain Sync session.
+> **Fulfillment-loop sections refreshed 2026-06-19** (recon for the client-role pivot) — see the new "## Fulfillment Loop" section below; the rest of this doc is still 2026-06-09 vintage and may be stale (migration count, edge-fn count, secret state).
 > Live URL: **https://ohvara-dashboard.vercel.app**
 > Supabase project: `jjextitmbptoaolacocs.supabase.co`
 
@@ -262,7 +263,7 @@ All deployed to `https://jjextitmbptoaolacocs.supabase.co/functions/v1/`
 |----------|-------------|--------|
 | `assign-daily-batch` | Round-robin 150 leads per active rep, sets batch_date=today | ✅ 200 |
 | `generate-ai-script` | 4 modes: script / stack_analysis / pitch_anchor / briefing. Triple-layer fallback — never 500s. Model: claude-haiku-4-5 | ✅ 200 (fallback when no credits) |
-| `recommend-stack` | Thin wrapper calling generate-ai-script in stack_analysis mode | ⚠️ 500 when API credits depleted |
+| `recommend-stack` | **(REFRESHED 2026-06-19)** Standalone fn with its OWN 4-tier PACKAGES (basic/pro/premium/elite, North-Star-aligned) + rich JSON (tier, ROI, pain points, talking points, objection handling). Has a deterministic rule-based FALLBACK — no longer 500s when credits are depleted. NOT a wrapper. This is the canonical recommender the closer UI calls. | ✅ (fallback covers no-credits) |
 | `admin-create-user` | Creates auth.users + profiles row; requires admin JWT | ✅ (401 without JWT) |
 | `admin-toggle-user` | Flips is_active on profiles | ✅ (401 without JWT) |
 | `admin-delete-user` | Deletes auth.users row (cascades to profiles) | ✅ (401 without JWT) |
@@ -273,7 +274,7 @@ All deployed to `https://jjextitmbptoaolacocs.supabase.co/functions/v1/`
 | `indeed-scraper` | Scrapes Indeed job listings for leads | ✅ (401 without admin JWT) |
 | `maps-scraper` | Scrapes Google Maps for business leads | ✅ (403 without admin JWT) |
 | `process-reminders` | Sends pending appointment reminders via Twilio SMS | ✅ 200 |
-| `provision-client` | Creates full client stack (Retell agent + Twilio number + DB row) | ✅ (400 without body) |
+| `provision-client` | **(CORRECTED 2026-06-19)** DB-ONLY — does NOT create a Retell agent or Twilio number. It marks the appointment closed, inserts a `clients` row + an `onboarding` row (tier-based questions) + an admin notification, and returns an onboarding URL on the separate client-portal. The actual Retell/Twilio provisioning is `build-agent`, triggered later from the client portal's onboarding submit. | ✅ (400 without body) |
 | `score-roleplay` | Scores rep's roleplay transcript | ✅ (400 without transcript) |
 | `schedule-reminders` | Schedules reminder_log rows for upcoming appointments | ✅ (400 without body) |
 | `trigger-re-engagement` | Fires re-engagement sequences for inactive leads | ✅ 200 |
@@ -485,6 +486,34 @@ ohvara-dashboard/
 6. **Set `INDEED_MCP_TOKEN`** — unlocks Indeed lead scraper
 
 ---
+
+## Fulfillment Loop — Recon 2026-06-19 (for the `client`-role pivot)
+
+The end-to-end "Nate closes → client live → client logs in" loop, as it actually exists today:
+
+**The close → provision chain (in `closer/AppointmentCard.jsx`):**
+1. Closer opens an appointment → invokes **`recommend-stack`** → gets tier + ROI + pitch (canonical 4-tier fn; works even without Anthropic credits via fallback).
+2. Closer marks closed → invokes **`provision-client`** → writes `clients` (status='onboarding') + `onboarding` (tier questions) + admin `notification`; returns an onboarding URL on the **separate** client portal.
+3. → `generate-stripe-links` + `schedule-reminders` also fire. So the two-Stripe-link rule is wired at close.
+
+**The onboarding → live chain (in the SEPARATE `ohvara-client-portal` app):**
+4. Client opens `client-portal/onboard/:clientId` (no login — UUID-in-URL) → `Onboarding.jsx` loads the `onboarding` questions, collects answers → invokes **`build-agent`**.
+5. **`build-agent`** is the real provisioner: creates a Retell agent (if `RETELL_API_KEY`) + buys a Twilio number in the business's area code (if `TWILIO_*`), then sets `clients.status='active'` + `retell_agent_id`/`twilio_number`, notifies Brayden. Degrades gracefully → "onboarded, manual setup needed" if secrets missing.
+6. Client views `client-portal/:clientId` → `Portal.jsx` shows status + AI number; **KPI stats are hardcoded placeholders** ("until call data flows").
+
+**What's REAL & working:** recommend-stack (incl. fallback), provision-client (DB rows), build-agent code (Retell + Twilio, graceful), the portal onboarding questionnaire + answers persistence, the close-flow wiring in AppointmentCard.
+
+**What's STUBBED/half-wired:** build-agent needs `TWILIO_*` (per LIVE_STATE: RETELL set, TWILIO missing) → agent yes, number no → never reaches "live"; Portal KPIs are placeholders; `clients` has **0 rows ever** (loop never exercised end-to-end).
+
+**What's MISSING entirely:**
+- **No `client` role, no `/client/*` route** — the `user_role` enum is ('rep','closer','admin'); a 4th value + route tree must be added (the pivot's target end-state: one dashboard, retire the standalone portal).
+- **No client auth link** — `clients` has NO FK to `profiles`/`auth.users`; a client cannot log in and be matched to their record. This is the core gap for a `/client` login.
+- **No place to store the AI-recommended price or Nate's override** — `clients` has only `tier` + `monthly_value` (fixed tier price); `recommend-stack` output is computed for the closer UI but never persisted. Add `recommended_tier`/`recommended_price`/`override_price` if the close should capture them.
+- **Client-portal RLS mismatch** — migration 012 grants `clients`/`onboarding` to admin/closer only; the portal reads with the anon key by UUID, so those reads likely return nothing under live RLS (portal may be effectively non-functional against prod). Folding into a real `client` role with self-RLS fixes this.
+
+**Duplicate/dead code:** `generate-ai-script` mode `stack_analysis` is a STALE parallel recommender (3-tier Starter/Growth/Full Stack, no Elite — pre-North-Star). The live UI calls `recommend-stack`, not this mode → safe to retire the `stack_analysis` branch.
+
+**Smallest next build step** (to get ONE real client through the loop on the main dashboard): (a) `ALTER TYPE user_role ADD VALUE 'client'`; (b) add `clients.profile_id` FK → `profiles`/auth + a client-self RLS policy; (c) on close, create the client's auth/profile and link it; (d) add a minimal `/client/*` route tree that ports `Onboarding.jsx` + `Portal.jsx` from the standalone portal; (e) point `build-agent`/`provision-client` URLs at `/client/...` instead of CLIENT_PORTAL_URL; then retire the standalone app.
 
 ## Related
 

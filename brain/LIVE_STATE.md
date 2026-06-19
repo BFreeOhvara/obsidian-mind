@@ -10,6 +10,18 @@ tags:
 
 > **This is the ONE file any session reads to become fully operational.** It is a CURRENT-STATE document — overwritten on every update, not appended to. [[Memories]] remains the historical append-only log; this file is "what is true right now."
 
+## Next Up for CC
+
+> **CC reads this section FIRST, before anything else.** This is the literal handoff queue from Eagle (Cowork) to CC — what to build next, in order. Eagle (or Falcon) writes prompts here when a decision/idea is ready to build; CC executes top to bottom, logs each completion to [[Memories]], and DELETES the item from this list once done (don't leave finished items here — that's what Memories is for). If empty, there's nothing queued — check [[North Star]]'s Current Focus instead.
+
+_(Prompt 1 — Fulfillment recon — COMPLETED 2026-06-19. Findings logged to [[Memories]] + `work/active/ohvara-dashboard.md` "## Fulfillment Loop" section. Cleared from queue.)_
+
+---
+
+**Parked idea (not queued, for later — logged so it isn't lost):** When an appointment is booked, auto-kick a workflow that generates a website preview (using whatever info is already on the lead) for Nate to show live during the close call — not a finished site, just a "here's what it could look like" visual aid. Ties into Vertical 2 (web agency) in [[North Star]]. Revisit after the client-role fulfillment loop is proven — not part of Prompt 1.
+
+---
+
 **Last updated:** 2026-06-18 (CC — LATEST: 🎉 **FIRST REAL LEADS IN PROD.** Loaded 147 manually-scraped Indeed leads (Dallas 80 + Houston 67) into Supabase as unassigned `New` leads, `source='manual_scrape'` (migration 031 `fca4317` added the enum value) — judgment-HIPAA-filtered (147 pass / 116 healthcare-excluded of 263), web-search phone-enriched (104 phones / 43 null). **Total leads 412→559; the 412 seed rows are still fake, these 147 are the first REAL ones.** Combined with the now-fair `assign_daily_batches` (mig 030), the unassigned pool can be dished to real setters. PRIOR same-period: (a) **Thread #14 fair distribution FIXED** — migration 030 `cdc973a` round-robin rewrite, verified fair 50×6 / 19-18; (b) **Thread #2a bridge branch `indeed-supabase-bridge` @ `b67e288` ✅ PUSHED to origin** via new `workflow`-scope PAT — Apify E2E run still gated on Brayden adding the `SUPABASE_DRY_RUN` repo VARIABLE + triggering the workflow. Earlier: Thread #2a Apify→Supabase BRIDGE BUILT; Thread #17 script UI SHIPPED + LIVE-VERIFIED) — **✅ CLICK-THROUGH SCRIPT UI is built, deployed, and visually verified as apex11 (10/10 QA checkpoints PASS).** Call Modal right column is now a guided ONE-step-at-a-time walk (read a line → tap the prospect's response → next line → routes opener → branches A–E → shared close → "Lock the appointment"); Training Center Script tab has Flowchart (top-down boxes+lines tree, all 5 branches in one row) + Practice (same walk) + Full-script views. Built via a CONTENT-FREE derivation layer (`buildScriptFlow()` parses the existing markers — zero wording changed, single source preserved). Dashboard master `c4b6dcf` → `2d2d9a8` (commits `86d4fa5` build + `2d2d9a8` flowchart one-row QA fix), pushed + Vercel-deployed. Supersedes Thread #13. **Standing rule #11 (visual self-verify) exercised for the first time** — but NOTE the verification had to run from the **Claude DESKTOP** chat, not this CLI: the Chrome extension's native-messaging bridge is owned by Claude Desktop, so the CLI's `Claude_in_Chrome` sees zero browsers (full gotcha in [[Memories]] 2026-06-17 + [[Gotchas]]). Remaining rep-ready gate: the Brayden+Nate tree-wording review. **(Prior — CHAT DISTILL, Falcon PM):** **🎯 SCRIPT-UI DIRECTION + a new self-verification standing rule captured from the Falcon ~4–6 PM manager chat (the BUILDS `0af348e`+`c4b6dcf` were already CC-logged; this folds in the DECISIONS that came AFTER the decision tree rendered, which no commit recorded):**
 > **(A) THE FINISH LINE — plug a REAL setter into the dashboard.** That's Brayden's explicit goal driving all the script work ("what I've been wanting to get done"). Rep-ready = leads callable (✓ 259) + usable script (IN PROGRESS) + training gate (✓) + Retell roleplay (✓) + apex11 flow verified (✓). Remaining gates: the click-through script UI (B) + a final Brayden+Nate tree-wording review.
 > **(B) NET-NEW — CLICK-THROUGH SCRIPT UI (supersedes the current scrolling render).** The `c4b6dcf` whole-tree-on-screen render is too overwhelming for a live call. New design = "teleprompter meets decision tree": rep sees ONE step at a time, taps the prospect's response (Not Interested/Hesitant/Interested…), next line appears. **Two modes, one script:** Call Modal (live call) = click-through ONLY; Training Center = BOTH a full **visual flowchart** (boxes+lines, top-down, matching Brayden's HAND-DRAWN org chart) AND a click-through practice mode. Largely supersedes Open Thread #13 (full-screen View Script). Drafted-not-sent prompt `cc-prompt-clickthrough-script-visual-verify` → see Open Thread #17.
@@ -181,4 +193,7 @@ Non-CC sessions (Manager chats, no filesystem) re-ground from the most recent pa
 
 ## Related
 
-- [[Memorie
+- [[Memories]] — append-only historical log (the source this file distills)
+- [[North Star]] — who we are, packages, pricing, goals, hard rules
+- [[session-flow]] — reload/handoff chain, context alarm, artifact + auto-log rules
+- [[ohvara-dashboard]] — dashboard architecture brain doc
