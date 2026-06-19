@@ -21,20 +21,13 @@ Active Phase 1 skills only. If a task isn't covered here, check the Dormant tabl
 
 | Task | Go To |
 |------|-------|
-| Session start / loading context | [[eagle-startup]] |
-| Switching Manager chats / ending a session ("distill") | [[chat-distill]] |
-| Operating rules for the Eagle/Falcon Manager chat | [[manager-chat-skills]] |
-| Ending a session / handoff (legacy — superseded by distill) | [[auto-handoff]] |
-| Context window filling up / when to warn | [[session-management]] |
-| /reload — fresh CC + chat context chain | [[reload]] |
+| Session start, context alarm, reload/handoff, Manager chat rules, CC prompt format | [[session-flow]] |
 | Capturing knowledge mid-session | [[auto-knowledge-capture]] |
 | Writing a rep call script | [[rep-call-script]] |
 | Closing a deal / Stripe links | [[stripe-payments]] |
 | Building or fixing dashboard features | [[ohvara-dashboard|work/active/ohvara-dashboard]] |
 | Writing or fixing UI | [[DESIGN]] + [[ui-animations]] |
-| Writing a prompt for CC | [[cc-prompt-format]] |
 | Researching a prospect / company / competitor | [[company-research]] |
-| Rules that apply to all Claude instances (Eagle + Falcon) | [[shared-instance-rules]] |
 
 ---
 
@@ -44,19 +37,12 @@ Purpose-built for Phase 1 Ohvara operations. These live in `skills/` and appear 
 
 | Skill | Category | What It Does | Status |
 |-------|----------|-------------|--------|
-| [[eagle-startup]] | Memory / Session | Startup briefing for new chats — Ohvara summary, stack, blockers, state-check rule, resume prompt format | ✅ Active |
-| [[chat-distill]] | Memory / Session | Session handoff — "distill" logs net-new Manager-chat knowledge to Atlas + outputs a context load artifact; replaces wrap-up | ✅ Active |
-| [[manager-chat-skills]] | Session / Workflow | Operating rules for the Eagle/Falcon Manager chat (check-before-acting, artifact-per-prompt, batch prompts, prompt tracking, model routing, response style) — delivered in every context load artifact | ✅ Active |
-| [[auto-handoff]] | Memory / Session | Preserve context across long sessions — handoff protocol + token efficiency rules (legacy — superseded by [[chat-distill]]) | ✅ Active |
-| [[session-management]] | Memory / Session | CC self-monitors context — 60%+ full appends a wrap-up warning to every response | ✅ Active |
-| [[reload]] | Memory / Session | /reload — old CC prints one prompt; new CC reads Atlas and prints a context summary for a new Claude chat | ✅ Active |
+| [[session-flow]] | Memory / Session | Single canonical session lifecycle — start briefing, context alarm, reload/handoff (5-step), Manager chat rules, CC prompt artifact format. Replaces 8 overlapping files (2026-06-19). | ✅ Active |
 | [[auto-knowledge-capture]] | Memory | Scan sessions for decisions and auto-log to brain at session end | ✅ Active |
 | [[rep-call-script]] | AI / Sales | Generate Profile A niche-aware call scripts — surface pain, book discovery call | ✅ Active |
 | [[stripe-payments]] | Payments | Generate two Stripe links per close (setup fee + monthly) | ✅ Active |
 | [[ui-animations]] | UI / Design | Glass morphism, animated orbs, counting KPIs, staggered animations | ✅ Active |
-| [[cc-prompt-format]] | Session / Workflow | Eagle delivers every CC-bound prompt as its own clean, named artifact — prompt only, commentary stays in chat | ✅ Active |
 | [[company-research]] | Research / Sales | Exa-powered company/prospect research — Task-agent isolation, advanced search only, structured output | ✅ Active |
-| [[shared-instance-rules]] | Session / Workflow | One rulebook for Eagle + Falcon — CC prompt format, context alarm awareness, freshness check, state-check, scratch-paper principle | ✅ Active |
 
 ### Pending Action (in `skills/`, not routed)
 

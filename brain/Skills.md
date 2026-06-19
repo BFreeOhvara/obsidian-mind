@@ -31,21 +31,11 @@ Custom slash commands, subagents, and reusable workflows. Defined in `.claude/co
 
 | Command | Purpose |
 |---------|---------|
-| `/om-prep-1on1` | Prep for an upcoming 1:1 — load person context, open items, wins to share, suggested agenda |
-| `/om-capture-1on1` | Capture 1:1 meeting transcript into structured vault note with quotes, action items, DM context |
-| `/om-incident-capture` | Capture incident from Slack channels/DMs into structured vault notes — timeline, people, analysis, brag entry |
-| `/om-slack-scan` | Deep scan Slack channels/DMs for evidence — extracts timestamped touchpoints, organizes by context |
+| `/om-incident-capture` | Capture an incident into structured vault notes — timeline, people, analysis |
 | `/om-meeting` | Prep for any meeting by topic — subject-forward briefing with open items, blockers, and brainstormed considerations |
 | `/om-intake` | Process meeting notes inbox — classify raw exports in `work/meetings/` and route to the right vault notes |
 
-### Performance & Review
-
-| Command | Purpose |
-|---------|---------|
-| `/om-peer-scan` | Deep scan a peer's GitHub PRs for review prep — produces structured analysis saved to `perf/evidence/` |
-| `/om-review-brief` | Generate review brief (manager or peer version) from vault data |
-| `/om-self-review` | Write self-assessment for review tool — projects, competencies, principles |
-| `/om-review-peer` | Write peer review — projects, principles, performance summary |
+> Archived 2026-06-19: `/om-prep-1on1`, `/om-capture-1on1`, `/om-slack-scan`, `/om-peer-scan`, `/om-review-brief`, `/om-self-review`, `/om-review-peer` — corporate-employee template features (1:1s, Slack, performance reviews) with no use case in solo-founder Ohvara work. See `archive/template-cruft/`.
 
 ### Vault Maintenance
 
@@ -66,15 +56,6 @@ Custom slash commands, subagents, and reusable workflows. Defined in `.claude/co
 - `/om-humanize` calibrates against your actual writing samples, not a word blacklist. Detects context from frontmatter (review → corporate-confident, incident → precise, 1:1 → conversational). Run after drafting any note to make it sound human.
 - `/om-weekly` bridges standup and review brief — run at end of week for cross-session patterns, North Star drift, and uncaptured wins. Output is transient by default; offer to promote findings to brag doc or North Star.
 
-**Capture:**
-- `/om-capture-1on1` handles transcripts, raw notes, or summaries
-- `/om-incident-capture` takes Slack URLs and produces structured incident documentation
-- `/om-slack-scan` should be run AFTER `/om-peer-scan` to add context beyond code (leadership, communication, collaboration evidence)
-
-**Performance:**
-- `/om-peer-scan` works best when launched as parallel agents (one per person)
-- `/om-review-brief` needs the private brief to exist first — it generates filtered versions from it
-
 **Maintenance:**
 - `/om-vault-audit` should be run at the end of substantial sessions — catches stale indexes and mixed context
 - `/om-vault-upgrade` imports content from an existing vault (older obsidian-mind or any Obsidian vault). Detects version, classifies notes, transforms frontmatter, fixes wikilinks, rebuilds indexes. Use `--dry-run` to preview.
@@ -84,17 +65,14 @@ Custom slash commands, subagents, and reusable workflows. Defined in `.claude/co
 
 | Agent | Purpose | Invoked by |
 |-------|---------|------------|
-| `brag-spotter` | Proactively finds uncaptured wins and competency gaps | `/om-wrap-up`, `/om-weekly` |
 | `context-loader` | Loads all vault context about a person, project, incident, or concept | Direct — "load context on X" |
 | `cross-linker` | Finds missing wikilinks, orphans, broken backlinks across the vault | `/om-vault-audit` |
-| `people-profiler` | Bulk create/update person notes from Slack profiles | `/om-incident-capture` |
-| `review-prep` | Aggregates all performance evidence for a given review period | `/om-review-brief` |
-| `slack-archaeologist` | Full Slack reconstruction — reads every message, thread, profile, produces unified timeline | `/om-incident-capture` |
 | `vault-librarian` | Deep vault maintenance — orphan detection, broken links, frontmatter validation, stale notes | `/om-vault-audit` |
-| `review-fact-checker` | Verify every claim in a review draft against vault sources | `/om-self-review`, `/om-review-peer` |
 | `vault-migrator` | Classify, transform, and migrate content from a source vault | `/om-vault-upgrade` |
 
 Subagents run in isolated context windows via `.claude/agents/`. They don't pollute the main conversation.
+
+> Archived 2026-06-19: `brag-spotter`, `people-profiler`, `review-prep`, `slack-archaeologist`, `review-fact-checker` — see `archive/template-cruft/`.
 
 ## Hooks
 
@@ -145,22 +123,10 @@ SessionStart hook runs `qmd --index <name> update` automatically, reading the in
 ## Workflow: Weekly Review
 
 1. **`/om-weekly`** — synthesize the week's activity, check alignment, find patterns
-2. Promote any uncaptured wins to brag doc
-3. Update North Star if focus shifted
-4. **`/om-wrap-up`** — close the session cleanly
-
-## Workflow: Full Review Cycle Prep
-
-1. **`/om-review-brief manager`** — generate the manager context transfer doc
-2. **`/om-review-brief peers`** — generate the peer context transfer doc
-3. **`/om-peer-scan`** (parallel, one per peer) — deep scan each peer's PRs
-4. **`/om-slack-scan`** — scan relevant channels for your own evidence + peer context
-5. **`/om-capture-1on1`** — capture the review 1:1 with your manager
-6. **`/om-vault-audit`** — tidy up after all the new data
+2. Update North Star if focus shifted
+3. **`/om-wrap-up`** — close the session cleanly
 
 ## Workflow: Project Ramp-Up
 
-1. **`/om-slack-scan`** — scan project channels for history and decisions
-2. **`/om-peer-scan`** (if needed) — understand what teammates have already built
-3. Create work note from gathered context
-4. **`/om-vault-audit`** — ensure everything links properly
+1. Create work note from gathered context
+2. **`/om-vault-audit`** — ensure everything links properly
