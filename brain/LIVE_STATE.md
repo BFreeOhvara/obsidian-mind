@@ -14,7 +14,25 @@ tags:
 
 > **CC reads this section FIRST, before anything else.** This is the literal handoff queue from Eagle (Cowork) to CC — what to build next, in order. Eagle (or Falcon) writes prompts here when a decision/idea is ready to build; CC executes top to bottom, logs each completion to [[Memories]], and DELETES the item from this list once done (don't leave finished items here — that's what Memories is for). If empty, there's nothing queued — check [[North Star]]'s Current Focus instead.
 
-_(Prompt 1 — Fulfillment recon — COMPLETED 2026-06-19. Findings logged to [[Memories]] + `work/active/ohvara-dashboard.md` "## Fulfillment Loop" section. Cleared from queue.)_
+### Prompt 1 — Build the `client` role + close the fulfillment loop gaps
+
+> **⏳ IN PROGRESS (2026-06-19, CC CLI):** Phase 1 + the SQL half of Phase 5 DONE as **migrations 032 + 033** (commit `76f9938` on branch `client-role-fulfillment` in `ohvara-dashboard`, **NOT pushed, NOT applied to prod**). 032 = `user_role` += `'client'` (isolated — enum value can't be used in its own tx); 033 = `clients.profile_id` FK→profiles + `recommended_tier`/`recommended_price`/`override_price` cols + client self-RLS on clients/onboarding. **REMAINING: phases 2, 3, 4, 6, 7** (auth-on-close in `provision-client`; persist recommend-stack output + add closer override-price input to AppointmentCard.jsx; add `client` to App.jsx/ProtectedRoute/Sidebar + build `/client/*` porting Onboarding+Portal; retire standalone portal; retire dead `stack_analysis` mode). **Run the remainder from a fresh Claude DESKTOP session** — phases 4/6 need Chrome-MCP visual self-verify (rule #10b), which can't run from the CLI (extension bridge sees zero browsers). Also: apply 032 BEFORE 033 (separate txns), via the PAT runner.
+
+**Context:** Recon (logged in `work/active/ohvara-dashboard.md` "## Fulfillment Loop" section, 2026-06-19) found the pieces but not the connections: `recommend-stack`, `provision-client`, and `build-agent` all work, but there's no `client` role, no auth link from a `clients` row to a login, no field to persist the AI-recommended price or Nate's override, and the separate `ohvara-client-portal` app likely can't even read its own data under live RLS. Target end-state (Brayden, 2026-06-19): ONE dashboard, four roles (admin/closer/rep/client), no separate portal app.
+
+**Build in phases, self-verify after each before moving to the next (standing rule #10b — visual self-verify via Chrome MCP applies to the new `/client/*` UI too):**
+
+1. **Migration:** add `'client'` to the `user_role` enum. Add a FK linking `clients` → `profiles`/`auth.users` (so a client row maps to a login). Add `recommended_tier`, `recommended_price`, `override_price` columns to `clients` (currently only a fixed `tier`/`monthly_value` exist — the AI recommendation and Nate's override are never persisted today).
+2. **Auth on close:** when `provision-client` runs, also create the actual login (auth.users + profiles role='client', linked via the new FK) — same username@ohvara.internal / generated-password pattern as existing accounts. Surface the credentials in the admin notification that already fires on close (manual handoff to the client is fine for now — no email automation exists yet, don't build one unless trivial).
+3. **Persist the recommendation:** wire `recommend-stack`'s output into `clients.recommended_tier`/`recommended_price` at provision time, and add an override-price input to the closer's `AppointmentCard.jsx` flow so Nate can set `override_price` before close finalizes.
+4. **New role + routes:** add `client` to `App.jsx` routing, `ProtectedRoute`, and `Sidebar`. Build `/client/*` (start minimal — overview page showing tier/stack/agent status/phone number; port the onboarding questionnaire + `Portal.jsx` content from the separate `ohvara-client-portal` repo into this route tree rather than rebuilding from scratch).
+5. **RLS:** add self-row policies so a logged-in client can read only their own `clients`/`onboarding` rows (fixes the RLS gap recon found — the standalone portal's anon-key-by-UUID reads likely return nothing under live RLS today).
+6. **Retire the standalone portal:** once `/client/*` reaches parity with what `ohvara-client-portal` actually does today (onboarding form + status view), stop deploying/linking the separate app. Do NOT delete the repo — just unlink it from the close-flow URL and note in Memories that it's superseded.
+7. **Cleanup (low-risk, optional if time allows):** retire the dead `stack_analysis` mode in `generate-ai-script` (recon confirmed it's a stale parallel recommender the live UI never calls).
+
+**Out of scope this round:** TWILIO secrets are still missing (blocks `build-agent` from buying a real number) — that's a Brayden-side credential task, not a code blocker; note it, don't try to work around it. Don't touch `recommend-stack`'s actual recommendation logic/quality — this prompt is plumbing (role, auth, persistence, routing), not improving the AI's judgment.
+
+**When done:** log to Memories, update `work/active/ohvara-dashboard.md`, commit + push, clear this item from the queue.
 
 ---
 
