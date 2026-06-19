@@ -28,4 +28,9 @@ views:
       - property: description
         direction: ASC
   - type: table
-    name: All Peop
+    name: All People
+    order:
+      - file.name
+      - title
+      - team
+      - description

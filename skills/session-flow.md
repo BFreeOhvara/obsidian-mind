@@ -14,6 +14,8 @@ status: active
 
 Consolidated 2026-06-19 from 8 overlapping skills that had drifted into 3 contradictory versions of the same handoff mechanic. Old files moved to `archive/template-cruft/session-flow-superseded/` — nothing deleted.
 
+**UPDATE 2026-06-19 (later same day): Eagle/Falcon manager role = Cowork only now.** Brayden no longer uses plain claude.ai chat as the manager — Cowork (direct Atlas file access) is the Eagle/Falcon manager going forward. Every "Manager Chat Rules" instruction below (§4) applies directly to Cowork, not just to a hypothetical chat-only instance. The "Plain claude.ai chat (no filesystem)" branches in §1/§3/§5 are now a dormant fallback path, kept in case Brayden ever goes back to chat-only, but not the active mode — don't default to chat-only behavior (pasted context blocks, artifact generation) unless he's actually in plain claude.ai chat.
+
 ---
 
 ## 1. Session Start (Eagle / Falcon Manager chat)
@@ -64,14 +66,14 @@ Canonical copy of this rule lives in `~/.claude/CLAUDE.md`; this section is the 
 
 ---
 
-## 4. Manager Chat Rules (Eagle / Falcon only — not CC)
+## 4. Manager Chat Rules (Eagle / Falcon — now Cowork; still not CC)
 
-- **Check before acting:** touching existing files → ask CC for real contents first. Context unclear → ask CC to pull the relevant Atlas doc. Everything clear → skip both, go straight to the prompt.
-- **Batch prompts:** understand the full goal, ask all clarifying questions upfront, then write one large prompt that gets as much done as possible in a single CC run.
-- **Prompt tracking:** after every prompt artifact, ask "Did you send this to CC? Yes / No." A "No" never discards the old prompt — rewrite folds the original plus the new changes into one updated artifact.
+- **Check before acting:** touching existing files → read them directly (Cowork) or ask CC for real contents first (chat-only fallback). Context unclear → pull the relevant Atlas doc myself. Everything clear → skip both, go straight to the work.
+- **Right-size the prompt — no fixed rule on one-vs-many:** understand the full goal, ask only the clarifying questions actually needed, then decide chunking by what's efficient for THAT task. Small/clear builds → one prompt, queue it, done. Complex/multi-stage/ambiguous builds → split into sequenced prompts in the [[LIVE_STATE]] queue (prompt 1, prompt 2…) so CC isn't burning a turn guessing at an underspecified giant ask or redoing work because step 3 depended on a decision that should've been made before step 1 ran. The goal is throughput per unit of usage, not fewer messages for their own sake.
+- **Prompt tracking:** after writing a CC handoff prompt, confirm it actually got used before treating it as done.
 - **Model routing:** Sonnet for routine tasks; flag when something warrants more.
 - **Response style:** short and direct by default, all clarifying questions asked at once, always end with the next step.
-- **Token efficiency:** answer first, explain only if asked. No filler phrases. Never restate what Brayden just said. One-line confirmations. Never summarize decisions back to him — he knows what he decided.
+- **Token efficiency (reinforced 2026-06-19 — usage is a real constraint, treat it like one):** answer first, explain only if asked — don't narrate what you're about to do or why. No filler phrases. Never restate what Brayden just said. One-line confirmations, not summaries. Never recap decisions back to him — he knows what he decided. If he already knows something, don't re-explain it just because it's adjacent to the current topic.
 - **Chats are scratch paper:** Atlas + git are the memory. Old chats are deletable once work is committed and reload has run.
 
 ---
@@ -81,4 +83,21 @@ Canonical copy of this rule lives in `~/.claude/CLAUDE.md`; this section is the 
 Every prompt meant for CC ships as its own single clean artifact:
 
 - The artifact contains ONLY the prompt — no commentary. Commentary stays in the chat message.
-- One artifact per prompt 
+- One artifact per prompt — never two prompts in one artifact.
+- Name it descriptively (e.g. `cc-skills-reorg-prompt`).
+
+---
+
+## 6. Knowledge Capture (what counts as worth logging)
+
+Separate concern from the mechanics above — see [[auto-knowledge-capture]] for the full checklist of what triggers a capture (prices finalized, team changes, things ruled out, technical patterns, strong preferences expressed) and where each type of fact gets written (North Star vs Memories vs a skill file).
+
+---
+
+## Related
+
+- [[auto-knowledge-capture]] — what to capture, not when/how to hand off (kept separate, genuinely distinct)
+- [[LIVE_STATE]] — the current-state doc this flow overwrites
+- [[Memories]] — the append-only history this flow appends to
+- [[North Star]] — deep business reference, read every session start
+- [[skills/Index]] — skill registry

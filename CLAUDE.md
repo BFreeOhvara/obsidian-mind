@@ -10,11 +10,12 @@ External brain for **Ohvara** — SMB automation business. This file loads on to
 
 ## Session Start
 
-1. Read [[North Star]] and [[Memories]] before every session — never repeat a logged mistake
-2. Read [[DESIGN]] before touching any UI
-3. Load all skills from the `skills/` folder ([[skills/Index]])
-4. Follow all rules in [[North Star]] section "Rules Claude Always Follows"
-5. State what's relevant before writing code
+1. Read [[LIVE_STATE]] "Next Up for CC" FIRST — if non-empty, that's the live task queue from Eagle/Falcon; execute top to bottom, delete each item when done, log to [[Memories]]
+2. Read [[North Star]] and [[Memories]] before every session — never repeat a logged mistake
+3. Read [[DESIGN]] before touching any UI
+4. Load all skills from the `skills/` folder ([[skills/Index]])
+5. Follow all rules in [[North Star]] section "Rules Claude Always Follows"
+6. State what's relevant before writing code
 
 ### Token Awareness Check
 When the conversation reaches 15+ exchanges or 3+ distinct topics, warn Brayden with:
@@ -24,8 +25,7 @@ When the conversation reaches 15+ exchanges or 3+ distinct topics, warn Brayden 
 
 1. Append a session log entry to [[Memories]] on every wrap up: date, topics, decisions, current state, blockers, resume prompt
 2. Update [[ohvara-dashboard]] brain doc if any dashboard code changed
-3. Update [[work/Ohvara]] index if new notes were created
-4. Never end without logging — partial logs beat no logs
+3. Never end without logging — partial logs beat no logs
 
 ### Auto-Handoff (runs when session is long OR switching chats)
 Before closing any session that covered 3+ topics OR when Brayden says "new chat":
@@ -43,6 +43,16 @@ Before closing any session that covered 3+ topics OR when Brayden says "new chat
 - Compress output, never reasoning — terse replies, full rigor in thinking (brevity improves accuracy, not just cost)
 - Commit subjects: terse and conventional, ≤50 chars
 
+### Minimal chat narration (added 2026-06-19)
+
+**CC is the builder, not the reporter.** Brayden reads updates from Eagle/Falcon (who read Atlas), not from CC's own chat output. So CC should run as silently as the tooling allows:
+
+- Don't narrate steps in chat ("Let me check...", "Now I'll...", running commentary on what's being read/tried) — just do the work
+- No play-by-play of recon/debugging in chat — that detail belongs in the Memories.md log entry, not the conversation
+- End-of-task chat output should be minimal-to-none beyond what's needed to log + queue-clear — the real report lives in Memories.md/LIVE_STATE, which Eagle/Falcon will read and relay
+- This does not relax the logging requirement — if anything it shifts detail OUT of chat and INTO the Atlas log, since that's the channel that actually gets read
+- Exception: surface immediately in chat (don't bury it) anything that blocks progress and needs a human decision right now (missing secret, destructive action, genuine ambiguity) — silence is for routine work, not for stuck points
+
 ## Code Discipline
 
 _Adopted from ruvnet/ruflo CLAUDE.md (generic principles only — its swarm/tooling content doesn't apply here)._
@@ -53,6 +63,7 @@ _Adopted from ruvnet/ruflo CLAUDE.md (generic principles only — its swarm/tool
 - Never commit secrets or credentials
 - Batch independent operations in one message — parallel tool calls, not sequential round-trips
 - Use the cheapest model that does the job (Haiku for simple/high-volume tasks, Sonnet/Opus for complex work) — same rule that took rep scripts to claude-haiku-4-5
+- **Self-flag model upgrades (added 2026-06-19):** default is Sonnet. If you (CC) hit one of these mid-task — stuck/wrong on the same thing twice, a genuinely ambiguous design tradeoff (not just executing a spec), or subtle debugging Sonnet keeps missing — stop and surface it in chat: `⚠️ This looks like an Opus-tier problem: {one line why}. Switch model and resume?` Treat this like the blocker exception to minimal-narration — don't silently grind on Sonnet, and don't switch yourself (you can't); just flag it and wait.
 
 ## Rules
 
@@ -99,4 +110,4 @@ All memories in `brain/`. Never create memory files in `~/.claude/projects/.../m
 
 ---
 
-[[North Star]] · [[Memories]] · [[DESIGN]] · [[work/Ohvara]] · [[skills/Index]]
+[[North Star]] · [[Memories]] · [[DESIGN]] · [[LIVE_STATE]] · [[skills/Index]]

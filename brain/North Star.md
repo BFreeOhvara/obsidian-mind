@@ -34,7 +34,7 @@ Replace the receptionist or dispatcher they're actively trying to hire.
 
 > **Core insight:** Indeed leads are warm leads. They are already problem-aware and actively trying to solve it by hiring. We are a faster, cheaper solution to the exact problem they just posted about.
 
-**Target niches (Profile A):** Roofing, HVAC, Electrical, Landscaping, Pressure Washing, Concrete, Hotshot Trucking, Towing, Oilfield Services, Transportation
+**Target niches (locked lineup, 2026-06-17):** Veterinary, HVAC, Electrical, Roofing, Landscaping, Pressure Washing. 7th slot open (plumbing leading, pest control alternative — unconfirmed). Concrete, Hotshot Trucking, Towing, Oilfield Services, and Transportation were all considered and dropped (see [[LIVE_STATE]] Open Thread #2a + niche distill). Veterinary replaced dental as the HIPAA-safe medical-adjacent niche — all other healthcare/medical niches remain excluded entirely.
 **Geographic market:** Anywhere in the US
 **Lead source:** Businesses hiring receptionists/dispatchers on Indeed and Google Maps
 
@@ -107,10 +107,12 @@ All packages include a **`$497` one-time setup fee**.
 **All reps and Nate work Profile A only until second closer is confirmed.**
 
 Profile A — Trades & Field Services:
-- Roofing, HVAC, Electrical, Landscaping, Concrete, Pressure Washing
+- HVAC, Electrical, Roofing, Landscaping, Pressure Washing (+ 7th slot TBD)
 - Tone: direct, no-nonsense, peer-to-peer
 - Key pain: missing calls while on job sites, losing jobs to competitors who answer
 - Opening question: "How many calls do you think you're missing while your guys are out on jobs?"
+
+> **Veterinary** is the niche correction for the former medical/dental slot (HIPAA-safe). It doesn't fit the Profile A trades framing above — runs the same universal question-based discovery script, just without the job-site framing. As of the 2026-06-16 distill, the script is niche-agnostic across all 6+ niches anyway (leads pooled, not siloed per setter), so Profile A's tone description is closer's-context flavor, not a hard script branch.
 
 ### Rep Commission
 
@@ -119,37 +121,37 @@ Profile A — Trades & Field Services:
 
 ---
 
-## Commission Structure (FINAL)
+## Commission Structure (FINAL — updated 2026-06-19)
 
-| Role | Setup Fee (`$497`) | Monthly Recurring |
-|------|-------------------|------------------|
-| Appointment Setter | 50% (`$248`) | 0% |
-| Nate (Closer) | 50% (`$248`) | 50% |
-| Brayden (Backend) | 0% | 50% |
+**Setter gets 10% of the whole deal (setup fee + first month's recurring, combined) as a one-time payment.** The remaining 90% of that combined first-deal amount splits 50/50 between Nate and Brayden. From month 2 onward (no more setter cut), the monthly recurring splits 50/50 between Nate and Brayden, forever.
 
-- Setter only paid on **closed deals** — not just bookings
+- Setter only paid on **closed deals** — not just bookings, and only once (no residual)
 - Nate owns client relationship from close forward — handles all client questions and issues
-- Brayden owns all tech — income is 100% recurring, zero setup fee cut
+- Brayden owns all tech
 
-### Monthly Recurring Per Package
+### Payout Per Close, By Package
+
+| Package | Setup | Month 1 | Setup+M1 Combined | Setter (10%, one-time) | Nate (45%) | Brayden (45%) |
+|---------|-------|---------|-------------------|------------------------|------------|----------------|
+| Basic | `$497` | `$497` | `$994` | `$99.40` | `$447.30` | `$447.30` |
+| Pro | `$497` | `$797` | `$1,294` | `$129.40` | `$582.30` | `$582.30` |
+| Premium | `$497` | `$1,297` | `$1,794` | `$179.40` | `$807.30` | `$807.30` |
+| Elite | `$497` | `$1,797` | `$2,294` | `$229.40` | `$1,032.30` | `$1,032.30` |
+
+### Monthly Recurring From Month 2 On (50/50, no setter cut)
 
 | Package | Monthly | Brayden | Nate |
 |---------|---------|---------|------|
-| Basic | `$497` | `$248` | `$248` |
-| Pro | `$797` | `$398` | `$398` |
-| Premium | `$1,297` | `$648` | `$648` |
-| Elite | `$1,797` | `$898` | `$898` |
+| Basic | `$497` | `$248.50` | `$248.50` |
+| Pro | `$797` | `$398.50` | `$398.50` |
+| Premium | `$1,297` | `$648.50` | `$648.50` |
+| Elite | `$1,797` | `$898.50` | `$898.50` |
 
-### Full Payout Per Close (Pro — `$797/mo`)
-
-- Setup fee (`$497`): Setter `$248` + Nate `$248` + Brayden `$0`
-- Monthly recurring (`$797`): Brayden `$398` + Nate `$398` **forever**
-
-### At Scale — 20 Pro Clients
+### At Scale — 20 Pro Clients (steady state, month 2+)
 
 - Brayden MRR: `$7,970/mo`
-- Nate MRR: `$7,970/mo` + setup fees on new closes
-- Setter at 3 closes/week: ~`$3,000/mo`
+- Nate MRR: `$7,970/mo` + 45% of setup+M1 on new closes
+- Setter at 3 closes/week (Pro): ~`$1,550/mo`
 
 ---
 
@@ -273,3 +275,4 @@ TBD — do not hardcode any dialer assumption anywhere in the codebase.
 | 2026-06-07 | Initialized North Star | Ohvara vault setup |
 | 2026-06-07 | Full business context upgrade | Added sales process detail, warm lead insight, rep onboarding flow, commission, dialer TBD, geo market, Stripe auto-link rule, training optional |
 | 2026-06-07 | Packages, team structure, niche profiles locked | Finalized 4 packages with setup fee, confirmed Nate as sole closer, Profile A only, ROI anchors |
+| 2026-06-19 | Hard refresh: niche lineup + commission structure corrected | Niche list updated to the real locked 6 (vet, HVAC, electrical, roofing, landscaping, pressure washing, 7th TBD) — was listing 4 dropped niches and missing vet entirely. Commission changed: setter now 10% of (setup+month-1 combined) one-time, Nate/Brayden split the rest 45/45 on the first deal and 50/50 on month-2+ recurring (was 50% of setup only, 0% recurring). |

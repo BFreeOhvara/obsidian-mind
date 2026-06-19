@@ -267,4 +267,3 @@ Initial release. Basic vault structure with:
 - `thinking/` — scratchpad
 - SessionStart hook (file listing injection)
 - [obsidian-skills](https://github.com/kepano/obsidian-skills) pre-installed
-                                                                                                                                                                                                                                                                             
