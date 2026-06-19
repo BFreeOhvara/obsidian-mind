@@ -14,21 +14,22 @@ tags:
 
 > **CC reads this section FIRST, before anything else.** This is the literal handoff queue from Eagle (Cowork) to CC — what to build next, in order. Eagle (or Falcon) writes prompts here when a decision/idea is ready to build; CC executes top to bottom, logs each completion to [[Memories]], and DELETES the item from this list once done (don't leave finished items here — that's what Memories is for). If empty, there's nothing queued — check [[North Star]]'s Current Focus instead.
 
-*(no items queued — Prompt 1 "Build the `client` role" shipped 2026-06-19, Prompt 2 "Client dashboard redesign" shipped 2026-06-19 `8ddee69`. See [[Memories]] for full trail.)*
+*(Prompt 1 + Prompt 2 shipped 2026-06-19. Prompt 3's decision is now made — see queue below. CC: execute top to bottom, one step at a time if Brayden says "run next step," logging + deleting each as it completes.)*
+
+### Prompt 4 — Custom stack recommendation + closer demo dashboard (supersedes Prompt 3)
+
+**Decision made 2026-06-19 (was the open question in old Prompt 3):** à la carte, formula-priced — not fixed packages. The rep's discovery script already gathers calls-missed/week + avg ticket + current setup as pain-discovery questions; that feeds an AI recommendation of which specific automations fix the problem, priced off the lead's own numbers (not a flat package). Nate then uses a sample dashboard (reusing Prompt 2's per-automation-tab layout, sample data only) live on the closer call as closing ammo. Full original framing/mockup context: [[Memories]] 2026-06-19.
+
+1. **Recon first.** Read the current `recommend-stack` edge function, `discoveryScript.js` (Problem Discovery section), `AppointmentCard.jsx`, and the `leads`/`appointments` schema. Confirm exactly what exists before changing anything.
+2. **Structured discovery fields.** Add real columns on `leads` for `calls_missed_per_week` (numeric) and `avg_ticket` (numeric) — additive, keep capturing the same info in free-text Call Notes too for Nate's human context.
+3. **À la carte catalog + formula pricing.** Rewrite `recommend-stack`: maintain a catalog of individual automations (AI Receptionist, Missed Call Text Back, Review Generation, Lead Follow-Up Automation, Appointment Reminders, AI Dispatcher, SMS Marketing, Website); select only the ones that address this lead's diagnosed pain; price using a formula anchored to `calls_missed_per_week × avg_ticket` (estimated monthly lost revenue), e.g. price the stack around 10-20% of that lost revenue with a sane floor/ceiling — pick defensible starting constants and flag them in the "done" report as tunable, not final. Persist the recommended automations + price on the lead/appointment record. Update the commission calc (currently keyed off the 4 fixed package prices) to compute the setter/Nate/Brayden splits off the actual custom price instead.
+4. **Trigger earlier.** Move the `recommend-stack` invocation to fire automatically when a rep books the appointment (status → `Appointment Booked`), not when Nate opens it — so it's ready well before Nate's call (could be as soon as 15 minutes later).
+5. **Sample dashboard in Nate's closer screen.** Build a "Preview for [Business Name]" panel inside the existing `AppointmentCard` view, reusing the Prompt 2 per-automation-tab layout (Overview + one tab per recommended automation, each with its own specifics) — in-screen, no separate URL/login needed. Populate with clearly-labeled sample data only (synthetic calls/week, sample activity log), just for the automations actually recommended for this lead. Make it visually obvious this is a preview, not live data.
+6. **Verify + ship.** Visually self-verify via Chrome MCP (rule #11) as Nate's closer login — confirm the recommendation generates correctly and the preview panel renders right. Log to Memories, update this file (mark Prompt 4 done), update `ohvara-dashboard.md`, commit + push.
 
 ---
 
-**Parked idea (not queued, for later — logged so it isn't lost):** When an appointment is booked, auto-kick a workflow that generates a website preview (using whatever info is already on the lead) for Nate to show live during the close call — not a finished site, just a "here's what it could look like" visual aid. Ties into Vertical 2 (web agency) in [[North Star]]. Revisit after the client-role fulfillment loop is proven — not part of Prompt 1.
-
----
-
-### Prompt 3 — Smarter AI recommendation engine (PARKED — needs one decision first)
-
-**Open question before building:** The current packages are fixed bundles (Basic/Pro/Premium/Elite). Brayden wants the recommendation engine to diagnose the client's specific problem and recommend the right automation — not default to the receptionist stack every time. Example: a client who needs review generation more than call handling should get a recommendation that reflects that, not just "Pro because your revenue is mid-range."
-
-**Decision needed:** Is the engine still recommending one of the 4 fixed packages (but with smarter reasoning that matches the package to the actual pain), or should it eventually support custom/à la carte stacks? Answer changes the build scope significantly.
-
-**Once decided:** update this prompt with the scope and queue it for CC.
+**Parked idea (not queued, for later — logged so it isn't lost):** When an appointment is booked, auto-kick a workflow that generates a website preview (using whatever info is already on the lead) for Nate to show live during the close call — not a finished site, just a "here's what it could look like" visual aid. Ties into Vertical 2 (web agency) in [[North Star]]. Largely subsumed by Prompt 4's sample dashboard above; revisit only if Nate wants a website-specific preview too.
 
 ---
 
@@ -205,14 +206,4 @@ Non-CC sessions (Manager chats, no filesystem) re-ground from the most recent pa
 11. **2026-06-12 — Verification trap: duplicate lead names.** Seeded data has duplicate business names ("CrystalBlue Pool" ×2 + "CrystalBlue Pool LLC"); a DB check against `[0]` of a name query read the WRONG duplicate and produced a false "save failed" diagnosis. Always verify by lead id, never by business name. Bonus artifact: hidden preview tabs never fire rAF, so count-up KPI numbers stay 0 — assert the data layer, not the animated number.
 12. **2026-06-12 — Zombie re-engagement cron.** trigger-re-engagement (day-one legacy) still fires nightly, writing SMS/email rows to re_engagement_log that NOTHING sends (6 rows stuck pending). Decoupled from pipeline v2, harmless, flagged for unscheduling (logged `a02cbb0`).
 13. **2026-06-12 — Twilio "descope" false memory.** Believed descoped; verified NO such decision exists in vault, git history, or secrets. Resolution: Twilio stays a tracked blocker, but code audit confirmed the pipelines never depended on it — the rep test can run without it. Manager chat then clarified: required for Pro+ fulfillment, deprioritized for Phase 1 testing.
-14. **2026-06-12 — Retell v2 coach/roleplay fix.** Root cause: missing agent-ID secrets + broken dynamic fallback (invalid voice id; general_prompt passed straight to create-agent — Retell v2 requires create-retell-llm + response_engine). Fixed both functions; roleplay verified live; create-lead-call deployed v5 (04:16 UTC, fix confirmed in deployed source).
-15. **2026-06-11 — OneDrive "Delete 673 items?" popup.** Git auto-gc repacked loose objects in OneDrive-synced repos; correct answer is "Delete all items" ([[Gotchas]]).
-
----
-
-## Related
-
-- [[Memories]] — append-only historical log (the source this file distills)
-- [[North Star]] — who we are, packages, pricing, goals, hard rules
-- [[session-flow]] — reload/handoff chain, context alarm, artifact + auto-log rules
-- [[ohvara-dashboard]] — dashboard architecture brain doc
+14. **2026-06-12 — Retell v2 coach/roleplay fix.** Root cause: missing agent-ID secrets + broken dynamic fallback (
