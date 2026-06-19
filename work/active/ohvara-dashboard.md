@@ -11,7 +11,8 @@ team: Ohvara
 # Ohvara Dashboard — Full Brain Sync
 
 > Last synced: **2026-06-09** by Claude Brain Sync session.
-> **Fulfillment-loop sections refreshed 2026-06-19** (recon for the client-role pivot) — see the new "## Fulfillment Loop" section below; the rest of this doc is still 2026-06-09 vintage and may be stale (migration count, edge-fn count, secret state).
+> **Fulfillment-loop sections refreshed 2026-06-19** (recon for the client-role pivot) — see "## Fulfillment Loop" below.
+> **Prompt 2 shipped 2026-06-19 `8ddee69`** — client dashboard redesigned analytics-first; Automations + Messages tabs added to client sidebar.
 > Live URL: **https://ohvara-dashboard.vercel.app**
 > Supabase project: `jjextitmbptoaolacocs.supabase.co`
 
@@ -95,6 +96,14 @@ Vercel
 | `/admin/sources` | `LeadSources` | Lead source analysis |
 | `/admin/scraper` | `LeadScraper` | Maps + Indeed scraper UI |
 | `/admin/users` | `Users` | Create/activate/deactivate reps and closers |
+
+### Client Routes (`/client/*`) — added 2026-06-19 (Prompts 1 + 2)
+| Route | Component | Purpose |
+|-------|-----------|---------|
+| `/client/onboarding` | `ClientOnboarding` | Multi-step onboarding questionnaire (no layout shell) |
+| `/client` | `ClientOverview` | Analytics-first overview — KPI cards, automations grid, phone number, agent status |
+| `/client/automations` | `ClientAutomations` | Full automation list: active features with status pills + locked upgrades |
+| `/client/messages` | `ClientMessages` | Support channel — client messages Nate only |
 
 ---
 

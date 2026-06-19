@@ -14,34 +14,11 @@ tags:
 
 > **CC reads this section FIRST, before anything else.** This is the literal handoff queue from Eagle (Cowork) to CC — what to build next, in order. Eagle (or Falcon) writes prompts here when a decision/idea is ready to build; CC executes top to bottom, logs each completion to [[Memories]], and DELETES the item from this list once done (don't leave finished items here — that's what Memories is for). If empty, there's nothing queued — check [[North Star]]'s Current Focus instead.
 
-*(no items queued — Prompt 1 "Build the `client` role" shipped 2026-06-19, see [[Memories]] + `work/active/ohvara-dashboard.md` "Fulfillment Loop" for the full trail)*
+*(no items queued — Prompt 1 "Build the `client` role" shipped 2026-06-19, Prompt 2 "Client dashboard redesign" shipped 2026-06-19 `8ddee69`. See [[Memories]] for full trail.)*
 
 ---
 
 **Parked idea (not queued, for later — logged so it isn't lost):** When an appointment is booked, auto-kick a workflow that generates a website preview (using whatever info is already on the lead) for Nate to show live during the close call — not a finished site, just a "here's what it could look like" visual aid. Ties into Vertical 2 (web agency) in [[North Star]]. Revisit after the client-role fulfillment loop is proven — not part of Prompt 1.
-
----
-
-### Prompt 2 — Client dashboard redesign
-
-**Prereq:** Prompt 1 merged to master first.
-
-Brayden reviewed the Vercel preview for the client dashboard and wants a redesign before merge. Current build is a basic status page — should look and feel like the admin dashboard (analytical, data-forward).
-
-**Changes:**
-
-1. **Overview page** (`ClientOverview.jsx`) — redesign to be analytics-first. Show their AI agent status, phone number, tier/package, key metrics (calls handled, appointments booked, reviews generated — whatever is available from the `clients`/`onboarding` tables). Think admin KPI card layout, not a blank info card.
-
-2. **Left sidebar** — tabs should be:
-   - Overview (current)
-   - Automations (their active AI agents/stack — what they're paying for, status of each)
-   - Messages (new — see below)
-
-3. **Messages tab** — client can message Nate with questions. Same pattern as the existing rep messages system (rep → Nate/Brayden). Client messages go to Nate only. Label it something like "Ask Nate a Question" or "Support." Reuse the existing `messages` table + `Inbox` component pattern — just add `recipient='nate'` and scope the sender to `role='client'`.
-
-**Visual self-verify** via Chrome MCP on the Vercel preview before merging Prompt 1 to master (or merge Prompt 1 first, then deploy Prompt 2 on top — either order is fine as long as visual verify happens before Brayden demos it).
-
-**When done:** log to Memories, update ohvara-dashboard.md, commit + push.
 
 ---
 
