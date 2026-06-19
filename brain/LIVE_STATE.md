@@ -14,29 +14,44 @@ tags:
 
 > **CC reads this section FIRST, before anything else.** This is the literal handoff queue from Eagle (Cowork) to CC — what to build next, in order. Eagle (or Falcon) writes prompts here when a decision/idea is ready to build; CC executes top to bottom, logs each completion to [[Memories]], and DELETES the item from this list once done (don't leave finished items here — that's what Memories is for). If empty, there's nothing queued — check [[North Star]]'s Current Focus instead.
 
-### Prompt 1 — Build the `client` role + close the fulfillment loop gaps
-
-> **⏳ ALL PHASES BUILT — WAITING ON A PREVIEW-URL VISUAL CHECK TO MERGE (2026-06-19, CC CLI).** Migrations 032+033 **APPLIED TO PROD** (verified live). Phases 2/3/4/5/6/7 all built and pushed to branch `client-role-fulfillment` (`2da4c0a`, `673b86a`, `7e966f3`, `f40a4da`, on top of `76f9938`) — **NOT merged to master yet.** Build summary unchanged, see [[Memories]] 2026-06-19 "BUILD COMPLETE" entry. **BUG FOUND + FIXED (`f40a4da`):** `Login.jsx`'s post-sign-in redirect only branched on `admin`/`closer`, falling through to `/rep` for `client` — missed in Phase 4 (App.jsx/ProtectedRoute/Sidebar were already correct). Found when Brayden tested `testclient-verify` and landed on `/rep`'s training gate. **IMPORTANT — Brayden was testing `ohvara-dashboard.vercel.app`, which only deploys `master`. None of phases 2-7 are live there** — what he saw was old pre-client-role production code, not a live bug in the new code. The actual `/client` UI has never been browsed by anyone yet. **TEST CLIENT for the verify step:** login `testclient-verify` / `VerifyClient2026!` (Test Client Co, tier pro, 8-question onboarding pending) — backend already confirmed working via direct API calls (self-RLS scoped correctly). **Chrome MCP still unreachable from CLI** (`list_connected_browsers` → `[]`). **Brayden is now checking the Vercel dashboard for a `client-role-fulfillment` preview-deployment URL** to test the real UI before merge (Vercel's GitHub integration typically auto-builds a preview per pushed branch). **BLOCKED ON: his test result against that preview URL** — once he confirms `/client` + `/client/onboarding` look right, CC merges to master. **Side finding (not in scope, not fixed):** local `.env.local` anon key is still the legacy `eyJ…` one (401s against publishable-key-only auth) — Open Thread E. Also `profiles` RLS lets any authenticated user read all profiles, not just their own — pre-existing, flagged for awareness only.
-
-**Context:** Recon (logged in `work/active/ohvara-dashboard.md` "## Fulfillment Loop" section, 2026-06-19) found the pieces but not the connections: `recommend-stack`, `provision-client`, and `build-agent` all work, but there's no `client` role, no auth link from a `clients` row to a login, no field to persist the AI-recommended price or Nate's override, and the separate `ohvara-client-portal` app likely can't even read its own data under live RLS. Target end-state (Brayden, 2026-06-19): ONE dashboard, four roles (admin/closer/rep/client), no separate portal app.
-
-**Build in phases, self-verify after each before moving to the next (standing rule #10b — visual self-verify via Chrome MCP applies to the new `/client/*` UI too):**
-
-1. **Migration:** add `'client'` to the `user_role` enum. Add a FK linking `clients` → `profiles`/`auth.users` (so a client row maps to a login). Add `recommended_tier`, `recommended_price`, `override_price` columns to `clients` (currently only a fixed `tier`/`monthly_value` exist — the AI recommendation and Nate's override are never persisted today).
-2. **Auth on close:** when `provision-client` runs, also create the actual login (auth.users + profiles role='client', linked via the new FK) — same username@ohvara.internal / generated-password pattern as existing accounts. Surface the credentials in the admin notification that already fires on close (manual handoff to the client is fine for now — no email automation exists yet, don't build one unless trivial).
-3. **Persist the recommendation:** wire `recommend-stack`'s output into `clients.recommended_tier`/`recommended_price` at provision time, and add an override-price input to the closer's `AppointmentCard.jsx` flow so Nate can set `override_price` before close finalizes.
-4. **New role + routes:** add `client` to `App.jsx` routing, `ProtectedRoute`, and `Sidebar`. Build `/client/*` (start minimal — overview page showing tier/stack/agent status/phone number; port the onboarding questionnaire + `Portal.jsx` content from the separate `ohvara-client-portal` repo into this route tree rather than rebuilding from scratch).
-5. **RLS:** add self-row policies so a logged-in client can read only their own `clients`/`onboarding` rows (fixes the RLS gap recon found — the standalone portal's anon-key-by-UUID reads likely return nothing under live RLS today).
-6. **Retire the standalone portal:** once `/client/*` reaches parity with what `ohvara-client-portal` actually does today (onboarding form + status view), stop deploying/linking the separate app. Do NOT delete the repo — just unlink it from the close-flow URL and note in Memories that it's superseded.
-7. **Cleanup (low-risk, optional if time allows):** retire the dead `stack_analysis` mode in `generate-ai-script` (recon confirmed it's a stale parallel recommender the live UI never calls).
-
-**Out of scope this round:** TWILIO secrets are still missing (blocks `build-agent` from buying a real number) — that's a Brayden-side credential task, not a code blocker; note it, don't try to work around it. Don't touch `recommend-stack`'s actual recommendation logic/quality — this prompt is plumbing (role, auth, persistence, routing), not improving the AI's judgment.
-
-**When done:** log to Memories, update `work/active/ohvara-dashboard.md`, commit + push, clear this item from the queue.
+*(no items queued — Prompt 1 "Build the `client` role" shipped 2026-06-19, see [[Memories]] + `work/active/ohvara-dashboard.md` "Fulfillment Loop" for the full trail)*
 
 ---
 
 **Parked idea (not queued, for later — logged so it isn't lost):** When an appointment is booked, auto-kick a workflow that generates a website preview (using whatever info is already on the lead) for Nate to show live during the close call — not a finished site, just a "here's what it could look like" visual aid. Ties into Vertical 2 (web agency) in [[North Star]]. Revisit after the client-role fulfillment loop is proven — not part of Prompt 1.
+
+---
+
+### Prompt 2 — Client dashboard redesign
+
+**Prereq:** Prompt 1 merged to master first.
+
+Brayden reviewed the Vercel preview for the client dashboard and wants a redesign before merge. Current build is a basic status page — should look and feel like the admin dashboard (analytical, data-forward).
+
+**Changes:**
+
+1. **Overview page** (`ClientOverview.jsx`) — redesign to be analytics-first. Show their AI agent status, phone number, tier/package, key metrics (calls handled, appointments booked, reviews generated — whatever is available from the `clients`/`onboarding` tables). Think admin KPI card layout, not a blank info card.
+
+2. **Left sidebar** — tabs should be:
+   - Overview (current)
+   - Automations (their active AI agents/stack — what they're paying for, status of each)
+   - Messages (new — see below)
+
+3. **Messages tab** — client can message Nate with questions. Same pattern as the existing rep messages system (rep → Nate/Brayden). Client messages go to Nate only. Label it something like "Ask Nate a Question" or "Support." Reuse the existing `messages` table + `Inbox` component pattern — just add `recipient='nate'` and scope the sender to `role='client'`.
+
+**Visual self-verify** via Chrome MCP on the Vercel preview before merging Prompt 1 to master (or merge Prompt 1 first, then deploy Prompt 2 on top — either order is fine as long as visual verify happens before Brayden demos it).
+
+**When done:** log to Memories, update ohvara-dashboard.md, commit + push.
+
+---
+
+### Prompt 3 — Smarter AI recommendation engine (PARKED — needs one decision first)
+
+**Open question before building:** The current packages are fixed bundles (Basic/Pro/Premium/Elite). Brayden wants the recommendation engine to diagnose the client's specific problem and recommend the right automation — not default to the receptionist stack every time. Example: a client who needs review generation more than call handling should get a recommendation that reflects that, not just "Pro because your revenue is mid-range."
+
+**Decision needed:** Is the engine still recommending one of the 4 fixed packages (but with smarter reasoning that matches the package to the actual pain), or should it eventually support custom/à la carte stacks? Answer changes the build scope significantly.
+
+**Once decided:** update this prompt with the scope and queue it for CC.
 
 ---
 

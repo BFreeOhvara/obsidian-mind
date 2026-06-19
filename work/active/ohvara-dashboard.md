@@ -489,6 +489,8 @@ ohvara-dashboard/
 
 ## Fulfillment Loop — Recon 2026-06-19 (for the `client`-role pivot)
 
+> **✅ RESOLVED 2026-06-19 — all gaps below CLOSED, merged to master (`f40a4da`).** Migrations 032/033 live in prod (`client` role + `clients.profile_id`/`recommended_tier`/`recommended_price`/`override_price` + self-RLS). `provision-client` creates the client's login on close. `/client` + `/client/onboarding` built and ported from the standalone portal, gated by the `client` role, no UUID-in-URL. `provision-client`/`build-agent` point at the main dashboard instead of `CLIENT_PORTAL_URL`. Dead `stack_analysis` mode deleted. Visually verified by Brayden against a Vercel preview deploy with a real test client (`testclient-verify`) before merge. Full build/verify trail: [[Memories]] 2026-06-19 entries ("BUILD COMPLETE" through the Login.jsx redirect-bug fix). The recon below is left as historical record of the pre-fix state.
+
 The end-to-end "Nate closes → client live → client logs in" loop, as it actually exists today:
 
 **The close → provision chain (in `closer/AppointmentCard.jsx`):**
