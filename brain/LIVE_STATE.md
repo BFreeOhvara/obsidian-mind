@@ -16,11 +16,46 @@ tags:
 
 *(Prompt 1 + Prompt 2 shipped 2026-06-19. Prompt 3's decision is now made — see queue below. CC: execute top to bottom, one step at a time if Brayden says "run next step," logging + deleting each as it completes.)*
 
-*(Prompts 5–12 shipped 2026-06-20 — see [[Memories]] for the full build + verify trail. Queue is now empty — check [[North Star]]'s Current Focus for what's next.)*
+*(Prompts 5–13 shipped 2026-06-20 — see [[Memories]] for the full build + verify trail.)*
 
 ---
 
-### Prompt 9 — Stripe dynamic checkout — ✅ SHIPPED + VERIFIED LIVE 2026-06-20
+### Prompt 14 — Closer Pipeline redesign + Messages full-width
+
+Two changes. Recon both target files before writing a line of code.
+
+---
+
+**Change 1 — Closer Pipeline matches Admin Pipeline**
+
+Recon first:
+- Read `src/pages/admin/Pipeline.jsx` (or wherever the admin Pipeline lives) — understand its full structure: tabs, lead cards, search/filter, layout.
+- Read the closer Pipeline page (likely `src/pages/closer/Pipeline.jsx` or similar) — understand what it currently renders.
+
+Goal: The closer's Pipeline page should be visually and structurally identical to the admin Pipeline, but scoped to leads that have appointments belonging to this closer (i.e., `appointments.closer_id = auth.uid()` OR `closer_id IS NULL AND role='closer'` — same RLS logic already in place). Tabs, card layout, search box, status counts — everything should match the admin version. The only difference is the data scope (closer sees only their leads/appointments, not the whole pipeline).
+
+If the admin Pipeline has an "All Reps" filter dropdown, hide that on the closer version (closers only see their own). If it has an "Unassigned" tab, hide that too (unassigned leads aren't relevant to a closer).
+
+Tabs the closer Pipeline should show: **Pending** (appointment not yet completed), **Closed** (won deals), **Lost** (lost deals). Map these to the appointment `status` field values already in the DB. If `status` values differ from what the admin uses, adapt — don't change the DB schema.
+
+---
+
+**Change 2 — Messages page fills the full viewport**
+
+The Messages page (MessageCenter.jsx shared component, rendered at `/closer/messages` and `/rep/messages` and `/admin/messages`) currently renders in a constrained width — visible in the screenshot as padded/centered content that doesn't fill the full content area.
+
+Fix: Remove any max-width, margin auto, padding, or container constraints that are limiting the Messages page width. It should fill 100% of the space available after the sidebar — edge to edge, top to bottom (minus any top nav bar if present). The 3-panel layout (conversation list | chat thread | contact info) should expand to fill all that space.
+
+Do NOT change the 3-panel proportions themselves (e.g. if the list panel is 280px fixed and the contact panel is 300px fixed, keep those — just let the middle chat panel expand to fill the remaining width). The page should feel like a full-screen messaging app, not a card floating in a page.
+
+---
+
+**After both changes:**
+- `npm run build` — must pass.
+- Chrome MCP visual verify: screenshot the closer Pipeline and the Messages page, confirm Pipeline looks like admin, Messages fills the viewport.
+- Log to [[Memories]], commit, push.
+
+---
 
 **Built + deployed 2026-06-20** (`dd883ed`): edge fn `create-checkout-session` (one combined Stripe Checkout Session per deal — recurring monthly line item at the real `custom_monthly_price` + a one-time $297 setup line item on the same invoice); `AppointmentCard.jsx`'s old fixed-tier `StripeButtonRow` replaced with `PaymentLinkRow` ("Generate Payment Link" → Open/Copy Link, gated on `appt.demo_client_id` existing). `recommend-stack` got the no-overlap instruction added to its prompt.
 
