@@ -16,7 +16,7 @@ tags:
 
 *(Prompt 1 + Prompt 2 shipped 2026-06-19. Prompt 3's decision is now made — see queue below. CC: execute top to bottom, one step at a time if Brayden says "run next step," logging + deleting each as it completes.)*
 
-*(Prompts 5+6 shipped 2026-06-20. Prompts 7+8 shipped 2026-06-20. Prompt 9 verified, Prompt 10 + Prompt 11 shipped 2026-06-20 — see [[Memories]] for the full build + verify trail. Queue is now empty — check [[North Star]]'s Current Focus for what's next.)*
+*(Prompts 5–12 shipped 2026-06-20 — see [[Memories]] for the full build + verify trail. Queue is now empty — check [[North Star]]'s Current Focus for what's next.)*
 
 ---
 

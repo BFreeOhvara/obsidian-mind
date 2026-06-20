@@ -64,6 +64,18 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-20 | Prompt 12 — modal sizing, stack tier enforcement, nav + Messages redesign SHIPPED
+
+**Task:** 4-part fix list from Brayden.
+**What was done:**
+1. `AppointmentCard.jsx` detail modal — Override price / Client email inputs shrunk to a fixed 34px height, compact flex-basis (200/220px instead of growing to 320px), smaller font, no longer dominate the modal.
+2. `recommend-stack` — added an explicit "MUST return at least 1 front-runner AND 1 sub-agent" rule to the AI prompt, plus a new `enforceBothTiers()` post-process safety net applied to **both** the AI response path and the deterministic fallback path. **This caught a real bug**: the Prompt 10 live-verification test (logged in the 2026-06-20 Prompt 10 entry) had actually returned `sub_agents: []` — at the time I noted it as a "loose end, not investigated." It turned out to be exactly this gap (`splitFrontRunners` puts both items in front-runners when the automations pool has only 2). Re-tested the identical payload post-fix: now correctly returns 1 front-runner + 1 sub-agent. Lesson: that "loose end" should have been chased further at the time rather than filed away — it was a real defect, not a quirk of the fallback path being hit.
+3. Removed Commissions + Lead Scraper from the closer sidebar nav (`Sidebar.jsx`) — routes/pages left in the codebase, just unlinked, per the prompt's instruction.
+4. Replaced the single-column `Inbox.jsx` with a new shared `MessageCenter.jsx` (3-panel chat layout: conversation list with letter avatars + last-message preview / chat-bubble thread with pinned compose box / contact-info side panel) used by all three message surfaces (`/rep/messages`, `/closer/messages`, `/admin/messages`). Data model unchanged (still one row per rep-initiated message + at most one reply) — "conversations" are a client-side grouping by sender (recipient views) or the two fixed contacts Brayden/Nate (rep view). Closer's contact panel shows the rep's bookings count in the last 7 days (new lightweight query). Deleted old `Inbox.jsx` and the now-dead `recipientName`/`recipientLabel` exports.
+**Deploy trail:** build verified clean. `recommend-stack` redeployed (v17) via the Management API (Brayden re-approved per-action, since the Prompt 10 approval didn't carry forward) and re-tested live — confirmed the exact previously-broken case now returns both tiers. No DB migration needed (no schema changes this prompt). Fixes 1/3/4 are pure frontend — no separate deploy step beyond the `git push` (Vercel auto-deploys from master).
+**Could not visually self-verify** (standing rule #11) — `list_connected_browsers` returned `[]` again, same CLI-vs-Desktop Chrome bridge limitation as Prompt 11. Build-verified only.
+**Status:** ✅ Prompt 12 fully shipped. Commit `e8e07cd`, pushed to master. **CC queue is empty again.**
+
 ### 2026-06-20 | Prompt 11 — closer dashboard UI polish SHIPPED (5 fixes)
 
 **Task:** Brayden's screenshot feedback (2026-06-19) on the closer (Nate) appointment pipeline — 5 polish fixes.
