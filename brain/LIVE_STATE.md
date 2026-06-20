@@ -25,9 +25,11 @@ tags:
 - ✅ **Step 3 — `recommend-stack` rewritten + deployed.** Formula: `callsMissedPerWeek × 4.33 × avgTicket × 0.15` → price (floor $297, ceiling $1,797, round to $10). 8-automation catalog. VERIFIED: Peak HVAC 8 calls/wk × $900 → $1,800/mo + 3 automations. Tunable constants labeled in code.
 - ✅ **Step 4 — Fire-and-forget at booking.** `CallModal.jsx` invokes `recommend-stack` on `Appointment Booked`, caches full rec on lead row. `useMyAppointments` selects all 6 new columns.
 - ✅ **Step 5 — AppointmentCard overhauled.** Cached rec loads first (skips API call). RecommendationPanel shows formula price + automation list. SampleDashboard: collapsible "Preview for [Business Name]", Overview + per-automation tabs, KPIs from lead's own discovery data.
-- ⏳ **Step 6 — Visual verify PENDING.** Chrome MCP offline last session. Next CC session: log in as `nate44`/`Nate2026!` on `/closer`, expand an appointment card, verify custom price + automation checklist + preview panel. Log done, delete this item, update `ohvara-dashboard.md`, commit + push vault.
+- ⏳ **Step 6 — FIX SHIPPED 2026-06-20, BLOCKED ON BRAYDEN'S VISUAL VERIFY.** Root cause was RLS, not just the query: `appointments_closer_select`/`_update` (migration 001) only allowed `closer_id = auth.uid()`, so unassigned (`closer_id IS NULL`) pending appointments were invisible to every closer regardless of frontend filter. **Migration `035_closer_unassigned_appointments.sql` applied to prod** (broadens both policies to `closer_id = auth.uid() OR (closer_id IS NULL AND role='closer') OR admin`, verified live via `pg_policies`); `useMyAppointments` (`useAppointments.js`) query changed to `.or('closer_id.eq.${profile.id},closer_id.is.null')`. `npm run build` passes. **Functionally verified pre-push:** signed in as `nate44`/`Nate2026!` via direct API call, confirmed all 3 previously-invisible pending appointments now return. Pushed straight to master `1cbc62c` (no branch) — production deploying. Full trail: [[Memories]] 2026-06-20.
 
-**Dashboard commit:** `d941e8d` on master. `vite build` clean ✓. Edge fn verified via curl ✓.
+  **REMAINING:** Chrome MCP still unreachable from CLI (`list_connected_browsers` → `[]`). **Brayden needs to log in as `nate44`/`Nate2026!` on `/closer`, expand an appointment card, confirm custom price + automation checklist + SampleDashboard preview panel all render**, then tell CC pass/fail. Once confirmed: log done, delete this Prompt 4 entry, update `ohvara-dashboard.md`, commit + push vault.
+
+**Dashboard commits:** `d941e8d` (Steps 1-5) + `1cbc62c` (Step 6 fix) on master. `vite build` clean ✓. Edge fn verified via curl ✓.
 
 ---
 
