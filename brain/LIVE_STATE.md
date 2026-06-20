@@ -16,30 +16,78 @@ tags:
 
 *(Prompt 1 + Prompt 2 shipped 2026-06-19. Prompt 3's decision is now made — see queue below. CC: execute top to bottom, one step at a time if Brayden says "run next step," logging + deleting each as it completes.)*
 
-*(Prompts 5+6 shipped 2026-06-20. Prompts 7+8 shipped 2026-06-20 — see [[Memories]] for the full build + verify trail. Only Prompt 9 remains, blocked on Brayden.)*
+*(Prompts 5+6 shipped 2026-06-20. Prompts 7+8 shipped 2026-06-20 — see [[Memories]] for the full build + verify trail. Prompt 10 queued below.)*
 
 ---
 
-### Prompt 9 — Stripe dynamic checkout (setup fee + monthly subscription)
+### Prompt 9 — Stripe dynamic checkout — ⏳ CODE SHIPPED, BLOCKED ON A BAD SECRET VALUE
 
-**Blocked on: `STRIPE_SECRET_KEY` set in Supabase secrets.** Brayden must add this before CC can build. Once added, tell CC "STRIPE_SECRET_KEY is set, run Prompt 9."
+**Built + deployed 2026-06-20** (`dd883ed`): new edge fn `create-checkout-session` (one combined Stripe Checkout Session per deal — recurring monthly line item at the real `custom_monthly_price` + a one-time $297 setup line item on the same invoice); `AppointmentCard.jsx`'s old fixed-tier `StripeButtonRow` replaced with `PaymentLinkRow` ("Generate Payment Link" → Open/Copy Link, gated on `appt.demo_client_id` existing). `recommend-stack` got the no-overlap instruction added to its prompt.
 
-**Build:**
+**BLOCKED — `STRIPE_SECRET_KEY` as currently set is not a valid Stripe key.** Tested live: Stripe itself rejects it — `"Invalid API Key provided: mk_1TTUu***************vS24"`. Valid Stripe secret keys start `sk_test_…`/`sk_live_…` (or `rk_…` for restricted keys); this one starts `mk_…`, which isn't a Stripe format at all — looks like the wrong credential got pasted into the secret. **The function code itself is confirmed correct** (the error came back FROM Stripe's API, not from a code bug). **Brayden: go to https://dashboard.stripe.com/apikeys, copy the real Secret key (starts `sk_`), and reset the `STRIPE_SECRET_KEY` Supabase secret** — then tell CC "Stripe key fixed, verify Prompt 9" and it'll re-test immediately (no rebuild needed).
 
-New edge function `create-checkout-session`:
-- Takes: `setup_fee` (always $297), `monthly_price` (from `custom_monthly_price` on the lead), `client_id`, `business_name`
-- Creates a Stripe Checkout Session with two line items:
-  - One-time: $297 setup fee
-  - Recurring subscription: `monthly_price`/mo
-- Returns the Checkout Session URL
+---
 
-**AppointmentCard.jsx** — replace the current static Stripe link buttons with:
-- "Generate Payment Link" button (calls `create-checkout-session`)
-- Displays the generated URL + a "Copy Link" button
-- Only enabled after demo account is provisioned (Prompt 7) and Nate is ready to close
+### Prompt 10 — Tiered stack structure (front-runner agents + sub-agents)
 
-**recommend-stack tightening (bundle into this prompt):**
-- Add explicit instruction to the Claude prompt: "Do not recommend two automations that solve the same problem. If there's overlap, combine them into one. Each automation must address a distinct problem the prospect described."
+**Decision (Brayden, 2026-06-19):** The flat automation list feels generic. Replace it with a two-tier hierarchy that tells a clear story: here's what solves your core problem, here's what makes it work better.
+
+**Structure:**
+- **1-2 front-runner agents** — directly solve the primary pain they described. These are the headline of the sale.
+- **1-5 sub-agents** — complement and amplify the front-runners. Each one must have a clear relationship to a front-runner (makes it smarter, handles edge cases, extends its reach). No standalone sub-agents that could exist without the primaries.
+
+Counts are flexible — the AI determines how many of each based on the actual problem. Not a fixed 2+3.
+
+**Changes:**
+
+**`recommend-stack` edge function:**
+- Change output schema from flat `recommended_automations: [{name, description}]` to:
+  ```json
+  {
+    "front_runners": [{"name": "...", "description": "..."}],
+    "sub_agents": [{"name": "...", "description": "..."}],
+    "custom_monthly_price": 1200,
+    "setup_fee": 297
+  }
+  ```
+- Update the Claude prompt to: identify the 1-2 most critical problems → assign 1-2 front-runner agents that solve them directly → assign 1-5 sub-agents that complement each front-runner → no agent should sound generic or overlap another → each name should be specific (e.g., "After-Hours Call Handler" not "AI Receptionist").
+
+**`leads` table:** add `front_runner_agents` jsonb + `sub_agents` jsonb columns (migration 039). Keep `recommended_automations` for backward compat (populate it as front_runners + sub_agents combined).
+
+**`AppointmentCard.jsx` + `SampleDashboard`:** render front-runners prominently (larger cards, labeled "Core Solution"), sub-agents underneath (smaller, labeled "Supporting Agents"). Each still gets its own synthetic stats tab.
+
+**`ClientOverview.jsx` + `ClientAutomations.jsx`:** same hierarchy in the client portal. Front-runners shown first with emphasis, sub-agents as supporting stack.
+
+**Pricing formula update (bundle into this prompt):**
+- Floor: $297 → **$397**
+- Ceiling: $1,797 → **$1,997**
+- Setup fee: $297 (unchanged)
+- Update everywhere the constants appear: `recommend-stack` edge fn, `CLAUDE.md`, `North Star.md`.
+
+**Recon first:** check `supabase/functions/recommend-stack/index.ts` current prompt + output shape + floor/ceiling constants, `src/components/closer/AppointmentCard.jsx` SampleDashboard rendering, `src/pages/client/ClientAutomations.jsx`.
+
+---
+
+### Prompt 11 — Closer dashboard UI polish (5 fixes)
+
+Visual feedback from Brayden (2026-06-19, screenshot confirmed). All changes in `AppointmentCard.jsx` + `MyAppointments.jsx` (or wherever the closer pipeline lives).
+
+**1. Remove tier badge from appointment card header.**
+The "Basic" / "Pro" / "Premium" badge next to the business name is a leftover from the old fixed-package model. Remove it entirely. If a label is needed, replace with nothing — the AI Recommendation section below already shows the custom price and stack.
+
+**2. Appointment cards collapsed by default.**
+Currently all cards auto-expand on page load. Change so all cards start collapsed. User clicks to expand.
+
+**3. Expand on full row click, not just the arrow.**
+Currently only the chevron/arrow toggles expansion. Make the entire card header row clickable to toggle.
+
+**4. Expand as a popup/modal, not inline dropdown.**
+Instead of the card expanding inline (pushing content down), clicking the card should open a modal/popup overlay showing the full appointment detail. The appointments list stays intact behind it. Style consistent with the existing dashboard modals.
+
+**5. Remove "Past Deals" nav tab. Add Pending/Closed filter to Appointments.**
+Delete the Past Deals page from the closer sidebar nav. On the My Appointments page, add a simple filter toggle: "Pending" (default) | "Closed" — so Nate can switch between active pipeline and closed deals in one place without a separate page.
+
+**Note on the $497 showing in the screenshot:** that lead (Dalco, booked Jun 13) has no `calls_missed_per_week`/`avg_ticket` data (booked before Prompt 5 added those inputs) — formula falls back to tier price. Expected behavior for old leads; new bookings will show correct custom price.
 
 ---
 
