@@ -16,26 +16,7 @@ tags:
 
 *(Prompt 1 + Prompt 2 shipped 2026-06-19. Prompt 3's decision is now made — see queue below. CC: execute top to bottom, one step at a time if Brayden says "run next step," logging + deleting each as it completes.)*
 
-*(Prompts 5–14 shipped 2026-06-20 — see [[Memories]] for the full build + verify trail.)*
-
----
-
-### Prompt 15 — Open Client Dashboard missing, confidence badge removal, stack-size minimum
-
-**Source: Brayden's live screenshot review as Nate on `/closer`, lead "North Texas Climate Control" (HVAC, pending appointment).** Three fixes.
-
-**1. BUG — "Open Client Dashboard" button never appears.** On this real appointment, the AI recommendation panel rendered fully ($797/mo, AI Receptionist core + Review Generation supporting) but the button is nowhere on the card — only "Generate Payment Link" with a "Waiting on the demo account to provision…" subtext underneath it. That subtext means `appt.demo_client_id` is still null on this appointment well after booking. Recon first: pull this exact appointment + its lead row from Supabase (search business_name `North Texas Climate Control`), confirm `demo_client_id` is null, then check `provision-demo-client` invocation logs (it's fired fire-and-forget from `CallModal.jsx` inside `recommend-stack`'s `.then()`, wrapped in `.catch(() => {})` — so a failure here is silently swallowed and nothing tells Nate it's stuck). Diagnose why it never completed (edge fn error? this appointment booked before Prompt 7 shipped, so provisioning never ran at all? race condition?). Fix the root cause. Also fix the UX gap regardless of root cause: a fire-and-forget call with a silent catch means appointments can get permanently stuck in "waiting" with zero visibility — add a manual "Retry provisioning" action (or surface the actual error) on `AppointmentCard.jsx` when `demo_client_id` is null and enough time has passed, instead of relying purely on the booking-time fire-and-forget. Verify fixed against this real appointment — confirm `demo_client_id` populates and "Open Client Dashboard" appears.
-
-**2. Remove the confidence badge.** The `RECOMMENDED` + `MEDIUM CONFIDENCE` badges in the top-right of the AI Recommendation panel (`RecommendationPanel` in `AppointmentCard.jsx`) — remove the confidence badge entirely (`MEDIUM CONFIDENCE` / whatever the other tiers are called). Keep or drop the `RECOMMENDED` badge at your judgment, but the confidence-level badge specifically goes — Brayden doesn't want a confidence score shown to Nate.
-
-**3. Stack composition minimum — recommend-stack must never return a too-thin stack.** Current behavior produced a 2-item stack (1 front-runner "AI Receptionist" + 1 supporting "Review Generation") on a real lead — Brayden wants a floor on stack *composition*, independent of price (price stays formula-driven, unaffected by this change — this is purely about how many automations get bundled in). New rule for the `recommend-stack` AI prompt + its deterministic fallback path:
-   - Minimum total automations in any recommended stack: **3** (never just a front-runner + one supporting agent, never just 2 items total).
-   - Minimum supporting agents per front-runner: **2** — so 1 front-runner needs ≥2 supporting (3 total minimum), 2 front-runners needs ≥4 supporting (6 total), scaling roughly 2:1 supporting-to-front-runner.
-   - The supporting agents added to hit this floor should still be ones that genuinely complement the diagnosed pain (no random padding) — same "why pitch this" framing logic already in place, just don't let the AI stop at the bare minimum that satisfies the core problem alone.
-   - Add a post-generation validation/pad step in the edge function: if the AI's response comes back under the floor, either re-prompt with the explicit minimum stated, or deterministically add the next-most-relevant catalog/free-form automations until the floor is met — don't just trust the AI to always comply.
-   - Verify with at least 2 test calls through `recommend-stack` (different pain profiles) confirming the floor holds.
-
-Recon all three files/functions before editing (`AppointmentCard.jsx`, `CallModal.jsx`, `provision-demo-client`, `recommend-stack`) — confirm current state matches what's described above before changing anything. Visually self-verify per standing rule #11 if Chrome MCP is reachable this session; if not (the recurring CLI gotcha), do a live functional check against the actual North Texas Climate Control appointment instead of build-only verification. Log + delete this item when done.
+*(Prompts 5–15 shipped 2026-06-20 — see [[Memories]] for the full build + verify trail.)*
 
 ---
 
