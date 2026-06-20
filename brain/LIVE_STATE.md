@@ -16,7 +16,32 @@ tags:
 
 *(Prompt 1 + Prompt 2 shipped 2026-06-19. Prompt 3's decision is now made — see queue below. CC: execute top to bottom, one step at a time if Brayden says "run next step," logging + deleting each as it completes.)*
 
-*(no items queued — Prompts 5+6 shipped 2026-06-20, see [[Memories]] for the full build + verify trail)*
+*(Prompts 5+6 shipped 2026-06-20. Prompts 7+8 shipped 2026-06-20 — see [[Memories]] for the full build + verify trail. Only Prompt 9 remains, blocked on Brayden.)*
+
+---
+
+### Prompt 9 — Stripe dynamic checkout (setup fee + monthly subscription)
+
+**Blocked on: `STRIPE_SECRET_KEY` set in Supabase secrets.** Brayden must add this before CC can build. Once added, tell CC "STRIPE_SECRET_KEY is set, run Prompt 9."
+
+**Build:**
+
+New edge function `create-checkout-session`:
+- Takes: `setup_fee` (always $297), `monthly_price` (from `custom_monthly_price` on the lead), `client_id`, `business_name`
+- Creates a Stripe Checkout Session with two line items:
+  - One-time: $297 setup fee
+  - Recurring subscription: `monthly_price`/mo
+- Returns the Checkout Session URL
+
+**AppointmentCard.jsx** — replace the current static Stripe link buttons with:
+- "Generate Payment Link" button (calls `create-checkout-session`)
+- Displays the generated URL + a "Copy Link" button
+- Only enabled after demo account is provisioned (Prompt 7) and Nate is ready to close
+
+**recommend-stack tightening (bundle into this prompt):**
+- Add explicit instruction to the Claude prompt: "Do not recommend two automations that solve the same problem. If there's overlap, combine them into one. Each automation must address a distinct problem the prospect described."
+
+---
 
 ---
 
