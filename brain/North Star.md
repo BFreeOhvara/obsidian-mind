@@ -46,52 +46,18 @@ Bundled into the Elite package or standalone.
 
 ---
 
-## The Four Packages
+## Custom Stack Pricing (replaces the old 4 fixed packages, 2026-06-20)
 
-All packages include a **`$497` one-time setup fee**.
+**No fixed packages.** Every client gets a custom-named automation stack and a custom price, generated from their specific discovery answers — not picked off a menu.
 
-| Package | Setup Fee | Monthly | Best For |
-|---------|-----------|---------|---------|
-| Basic | `$497` | `$497/mo` | Owner-operators missing calls, need basic coverage |
-| Pro | `$497` | `$797/mo` | Growing businesses that want reviews + follow-up too |
-| Premium | `$497` | `$1,297/mo` | Established businesses ready to automate the full front office |
-| Elite | `$497` | `$1,797/mo` | Everything — full automation + website + multiple agents |
-
-### What's Included Per Package
-
-**Basic — `$497/mo`**
-- AI Receptionist (24/7 inbound call handling)
-- Missed Call Text Back
-
-**Pro — `$797/mo`**
-- AI Receptionist (24/7)
-- Missed Call Text Back
-- Review Generation
-- Lead Follow-Up Automation
-- Appointment Reminders
-
-**Premium — `$1,297/mo`**
-- AI Receptionist (24/7)
-- Missed Call Text Back
-- Review Generation
-- Lead Follow-Up Automation
-- Appointment Reminders
-- AI Dispatcher
-- SMS Marketing
-
-**Elite — `$1,797/mo`**
-- Everything in Premium
-- Professional Website
-- Multiple AI agents (up to 5 lines)
-- Priority support
-- Custom reporting dashboard
+- **Setup fee: `$297` flat, one-time** (was `$497` — lowered with the pivot to formula pricing).
+- **Monthly: formula-priced, value-based.** `callsMissedPerWeek × 4.33 × avgTicket × 0.15` = estimated monthly value lost to missed calls; that becomes the price. Floor `$397/mo`, ceiling `$1,997/mo` (raised from `$297`/`$1,797` — Prompt 10, 2026-06-20), rounded to the nearest `$10`.
+- **Target average deal: ~`$1,200/mo`.**
+- **Automations are AI-generated per lead as a tiered stack** (Prompt 10, 2026-06-20): 1-2 **front-runner agents** that directly solve the 1-2 most critical stated problems (the headline of the sale) + 1-5 **sub-agents** that complement/amplify each front-runner (no standalone sub-agent — every one ties to a front-runner). Names are specific (e.g. "After-Hours Call Handler," not "AI Receptionist"). No catalog constraint — the AI invents whatever the lead's situation calls for.
 
 ### ROI Anchor (use in every close)
 
-- Basic replaces a `$2,800+/mo` receptionist
-- Pro replaces a `$3,500+/mo` receptionist + marketing assistant
-- Premium replaces a `$4,500+/mo` receptionist + dispatcher
-- Elite replaces `$6,000+/mo` full office staff
+Always anchor to the cost of a human hire, not to competitors or fixed tiers — typically `$2,800`–`$6,000+/mo` depending on scope (receptionist alone vs. full front-office automation).
 
 ---
 
@@ -121,37 +87,32 @@ Profile A — Trades & Field Services:
 
 ---
 
-## Commission Structure (FINAL — updated 2026-06-19)
+## Commission Structure (FINAL — updated 2026-06-19, formula applied 2026-06-20)
 
 **Setter gets 10% of the whole deal (setup fee + first month's recurring, combined) as a one-time payment.** The remaining 90% of that combined first-deal amount splits 50/50 between Nate and Brayden. From month 2 onward (no more setter cut), the monthly recurring splits 50/50 between Nate and Brayden, forever.
 
 - Setter only paid on **closed deals** — not just bookings, and only once (no residual)
 - Nate owns client relationship from close forward — handles all client questions and issues
 - Brayden owns all tech
+- **Percentages are fixed; the dollar amount is whatever the deal actually closed at** (custom formula price, or Nate's override price if he set one) — there's no fixed-package lookup table anymore. Apply 10% / 45% / 45% to the real `setup + month-1` total, and 50% / 50% to the real monthly from month 2 on.
 
-### Payout Per Close, By Package
+### Worked Example — at the target average deal (`$297` setup + `$1,200/mo`)
 
-| Package | Setup | Month 1 | Setup+M1 Combined | Setter (10%, one-time) | Nate (45%) | Brayden (45%) |
-|---------|-------|---------|-------------------|------------------------|------------|----------------|
-| Basic | `$497` | `$497` | `$994` | `$99.40` | `$447.30` | `$447.30` |
-| Pro | `$497` | `$797` | `$1,294` | `$129.40` | `$582.30` | `$582.30` |
-| Premium | `$497` | `$1,297` | `$1,794` | `$179.40` | `$807.30` | `$807.30` |
-| Elite | `$497` | `$1,797` | `$2,294` | `$229.40` | `$1,032.30` | `$1,032.30` |
+| | Combined Setup+M1 | Setter (10%, one-time) | Nate (45%) | Brayden (45%) |
+|---|---|---|---|---|
+| First deal | `$1,497` | `$149.70` | `$673.65` | `$673.65` |
 
-### Monthly Recurring From Month 2 On (50/50, no setter cut)
+| | Monthly (month 2+) | Brayden (50%) | Nate (50%) |
+|---|---|---|---|
+| Recurring | `$1,200` | `$600` | `$600` |
 
-| Package | Monthly | Brayden | Nate |
-|---------|---------|---------|------|
-| Basic | `$497` | `$248.50` | `$248.50` |
-| Pro | `$797` | `$398.50` | `$398.50` |
-| Premium | `$1,297` | `$648.50` | `$648.50` |
-| Elite | `$1,797` | `$898.50` | `$898.50` |
+A deal that closes higher or lower than the `$1,200` target scales proportionally — same percentages, different base number.
 
-### At Scale — 20 Pro Clients (steady state, month 2+)
+### At Scale — 20 clients @ `$1,200/mo` average (steady state, month 2+)
 
-- Brayden MRR: `$7,970/mo`
-- Nate MRR: `$7,970/mo` + 45% of setup+M1 on new closes
-- Setter at 3 closes/week (Pro): ~`$1,550/mo`
+- Brayden MRR: `$12,000/mo`
+- Nate MRR: `$12,000/mo` + 45% of setup+M1 on new closes
+- Setter at 3 closes/week (~12/mo @ target average): ~`$1,796/mo`
 
 ---
 
@@ -264,7 +225,7 @@ TBD — do not hardcode any dialer assumption anywhere in the codebase.
 12. Generate TWO Stripe links on close (setup fee + monthly) — never deferred
 13. AI scripts are question-based and pain-surfacing — never a pitch
 14. All reps and Nate on Profile A only until second closer confirmed
-15. Setup fee (`$497`) always presented as one-time, separate from monthly
+15. Setup fee (`$297`) always presented as one-time, separate from monthly
 
 ---
 

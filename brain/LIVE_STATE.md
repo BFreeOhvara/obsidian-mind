@@ -16,7 +16,7 @@ tags:
 
 *(Prompt 1 + Prompt 2 shipped 2026-06-19. Prompt 3's decision is now made — see queue below. CC: execute top to bottom, one step at a time if Brayden says "run next step," logging + deleting each as it completes.)*
 
-*(Prompts 5+6 shipped 2026-06-20. Prompts 7+8 shipped 2026-06-20 — see [[Memories]] for the full build + verify trail. Prompt 10 queued below.)*
+*(Prompts 5+6 shipped 2026-06-20. Prompts 7+8 shipped 2026-06-20. Prompt 9 verified + Prompt 10 shipped 2026-06-20 — see [[Memories]] for the full build + verify trail. Prompt 11 queued below.)*
 
 ---
 
@@ -25,46 +25,6 @@ tags:
 **Built + deployed 2026-06-20** (`dd883ed`): edge fn `create-checkout-session` (one combined Stripe Checkout Session per deal — recurring monthly line item at the real `custom_monthly_price` + a one-time $297 setup line item on the same invoice); `AppointmentCard.jsx`'s old fixed-tier `StripeButtonRow` replaced with `PaymentLinkRow` ("Generate Payment Link" → Open/Copy Link, gated on `appt.demo_client_id` existing). `recommend-stack` got the no-overlap instruction added to its prompt.
 
 **VERIFIED 2026-06-20:** Brayden reset `STRIPE_SECRET_KEY` to the real `sk_…` key (was a bad `mk_…` value). Re-invoked the edge fn directly with a test payload ($497 monthly + $297 setup) — Stripe accepted it, returned `success:true` + a real `cs_live_…` Checkout Session URL with both line items correctly priced. Function code was already confirmed correct (prior failure was the secret value, not the code) — no rebuild needed. **Prompt 9 is DONE.**
-
----
-
-### Prompt 10 — Tiered stack structure (front-runner agents + sub-agents)
-
-**Decision (Brayden, 2026-06-19):** The flat automation list feels generic. Replace it with a two-tier hierarchy that tells a clear story: here's what solves your core problem, here's what makes it work better.
-
-**Structure:**
-- **1-2 front-runner agents** — directly solve the primary pain they described. These are the headline of the sale.
-- **1-5 sub-agents** — complement and amplify the front-runners. Each one must have a clear relationship to a front-runner (makes it smarter, handles edge cases, extends its reach). No standalone sub-agents that could exist without the primaries.
-
-Counts are flexible — the AI determines how many of each based on the actual problem. Not a fixed 2+3.
-
-**Changes:**
-
-**`recommend-stack` edge function:**
-- Change output schema from flat `recommended_automations: [{name, description}]` to:
-  ```json
-  {
-    "front_runners": [{"name": "...", "description": "..."}],
-    "sub_agents": [{"name": "...", "description": "..."}],
-    "custom_monthly_price": 1200,
-    "setup_fee": 297
-  }
-  ```
-- Update the Claude prompt to: identify the 1-2 most critical problems → assign 1-2 front-runner agents that solve them directly → assign 1-5 sub-agents that complement each front-runner → no agent should sound generic or overlap another → each name should be specific (e.g., "After-Hours Call Handler" not "AI Receptionist").
-
-**`leads` table:** add `front_runner_agents` jsonb + `sub_agents` jsonb columns (migration 039). Keep `recommended_automations` for backward compat (populate it as front_runners + sub_agents combined).
-
-**`AppointmentCard.jsx` + `SampleDashboard`:** render front-runners prominently (larger cards, labeled "Core Solution"), sub-agents underneath (smaller, labeled "Supporting Agents"). Each still gets its own synthetic stats tab.
-
-**`ClientOverview.jsx` + `ClientAutomations.jsx`:** same hierarchy in the client portal. Front-runners shown first with emphasis, sub-agents as supporting stack.
-
-**Pricing formula update (bundle into this prompt):**
-- Floor: $297 → **$397**
-- Ceiling: $1,797 → **$1,997**
-- Setup fee: $297 (unchanged)
-- Update everywhere the constants appear: `recommend-stack` edge fn, `CLAUDE.md`, `North Star.md`.
-
-**Recon first:** check `supabase/functions/recommend-stack/index.ts` current prompt + output shape + floor/ceiling constants, `src/components/closer/AppointmentCard.jsx` SampleDashboard rendering, `src/pages/client/ClientAutomations.jsx`.
 
 ---
 
