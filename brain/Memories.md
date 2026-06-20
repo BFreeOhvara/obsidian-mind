@@ -64,6 +64,14 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-20 | Prompt 9 — Stripe checkout VERIFIED live
+
+**Task:** Brayden fixed `STRIPE_SECRET_KEY` (was a bad `mk_…` value, not a real Stripe key) and asked CC to verify Prompt 9 (real dynamic Stripe checkout).
+**What was done:** Re-invoked the `create-checkout-session` edge fn directly (no rebuild needed — code was already confirmed correct, the prior failure was the secret value) with a test payload ($497/mo + $297 setup). Stripe accepted the key and returned `success:true` + a real `cs_live_…` Checkout Session URL with both line items priced correctly.
+**Root cause (prior session):** wrong credential type pasted into the Supabase secret (`mk_…` prefix isn't a Stripe format at all).
+**Status:** ✅ Prompt 9 fully done. [[LIVE_STATE]] updated to close out the blocker.
+**Lesson:** when a Stripe (or any provider) secret fails, check the key *prefix* first — `sk_`/`rk_` for Stripe secret keys — before assuming a code bug.
+
 ### 2026-06-07 | Vault Initialized
 
 **Task:** Bootstrap obsidian-mind vault with Ohvara context

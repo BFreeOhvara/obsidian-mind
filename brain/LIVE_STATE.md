@@ -20,11 +20,11 @@ tags:
 
 ---
 
-### Prompt 9 — Stripe dynamic checkout — ⏳ CODE SHIPPED, BLOCKED ON A BAD SECRET VALUE
+### Prompt 9 — Stripe dynamic checkout — ✅ SHIPPED + VERIFIED LIVE 2026-06-20
 
-**Built + deployed 2026-06-20** (`dd883ed`): new edge fn `create-checkout-session` (one combined Stripe Checkout Session per deal — recurring monthly line item at the real `custom_monthly_price` + a one-time $297 setup line item on the same invoice); `AppointmentCard.jsx`'s old fixed-tier `StripeButtonRow` replaced with `PaymentLinkRow` ("Generate Payment Link" → Open/Copy Link, gated on `appt.demo_client_id` existing). `recommend-stack` got the no-overlap instruction added to its prompt.
+**Built + deployed 2026-06-20** (`dd883ed`): edge fn `create-checkout-session` (one combined Stripe Checkout Session per deal — recurring monthly line item at the real `custom_monthly_price` + a one-time $297 setup line item on the same invoice); `AppointmentCard.jsx`'s old fixed-tier `StripeButtonRow` replaced with `PaymentLinkRow` ("Generate Payment Link" → Open/Copy Link, gated on `appt.demo_client_id` existing). `recommend-stack` got the no-overlap instruction added to its prompt.
 
-**BLOCKED — `STRIPE_SECRET_KEY` as currently set is not a valid Stripe key.** Tested live: Stripe itself rejects it — `"Invalid API Key provided: mk_1TTUu***************vS24"`. Valid Stripe secret keys start `sk_test_…`/`sk_live_…` (or `rk_…` for restricted keys); this one starts `mk_…`, which isn't a Stripe format at all — looks like the wrong credential got pasted into the secret. **The function code itself is confirmed correct** (the error came back FROM Stripe's API, not from a code bug). **Brayden: go to https://dashboard.stripe.com/apikeys, copy the real Secret key (starts `sk_`), and reset the `STRIPE_SECRET_KEY` Supabase secret** — then tell CC "Stripe key fixed, verify Prompt 9" and it'll re-test immediately (no rebuild needed).
+**VERIFIED 2026-06-20:** Brayden reset `STRIPE_SECRET_KEY` to the real `sk_…` key (was a bad `mk_…` value). Re-invoked the edge fn directly with a test payload ($497 monthly + $297 setup) — Stripe accepted it, returned `success:true` + a real `cs_live_…` Checkout Session URL with both line items correctly priced. Function code was already confirmed correct (prior failure was the secret value, not the code) — no rebuild needed. **Prompt 9 is DONE.**
 
 ---
 
