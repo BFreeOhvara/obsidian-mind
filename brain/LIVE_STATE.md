@@ -16,64 +16,7 @@ tags:
 
 *(Prompt 1 + Prompt 2 shipped 2026-06-19. Prompt 3's decision is now made — see queue below. CC: execute top to bottom, one step at a time if Brayden says "run next step," logging + deleting each as it completes.)*
 
----
-
-### Prompt 5 — Problem-first custom stack + pricing overhaul
-
-**Decision made 2026-06-19 (Falcon):** Drop the 4 fixed packages entirely. Full custom pricing and stack based on the prospect's actual problems.
-
-**What changes:**
-
-**1. Discovery script — add problem questions**
-After "how many calls do you miss per week?" and "what's your average ticket?", add:
-- "What's costing you the most right now — missed calls, slow response, no-shows, or leads who called but never booked?" → store as `primary_pain` on the lead (new column if not exists, else use `pain_points`)
-- "What do you have in place today to handle that?" → `current_setup`
-- "Anything else slipping through the cracks?" → `secondary_pain` (can fold into `pain_points`)
-
-These feed directly into the recommend-stack call.
-
-**2. recommend-stack edge function — replace fixed catalog with AI-generated custom stack**
-Currently picks from a hardcoded 8-automation catalog by niche. Replace this with a Claude call that:
-- Takes: `primary_pain`, `secondary_pain`, `current_setup`, `niche`, `calls_missed_per_week`, `avg_ticket`
-- Returns: a list of 2–5 custom automation descriptions that solve their specific problems (plain English names + one-line descriptions, no catalog constraint — if a new agent type is needed, name it)
-- No cap on automation types. Problem → solution. Patterns will repeat over time naturally.
-
-**3. Pricing formula — keep, tune floor**
-Formula stays: `callsMissedPerWeek × 4.33 × avgTicket × 0.15` → monthly price.
-- Floor: $297 (down from $497... wait, floor was $297 already — confirm in code)
-- Ceiling: $1,797 (keep)
-- Target average deal: ~$1,200/mo
-- Round to nearest $10 (keep)
-
-**4. Setup fee → $297 everywhere**
-Was $497. Change in: CLAUDE.md packages table, North Star commission structure, any hardcoded values in the dashboard (Commissions page, etc.), `recommend-stack` output if it includes setup fee.
-
-**5. North Star / CLAUDE.md — remove 4 fixed packages**
-The Basic/Pro/Premium/Elite table in CLAUDE.md is obsolete. Replace with: "Setup fee: $297 flat. Monthly: formula-priced (value-based). Target average: ~$1,200/mo."
-
-**Recon first** — check: `supabase/functions/recommend-stack/index.ts`, `src/lib/discoveryScript.js`, `CLAUDE.md` packages table, `src/components/closer/AppointmentCard.jsx` (SampleDashboard pricing display), `src/pages/closer/MyCommissions.jsx` (any hardcoded $497). Then build.
-
----
-
-### Prompt 6 — Visual verify Prompt 5 (problem-first stack + pricing)
-
-After Prompt 5 ships, CC verifies the full flow end-to-end via Chrome MCP:
-
-**Step 1 — Setter flow (as apex11 / `Nate2026!` on `/rep`):**
-- Open Call Now modal on any HVAC lead
-- Confirm the discovery script now includes the problem questions (`primary_pain`, `current_setup`, `secondary_pain`)
-- Fill in test answers: 5 missed calls/wk, $600 avg ticket, primary pain = "missed calls after hours", current setup = "voicemail only", secondary = "slow follow-up"
-- Book the appointment → confirm `recommend-stack` fires and caches result on the lead row (check via Supabase API: `recommended_stack` + `custom_monthly_price` non-null on that lead)
-
-**Step 2 — Closer flow (as nate44 / `Nate2026!` on `/closer`):**
-- Expand the appointment card for that lead
-- Confirm: custom price shows (not a package name), automation list is AI-generated free-form descriptions (not catalog checkboxes), SampleDashboard preview renders
-
-**Step 3 — Pricing sanity check:**
-- 5 calls/wk × $600 avg ticket × 4.33 × 0.15 = ~$1,949 → hits ceiling → should display $1,797
-- Confirm setup fee shown anywhere = $297 (not $497)
-
-Log done, delete this entry, commit + push vault.
+*(no items queued — Prompts 5+6 shipped 2026-06-20, see [[Memories]] for the full build + verify trail)*
 
 ---
 
