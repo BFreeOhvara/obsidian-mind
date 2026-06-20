@@ -16,22 +16,64 @@ tags:
 
 *(Prompt 1 + Prompt 2 shipped 2026-06-19. Prompt 3's decision is now made — see queue below. CC: execute top to bottom, one step at a time if Brayden says "run next step," logging + deleting each as it completes.)*
 
-### Prompt 4 — Custom stack recommendation + closer demo dashboard ✅ Steps 1–5 DONE / Step 6 pending
+---
 
-**Decision made 2026-06-19:** à la carte, formula-priced — not fixed packages. Full framing: [[Memories]] 2026-06-19.
+### Prompt 5 — Problem-first custom stack + pricing overhaul
 
-- ✅ **Step 1 — Recon** complete.
-- ✅ **Step 2 — Migration 034 applied** (`calls_missed_per_week`, `avg_ticket`, `recommended_automations`, `custom_monthly_price`, `recommended_stack`, `stack_generated_at` on leads). Applied via temp edge fn workaround (CLI IPv6 issue).
-- ✅ **Step 3 — `recommend-stack` rewritten + deployed.** Formula: `callsMissedPerWeek × 4.33 × avgTicket × 0.15` → price (floor $297, ceiling $1,797, round to $10). 8-automation catalog. VERIFIED: Peak HVAC 8 calls/wk × $900 → $1,800/mo + 3 automations. Tunable constants labeled in code.
-- ✅ **Step 4 — Fire-and-forget at booking.** `CallModal.jsx` invokes `recommend-stack` on `Appointment Booked`, caches full rec on lead row. `useMyAppointments` selects all 6 new columns.
-- ✅ **Step 5 — AppointmentCard overhauled.** Cached rec loads first (skips API call). RecommendationPanel shows formula price + automation list. SampleDashboard: collapsible "Preview for [Business Name]", Overview + per-automation tabs, KPIs from lead's own discovery data.
-- ⏳ **Step 6 — FIX SHIPPED 2026-06-20, BLOCKED ON BRAYDEN'S VISUAL VERIFY.** Root cause was RLS, not just the query: `appointments_closer_select`/`_update` (migration 001) only allowed `closer_id = auth.uid()`, so unassigned (`closer_id IS NULL`) pending appointments were invisible to every closer regardless of frontend filter. **Migration `035_closer_unassigned_appointments.sql` applied to prod** (broadens both policies to `closer_id = auth.uid() OR (closer_id IS NULL AND role='closer') OR admin`, verified live via `pg_policies`); `useMyAppointments` (`useAppointments.js`) query changed to `.or('closer_id.eq.${profile.id},closer_id.is.null')`. `npm run build` passes. **Functionally verified pre-push:** signed in as `nate44`/`Nate2026!` via direct API call, confirmed all 3 previously-invisible pending appointments now return. Pushed straight to master `1cbc62c` (no branch) — production deploying. Full trail: [[Memories]] 2026-06-20.
+**Decision made 2026-06-19 (Falcon):** Drop the 4 fixed packages entirely. Full custom pricing and stack based on the prospect's actual problems.
 
-  **Second RLS bug (found 2026-06-19, Falcon visual verify) — FIX SHIPPED 2026-06-20.** Appointments showed (3 pending ✓) but each card rendered "lead not visible to this account" — `leads_rep_select` only granted a closer access via `assigned_closer_id`, which is set by a separate `assign-closer` edge function, never at booking time. **Migration `036_closer_leads_via_appointment.sql` applied to prod** (lets any closer read a lead that has an appointment row, verified live via `pg_policies`). `npm run build` passes. **Functionally verified pre-push:** signed in as `nate44`, confirmed all 3 lead business names now resolve through the appointments join (previously null). Note: these 3 leads have no cached `custom_monthly_price`/`recommended_automations` (booked pre-Step-4) — `AppointmentCard.jsx` falls back to a live `recommend-stack` call in that case, confirmed in code. Commit `757f779`, pushed to master — production deploying. Full trail: [[Memories]] 2026-06-20.
+**What changes:**
 
-  **REMAINING:** Chrome MCP still unreachable from CLI. **Need a human (Brayden or Falcon) to re-verify `/closer` as `nate44`/`Nate2026!`: expand an appointment card, confirm business name + custom price + automation checklist + SampleDashboard preview all render now.** Once confirmed: log done, delete this Prompt 4 entry, update `ohvara-dashboard.md`, commit + push vault.
+**1. Discovery script — add problem questions**
+After "how many calls do you miss per week?" and "what's your average ticket?", add:
+- "What's costing you the most right now — missed calls, slow response, no-shows, or leads who called but never booked?" → store as `primary_pain` on the lead (new column if not exists, else use `pain_points`)
+- "What do you have in place today to handle that?" → `current_setup`
+- "Anything else slipping through the cracks?" → `secondary_pain` (can fold into `pain_points`)
 
-**Dashboard commits:** `d941e8d` (Steps 1-5) + `1cbc62c` + `757f779` (Step 6 fixes, RLS round 1 + 2) on master. `vite build` clean ✓. Edge fn verified via curl ✓.
+These feed directly into the recommend-stack call.
+
+**2. recommend-stack edge function — replace fixed catalog with AI-generated custom stack**
+Currently picks from a hardcoded 8-automation catalog by niche. Replace this with a Claude call that:
+- Takes: `primary_pain`, `secondary_pain`, `current_setup`, `niche`, `calls_missed_per_week`, `avg_ticket`
+- Returns: a list of 2–5 custom automation descriptions that solve their specific problems (plain English names + one-line descriptions, no catalog constraint — if a new agent type is needed, name it)
+- No cap on automation types. Problem → solution. Patterns will repeat over time naturally.
+
+**3. Pricing formula — keep, tune floor**
+Formula stays: `callsMissedPerWeek × 4.33 × avgTicket × 0.15` → monthly price.
+- Floor: $297 (down from $497... wait, floor was $297 already — confirm in code)
+- Ceiling: $1,797 (keep)
+- Target average deal: ~$1,200/mo
+- Round to nearest $10 (keep)
+
+**4. Setup fee → $297 everywhere**
+Was $497. Change in: CLAUDE.md packages table, North Star commission structure, any hardcoded values in the dashboard (Commissions page, etc.), `recommend-stack` output if it includes setup fee.
+
+**5. North Star / CLAUDE.md — remove 4 fixed packages**
+The Basic/Pro/Premium/Elite table in CLAUDE.md is obsolete. Replace with: "Setup fee: $297 flat. Monthly: formula-priced (value-based). Target average: ~$1,200/mo."
+
+**Recon first** — check: `supabase/functions/recommend-stack/index.ts`, `src/lib/discoveryScript.js`, `CLAUDE.md` packages table, `src/components/closer/AppointmentCard.jsx` (SampleDashboard pricing display), `src/pages/closer/MyCommissions.jsx` (any hardcoded $497). Then build.
+
+---
+
+### Prompt 6 — Visual verify Prompt 5 (problem-first stack + pricing)
+
+After Prompt 5 ships, CC verifies the full flow end-to-end via Chrome MCP:
+
+**Step 1 — Setter flow (as apex11 / `Nate2026!` on `/rep`):**
+- Open Call Now modal on any HVAC lead
+- Confirm the discovery script now includes the problem questions (`primary_pain`, `current_setup`, `secondary_pain`)
+- Fill in test answers: 5 missed calls/wk, $600 avg ticket, primary pain = "missed calls after hours", current setup = "voicemail only", secondary = "slow follow-up"
+- Book the appointment → confirm `recommend-stack` fires and caches result on the lead row (check via Supabase API: `recommended_stack` + `custom_monthly_price` non-null on that lead)
+
+**Step 2 — Closer flow (as nate44 / `Nate2026!` on `/closer`):**
+- Expand the appointment card for that lead
+- Confirm: custom price shows (not a package name), automation list is AI-generated free-form descriptions (not catalog checkboxes), SampleDashboard preview renders
+
+**Step 3 — Pricing sanity check:**
+- 5 calls/wk × $600 avg ticket × 4.33 × 0.15 = ~$1,949 → hits ceiling → should display $1,797
+- Confirm setup fee shown anywhere = $297 (not $497)
+
+Log done, delete this entry, commit + push vault.
 
 ---
 
