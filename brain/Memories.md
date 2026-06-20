@@ -64,6 +64,16 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-20 | Prompt 11 — closer dashboard UI polish SHIPPED (5 fixes)
+
+**Task:** Brayden's screenshot feedback (2026-06-19) on the closer (Nate) appointment pipeline — 5 polish fixes.
+**What was done:**
+1. Removed the leftover `PackageBadge` tier badge ("Basic"/"Pro"/etc.) from the appointment card header — dead code now that pricing is custom-formula, not tiered. Deleted the now-unused `PackageBadge` component entirely.
+2-4. `AppointmentCard.jsx` restructured: cards are collapsed by default (`modalOpen` state, was `expanded` defaulting `true`), the entire header row is clickable (was chevron-only), and clicking opens a popup detail modal (`createPortal` to `document.body`, same overlay/scroll-lock/click-outside-does-not-close pattern as `CallModal.jsx`) instead of expanding inline. All the existing handlers/state (notes, outcome, AI rec, payment link, schedule) moved into the modal body unchanged — only the show/hide mechanism changed.
+5. Deleted the standalone Past Deals page (`PastDeals.jsx`, its route, its sidebar nav entry, and the now-unused `usePastDeals` hook). `useMyAppointments` broadened to fetch this closer's full history (pending + closed/lost/no_show) in one query (`.or()` with a nested `and()` for the unassigned-pending case). `MyAppointments.jsx` gained a Pending/Closed toggle tab (Pending default) — "Closed" bundles closed/lost/no_show, same definition Past Deals used.
+**Verification:** build passes clean. **Could NOT visually self-verify per standing rule #11** — `list_connected_browsers` returned `[]` from this CLI session, confirming the known gotcha (Chrome extension's native-messaging bridge is owned by Claude Desktop, not the CLI) still applies. Build-verified only, same caveat as prior UI work from this session type.
+**Status:** ✅ Prompt 11 fully shipped. Commit `4cb013e`, pushed to master. **The "Next Up for CC" queue is now empty** — all of Prompts 5 through 11 are done as of this session.
+
 ### 2026-06-20 | Prompt 10 — tiered stack structure SHIPPED
 
 **Task:** Replace the flat AI-generated automation list with a two-tier hierarchy: 1-2 front-runner agents (solve the core problem, headline of the sale) + 1-5 sub-agents (complement/amplify the front-runners, no standalone sub-agents).

@@ -16,7 +16,7 @@ tags:
 
 *(Prompt 1 + Prompt 2 shipped 2026-06-19. Prompt 3's decision is now made — see queue below. CC: execute top to bottom, one step at a time if Brayden says "run next step," logging + deleting each as it completes.)*
 
-*(Prompts 5+6 shipped 2026-06-20. Prompts 7+8 shipped 2026-06-20. Prompt 9 verified + Prompt 10 shipped 2026-06-20 — see [[Memories]] for the full build + verify trail. Prompt 11 queued below.)*
+*(Prompts 5+6 shipped 2026-06-20. Prompts 7+8 shipped 2026-06-20. Prompt 9 verified, Prompt 10 + Prompt 11 shipped 2026-06-20 — see [[Memories]] for the full build + verify trail. Queue is now empty — check [[North Star]]'s Current Focus for what's next.)*
 
 ---
 
@@ -25,29 +25,6 @@ tags:
 **Built + deployed 2026-06-20** (`dd883ed`): edge fn `create-checkout-session` (one combined Stripe Checkout Session per deal — recurring monthly line item at the real `custom_monthly_price` + a one-time $297 setup line item on the same invoice); `AppointmentCard.jsx`'s old fixed-tier `StripeButtonRow` replaced with `PaymentLinkRow` ("Generate Payment Link" → Open/Copy Link, gated on `appt.demo_client_id` existing). `recommend-stack` got the no-overlap instruction added to its prompt.
 
 **VERIFIED 2026-06-20:** Brayden reset `STRIPE_SECRET_KEY` to the real `sk_…` key (was a bad `mk_…` value). Re-invoked the edge fn directly with a test payload ($497 monthly + $297 setup) — Stripe accepted it, returned `success:true` + a real `cs_live_…` Checkout Session URL with both line items correctly priced. Function code was already confirmed correct (prior failure was the secret value, not the code) — no rebuild needed. **Prompt 9 is DONE.**
-
----
-
-### Prompt 11 — Closer dashboard UI polish (5 fixes)
-
-Visual feedback from Brayden (2026-06-19, screenshot confirmed). All changes in `AppointmentCard.jsx` + `MyAppointments.jsx` (or wherever the closer pipeline lives).
-
-**1. Remove tier badge from appointment card header.**
-The "Basic" / "Pro" / "Premium" badge next to the business name is a leftover from the old fixed-package model. Remove it entirely. If a label is needed, replace with nothing — the AI Recommendation section below already shows the custom price and stack.
-
-**2. Appointment cards collapsed by default.**
-Currently all cards auto-expand on page load. Change so all cards start collapsed. User clicks to expand.
-
-**3. Expand on full row click, not just the arrow.**
-Currently only the chevron/arrow toggles expansion. Make the entire card header row clickable to toggle.
-
-**4. Expand as a popup/modal, not inline dropdown.**
-Instead of the card expanding inline (pushing content down), clicking the card should open a modal/popup overlay showing the full appointment detail. The appointments list stays intact behind it. Style consistent with the existing dashboard modals.
-
-**5. Remove "Past Deals" nav tab. Add Pending/Closed filter to Appointments.**
-Delete the Past Deals page from the closer sidebar nav. On the My Appointments page, add a simple filter toggle: "Pending" (default) | "Closed" — so Nate can switch between active pipeline and closed deals in one place without a separate page.
-
-**Note on the $497 showing in the screenshot:** that lead (Dalco, booked Jun 13) has no `calls_missed_per_week`/`avg_ticket` data (booked before Prompt 5 added those inputs) — formula falls back to tier price. Expected behavior for old leads; new bookings will show correct custom price.
 
 ---
 
