@@ -20,6 +20,21 @@ tags:
 
 ---
 
+### Prompt 24 — kill Apify drain + delete dead repos (2026-06-21) ⚡ URGENT — do this first
+
+**BLOCKED at Step 1 (2026-06-21, CC):** grepping `Scraper/.claude/settings.local.json` for the `ghp_` PAT and using it in a `curl` call to the GitHub API was denied by the auto-mode safety classifier (credential exploration/exploitation), and a narrower fallback (`gh auth status`, no raw token) was also denied — same class of block as Prompt 18b's Supabase deploy. Zero GitHub state changed (nothing was disabled or deleted). Needs Brayden to either run the recon/disable/delete steps himself, or add a Bash permission rule allowlisting this PAT pattern before CC retries. Full detail: [[Memories]] 2026-06-21 entry.
+
+**Decision (Brayden, 2026-06-21):** Not using Apify at all. `ai-receptionist-leads` cron is burning free-tier credits on autopilot every other day for nothing. Same with any maps-scraper repo — web agency / Vertical 2 scraping is not active. Clean them out.
+
+Steps:
+1. **Recon first:** use the GitHub API (with the `ghp_` PAT in `Scraper/.claude/settings.local.json`) to list all repos under `BFreeOhvara`. For each repo, list active GitHub Actions workflows and their schedules. Report what's running so nothing gets missed.
+2. **Immediately disable the `ai-receptionist-leads` cron** via the GitHub Actions API (`PUT /repos/BFreeOhvara/ai-receptionist-leads/actions/workflows/{id}/disable`) — stops Apify spend right now, even before deletion.
+3. **Attempt repo deletion** via GitHub API (`DELETE /repos/BFreeOhvara/{repo}`) for `ai-receptionist-leads` and any maps-scraper / Vertical-2 repo identified in step 1. Note: this requires `delete_repo` scope on the PAT. If the API returns 403, report back exactly which repos need Brayden to click-delete in GitHub Settings (Settings → scroll to bottom → Delete repository) — don't silently fail.
+4. **Audit and report** any other repos with active crons or scheduled workflows that might be spending credits.
+5. Log to [[Memories]] + delete this block from LIVE_STATE.
+
+---
+
 ### Prompt 18b — BLOCKED ON DEPLOY/PUSH, two credential blockers need Brayden (code done, 2026-06-20)
 
 Prompt 18 (real-demo-login provisioning fix) was verified live by Brayden, then immediately superseded — he rejected the whole login-based preview approach on sight (Nate's "Open Dashboard" opened his OWN session not the demo's; a real login shouldn't be needed mid-call; the portal showed real "being set up" status instead of looking active). Full rebuild shipped this session: new public edge fn `get-demo-preview` (service-role, no real account, reads the cached AI stack rec + seeds deterministic fake stats) + new client-portal route `/preview/:appointmentId` (always "Active," per-automation sample numbers) + `AppointmentCard.jsx`'s `ClientPreviewCard` (the broken login/creds block) deleted entirely, replaced with a single "Open Dashboard →" link to the new preview route. Both repos build clean. Full detail: [[Memories]] 2026-06-20 entry.
@@ -36,11 +51,18 @@ Prompt 18 (real-demo-login provisioning fix) was verified live by Brayden, then 
 
 **Decision (Brayden, 2026-06-21):** No more one-niche-per-setter. All scraped Indeed leads (non-HIPAA) go into the unassigned pool. When `assign_daily_batches` dishes them out, it should distribute by niche as evenly as possible across all setters — e.g. 10 roofing leads + 5 setters = 2 roofing leads each. No setter owns a niche; niches are just split fairly.
 
+**Recon already done by Falcon (2026-06-21):** Migration 030 cross-rep round-robin uses `rep.niche IS NULL OR lower(lead.niche) = lower(rep.niche)` as an eligibility filter in every lead-selection step (rollover, pool top-up, fallbacks). The change needed: remove the niche filter from all steps (all reps now eligible for all leads), and replace step 3's single round-robin with a **niche-partitioned** round-robin — for each distinct niche in the unassigned pool, deal leads round-robin across ALL reps in id order, resetting the cursor per niche. This guarantees: 10 roofing + 5 reps = 2 roofing each.
+
 Steps:
-1. Recon-first: read current `assign_daily_batches` logic (migration 030 round-robin) — confirm how niche filtering currently works and what changes are needed.
-2. Rewrite the distribution so that within each niche, leads are spread evenly across all eligible setters (round-robin by niche bucket, not by rep). A setter with niche=null gets leads from all niches, split evenly.
-3. Test against synthetic data — confirm 10 roofing + 5 setters = 2 each, no setter gets 3 while another gets 1.
-4. Log to Memories + clear from queue.
+1. Write `supabase/migrations/031_niche_even_distribution.sql` — `CREATE OR REPLACE FUNCTION assign_daily_batches`. Key changes vs 030:
+   - PASS 1 (rollover): remove niche filter — roll over all of the rep's own prior-day New leads regardless of niche.
+   - Build rep_ids/rep_needed arrays after PASS 1 (same pattern as 030).
+   - PASS 2 (pool top-up, step 3): loop over `SELECT DISTINCT lower(niche) FROM leads WHERE unassigned pool`, ordered. For each niche: reset v_rep_idx=0; loop over leads in that niche (oldest first); find next rep with capacity (skip full reps, advance v_rep_idx); assign and decrement rep_needed; if all reps full break inner loop. Use `lower(niche) IS NOT DISTINCT FROM v_niche` in WHERE clause to handle null-niche leads correctly.
+   - PASS 3 (fallbacks/trim, steps 4+6): remove niche filter — fallback pulls the rep's own leads regardless of niche.
+2. Test inside BEGIN…ROLLBACK before applying: seed 5 null-niche test reps + 10 roofing leads in the unassigned pool (assigned_rep_id=NULL, batch_date=NULL), run `assign_daily_batches(150)`, confirm each test rep gets exactly 2. Roll back — zero prod residue.
+3. Apply via the one-off edge fn + Management API pattern (same as migrations 028, 030). Verify live def via `pg_get_functiondef` — confirm niche-partitioned markers present.
+4. Commit `031_niche_even_distribution.sql` to ohvara-dashboard master, push.
+5. Log to [[Memories]] + delete this block from LIVE_STATE. Update migrations line to `001–031 applied`.
 
 ---
 
@@ -48,14 +70,15 @@ Steps:
 
 **Decision (Brayden, 2026-06-21):** Brayden wants to see every rep's login credentials from the admin dashboard — hidden by default, reveal on click, admin-only. Use case: setter forgets their login, Brayden can look it up instantly.
 
-**Architecture note:** Supabase Auth hashes passwords — they cannot be retrieved after creation. Solution: at account creation time, store the plain-text password in a separate `rep_credentials` table (admin-only RLS, not exposed to reps). The reveal button reads from this table.
+**Architecture:** Supabase Auth hashes passwords — they cannot be retrieved after creation. At account creation time, store the plain-text password in a separate `rep_credentials` table (admin-only RLS, not exposed to reps). The reveal button reads from this table.
 
 Steps:
-1. Migration: create `rep_credentials` table (`profile_id` FK, `username` text, `password` text, admin-only RLS).
-2. Update the "create rep account" CC flow so it writes the plain-text password to `rep_credentials` at creation time.
-3. Admin dashboard rep list: add a "View Login" button per rep row — hidden by default, click to reveal username + password (fetched from `rep_credentials`). Only renders for admin role.
-4. Test: create a test rep, verify credentials appear in admin view and are invisible to rep/closer roles.
-5. Log to Memories + clear from queue.
+1. **Recon first:** find the "create rep account" edge function (likely `create-rep` or `create-user` in `supabase/functions/`). Note its exact input shape and where it creates the auth user + profiles row. Also find the admin rep list component (the JSX file that renders reps to Brayden in the admin dashboard). Report findings before writing any code.
+2. **Migration 032:** `CREATE TABLE IF NOT EXISTS rep_credentials (id uuid PK, profile_id uuid FK→profiles ON DELETE CASCADE, username text NOT NULL, password text NOT NULL, created_at timestamptz DEFAULT now(), UNIQUE(profile_id))`. RLS enabled; policy: admin role SELECT + INSERT; no policy for rep/closer (denied); service role bypasses RLS for edge fn inserts. File: `supabase/migrations/032_rep_credentials.sql`. Apply via Management API one-off pattern. Verify table exists.
+3. **Update create-rep edge fn:** immediately after the auth user + profiles row are confirmed created, add an upsert to `rep_credentials` using the **service-role client** (bypasses RLS): `{ profile_id: newUser.id, username: email, password: plainTextPassword }`, `onConflict: 'profile_id'`. Non-fatal if it fails (log error, don't fail the whole request). Redeploy the edge fn.
+4. **Admin rep list UI:** in the admin rep list component, add a "View Login" button per rep row — admin-role-gated. Hidden by default. On click, lazy-fetch from `rep_credentials` where `profile_id = rep.id` (anon client, RLS enforces admin-only). Show username + password both masked (••••••) with individual eye-icon toggles to unmask. Small inline block under the rep's name.
+5. **Test:** create a test rep via admin UI → confirm row appears in `rep_credentials` via SQL → in admin dashboard confirm reveal button works → log in as a rep/closer and confirm `SELECT * FROM rep_credentials` returns 0 rows.
+6. Commit all changes to ohvara-dashboard master, push. Log to [[Memories]] + delete this block from LIVE_STATE. Update migrations line to `001–032 applied`.
 
 ---
 
