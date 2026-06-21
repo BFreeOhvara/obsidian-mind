@@ -74,18 +74,13 @@ _Adopted from ruvnet/ruflo CLAUDE.md (generic principles only — its swarm/tool
 - Generate TWO Stripe links on close: setup fee link + monthly subscription link
 - AI scripts are question-based and pain-surfacing — never a pitch on the rep call
 - All reps and Nate on Profile A only until second closer confirmed
-- Setup fee ($497) always presented as one-time, separate from monthly
+- Setup fee ($297) always presented as one-time, separate from monthly
 - Log every mistake — mistakes written down don't repeat
 - All monetary values in JetBrains Mono
 
-## Packages
+## Pricing (custom stack, no fixed packages — 2026-06-20)
 
-| Package | Setup Fee | Monthly |
-|---------|-----------|---------|
-| Basic | $497 | $497/mo |
-| Pro | $497 | $797/mo |
-| Premium | $497 | $1,297/mo |
-| Elite | $497 | $1,797/mo |
+Setup fee: $297 flat. Monthly: formula-priced (value-based) — `callsMissedPerWeek × 4.33 × avgTicket × 0.15`, floor $397, ceiling $1,997, rounded to nearest $10. Target average: ~$1,200/mo. Automations are AI-generated per lead, structured as 1-2 front-runner agents (solve core problem) + 1-5 sub-agents (complement front-runners), no fixed catalog. Full detail + commission math: [[North Star]] "Custom Stack Pricing" + "Commission Structure".
 
 ROI anchor: always compare to cost of a human hire, not to competitors.
 

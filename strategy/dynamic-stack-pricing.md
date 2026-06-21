@@ -10,6 +10,8 @@ quarter: Q2-2026
 
 # Dynamic Stack Pricing — Strategy Idea (2026-06-11)
 
+> **SUPERSEDED 2026-06-20.** This proposal (fixed price points, dynamic contents) was overtaken by a more aggressive build: fully custom formula pricing per lead (no fixed price points at all) — see [[North Star]] "Custom Stack Pricing" + Prompt 4/5 in [[Memories]]. Left here for history.
+
 ## The Idea
 Same four price points ($497 / $797 / $1,297 / $1,797/mo + $497 setup), but the CONTENTS of each tier are dynamic — determined by what the specific business actually needs, not a hardcoded list.
 

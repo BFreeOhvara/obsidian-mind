@@ -189,6 +189,8 @@ TBD — do not hardcode any dialer assumption anywhere in the codebase.
 - Do not over-engineer tooling before the sales machine is running
 - Do not hire before outreach is proven at scale
 - Do not hardcode any dialer assumption
+- **Do not onboard additional appointment setters until client fulfillment is proven end-to-end (2026-06-20, Brayden).** Today `build-agent` only provisions one generic voice agent on close — it doesn't build the actual sold stack (front-runners + sub-agents). Scaling lead volume/setters before this works means selling deals we can't actually deliver. Gate: at least one close → real client → every sold automation actually provisioned (or a manual fallback Brayden is comfortable running at small scale) before adding setter headcount beyond the current bench.
+- **UPDATE (2026-06-20, Brayden) — automation-stack-builder is UN-PARKED, building ahead of a real close.** Original plan was to wait for a real client to test against; Brayden's call: build the per-automation fulfillment registry now, so the moment a deal closes, fulfillment is just "fill in the info" rather than a fresh manual build. Reasoning: this IS the business — if AI can build the sold stack and the only manual step left is collecting each agent's required info from the client, that's the product. The setter-headcount gate above still holds (don't scale setters until fulfillment is proven), but the build itself no longer waits on a real close to start. See [[automation-stack-builder]] — status updated to building.
 
 ---
 

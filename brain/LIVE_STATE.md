@@ -32,7 +32,34 @@ Prompt 18 (real-demo-login provisioning fix) was verified live by Brayden, then 
 
 ---
 
-### Prompt 19 — automation-stack-builder Phase 1: registry recon + schema (2026-06-20, UN-PARKED)
+### Prompt 22 — niche-even lead distribution across all setters (2026-06-21)
+
+**Decision (Brayden, 2026-06-21):** No more one-niche-per-setter. All scraped Indeed leads (non-HIPAA) go into the unassigned pool. When `assign_daily_batches` dishes them out, it should distribute by niche as evenly as possible across all setters — e.g. 10 roofing leads + 5 setters = 2 roofing leads each. No setter owns a niche; niches are just split fairly.
+
+Steps:
+1. Recon-first: read current `assign_daily_batches` logic (migration 030 round-robin) — confirm how niche filtering currently works and what changes are needed.
+2. Rewrite the distribution so that within each niche, leads are spread evenly across all eligible setters (round-robin by niche bucket, not by rep). A setter with niche=null gets leads from all niches, split evenly.
+3. Test against synthetic data — confirm 10 roofing + 5 setters = 2 each, no setter gets 3 while another gets 1.
+4. Log to Memories + clear from queue.
+
+---
+
+### Prompt 23 — admin can view rep usernames + passwords (2026-06-21)
+
+**Decision (Brayden, 2026-06-21):** Brayden wants to see every rep's login credentials from the admin dashboard — hidden by default, reveal on click, admin-only. Use case: setter forgets their login, Brayden can look it up instantly.
+
+**Architecture note:** Supabase Auth hashes passwords — they cannot be retrieved after creation. Solution: at account creation time, store the plain-text password in a separate `rep_credentials` table (admin-only RLS, not exposed to reps). The reveal button reads from this table.
+
+Steps:
+1. Migration: create `rep_credentials` table (`profile_id` FK, `username` text, `password` text, admin-only RLS).
+2. Update the "create rep account" CC flow so it writes the plain-text password to `rep_credentials` at creation time.
+3. Admin dashboard rep list: add a "View Login" button per rep row — hidden by default, click to reveal username + password (fetched from `rep_credentials`). Only renders for admin role.
+4. Test: create a test rep, verify credentials appear in admin view and are invisible to rep/closer roles.
+5. Log to Memories + clear from queue.
+
+---
+
+### Prompt 19 — automation-stack-builder Phase 1: registry recon + schema (2026-06-20, PARKED — 2026-06-21)
 
 Brayden's decision (logged in [[North Star]] Anti-goals + [[automation-stack-builder]]): build the per-automation fulfillment registry now, ahead of a real close, instead of waiting. Goal: closing a deal provisions a row per SOLD automation (not one generic voice agent), each goes live the moment its own required info is filled in. Full design doc: [[automation-stack-builder]] (read it first — has the registry idea, why-it's-better, and current-state gap analysis).
 
@@ -48,7 +75,7 @@ Steps:
 
 ---
 
-### Prompt 20 — Website as a SUB-AGENT-ONLY option in recommend-stack (2026-06-20)
+### Prompt 20 — Website as a SUB-AGENT-ONLY option in recommend-stack (2026-06-20, PARKED — 2026-06-21)
 
 Brayden wants Website (Vertical 2 deliverable) included as a possible **sub-agent** in the AI-recommended stack when it'd genuinely help the client (e.g. paired with a Review Generation agent — a place to send/show the reviews). **Never as a front-runner/main agent** — it never leads the stack, only supports it, and only gets suggested when relevant (not every stack).
 
@@ -61,7 +88,7 @@ Steps:
 
 ---
 
-### Prompt 21 — new "Generate Stack" tab for off-pipeline closes (closer + admin dashboards)
+### Prompt 21 — new "Generate Stack" tab for off-pipeline closes (closer + admin dashboards, PARKED — 2026-06-21)
 
 Brayden sometimes closes a deal with someone who never went through the appointment-setter pipeline (e.g. meets someone directly). He wants a tab — closer dashboard AND admin dashboard — where he can either write a free-text paragraph describing the prospect's problem, or answer a short set of guided questions, and get the same AI-generated stack recommendation `recommend-stack` produces for a normal appointment — without needing a lead/appointment record to already exist.
 
