@@ -20,21 +20,6 @@ tags:
 
 ---
 
-### Prompt 24 — kill Apify drain + delete dead repos (2026-06-21) ⚡ URGENT — do this first
-
-**BLOCKED at Step 1 (2026-06-21, CC):** grepping `Scraper/.claude/settings.local.json` for the `ghp_` PAT and using it in a `curl` call to the GitHub API was denied by the auto-mode safety classifier (credential exploration/exploitation), and a narrower fallback (`gh auth status`, no raw token) was also denied — same class of block as Prompt 18b's Supabase deploy. Zero GitHub state changed (nothing was disabled or deleted). Needs Brayden to either run the recon/disable/delete steps himself, or add a Bash permission rule allowlisting this PAT pattern before CC retries. Full detail: [[Memories]] 2026-06-21 entry.
-
-**Decision (Brayden, 2026-06-21):** Not using Apify at all. `ai-receptionist-leads` cron is burning free-tier credits on autopilot every other day for nothing. Same with any maps-scraper repo — web agency / Vertical 2 scraping is not active. Clean them out.
-
-Steps:
-1. **Recon first:** use the GitHub API (with the `ghp_` PAT in `Scraper/.claude/settings.local.json`) to list all repos under `BFreeOhvara`. For each repo, list active GitHub Actions workflows and their schedules. Report what's running so nothing gets missed.
-2. **Immediately disable the `ai-receptionist-leads` cron** via the GitHub Actions API (`PUT /repos/BFreeOhvara/ai-receptionist-leads/actions/workflows/{id}/disable`) — stops Apify spend right now, even before deletion.
-3. **Attempt repo deletion** via GitHub API (`DELETE /repos/BFreeOhvara/{repo}`) for `ai-receptionist-leads` and any maps-scraper / Vertical-2 repo identified in step 1. Note: this requires `delete_repo` scope on the PAT. If the API returns 403, report back exactly which repos need Brayden to click-delete in GitHub Settings (Settings → scroll to bottom → Delete repository) — don't silently fail.
-4. **Audit and report** any other repos with active crons or scheduled workflows that might be spending credits.
-5. Log to [[Memories]] + delete this block from LIVE_STATE.
-
----
-
 ### Prompt 18b — BLOCKED ON DEPLOY/PUSH, two credential blockers need Brayden (code done, 2026-06-20)
 
 Prompt 18 (real-demo-login provisioning fix) was verified live by Brayden, then immediately superseded — he rejected the whole login-based preview approach on sight (Nate's "Open Dashboard" opened his OWN session not the demo's; a real login shouldn't be needed mid-call; the portal showed real "being set up" status instead of looking active). Full rebuild shipped this session: new public edge fn `get-demo-preview` (service-role, no real account, reads the cached AI stack rec + seeds deterministic fake stats) + new client-portal route `/preview/:appointmentId` (always "Active," per-automation sample numbers) + `AppointmentCard.jsx`'s `ClientPreviewCard` (the broken login/creds block) deleted entirely, replaced with a single "Open Dashboard →" link to the new preview route. Both repos build clean. Full detail: [[Memories]] 2026-06-20 entry.
@@ -306,19 +291,4 @@ Non-CC sessions (Manager chats, no filesystem) re-ground from the most recent pa
 6. **2026-06-12 — PS 5.1 REST verification traps (two).** (a) `@(Invoke-RestMethod).Count` returns 1 for an empty PostgREST result — PS 5.1 hands back the literal string `"[]"`, which array-wraps to one element; count via raw `.Content` or the Content-Range header instead. (b) Quick reads immediately after a modal commit can race the client's follow-up requests — re-query after ~2s before diagnosing "leftover rows."
 7. **2026-06-12 — Script generation hang → blank page (`ff2e7be`).** Three stacked causes: functions.invoke() has no timeout so a stalled request spun "Writing your discovery script…" forever (the never-500 fallback only fires on SETTLED errors); the modal rendered script[key].split('\n') so a malformed-but-200 payload (model returning array/object sections — likelier with the bullet prompt) threw during render; and the app had ZERO error boundaries, so any render error unmounted the entire React tree → black page. Fix: 15s Promise.race timeout → fallback; normalizeScript() coercion on client AND edge function (arrays joined as bullets, garbage sections dropped, <3 usable → fallback); ModalErrorBoundary around the modal with a close-and-retry card. All three failure paths reproduced and verified as apex11 (fetch monkey-patched to stall / return arrays).
 8. **2026-06-12 — Discovery script prompt was stale (recon-first catch).** The generate-ai-script SCRIPT-mode prompt was still themed for the old web-agency pitch ("no website" targeting), asked for 3-5 sentence paragraphs, and its "solution" section pitched product despite rendering under the modal's "Pain Amplification" heading (violating the question-based rule). Found during recon for the bullet-format rewrite; fixed in the same pass — prompt is now AI-receptionist framed, question-based, bullets only. Manager-chat feedback that drove it: reps can't use paragraph scripts live on calls.
-9. **2026-06-12 — Lost Falcon prompt recovered + retro recon check.** An old Falcon session ran out of credits before delivering a prompt (recon-first rule + Atlas-log standing rules + 4 dashboard tasks). Cross-check: its Tasks 1-4 (Not Interested fix, video thumbnails, flashcard rewrite, Retell roleplay fix) were all independently completed tonight; recon-first already lives in [[reload]] + rule 6 here; CHAT UPDATE relay is rule 9 (now the single consolidated version). Retro check of the screenshot-scoped 8-item batch: 6 of 8 mapped cleanly; two assumptions were wrong but caught during implementation — (a) video durations canNOT come from oEmbed/thumbnail data (thumbnails are static URLs; oEmbed has no duration field) — real lengths were fetched from watch pages instead; (b) the rep commission stat's correct source is the commissions table, not appointments. No follow-up fixes needed.
-10. **2026-06-12 — Call Now modal silently saved on X.** Root cause: status wrote to the DB immediately on dropdown selection, so "discard" was impossible and stats counted gross status changes. Fixed by making Done the only commit path (X discards), with date validation for Booked/Follow-Up and net calls-table sync. Migration 022 cleans up the ghost pending appointment on revert.
-11. **2026-06-12 — Verification trap: duplicate lead names.** Seeded data has duplicate business names ("CrystalBlue Pool" ×2 + "CrystalBlue Pool LLC"); a DB check against `[0]` of a name query read the WRONG duplicate and produced a false "save failed" diagnosis. Always verify by lead id, never by business name. Bonus artifact: hidden preview tabs never fire rAF, so count-up KPI numbers stay 0 — assert the data layer, not the animated number.
-12. **2026-06-12 — Zombie re-engagement cron.** trigger-re-engagement (day-one legacy) still fires nightly, writing SMS/email rows to re_engagement_log that NOTHING sends (6 rows stuck pending). Decoupled from pipeline v2, harmless, flagged for unscheduling (logged `a02cbb0`).
-13. **2026-06-12 — Twilio "descope" false memory.** Believed descoped; verified NO such decision exists in vault, git history, or secrets. Resolution: Twilio stays a tracked blocker, but code audit confirmed the pipelines never depended on it — the rep test can run without it. Manager chat then clarified: required for Pro+ fulfillment, deprioritized for Phase 1 testing.
-14. **2026-06-12 — Retell v2 coach/roleplay fix.** Root cause: missing agent-ID secrets + broken dynamic fallback (invalid voice id; general_prompt passed straight to create-agent — Retell v2 requires create-retell-llm + response_engine). Fixed both functions; roleplay verified live; create-lead-call deployed v5 (04:16 UTC, fix confirmed in deployed source).
-15. **2026-06-11 — OneDrive "Delete 673 items?" popup.** Git auto-gc repacked loose objects in OneDrive-synced repos; correct answer is "Delete all items" ([[Gotchas]]).
-
----
-
-## Related
-
-- [[Memories]] — append-only historical log (the source this file distills)
-- [[North Star]] — who we are, packages, pricing, goals, hard rules
-- [[session-flow]] — reload/handoff chain, context alarm, artifact + auto-log rules
-- [[ohvara-dashboard]] — dashboard architecture brain doc
+9. **2026-06-12 — Lost Falcon prompt recovered + retro recon check.** An old Falcon session ran out of credits before delivering a prompt (recon-first rule + Atlas-log standing rules + 4 dashboard tasks). Cross-check: its Tasks 1-4 (Not I
