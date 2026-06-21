@@ -16,7 +16,62 @@ tags:
 
 *(Prompt 1 + Prompt 2 shipped 2026-06-19. Prompt 3's decision is now made — see queue below. CC: execute top to bottom, one step at a time if Brayden says "run next step," logging + deleting each as it completes.)*
 
-*(Prompts 5–15 shipped 2026-06-20 — see [[Memories]] for the full build + verify trail.)*
+*(Prompts 5–17 shipped + live-verified 2026-06-20 — see [[Memories]] for the full build + verify trail.)*
+
+---
+
+### Prompt 18b — BLOCKED ON DEPLOY/PUSH, two credential blockers need Brayden (code done, 2026-06-20)
+
+Prompt 18 (real-demo-login provisioning fix) was verified live by Brayden, then immediately superseded — he rejected the whole login-based preview approach on sight (Nate's "Open Dashboard" opened his OWN session not the demo's; a real login shouldn't be needed mid-call; the portal showed real "being set up" status instead of looking active). Full rebuild shipped this session: new public edge fn `get-demo-preview` (service-role, no real account, reads the cached AI stack rec + seeds deterministic fake stats) + new client-portal route `/preview/:appointmentId` (always "Active," per-automation sample numbers) + `AppointmentCard.jsx`'s `ClientPreviewCard` (the broken login/creds block) deleted entirely, replaced with a single "Open Dashboard →" link to the new preview route. Both repos build clean. Full detail: [[Memories]] 2026-06-20 entry.
+
+**Two things only Brayden can clear:**
+1. **Deploy the edge function** — `supabase functions deploy get-demo-preview --no-verify-jwt --project-ref jjextitmbptoaolacocs` (or via the Supabase dashboard UI). CC's attempt was blocked twice by the auto-mode safety classifier (flagged using the `sbp_…` Management PAT from `Scraper/.claude/settings.local.json` as credential exfiltration) — a one-time approval didn't carry through to the actual deploy call, and CC stopped rather than work around the block.
+2. **Fix the `ohvara-client-portal` git remote** — `git push origin main` fails `remote: Repository not found`; the embedded PAT (`ghp_n8gFR8X1...`) appears dead. Code is committed locally (`49c27e0`, branch `main`, NOT pushed). This is the same pending PAT-rotation thread already tracked below (Thread updates §"PAT rotation") — confirmed still broken, not newly caused. Needs a fresh GitHub PAT with repo access.
+
+**Dashboard side already pushed** (`4d5a203` on `ohvara-dashboard` master, Vercel will auto-deploy) — but the new "Open Dashboard" button will 404 until both blockers above clear, since it points at an undeployed edge fn + an unpushed portal route. This is a temporary regression vs. the old (broken but at least rendering) login block — flagging clearly, not silently leaving half-shipped. Once both are cleared, still needs a live click-through verify (Chrome MCP unreachable from CLI all session, same standing gap).
+
+---
+
+### Prompt 19 — automation-stack-builder Phase 1: registry recon + schema (2026-06-20, UN-PARKED)
+
+Brayden's decision (logged in [[North Star]] Anti-goals + [[automation-stack-builder]]): build the per-automation fulfillment registry now, ahead of a real close, instead of waiting. Goal: closing a deal provisions a row per SOLD automation (not one generic voice agent), each goes live the moment its own required info is filled in. Full design doc: [[automation-stack-builder]] (read it first — has the registry idea, why-it's-better, and current-state gap analysis).
+
+This is Phase 1 only — recon + data model, NOT the full dynamic-onboarding-UI rewrite in one shot (per session-flow's "complex builds get sequenced" rule). Do not build Phase 2 (dynamic onboarding form) or Phase 3 (client dashboard per-automation status UI) until Phase 1 is verified.
+
+Steps:
+1. Recon-first: read `build-agent`, `provision-client`, and `recommend-stack`'s actual current output shape (`front_runner_agents`/`sub_agents` structure, field names) — report back before designing the schema.
+2. Design + migrate a registry table (e.g. `client_automations`): one row per sold automation per client, columns for automation type/name, status (`awaiting_info`/`active`/etc.), required-info schema (jsonb), collected-info (jsonb), and shared-infra linkage (e.g. a `twilio_number_id` FK so Receptionist + Missed-Call-Text-Back + Dispatcher on one client share one number instead of provisioning three).
+3. Write the static registry itself as code (not DB-driven yet) — one entry per automation type from the current `AUTOMATION_POOL`/AI-generated names, each declaring required-info fields + which builder function it maps to (Retell-agent-creation vs Twilio-SMS-config vs none-yet-for-Website).
+4. On `provision-client` (the real close path), replace the single hardcoded `build-agent` call with: create one `client_automations` row per automation in the sold stack (front-runners + sub-agents), each `awaiting_info`. Do NOT yet build the actual provisioning logic per type (Phase 2) — Phase 1 stops at "the rows exist and are correct for a real sold stack."
+5. Test against synthetic data: a manually-created `clients`/`appointments` row with a realistic stack (use a real `recommend-stack` output, not invented data) — confirm the right `client_automations` rows get created with the right required-info schemas.
+6. Log to Memories with the schema decisions made + what Phase 2 needs to pick up next (don't let CC silently expand scope into Phase 2 mid-prompt).
+
+---
+
+### Prompt 20 — Website as a SUB-AGENT-ONLY option in recommend-stack (2026-06-20)
+
+Brayden wants Website (Vertical 2 deliverable) included as a possible **sub-agent** in the AI-recommended stack when it'd genuinely help the client (e.g. paired with a Review Generation agent — a place to send/show the reviews). **Never as a front-runner/main agent** — it never leads the stack, only supports it, and only gets suggested when relevant (not every stack).
+
+Steps:
+1. Recon-first: read `recommend-stack`'s current AI prompt, JSON schema, deterministic fallback, and `AUTOMATION_POOL` (touched again in Prompt 16 for `customer_benefit` — get the current real shape).
+2. Add "Website" to the sub-agent-eligible pool only — explicitly instruct the AI prompt that Website can never be chosen as a front-runner, and should only be suggested when it complements an existing front-runner/sub-agent (e.g. Review Generation, lead capture, anything that benefits from having somewhere to send the customer).
+3. Update the deterministic no-API-key fallback + `AUTOMATION_POOL` padding logic the same way, so Website never gets force-padded in as a generic filler — only picked when contextually relevant.
+4. Test with a few real lead profiles (one where Website should plausibly appear, one where it shouldn't) — confirm it shows up only when relevant and never as the front-runner.
+5. Log to Memories + clear from queue.
+
+---
+
+### Prompt 21 — new "Generate Stack" tab for off-pipeline closes (closer + admin dashboards)
+
+Brayden sometimes closes a deal with someone who never went through the appointment-setter pipeline (e.g. meets someone directly). He wants a tab — closer dashboard AND admin dashboard — where he can either write a free-text paragraph describing the prospect's problem, or answer a short set of guided questions, and get the same AI-generated stack recommendation `recommend-stack` produces for a normal appointment — without needing a lead/appointment record to already exist.
+
+Steps:
+1. Recon-first: read `recommend-stack`'s actual input contract (today driven off `appt`/`lead` fields like calls-missed/avg-ticket/niche/pain notes) — report back what it actually needs before designing the new entry point.
+2. Add a new nav tab (name it sensibly — e.g. "Quick Stack" or "Generate Stack," Brayden didn't specify) visible to closer role + admin role.
+3. Build a small form: either a single free-text paragraph (let the AI extract calls-missed/avg-ticket/pain/niche-equivalent signals from prose) or a short guided Q&A mirroring the real discovery questions (whichever is more reliable — recommend a default, note the tradeoff in the log) — then call `recommend-stack` (or a thin variant) to generate the stack using that input instead of a real appointment's stored fields.
+4. Render the result using the SAME stack-display component already built (the PresentationWalk / AI Recommendation panel from Prompt 16) — don't build a second UI for the same data shape.
+5. This tool does NOT need to create a real `appointments` row — it's a standalone generator. If Brayden then actually closes the deal from here, decide (and ask Brayden if genuinely ambiguous) whether this should also create a minimal `clients`/`appointments` record so it flows into Mark Closed / Prompt 19's `client_automations` registry, or whether that's a separate manual step.
+6. Log to Memories + clear from queue.
 
 ---
 
@@ -159,6 +214,7 @@ Non-CC sessions (Manager chats, no filesystem) re-ground from the most recent pa
 7. Firecrawl auth: Brayden runs `firecrawl login --browser`, tells CC "logged in."
 8. **✅ RESOLVED 2026-06-16 — GitHub PAT `workflow`-scope push rejection FIXED via gitignore (no scope change).** Added `.github/` to obsidian-mind `.gitignore`: the 4 upstream-template CI workflows are now ignored (kept on disk), no longer untracked, no longer blocking pushes — zero PAT scope-widening. Also reverted the cosmetic YAML quote-strip on `skills/cc-prompt-format.md`. Vault now genuinely clean + pushed. *(recon history below.)* **RECON 2026-06-15: the 4 untracked workflow files are upstream obsidian-mind TEMPLATE CI, not personal-vault infra** — `manifest-check.yml` (PR-time check that every template file is covered by a manifest glob), `pr-title.yml` (enforces conventional-commit PR titles), `test.yml` (cross-OS typecheck + hook tests on `.claude/scripts/`), `release.yml` (tag-triggered ShardMind release: changelog, version-bump, vault zip, GH release — references `breferrari/obsidian-mind`). None apply to Brayden's personal fork (he isn't publishing template releases or running PR gates). **RECOMMENDATION: gitignore `.github/` (or delete the workflows) → stops them blocking every push with NO PAT scope-widening** (preferred given the post-leak PAT-cleanup posture). NOT executed — awaiting Brayden's go. maps-scraper README stale vs code (low priority).
 9. Parked until 5+ recurring clients: [[dynamic-stack-pricing]], [[review-agent-leads]].
+9a. Parked until a real client is ready to onboard: [[automation-stack-builder]] — per-automation build registry so closing a deal provisions every sold automation (not just one voice agent), client fills in only what each one needs.
 10. **Parked — rep onboarding video** (Manager chat 2026-06-12): Synthesia/Loom recommended; CC writes the script later. Not scheduled.
 11. **Watch item — no_answer_queue leak on rapid status flips** (2026-06-12): a No Answer → Appointment Booked → New sequence within ~11s left a pending no_answer_queue row that migration 023's trigger should have deleted; cleaned manually, root cause not reproducible remotely. If another orphan pending row appears for a New lead, this needs a dedicated debugging session.
 
