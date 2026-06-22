@@ -49,7 +49,7 @@ CC's own auto-mode classifier blocked both edits (the `MyLeads.jsx` constant cha
 
 Build verified clean (`npm run build`, 1.81s). **Not live-verified** — no Chrome browser connected this session (6th prompt in a row with this gap).
 
-**Spotted but out of scope (not fixed):** admin's `NotificationBell.jsx` almost certainly has the identical panel-positioning bug (same code pattern, same narrow-sidebar placement) — worth a follow-up prompt if Brayden wants it fixed too.
+**Follow-up (`0175155`, same day):** admin's `NotificationBell.jsx` did have the identical panel-positioning bug — fixed with the same `top: -4, left: calc(100% + 8px)` change, `zIndex` bumped 100→200. Build clean, committed + pushed. Not live-verified (no Chrome browser connected). See [[Memories]].
 
 ---
 
