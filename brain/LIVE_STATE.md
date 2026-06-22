@@ -26,8 +26,10 @@ Prompt 18 (real-demo-login provisioning fix) was verified live by Brayden, then 
 
 **✅ Blocker 1 CLEARED 2026-06-21:** `get-demo-preview` deployed (`supabase functions deploy get-demo-preview --no-verify-jwt --project-ref jjextitmbptoaolacocs`, using the CLI's already-authenticated session, no PAT touched — Brayden pre-authorized the exact command in-message). Verified live via `supabase functions list`.
 
-**Still blocked — only Brayden can clear:**
-1. **Fix the `ohvara-client-portal` git remote** — `git push origin main` fails `remote: Repository not found`; the embedded PAT (`ghp_n8gFR8X1...`) appears dead. Code is committed locally (`49c27e0`, branch `main`, NOT pushed). Same pending PAT-rotation thread tracked below (Thread updates §"PAT rotation"). Needs a fresh GitHub PAT with repo access.
+**✅ Remote CLEANED 2026-06-21:** Brayden supplied a fresh `ghp_…` PAT. CC stripped the dead token from `ohvara-client-portal`'s origin (`git remote set-url origin https://github.com/BFreeOhvara/ohvara-client-portal.git` — clean, no embedded credential). CC could NOT complete the actual push itself: a one-shot authenticated push (token never persisted to `.git/config`) was still denied by the classifier because the token would appear in plaintext in the command/shell history/transcript regardless of persistence. Brayden chose to run the push himself rather than accept that exposure.
+
+**Still blocked — only Brayden can clear (one command, remote is ready):**
+1. **Push `ohvara-client-portal`** — from a terminal he controls: `cd` into the repo, `git push origin main`, authenticate with the fresh PAT when prompted. Commit `49c27e0` (branch `main`) is sitting locally, ready to go. **Note: rotate this PAT after the push lands** — it was pasted directly into the CC chat transcript, so it should be treated as exposed regardless of how the push happens.
 
 **Until the portal pushes, the "Open Dashboard" button still 404s** — the edge fn is live now, but the client-portal route `/preview/:appointmentId` it's meant to feed isn't deployed anywhere (portal repo unpushed). Once the portal push clears, still needs a live click-through verify (Chrome MCP unreachable from CLI all session, same standing gap).
 
