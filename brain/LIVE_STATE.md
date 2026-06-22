@@ -16,7 +16,22 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–35 shipped — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–36 shipped — see [[Memories]] for the full trail.)*
+
+### Prompt 37 — Tighten PASS 3 exclusion list in assign_daily_batches (queued 2026-06-22, Falcon)
+
+**Context:** Prompt 36 identified a latent gap in `assign_daily_batches` (migration 040, live version): PASS 3's "FINAL GUARANTEE" fallback only excludes `Not Interested` and `Appointment Booked` from resurfacing — meaning it can pull a rep's own `No Answer`/`Follow-Up` leads back into today's batch ahead of their dedicated 4h/24h requeue timers (migrations 017/019/025). Brayden chose option B: ship the code fix speculatively, verify behaviorally at next day-rollover.
+
+**Task:**
+1. Recon-first: read the live `assign_daily_batches` function in the dashboard repo (the migration 040 version — confirmed live per LIVE_STATE migration-status block). Find the PASS 3 `WHERE` clause that currently excludes `Not Interested` and `Appointment Booked`.
+2. Write migration 046 (`046_tighten_pass3_exclusions.sql`) — a `CREATE OR REPLACE FUNCTION assign_daily_batches()` with PASS 3's exclusion list expanded to also exclude `No Answer` and `Follow-Up`. Everything else in the function is **unchanged**.
+3. Commit the migration file to `ohvara-dashboard`. Do NOT apply it — same SQL-editor apply pattern as 040–044.
+4. Add a note to LIVE_STATE migration-status block: "046 — committed, needs SQL editor apply."
+5. Update Prompt 36's LIVE_STATE entry: mark it fully resolved (the header bug is shipped, the PASS 3 fix is shipped as 046). Clear Prompt 36 from the queue and log both to Memories.
+
+**Verify:** build clean (`npm run build`). No behavior change visible until Brayden applies the migration — that's expected and fine.
+
+---
 
 ### Prompt 36 — BUG: My Leads stuck at 53/53, not resetting to 150/day (queued 2026-06-22, Eagle) — PARTIALLY SHIPPED, BLOCKED on deeper fix
 
