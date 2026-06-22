@@ -16,9 +16,17 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–37 shipped — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–38 shipped — see [[Memories]] for the full trail.)*
 
 (Queue empty — see [[North Star]] Current Focus.)
+
+---
+
+### ✅ Prompt 38 SHIPPED 2026-06-22 (`6f683b6`) — heatmap full-width cells + white-to-dark-red color ramp
+
+`src/pages/rep/MyStats.jsx`'s `CompletedDaysHeatmap`: (1) **full-width cells** — each week-row's cell wrapper is now `flex: 1` (was a fixed `width: 30`) inside a `width: '100%'` row, so all 7 columns stretch to fill the card with no dead space on the right; the colored box inside uses `width: '100%'` instead of a fixed pixel value. (2) **color ramp** — added a `lerpColor` helper that linearly interpolates RGB from white `(255,255,255)` to dark red `(185,28,28)` by `dialed/DAILY_BATCH_TARGET`; `cellColor` now returns that lerp at `r=0` for the 0-dials/no-activity state (previously `rgba(255,255,255,0.08)`, which read as gray/near-invisible against the dark card, not white) and at `r=1` for the completed-non-perfect state (previously a separate `rgba(185,28,28,0.85)` literal — now derived from the same lerp so the ramp's endpoint and the completed-state color can't drift apart). Perfect Day (`var(--success)`, green) unchanged. Legend swatches now call `cellColor()` directly with synthetic day objects instead of hand-duplicating the color math, so the legend can never drift from the actual cell rendering. Build verified clean (`npm run build`, 2.01s).
+
+**Not live-verified** — `list_connected_browsers` returned empty again this session (same standing CLI/Chrome-MCP gap noted on prior prompts); build-verified only. Recommend a Chrome MCP screenshot pass of `/rep/stats` as apex11 next time a browser is reachable, per standing rule 11.
 
 ---
 
@@ -331,4 +339,3 @@ Non-CC sessions (Manager chats, no filesystem) re-ground from the most recent pa
 - [[North Star]] — who we are, packages, pricing, goals, hard rules
 - [[session-flow]] — reload/handoff chain, context alarm, artifact + auto-log rules
 - [[ohvara-dashboard]] — dashboard architecture brain doc
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
