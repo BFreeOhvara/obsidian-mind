@@ -16,9 +16,47 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–41 shipped — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–41 shipped — Prompt 42 BLOCKED, not shipped — see [[Memories]] for the full trail.)*
 
-(Queue empty — see [[North Star]] Current Focus.)
+### ⛔ Prompt 42 BLOCKED 2026-06-22 — conflicting claims about the live cron schedule, could not verify either way
+
+**Task as queued (Falcon):** update `MyLeads.jsx`'s `BATCH_RESET_UTC_HOUR`/`MINUTE` to `6, 5` and migration 016's schedule line to `'5 6 * * *'`, on the claim that `daily-batch-assign` "was rescheduled to 06:05 UTC via Chrome SQL on 2026-06-22."
+
+**Could not complete — conflicting information, no way to verify.** Earlier the same day, Brayden directly asked CC to reschedule this same cron to a *different* time (22:20 UTC, 5:20pm Central, for testing) — that attempt was blocked (no Chrome browser connected to the CC session) and explicitly confirmed never applied (logged in [[Memories]]). Prompt 42 then claims a *separate* reschedule to 06:05 UTC happened via Falcon's own Chrome session — plausible (that's literally how migrations 031/032/042 were applied), but CC has no way to independently confirm it: no Chrome browser connected this session, no DB read access (classifier-blocked all session), no raw Postgres connection string available locally.
+
+CC's own auto-mode classifier blocked both edits (the `MyLeads.jsx` constant change and the migration 016 schedule-line change) when phrased as documenting the 06:05 UTC value as fact, specifically because it would write an unverified — and possibly false — production-state claim into committed source, where future recon (like Prompt 41's own mistake) would trust it at face value. CC agreed with the block rather than rephrase around it and reverted `MyLeads.jsx` back to the last verified value (`0, 5` / 00:05 UTC, migration 016's original literal value — still the only value CC can actually stand behind). **Migration 016 was never touched.**
+
+**This needs Brayden or Falcon to resolve, not CC:** confirm directly in the Supabase dashboard (Database → Cron Jobs, or `SELECT schedule FROM cron.job WHERE jobname='daily-batch-assign'`) what the live schedule actually is right now, then re-queue with the confirmed value. Until then the countdown stays at 00:05 UTC (possibly wrong, but it's the only value with a paper trail CC can point to).
+
+---
+
+### Prompt 43 — Rep notification bell: panel fix + full notification triggers (queued 2026-06-22, Falcon)
+
+**Context:** Migration 043 (`rep_notifications` table) is live and was originally built for the admin bell. The rep dashboard bell icon exists but its panel opens incorrectly (covers the nav instead of opening to the right). No notification triggers are wired for reps yet.
+
+**Change 1 — Fix panel positioning:**
+The notification panel should open to the RIGHT side of the bell icon, not over the nav. Recon the current bell component and fix its positioning so it appears as a dropdown/popover anchored to the right. When empty, show a simple "No notifications" empty state inside the panel.
+
+**Change 2 — Wire notification triggers (insert rows into `rep_notifications` for the authed rep):**
+
+- **Follow-up reminders:** 60 min, 10 min, and 1 min before each lead's `follow_up_at`. Reuse the existing `follow_up_at` field (mig 017). The existing toast reminder system (ships ~5 min before) already runs client-side on a tick — extend it to also insert a notification row at each of the three thresholds (60m, 10m, 1m) if one doesn't already exist for that lead+threshold combo (dedup to avoid repeat inserts on re-render).
+
+- **New message received:** When a new message arrives in the rep's inbox (recipient = rep's user id), insert a notification. Recon how the Messages page polls for new messages and hook into that.
+
+- **Appointment closed by Nate:** When one of the rep's booked appointments gets its status updated to closed/won by the closer, insert a notification for the rep. Recon `appointments` table — find the closer-update path and hook a notification insert there (or a DB trigger if cleaner).
+
+- **Milestone badge unlocked:** When `useBadgeActivity` detects a newly-earned badge (one that wasn't earned before), insert a notification. Recon the badge hook to find where earned state is computed.
+
+**Change 3 — Panel display:**
+Each notification row in the panel shows: icon (type-appropriate), short description, timestamp. Mark-as-read on click (already exists from admin side — reuse same pattern). Unread count badge on the bell icon.
+
+**Recon-first:** read the existing bell/notification component for admin, `rep_notifications` table schema, and the follow-up toast system before writing any code.
+
+**Verify:** Chrome MCP — open bell, confirm panel opens right, empty state shows. Then trigger a test notification (easiest: manually insert a row via Supabase) and confirm it appears.
+
+---
+
+(Queue empty after Prompt 43 — see [[North Star]] Current Focus.)
 
 ---
 
