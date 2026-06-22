@@ -13,6 +13,8 @@ tags:
 ## Next Up for CC
 
 > **CC reads this section FIRST, before anything else.** This is the literal handoff queue from Eagle (Cowork) to CC — what to build next, in order. Eagle (or Falcon) writes prompts here when a decision/idea is ready to build; CC executes top to bottom, logs each completion to [[Memories]], and DELETES the item from this list once done (don't leave finished items here — that's what Memories is for). If empty, there's nothing queued — check [[North Star]]'s Current Focus instead.
+>
+> **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
 *(Prompt 1 + Prompt 2 shipped 2026-06-19. Prompt 3's decision is now made — see queue below. CC: execute top to bottom, one step at a time if Brayden says "run next step," logging + deleting each as it completes.)*
 
@@ -24,17 +26,111 @@ tags:
 
 ---
 
-### Two migrations committed, NEITHER applied to prod yet (Prompts 22 + 23, re-flagged 2026-06-21 — this tracking note had dropped out of LIVE_STATE between turns, restoring it)
+### Migration status — 040 + 041 applied, 042 still pending
 
-Both are now safely in git history on `ohvara-dashboard` master — only the actual `CREATE OR REPLACE` / `CREATE TABLE` against the live database remains, and every attempt to run that from this CLI session hits the same recurring auto-mode credential-classifier lockout (5th+ occurrence this session alone — see [[Memories]] entries for Prompts 9/18b/24/22/23).
+- **040 / niche-even distribution** — ✅ applied 2026-06-21 via SQL editor, `assign_daily_batches` function replaced in prod.
+- **041 / rep_credentials** — ✅ applied 2026-06-21 via SQL editor, table + RLS policies + index all live.
+- **042 / profiles.timezone** (Prompt 33, `07adb84`) — ⏳ NOT yet applied. `alter table profiles add column if not exists timezone text not null default 'America/Chicago'` — apply via the SQL editor same as 040/041. All the application code (booking conversion, display formatting, admin create-user timezone field) is already shipped and waiting on this column existing.
 
-1. **`040_niche_even_distribution.sql`** (`bc2abb5`) — niche-partitioned round-robin (Prompt 22). Logic verified by read, never tested live.
-2. **`041_rep_credentials.sql`** (`108a913`) — `rep_credentials` table for admin login lookup (Prompt 23). Application code (edge fn upsert, admin UI) is already shipped and depends on this table existing.
-
-**To clear:** Brayden runs `supabase db push --project-ref jjextitmbptoaolacocs` (or applies both files via the Supabase dashboard SQL editor) from a terminal/session he controls, then tells CC "migrations applied" so CC can run the verification steps for both and close them out for good.
+**⚠️ DO NOT run `supabase db push`** for any of these — 040/041 were applied outside Supabase's migration tracking, so `db push` would try to re-run them and fail on `CREATE POLICY` (policies already exist). Apply 042 the same manual way.
 
 ---
 
+### ✅ Prompt 33 SHIPPED 2026-06-22 (`07adb84`) — timezone support
+
+`src/lib/timezones.js` (new): 50-state IANA lookup, `zonedTimeToUtcIso`/`utcIsoToZonedDatetimeLocal` conversion helpers (unit-tested against known DST offsets before commit), `formatInTimezone` display formatter. Setter's booking input (`CallModal.jsx`) and Nate's reschedule input (`AppointmentCard.jsx`) now interpret the typed time as the LEAD's inferred local time (from `lead.state`), not the typist's browser timezone — this also fixed a pre-existing bug where `AppointmentCard.jsx` displayed the edit field in UTC but saved it as browser-local (two different assumptions for the same field). All appointment-time displays (`AppointmentCard`, `CloserPipeline`, admin `Overview`, admin `LeadPipeline`) now format in the VIEWING user's own `profile.timezone`. Admin create-user form has a timezone Select; `admin-create-user` edge fn stores it non-fatally. **Migration 042 (`profiles.timezone`) is written but NOT yet applied** — see the migration-status block above, same SQL-editor pattern as 040/041. No live browser verification (Chrome MCP unreachable from CLI, standing gap). Full detail: [[Memories]] 2026-06-22 entry.
+
+---
+
+### Prompt 32 — In-dashboard notification system (2026-06-21)
+
+**Decision (Brayden, 2026-06-21):** Reps get real-time in-dashboard notifications for: new message received, badge unlocked, follow-up due soon. Bell icon in nav with unread count badge. Clicking opens a notification panel/dropdown. Notifications should persist (not just toast) so reps can see what they missed.
+
+Steps:
+1. Recon: check if a `notifications` table exists. If not, design a simple schema: `id, profile_id, type (message|badge|follow_up), body text, read bool, created_at`.
+2. Migration if needed — apply via SQL editor (Brayden will run it), same pattern as 031/032.
+3. Bell icon in rep nav with unread count. Notification panel on click showing recent notifications, mark-as-read on open.
+4. Wire up triggers: (a) new message → insert notification row for recipient; (b) badge unlocked → insert notification; (c) follow-up due within 30 min → insert notification (can be done client-side on a timer or a DB trigger on the queue).
+5. Build verify, commit + push, log + delete this block.
+
+---
+
+### Prompt 31 — Commission copy, Goals cleanup, Activity timestamps (2026-06-21)
+
+**Changes (Brayden, 2026-06-21):**
+
+1. **My Commissions subtitle:** change "50% of every setup fee — paid when the closer signs the client you booked" → "10% of every closed deal — paid when the closer signs the client you booked"
+2. **My Goals — monthly tab:** remove "Monthly Closes" metric/goal. Appointment setters don't control closes.
+3. **Activity page:** add timestamps to every activity item. Feed shows lead status changes only (calls/outcomes) — badges and messages are handled by the notification system (Prompt 32), not the activity feed.
+
+Steps: recon the relevant components, make all three changes, build verify, commit + push, log + delete this block.
+
+---
+
+### Prompt 30 — My Stats + My Goals UI updates (2026-06-21)
+
+**Definitions (Brayden, 2026-06-21):**
+- **Completed Day** = called all 150 leads
+- **Perfect Day** = called all 150 leads AND booked 2+ appointments
+
+**My Stats — Completed Days heatmap:**
+1. Make it larger
+2. Remove the "F" grade markers at the end of each week
+3. New color scale: white (0 calls) → progressively darker red (more calls, not yet 150) → dark red (called all 150, no perfect day) → green (called all 150 + booked 2+, perfect day)
+
+**My Goals changes:**
+1. Daily bookings goal: change from 3 → 2
+2. "Perfect Day" badge: move from Streak & Consistency section → Special section
+3. Streak & Consistency: streaks are now based on completed days (calling all 150), not bookings. Update badge descriptions/thresholds accordingly.
+
+Steps: recon `useBadgeActivity`, `useCompletedDays`, the Goals page component, and the heatmap component. Make all changes, build verify, commit + push, log to [[Memories]], delete this block.
+
+---
+
+### Prompt 28 — My Leads daily behavior redesign (2026-06-21)
+
+**Decision (Brayden, 2026-06-21):** Leads stay visible all day regardless of status — reps can always change a status they logged by mistake. Overnight, ALL leads that have any status (Appointment Booked, Not Interested, No Answer, Follow-Up) leave the daily batch and go to the pipeline. The ONLY leads that carry forward to the next day are uncalled New leads — they roll over and the batch tops back up to 150 from the unassigned pool.
+
+**"Complete Day" button:** When every lead in the batch has been actioned (New count = 0), the lead list box stays on screen but is empty, with a "Complete Day" button centered inside it. Clicking it confirms the day is done. If they don't finish, the overnight reset handles it automatically — no button needed.
+
+**Current behavior vs desired:**
+- Current: leads may disappear from the list immediately on status change — WRONG
+- Desired: leads stay in the list all day, status badge updates in place, rep can change status any time during the day
+
+Steps:
+1. Recon: find the My Leads query/hook (likely `useLeads` or similar) and the Call Now modal's status-commit logic. Understand exactly what triggers a lead to leave the list today.
+2. Fix the My Leads query to show ALL leads with `batch_date = CURRENT_DATE AND assigned_rep_id = rep.id` regardless of status — no status filter that removes them mid-day.
+3. When New count hits 0: show "Complete Day" button centered in the (now empty-of-New) lead list area. Clicking it can be a no-op for now (just a visual confirmation) or can log a completion event — use your judgment.
+4. Confirm the existing overnight logic (EOD sweep cron at 23:55 UTC + assign_daily_batches at 00:05 UTC) correctly handles the reset: actioned leads go to pipeline, New uncalled leads roll over, pool tops up to 150. If it already works correctly, no changes needed — just confirm and note.
+5. Build verify, commit + push, log to [[Memories]], delete this block.
+
+---
+
+### Prompt 29 — Call recording via Twilio Voice (2026-06-21)
+
+**Decision (Brayden, 2026-06-21):** Reps dial from their own phone (current `tel:` link). Brayden wants calls recorded. The dormant Twilio Voice scaffold already exists in the codebase (`src/lib/twilio.js`, STUB_MODE, `twilio-voice` edge fn doesn't exist yet). This is the path to call recording.
+
+Steps:
+1. Recon-first: read `src/lib/twilio.js` and any existing Twilio-related code. Understand what's stubbed vs what's missing. Report the current state before writing any code.
+2. Design the simplest path to call recording that works with reps dialing from their own phone — likely Twilio programmable voice (outbound call from a Twilio number that records, then connects to the prospect). Rep clicks "Call Now" → Twilio initiates a recorded call bridging the rep's phone to the lead's phone.
+3. Build out the minimum viable call recording path. TWILIO_* secrets are not yet set — note what Brayden needs to configure in Supabase secrets before the feature goes live.
+4. Build verify, commit + push, log to [[Memories]], delete this block.
+
+---
+
+### Prompt 27 — Training Center flowchart: expand depth + remove Full Script tab (2026-06-21)
+
+**Decision (Brayden, 2026-06-21):** The flowchart currently only shows the opener + 5 top-level branches. Brayden wants it expanded to show the full depth of the decision tree — what happens at each step AFTER the opener routes to a branch. Brayden and Nate will tweak wording after; just make your best attempt from the existing `discoveryScript.js` content.
+
+Steps:
+1. **Recon:** Read `src/lib/discoveryScript.js` — get the full script content including all branches, sub-steps, and their text/actions.
+2. **Expand the flowchart component** (`buildScriptFlow()` or wherever the flowchart tree is built) to render sub-steps under each branch. For each of the 5 branches, show the next 2-3 steps in the path — e.g. Owner path: opener → owner answer → discovery questions → hand to Nate. Use your best judgment from the script content. Brayden and Nate will adjust wording afterward.
+3. **Remove the "Full script" tab** from the Training Center script section. Only Flowchart and Practice tabs remain.
+4. Build verify — no errors.
+5. Commit + push to ohvara-dashboard master.
+6. Log to [[Memories]] + delete this block from LIVE_STATE.
+
+---
 
 ### Prompt 19 — automation-stack-builder Phase 1: registry recon + schema (2026-06-20, PARKED — 2026-06-21)
 
