@@ -26,9 +26,9 @@ Full prompt saved as artifact: `cc-prompt-2026-06-22-prompt26-fix.md` in the Ohv
 
 *(Prompt 32 SHIPPED 2026-06-22 (`a048974`) — see [[Memories]] for detail.)*
 
-### ✅ Prompt 26 SHIPPED 2026-06-21 (`adc4ba4`) — client preview merged into ohvara-dashboard, client-portal repo abandoned
+### ✅ Prompt 26 FULLY CLOSED 2026-06-22 (`ddd24fa`) — Booked tab rows now open appointment card
 
-`/preview/:appointmentId` ported into `ohvara-dashboard/src/pages/ClientPreview.jsx` (public route, no auth guard), `AppointmentCard.jsx`'s "Open Dashboard →" now a same-origin relative link (no more dead `VITE_CLIENT_PORTAL_URL`/`ohvara-client-portal.vercel.app`). Build clean, pushed. **Supersedes Prompt 18b entirely** — the separate `ohvara-client-portal` repo (local-only, stuck at `49c27e0`) can be ignored; that whole dead-PAT push thread is moot now. **One gap remains:** Chrome MCP still unreachable from CLI (`list_connected_browsers: []`, standing gap every session) — verified functionally instead (curl'd `get-demo-preview` directly, got a correct structured 404 for a fake id, confirming the fn parses/queries correctly) but never click-through-tested with a REAL appointment's demo data in an actual browser. **Next person with browser access:** open `/admin` → any appointment card → "Open Dashboard →" → confirm the preview renders real numbers, not just that it doesn't error. Full detail: [[Memories]] 2026-06-21 entry.
+`/preview/:appointmentId` lives in `ohvara-dashboard` as a public route (ported `adc4ba4`). Admin Pipeline → Booked tab rows now render `AppointmentCard` — clicking opens the full modal with "Open Dashboard →" linking to `/preview/:appointmentId`. `useBooked()` query expanded to full field set. **Pending final verify (needs browser):** admin → Pipeline → Booked tab → click row → card opens → "Open Dashboard →" → preview renders real numbers. Full detail: [[Memories]] 2026-06-22 entry.
 
 ---
 
