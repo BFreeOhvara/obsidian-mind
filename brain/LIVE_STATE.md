@@ -16,6 +16,10 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
+### Prompt 35 — fix Prompt 26 click-through: admin Booked tab rows don't open appointment card (2026-06-22)
+
+Full prompt saved as artifact: `cc-prompt-2026-06-22-prompt26-fix.md` in the Ohvara folder. Summary: Chrome re-verify (Eagle session, 2026-06-22) confirmed Prompt 34's `tz is not defined` fix is live — Booked tab loads clean, times render correctly in Central. But Prompt 26 click-through is still blocked: clicking a row in admin Pipeline → Booked tab does nothing — no appointment card opens, so "Open Dashboard →" can't be reached from that surface. Deployed bundle confirms the card component (minified `EX` in prod) exists and correctly builds `/preview/:appointmentId` links — it's just not wired to the Booked tab's row click. CC needs to: find the real component name, find where Booked tab rows render, wire up the click handler. Fix + push, no Chrome reverify needed beyond a quick manual click-through after.
+
 *(Prompt 1 + Prompt 2 shipped 2026-06-19. Prompt 3's decision is now made — see queue below. CC: execute top to bottom, one step at a time if Brayden says "run next step," logging + deleting each as it completes.)*
 
 *(Prompts 5–17 shipped + live-verified 2026-06-20 — see [[Memories]] for the full build + verify trail.)*
@@ -43,7 +47,7 @@ tags:
 
 `src/lib/timezones.js` (new): 50-state IANA lookup, `zonedTimeToUtcIso`/`utcIsoToZonedDatetimeLocal` conversion helpers (unit-tested against known DST offsets before commit), `formatInTimezone` display formatter. Setter's booking input (`CallModal.jsx`) and Nate's reschedule input (`AppointmentCard.jsx`) now interpret the typed time as the LEAD's inferred local time (from `lead.state`), not the typist's browser timezone — this also fixed a pre-existing bug where `AppointmentCard.jsx` displayed the edit field in UTC but saved it as browser-local (two different assumptions for the same field). All appointment-time displays (`AppointmentCard`, `CloserPipeline`, admin `Overview`, admin `LeadPipeline`) now format in the VIEWING user's own `profile.timezone`. Admin create-user form has a timezone Select; `admin-create-user` edge fn stores it non-fatally. **Migration 042 applied 2026-06-22 via SQL editor — `profiles.timezone` column is live.**
 
-**🟡 LIVE-VERIFIED 2026-06-22 via Claude in Chrome:** 5 of 6 surfaces passed. 1 crash (`tz is not defined` in `BookedTab`) fixed in `9e71bf4` (2-line prop-pass fix). **Pending:** one more Chrome re-verify pass on the Booked tab to confirm Prompt 33 fully live and Prompt 26 click-through unblocked. Next person with browser: open admin → Pipeline → Booked tab (should load without crash) → click "Open Dashboard →" on any appointment card (Prompt 26 verify).
+**✅ LIVE-VERIFIED 2026-06-22 via Claude in Chrome (re-verify pass):** Booked tab loads with zero crash, all 7 appointments render with correct Central-timezone times. Prompt 33 now fully live across all 6 surfaces. **Prompt 26 click-through still blocked** — not a timezone issue, a separate wiring gap: Booked tab rows have no click handler, so the appointment card (with "Open Dashboard →") never opens from that surface. Queued as Prompt 35 above for CC.
 
 ---
 
