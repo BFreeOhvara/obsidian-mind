@@ -64,15 +64,14 @@ Three files changed. **`useProfiles.js`**: `useCompletedDays` now parallel-fetch
 
 ---
 
-### Prompt 29 — Call recording via Twilio Voice (2026-06-21)
+### ✅ Prompt 29 SHIPPED 2026-06-22 (`252ad1d`) — Twilio bridge call recording MVP
 
-**Decision (Brayden, 2026-06-21):** Reps dial from their own phone (current `tel:` link). Brayden wants calls recorded. The dormant Twilio Voice scaffold already exists in the codebase (`src/lib/twilio.js`, STUB_MODE, `twilio-voice` edge fn doesn't exist yet). This is the path to call recording.
+**Architecture:** bridge pattern — Twilio rings the rep's personal phone first; when they pick up, TwiML connects them to the lead with `record-from-answer-dual-channel`. Reps never leave their own phone; recordings live in the Twilio dashboard. Old `twilio.js` browser-dialer stub (52 lines) replaced with a 4-line `bridgeCall(repPhone, leadPhone)` helper. `CallModal.jsx`: if `profile.phone` is set → shows "Call (Recorded)" button → calls `twilio-call` edge fn → success shows "Calling your phone — pick up to connect to {business}" → bridge error silently falls back to `tel:` link. If `profile.phone` not set → `tel:` link as before. **Migration 045** (`045_profiles_phone.sql`): add `phone text` to profiles — needs SQL editor apply. **Required secrets (not set):** `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER`. Feature is dormant until all 3 steps below are done.
 
-Steps:
-1. Recon-first: read `src/lib/twilio.js` and any existing Twilio-related code. Understand what's stubbed vs what's missing. Report the current state before writing any code.
-2. Design the simplest path to call recording that works with reps dialing from their own phone — likely Twilio programmable voice (outbound call from a Twilio number that records, then connects to the prospect). Rep clicks "Call Now" → Twilio initiates a recorded call bridging the rep's phone to the lead's phone.
-3. Build out the minimum viable call recording path. TWILIO_* secrets are not yet set — note what Brayden needs to configure in Supabase secrets before the feature goes live.
-4. Build verify, commit + push, log to [[Memories]], delete this block.
+**⚠️ 3 things needed before recording goes live:**
+1. Apply migration 045 via SQL editor (`alter table profiles add column if not exists phone text`)
+2. Add `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER` to Supabase Edge Function secrets
+3. Set `phone` for each rep in the `profiles` table (SQL or Supabase dashboard)
 
 ---
 
