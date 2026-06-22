@@ -51,23 +51,9 @@ Full prompt saved as artifact: `cc-prompt-2026-06-22-prompt26-fix.md` in the Ohv
 
 ---
 
-### Prompt 30 — My Stats + My Goals UI updates (2026-06-21)
+### ✅ Prompt 30 SHIPPED 2026-06-22 (`659aa1d`) — heatmap redesign + streak/badge overhaul
 
-**Definitions (Brayden, 2026-06-21):**
-- **Completed Day** = called all 150 leads
-- **Perfect Day** = called all 150 leads AND booked 2+ appointments
-
-**My Stats — Completed Days heatmap:**
-1. Make it larger
-2. Remove the "F" grade markers at the end of each week
-3. New color scale: white (0 calls) → progressively darker red (more calls, not yet 150) → dark red (called all 150, no perfect day) → green (called all 150 + booked 2+, perfect day)
-
-**My Goals changes:**
-1. Daily bookings goal: change from 3 → 2
-2. "Perfect Day" badge: move from Streak & Consistency section → Special section
-3. Streak & Consistency: streaks are now based on completed days (calling all 150), not bookings. Update badge descriptions/thresholds accordingly.
-
-Steps: recon `useBadgeActivity`, `useCompletedDays`, the Goals page component, and the heatmap component. Make all changes, build verify, commit + push, log to [[Memories]], delete this block.
+Three files changed. **`useProfiles.js`**: `useCompletedDays` now parallel-fetches booking-outcome rows per day so each day object carries a `bookings` count; `useBadgeActivity` streak now filters to completed days (dials ≥ 150) before consecutive-run calc; new `perfectDay` boolean (any day ≥ 150 dials AND ≥ 2 bookings). **`MyStats.jsx`**: new 4-state `cellColor` (white / red ramp / dark red / green); cells 24→30px; grade chips removed; tooltip shows `dials/150 · N booked`; legend + header updated. **`MyGoals.jsx`**: daily bookings goal 3→2; `perfect_day` badge moved to Special with new condition + detail; streak badges all have "N completed days in a row" detail. Build clean.
 
 ---
 
