@@ -1,4 +1,4 @@
-🌐 **English** | [日本語](README.ja.md) | [中文](README.zh-CN.md) | [한국어](README.ko.md)
+	🌐 **English** | [日本語](README.ja.md) | [中文](README.zh-CN.md) | [한국어](README.ko.md)
 
 <p align="center">
   <img src="obsidian-mind-logo.png" alt="Obsidian Mind" width="120">
