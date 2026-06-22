@@ -32,16 +32,30 @@ tags:
 
 - **040 / niche-even distribution** — ✅ applied 2026-06-21 via SQL editor, `assign_daily_batches` function replaced in prod.
 - **041 / rep_credentials** — ✅ applied 2026-06-21 via SQL editor, table + RLS policies + index all live.
-- **042 / profiles.timezone** — ✅ applied 2026-06-22 via SQL editor. `profiles.timezone` column live (`text NOT NULL DEFAULT 'America/Chicago'`). Prompt 33 fully complete.
-- **043 / rep_notifications** — ⏳ COMMITTED (`a048974`), NOT YET APPLIED. Brayden must run via SQL editor before the rep bell shows notifications. Adds `profile_id` + `badge_id` to `notifications`, rep RLS, DB trigger for message reply.
+- **042 / profiles.timezone** — ✅ applied 2026-06-22 via SQL editor. `profiles.timezone` column live (`text NOT NULL DEFAULT 'America/Chicago'`). Prompt 33 NOT fully complete — see live-verification bug below.
+- **043 / rep_notifications** — ✅ applied + live-verified 2026-06-22 via Chrome click-through (admin bell badge/panel/mark-as-read confirmed). Rep-side bell shows 0 — no rep-directed notification type fires yet, by design until a rep-facing trigger is built.
 
 **⚠️ DO NOT run `supabase db push`** for any of these — 040/041/042/043 were applied or need to be applied outside Supabase's migration tracking, so `db push` would try to re-run them and fail.
 
 ---
 
-### ✅ Prompt 33 SHIPPED + FULLY LIVE 2026-06-22 (`07adb84`) — timezone support
+### ⚠️ Prompt 33 SHIPPED 2026-06-22 (`07adb84`) — timezone support — LIVE-VERIFIED PARTIAL, 1 BUG OPEN
 
-`src/lib/timezones.js` (new): 50-state IANA lookup, `zonedTimeToUtcIso`/`utcIsoToZonedDatetimeLocal` conversion helpers (unit-tested against known DST offsets before commit), `formatInTimezone` display formatter. Setter's booking input (`CallModal.jsx`) and Nate's reschedule input (`AppointmentCard.jsx`) now interpret the typed time as the LEAD's inferred local time (from `lead.state`), not the typist's browser timezone — this also fixed a pre-existing bug where `AppointmentCard.jsx` displayed the edit field in UTC but saved it as browser-local (two different assumptions for the same field). All appointment-time displays (`AppointmentCard`, `CloserPipeline`, admin `Overview`, admin `LeadPipeline`) now format in the VIEWING user's own `profile.timezone`. Admin create-user form has a timezone Select; `admin-create-user` edge fn stores it non-fatally. **Migration 042 applied 2026-06-22 via SQL editor — `profiles.timezone` column is live.** No live browser verification (Chrome MCP unreachable from CLI, standing gap). Full detail: [[Memories]] 2026-06-22 entry.
+`src/lib/timezones.js` (new): 50-state IANA lookup, `zonedTimeToUtcIso`/`utcIsoToZonedDatetimeLocal` conversion helpers (unit-tested against known DST offsets before commit), `formatInTimezone` display formatter. Setter's booking input (`CallModal.jsx`) and Nate's reschedule input (`AppointmentCard.jsx`) now interpret the typed time as the LEAD's inferred local time (from `lead.state`), not the typist's browser timezone — this also fixed a pre-existing bug where `AppointmentCard.jsx` displayed the edit field in UTC but saved it as browser-local (two different assumptions for the same field). All appointment-time displays (`AppointmentCard`, `CloserPipeline`, admin `Overview`, admin `LeadPipeline`) now format in the VIEWING user's own `profile.timezone`. Admin create-user form has a timezone Select; `admin-create-user` edge fn stores it non-fatally. **Migration 042 applied 2026-06-22 via SQL editor — `profiles.timezone` column is live.**
+
+**🔴 LIVE-VERIFIED 2026-06-22 via Claude in Chrome (separate Chrome-profile session, see [[Gotchas]] for the account-binding context):** 5 of 6 surfaces PASS — `AppointmentCard` reschedule input, `CallModal` booking input, `CloserPipeline` list, admin `Overview` Recent Bookings, and the admin create-user timezone Select all correctly show/convert times in the lead's local tz (input) or viewer's `profile.timezone` (display). **1 surface FAILS: admin `LeadPipeline` "Booked" tab crashes with `ReferenceError: tz is not defined`** in the `renderRow` function (minified as `LZ` in the built bundle, `index-CjLsqY1W.js` ~line 116/pos 10809) — `tz` (viewer's `profile.timezone`) isn't captured in that closure. **This same bug blocks Prompt 26's click-through verification too** (admin can't open the Booked tab to click "Open Dashboard →" on a card). **NEXT FIX NEEDED:** find `renderRow`/the Booked-tab row renderer in `LeadPipeline.jsx` (or wherever it lives pre-minification) and pass `profile.timezone` into its closure/props — same pattern already working in the other 5 surfaces. Re-run the Chrome verification prompt after the fix to confirm both Prompt 33 and Prompt 26 close out. Full verification report: [[Memories]] 2026-06-22 entry.
+
+---
+
+### 🔴 Prompt 34 — URGENT bug fix: `tz is not defined` crashes admin Booked tab (2026-06-22, found during Chrome verification — JUMP THIS TO TOP OF QUEUE)
+
+Found live-verifying Prompts 26 + 33 (see those entries above for full repro). Admin `LeadPipeline` "Booked" tab throws `ReferenceError: tz is not defined` in its row-render function — `profile.timezone` isn't captured in that closure, unlike the 5 other surfaces that already handle it correctly. This single bug currently blocks: (a) Prompt 33 from being marked fully live, (b) Prompt 26's click-through verification (admin can't reach the appointment card to click "Open Dashboard →").
+
+Steps:
+1. Find the Booked-tab row renderer in `LeadPipeline.jsx` (admin) — minified bundle reference: `index-CjLsqY1W.js`, `renderRow`/`LZ`, ~pos 10809.
+2. Pass the viewer's `profile.timezone` into that render function/closure the same way it's already wired into `AppointmentCard`/`CloserPipeline`/admin `Overview`.
+3. Build verify, commit + push.
+4. Log to [[Memories]] + delete this block. Then flag for a re-run of the Chrome verification pass to confirm Prompt 26 + 33 both close out fully live.
 
 ---
 
@@ -364,4 +378,3 @@ Non-CC sessions (Manager chats, no filesystem) re-ground from the most recent pa
 - [[North Star]] — who we are, packages, pricing, goals, hard rules
 - [[session-flow]] — reload/handoff chain, context alarm, artifact + auto-log rules
 - [[ohvara-dashboard]] — dashboard architecture brain doc
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
