@@ -16,9 +16,17 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–38 shipped — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–39 shipped — see [[Memories]] for the full trail.)*
 
 (Queue empty — see [[North Star]] Current Focus.)
+
+---
+
+### ✅ Prompt 39 SHIPPED 2026-06-22 (`b01c3b8`) — heatmap header stats removed, square cells, steeper color curve
+
+`src/pages/rep/MyStats.jsx`'s `CompletedDaysHeatmap`: (1) **header stripped to just the title** — removed the trend chip ("↑/↓ N% vs last wk"), the "N of 21 days completed" count, and the explanatory subtitle paragraph; card is now title → grid → legend only. Their backing computations (`completedCount`, `perfectCount`, `recentAvg`/`prevAvg`/`delta`/`trendPct`/`up`) were deleted too since nothing else referenced them — would otherwise be dead code. (2) **square cells** — cell wrapper gets `aspectRatio: '1'`, inner colored box switched from a fixed `height: 30` to `height: '100%'` so it fills the now-square wrapper. (3) **steeper color curve** — `cellColor`'s in-progress branch now applies `Math.pow(r, 0.4)` before `lerpColor`, so low dial counts (e.g. 7/150) render clearly pink instead of near-white; the 0-dials and 150-dials (completed) endpoints are unaffected since `pow(0,0.4)=0` and the completed branch already passes a literal `t=1`. Build verified clean (`npm run build`, 1.59s).
+
+**Not live-verified** — no Chrome browser connected this session either (3rd prompt in a row with this gap); build-verified only.
 
 ---
 
