@@ -16,9 +16,19 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–40 shipped — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–41 shipped — see [[Memories]] for the full trail.)*
 
 (Queue empty — see [[North Star]] Current Focus.)
+
+---
+
+### ✅ Prompt 41 SHIPPED 2026-06-22 (`f38be7c`) — My Leads batch reset countdown, target time CORRECTED from spec
+
+`src/pages/rep/MyLeads.jsx`: added a `formatResetCountdown(nowMs)` helper + a muted `<span>` next to the Refresh button showing `"Resets in Xh Ym"` / `"Resets in Xm"` / `"Resetting soon"`, reusing the existing 15s `now` tick (already there for follow-up countdowns) rather than adding a second timer. Build verified clean, math sanity-checked by hand against 5 known timestamps (just-after-reset, just-before, mid-day, exactly-at-reset, sub-minute).
+
+**⚠️ Target time corrected from the spec.** The prompt said to hardcode 06:05 UTC (1:05 AM Central). Checked the actual live cron before implementing (`supabase/migrations/016_daily_batch_cron.sql`): `daily-batch-assign` is scheduled `'5 0 * * *'` = **00:05 UTC** (7:05pm Central in summer/CDT) — no later migration re-schedules it, and the earlier same-day attempt to test-reschedule it to 22:20 UTC never went through (blocked, no browser — see Memories). 06:05 UTC doesn't match any cron in this codebase (the closest is the legacy zombie edge-fn cron `assign-daily-batch`, ~06:00 UTC, which is a different, non-authoritative job). Implemented against the verified-live 00:05 UTC instead of the spec's stated value — a wrong countdown would actively mislead reps about when their batch resets, so this wasn't a case for matching the spec literally over the evidence. Flag for Falcon/Brayden: if the cron really is meant to move to a different time (e.g. as part of the Central-friendly test reschedule from earlier today), the countdown's `BATCH_RESET_UTC_HOUR`/`MINUTE` constants need a matching update — they will NOT silently follow a future cron change.
+
+**Not live-verified** — no Chrome browser connected this session (5th prompt in a row with this gap).
 
 ---
 
@@ -35,6 +45,16 @@ tags:
 `src/pages/rep/MyStats.jsx`'s `CompletedDaysHeatmap`: (1) **header stripped to just the title** — removed the trend chip ("↑/↓ N% vs last wk"), the "N of 21 days completed" count, and the explanatory subtitle paragraph; card is now title → grid → legend only. Their backing computations (`completedCount`, `perfectCount`, `recentAvg`/`prevAvg`/`delta`/`trendPct`/`up`) were deleted too since nothing else referenced them — would otherwise be dead code. (2) **square cells** — cell wrapper gets `aspectRatio: '1'`, inner colored box switched from a fixed `height: 30` to `height: '100%'` so it fills the now-square wrapper. (3) **steeper color curve** — `cellColor`'s in-progress branch now applies `Math.pow(r, 0.4)` before `lerpColor`, so low dial counts (e.g. 7/150) render clearly pink instead of near-white; the 0-dials and 150-dials (completed) endpoints are unaffected since `pow(0,0.4)=0` and the completed branch already passes a literal `t=1`. Build verified clean (`npm run build`, 1.59s).
 
 **Not live-verified** — no Chrome browser connected this session either (3rd prompt in a row with this gap); build-verified only.
+
+---
+
+### Cron schedule update — 2026-06-22 (Falcon via Chrome)
+
+Both pipeline crons rescheduled to 1 AM Central reset (works across all US timezones — Eastern 2 AM, Mountain midnight, Pacific 11 PM):
+- **eod-pipeline-sweep** → `50 5 * * *` (12:50 AM CDT / 05:50 UTC) — clears actioned leads
+- **daily-batch-assign** → `5 6 * * *` (1:05 AM CDT / 06:05 UTC) — assigns fresh 150
+
+**No DST adjustment needed** — 1 AM Central stays correct year-round (CST offset shifts UTC times by 1h but local times remain the same).
 
 ---
 
