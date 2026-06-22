@@ -228,6 +228,7 @@ TBD — do not hardcode any dialer assumption anywhere in the codebase.
 13. AI scripts are question-based and pain-surfacing — never a pitch
 14. All reps and Nate on Profile A only until second closer confirmed
 15. Setup fee (`$297`) always presented as one-time, separate from monthly
+16. **Never drive Claude in Chrome / browser actions directly from a Cowork (Eagle/Falcon) session.** Brayden runs his own Claude Chrome session with everything already logged in. Any task needing a browser (Supabase SQL editor, GitHub, live site verification, etc.) gets written up as a self-contained prompt file artifact in the Ohvara folder and handed to Brayden to paste into Claude Chrome himself — never attempted directly via the `Claude_in_Chrome` MCP tools from Eagle/Falcon.
 
 ---
 
@@ -239,3 +240,4 @@ TBD — do not hardcode any dialer assumption anywhere in the codebase.
 | 2026-06-07 | Full business context upgrade | Added sales process detail, warm lead insight, rep onboarding flow, commission, dialer TBD, geo market, Stripe auto-link rule, training optional |
 | 2026-06-07 | Packages, team structure, niche profiles locked | Finalized 4 packages with setup fee, confirmed Nate as sole closer, Profile A only, ROI anchors |
 | 2026-06-19 | Hard refresh: niche lineup + commission structure corrected | Niche list updated to the real locked 6 (vet, HVAC, electrical, roofing, landscaping, pressure washing, 7th TBD) — was listing 4 dropped niches and missing vet entirely. Commission changed: setter now 10% of (setup+month-1 combined) one-time, Nate/Brayden split the rest 45/45 on the first deal and 50/50 on month-2+ recurring (was 50% of setup only, 0% recurring). |
+| 2026-06-22 | New standing rule #16: Cowork sessions never drive Claude in Chrome directly | Brayden's Claude Chrome already has everything logged in and he prefers to run it himself. Eagle/Falcon now write a self-contained prompt artifact (saved to the Ohvara folder) for any browser-dependent task instead of attempting it via the `Claude_in_Chrome` MCP tools. |

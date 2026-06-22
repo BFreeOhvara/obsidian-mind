@@ -32,14 +32,15 @@ Full prompt saved as artifact: `cc-prompt-2026-06-22-prompt26-fix.md` in the Ohv
 
 ---
 
-### Migration status — 040 + 041 + 042 applied ✅
+### Migration status — 040–044 applied ✅
 
 - **040 / niche-even distribution** — ✅ applied 2026-06-21 via SQL editor, `assign_daily_batches` function replaced in prod.
 - **041 / rep_credentials** — ✅ applied 2026-06-21 via SQL editor, table + RLS policies + index all live.
-- **042 / profiles.timezone** — ✅ applied 2026-06-22 via SQL editor. `profiles.timezone` column live (`text NOT NULL DEFAULT 'America/Chicago'`). Prompt 33 NOT fully complete — see live-verification bug below.
-- **043 / rep_notifications** — ✅ applied + live-verified 2026-06-22 via Chrome click-through (admin bell badge/panel/mark-as-read confirmed). Rep-side bell shows 0 — no rep-directed notification type fires yet, by design until a rep-facing trigger is built.
+- **042 / profiles.timezone** — ✅ applied 2026-06-22 via SQL editor. `profiles.timezone` column live (`text NOT NULL DEFAULT 'America/Chicago'`).
+- **043 / rep_notifications** — ✅ applied + live-verified 2026-06-22 via Chrome click-through (admin bell badge/panel/mark-as-read confirmed).
+- **044 / keep_batch_date_intraday** — ✅ applied 2026-06-22 via SQL editor. `handle_lead_pipeline()` trigger updated — Not Interested and Follow-Up no longer null `batch_date` intraday; leads stay visible all day.
 
-**⚠️ DO NOT run `supabase db push`** for any of these — 040/041/042/043 were applied or need to be applied outside Supabase's migration tracking, so `db push` would try to re-run them and fail.
+**⚠️ DO NOT run `supabase db push`** for any of these — 040–044 were applied outside Supabase's migration tracking, so `db push` would try to re-run them and fail.
 
 ---
 
@@ -60,8 +61,6 @@ Three files changed. **`useProfiles.js`**: `useCompletedDays` now parallel-fetch
 ### ✅ Prompt 28 SHIPPED 2026-06-22 (`8d30ee5`) — leads stay visible all day + Complete Day button
 
 **Root cause:** `handle_lead_pipeline` trigger (migration 020) was doing `new.batch_date := null` immediately for Not Interested and Follow-Up → leads vanished from `useMyLeads` (`batch_date = today` filter) the moment a rep committed those statuses. No Answer already had batch_date kept (fixed in 020); Appointment Booked never had this issue. **Fix:** migration 044 — `create or replace function handle_lead_pipeline()` removing the two `batch_date := null` assignments for Not Interested and Follow-Up. Follow-up queue is still populated (for the overnight return routing); EOD sweep at 23:55 UTC already handles nulling batch_date for both statuses overnight. **Overnight logic verified correct — no changes needed.** `assign_daily_batches` (00:05 UTC) only pulls New leads from the pool, so actioned leads never resurface in the morning batch. **UI changes:** `CallModal.jsx` — Follow-Up status note updated to "Stays in your list today — returns to New on your chosen date". `MyLeads.jsx` — added `newCount` memo, `dayComplete` state, and a Complete Day empty state for the New filter tab when all leads are actioned: shows a checkmark + "All N leads worked" + green "Complete Day" button; clicking transitions to a "Day complete!" 🎉 state. Migration 044 needs to be applied via SQL editor before behavior changes in prod. Build clean.
-
-**⚠️ MIGRATION 044 NEEDS APPLYING** — `supabase/migrations/044_keep_batch_date_intraday.sql` committed but NOT yet applied to prod. Apply via Supabase SQL editor (the single `create or replace function handle_lead_pipeline()` block). Until applied, leads will still disappear mid-day in prod.
 
 ---
 
