@@ -16,9 +16,17 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–39 shipped — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–40 shipped — see [[Memories]] for the full trail.)*
 
 (Queue empty — see [[North Star]] Current Focus.)
+
+---
+
+### ✅ Prompt 40 SHIPPED 2026-06-22 (`f75911d`) — heatmap grid shrunk + centered, "Last 21 days" label added
+
+`src/pages/rep/MyStats.jsx`'s `CompletedDaysHeatmap`: header is now a flex row — "Completed Days" title on the left, a new muted "Last 21 days" label on the right (same slot the trend chip occupied before Prompt 39 removed it). Grid wrapper now has `width: '70%', margin: '4px auto 0'` so the week rows collectively take up 70% of the card and sit centered instead of full-width/left-aligned; individual cells are unchanged (`flex: 1`, `aspectRatio: '1'` from Prompts 38/39 still drive their sizing within the narrower wrapper). Build verified clean (`npm run build`, 1.71s).
+
+**Not live-verified** — no Chrome browser connected this session either (4th heatmap prompt in a row with this gap: 38, 39, 40 all build-only). Worth a single Chrome MCP catch-up pass across `/rep/stats` covering all three once a browser is reachable, rather than three separate passes.
 
 ---
 
