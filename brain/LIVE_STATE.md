@@ -63,9 +63,13 @@ Three files changed. **`useProfiles.js`**: `useCompletedDays` now parallel-fetch
 
 ---
 
-### ✅ Prompt 27 SHIPPED 2026-06-22 (`c2780d3`) — flowchart depth expanded, Full Script tab removed
+### ✅ Prompt 27 REBUILT 2026-06-22 (`609a97d`) — literal spoken lines + full recursive branching flowchart
 
-`ScriptFlowchart.jsx`: Added `getHighlights(steps)` (max 4 items, SAY_LIMIT = 2, excludes routes/subs) + `StepItem` component rendering action chips (`▸`), italic say lines, if/else fork nodes with option pills. Each branch card now shows a condensed step list between the trigger and the outcome badge, separated by thin dividers. `TrainingCenter.jsx`: removed `DISCOVERY_SCRIPT` from import, removed `{ key: 'full', label: 'Full script' }` from `SCRIPT_VIEWS`, removed `{view === 'full' && <FullScript />}` render, deleted the 110-line `FullScript` component, updated description copy to remove Full script mention. Build clean.
+**Problem 1 — literal spoken lines.** `discoveryScript.js` changes: (1) Branch A — removed `▸ You've got the decision-maker` directive (first spoken line is now "Awesome — so the reason I'm reaching out..."); (2) Branch B — added **⚡ CC DRAFT** spoken opening line `"Oh hey — is the owner or manager around? Just had a real quick question about how y'all handle phones right now."` before the fork, shortened coaching action to `▸ Keep it short and warm...`; (3) Branch C — simplified IF YES option from verbose routing note to clean `↳ IF YES: → run BRANCH A from the top.`; (4) Branch E — removed `Leave word for word:` meta intro, voicemail text is now the first step; (5) Close — restructured to proper `BRANCH — Did they ask about price?` fork with `↳ IF YES:` (spoken deflect) / `↳ IF NO:` (empty, advances), changed `↳ ONCE THEY PICK:` from a bad sub-marker to a `▸` action step.
+
+**⚠️ DRAFT FLAG:** The Branch B opening line is CC's best-attempt draft. All other script words are pre-existing — CC only restructured/removed directives. Brayden + Nate must review Branch B line before training reps.
+
+**Problem 2 — full recursive branching.** `ScriptFlowchart.jsx` full rewrite: `FlowStep` → `SayNode` / `ActionNode` / `RouteNode` / `ForkNode` recursive tree. Each `ForkNode` renders the if/else question + side-by-side option columns (each column recurses into `FlowStep` for its steps). `BranchColumn` renders the header card then the full flat `steps` array (forks expand in-place). `CloseColumn` renders the close header + its full step tree (including the price fork). Opener at top, 5-branch grid below, close at bottom — `overflowX: auto` wrapper handles narrow viewports. Every path is visible without expansion.
 
 ---
 
