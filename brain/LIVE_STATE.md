@@ -57,22 +57,11 @@ Three files changed. **`useProfiles.js`**: `useCompletedDays` now parallel-fetch
 
 ---
 
-### Prompt 28 — My Leads daily behavior redesign (2026-06-21)
+### ✅ Prompt 28 SHIPPED 2026-06-22 (`8d30ee5`) — leads stay visible all day + Complete Day button
 
-**Decision (Brayden, 2026-06-21):** Leads stay visible all day regardless of status — reps can always change a status they logged by mistake. Overnight, ALL leads that have any status (Appointment Booked, Not Interested, No Answer, Follow-Up) leave the daily batch and go to the pipeline. The ONLY leads that carry forward to the next day are uncalled New leads — they roll over and the batch tops back up to 150 from the unassigned pool.
+**Root cause:** `handle_lead_pipeline` trigger (migration 020) was doing `new.batch_date := null` immediately for Not Interested and Follow-Up → leads vanished from `useMyLeads` (`batch_date = today` filter) the moment a rep committed those statuses. No Answer already had batch_date kept (fixed in 020); Appointment Booked never had this issue. **Fix:** migration 044 — `create or replace function handle_lead_pipeline()` removing the two `batch_date := null` assignments for Not Interested and Follow-Up. Follow-up queue is still populated (for the overnight return routing); EOD sweep at 23:55 UTC already handles nulling batch_date for both statuses overnight. **Overnight logic verified correct — no changes needed.** `assign_daily_batches` (00:05 UTC) only pulls New leads from the pool, so actioned leads never resurface in the morning batch. **UI changes:** `CallModal.jsx` — Follow-Up status note updated to "Stays in your list today — returns to New on your chosen date". `MyLeads.jsx` — added `newCount` memo, `dayComplete` state, and a Complete Day empty state for the New filter tab when all leads are actioned: shows a checkmark + "All N leads worked" + green "Complete Day" button; clicking transitions to a "Day complete!" 🎉 state. Migration 044 needs to be applied via SQL editor before behavior changes in prod. Build clean.
 
-**"Complete Day" button:** When every lead in the batch has been actioned (New count = 0), the lead list box stays on screen but is empty, with a "Complete Day" button centered inside it. Clicking it confirms the day is done. If they don't finish, the overnight reset handles it automatically — no button needed.
-
-**Current behavior vs desired:**
-- Current: leads may disappear from the list immediately on status change — WRONG
-- Desired: leads stay in the list all day, status badge updates in place, rep can change status any time during the day
-
-Steps:
-1. Recon: find the My Leads query/hook (likely `useLeads` or similar) and the Call Now modal's status-commit logic. Understand exactly what triggers a lead to leave the list today.
-2. Fix the My Leads query to show ALL leads with `batch_date = CURRENT_DATE AND assigned_rep_id = rep.id` regardless of status — no status filter that removes them mid-day.
-3. When New count hits 0: show "Complete Day" button centered in the (now empty-of-New) lead list area. Clicking it can be a no-op for now (just a visual confirmation) or can log a completion event — use your judgment.
-4. Confirm the existing overnight logic (EOD sweep cron at 23:55 UTC + assign_daily_batches at 00:05 UTC) correctly handles the reset: actioned leads go to pipeline, New uncalled leads roll over, pool tops up to 150. If it already works correctly, no changes needed — just confirm and note.
-5. Build verify, commit + push, log to [[Memories]], delete this block.
+**⚠️ MIGRATION 044 NEEDS APPLYING** — `supabase/migrations/044_keep_batch_date_intraday.sql` committed but NOT yet applied to prod. Apply via Supabase SQL editor (the single `create or replace function handle_lead_pipeline()` block). Until applied, leads will still disappear mid-day in prod.
 
 ---
 
