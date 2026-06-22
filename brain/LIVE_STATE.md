@@ -51,18 +51,6 @@ Full prompt saved as artifact: `cc-prompt-2026-06-22-prompt26-fix.md` in the Ohv
 
 ---
 
-### Prompt 31 — Commission copy, Goals cleanup, Activity timestamps (2026-06-21)
-
-**Changes (Brayden, 2026-06-21):**
-
-1. **My Commissions subtitle:** change "50% of every setup fee — paid when the closer signs the client you booked" → "10% of every closed deal — paid when the closer signs the client you booked"
-2. **My Goals — monthly tab:** remove "Monthly Closes" metric/goal. Appointment setters don't control closes.
-3. **Activity page:** add timestamps to every activity item. Feed shows lead status changes only (calls/outcomes) — badges and messages are handled by the notification system (Prompt 32), not the activity feed.
-
-Steps: recon the relevant components, make all three changes, build verify, commit + push, log + delete this block.
-
----
-
 ### Prompt 30 — My Stats + My Goals UI updates (2026-06-21)
 
 **Definitions (Brayden, 2026-06-21):**
