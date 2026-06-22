@@ -16,19 +16,7 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-### Prompt 35 — fix Prompt 26 click-through: admin Booked tab rows don't open appointment card (2026-06-22)
-
-Full prompt saved as artifact: `cc-prompt-2026-06-22-prompt26-fix.md` in the Ohvara folder. Summary: Chrome re-verify (Eagle session, 2026-06-22) confirmed Prompt 34's `tz is not defined` fix is live — Booked tab loads clean, times render correctly in Central. But Prompt 26 click-through is still blocked: clicking a row in admin Pipeline → Booked tab does nothing — no appointment card opens, so "Open Dashboard →" can't be reached from that surface. Deployed bundle confirms the card component (minified `EX` in prod) exists and correctly builds `/preview/:appointmentId` links — it's just not wired to the Booked tab's row click. CC needs to: find the real component name, find where Booked tab rows render, wire up the click handler. Fix + push, no Chrome reverify needed beyond a quick manual click-through after.
-
-*(Prompt 1 + Prompt 2 shipped 2026-06-19. Prompt 3's decision is now made — see queue below. CC: execute top to bottom, one step at a time if Brayden says "run next step," logging + deleting each as it completes.)*
-
-*(Prompts 5–17 shipped + live-verified 2026-06-20 — see [[Memories]] for the full build + verify trail.)*
-
-*(Prompt 32 SHIPPED 2026-06-22 (`a048974`) — see [[Memories]] for detail.)*
-
-### ✅ Prompt 26 FULLY CLOSED 2026-06-22 (`ddd24fa`) — Booked tab rows now open appointment card
-
-`/preview/:appointmentId` lives in `ohvara-dashboard` as a public route (ported `adc4ba4`). Admin Pipeline → Booked tab rows now render `AppointmentCard` — clicking opens the full modal with "Open Dashboard →" linking to `/preview/:appointmentId`. `useBooked()` query expanded to full field set. **Pending final verify (needs browser):** admin → Pipeline → Booked tab → click row → card opens → "Open Dashboard →" → preview renders real numbers. Full detail: [[Memories]] 2026-06-22 entry.
+*(Prompts 1, 2, 5–17, 26, 28–35 shipped — see [[Memories]] for the full trail.)*
 
 ---
 
@@ -75,17 +63,9 @@ Three files changed. **`useProfiles.js`**: `useCompletedDays` now parallel-fetch
 
 ---
 
-### Prompt 27 — Training Center flowchart: expand depth + remove Full Script tab (2026-06-21)
+### ✅ Prompt 27 SHIPPED 2026-06-22 (`c2780d3`) — flowchart depth expanded, Full Script tab removed
 
-**Decision (Brayden, 2026-06-21):** The flowchart currently only shows the opener + 5 top-level branches. Brayden wants it expanded to show the full depth of the decision tree — what happens at each step AFTER the opener routes to a branch. Brayden and Nate will tweak wording after; just make your best attempt from the existing `discoveryScript.js` content.
-
-Steps:
-1. **Recon:** Read `src/lib/discoveryScript.js` — get the full script content including all branches, sub-steps, and their text/actions.
-2. **Expand the flowchart component** (`buildScriptFlow()` or wherever the flowchart tree is built) to render sub-steps under each branch. For each of the 5 branches, show the next 2-3 steps in the path — e.g. Owner path: opener → owner answer → discovery questions → hand to Nate. Use your best judgment from the script content. Brayden and Nate will adjust wording afterward.
-3. **Remove the "Full script" tab** from the Training Center script section. Only Flowchart and Practice tabs remain.
-4. Build verify — no errors.
-5. Commit + push to ohvara-dashboard master.
-6. Log to [[Memories]] + delete this block from LIVE_STATE.
+`ScriptFlowchart.jsx`: Added `getHighlights(steps)` (max 4 items, SAY_LIMIT = 2, excludes routes/subs) + `StepItem` component rendering action chips (`▸`), italic say lines, if/else fork nodes with option pills. Each branch card now shows a condensed step list between the trigger and the outcome badge, separated by thin dividers. `TrainingCenter.jsx`: removed `DISCOVERY_SCRIPT` from import, removed `{ key: 'full', label: 'Full script' }` from `SCRIPT_VIEWS`, removed `{view === 'full' && <FullScript />}` render, deleted the 110-line `FullScript` component, updated description copy to remove Full script mention. Build clean.
 
 ---
 
