@@ -16,7 +16,11 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–41 shipped — Prompt 42 BLOCKED, not shipped — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–41, 43 shipped — Prompt 42 BLOCKED, not shipped — see [[Memories]] for the full trail.)*
+
+(Queue empty — see [[North Star]] Current Focus.)
+
+---
 
 ### ⛔ Prompt 42 BLOCKED 2026-06-22 — conflicting claims about the live cron schedule, could not verify either way
 
@@ -30,33 +34,22 @@ CC's own auto-mode classifier blocked both edits (the `MyLeads.jsx` constant cha
 
 ---
 
-### Prompt 43 — Rep notification bell: panel fix + full notification triggers (queued 2026-06-22, Falcon)
+### ✅ Prompt 43 SHIPPED 2026-06-22 (`f475566`) — bell panel positioning fixed, follow-up notifier upgraded, deal-closed trigger added (migration 047 pending apply)
 
-**Context:** Migration 043 (`rep_notifications` table) is live and was originally built for the admin bell. The rep dashboard bell icon exists but its panel opens incorrectly (covers the nav instead of opening to the right). No notification triggers are wired for reps yet.
+**Recon found the prompt's premise was significantly stale — most of Change 2 already existed from Prompt 32, not net-new.** Before writing any code: read `RepNotificationBell.jsx`, `useRepNotificationTriggers.js`, `useNotifications.js`, migration 043, `useMessages.js`, and the closer-side `AppointmentCard.jsx`. Findings:
+- There is no separate `rep_notifications` table (the prompt's "Context" line was wrong) — migration 043 extended the existing shared `notifications` table (from migration 012) with a `profile_id` column, scoped via RLS.
+- **Badge-unlock notifications already exist and work** (`useBadgeNotifier`, Prompt 32) — no change needed.
+- **"New message received" already fully covered** — reps only ever message Brayden/Nate and receive a reply on the same row (no separate inbound-message path exists per `useMessages.js`), and migration 043 already has a `notify_rep_on_message_reply` DB trigger firing on exactly that. No change needed.
+- **Follow-up reminders existed but as a single 30-minute window**, not the three-threshold (60m/10m/1m) version this prompt asked for — this was the one real upgrade needed in Change 2.
+- **"Appointment closed by Nate" had no trigger at all** — the only genuinely new piece. Closer-side `handleComplete()` in `AppointmentCard.jsx` sets `status:'completed', outcome:'closed'` via a generic `useUpdateAppointment` mutation; a client-side insert into another rep's `notifications` row from Nate's session would be blocked by RLS (`profile_id = auth.uid()`), so this had to be a `SECURITY DEFINER` DB trigger — same pattern as the existing message-reply trigger.
+- **Panel positioning bug confirmed real** (not stale): the bell sits inside the narrow left sidebar (`Sidebar.jsx`); the dropdown was anchored `right: 0` relative to the bell's own small wrapper, so the 340px panel extended *leftward* over the nav instead of right into the main content area. Admin's `NotificationBell.jsx` has the exact same positioning code and likely the same bug, but is out of scope for this prompt — flagged separately, not fixed here.
+- Empty state, mark-as-read, and unread-count display were all already present and matched what Change 3 asked for — no changes needed there.
 
-**Change 1 — Fix panel positioning:**
-The notification panel should open to the RIGHT side of the bell icon, not over the nav. Recon the current bell component and fix its positioning so it appears as a dropdown/popover anchored to the right. When empty, show a simple "No notifications" empty state inside the panel.
+**Shipped:** (1) `RepNotificationBell.jsx` dropdown repositioned to `top: -4, left: 'calc(100% + 8px)'` so it opens beside the bell into the page area instead of below-left over the nav; added a `deal_closed` icon style (`DollarSign`, success color). (2) `useFollowUpNotifier` rewritten for 3 independent thresholds — dedup key is now `${leadId}:${threshold}` instead of just `leadId`, so 60m/10m/1m each fire their own notification instead of the first one blocking the rest; still relies on the existing 15s `useRepNotifications` poll to re-evaluate (no new timer). (3) New migration 047 (`notify_rep_on_deal_closed` trigger on `appointments` UPDATE, fires when `status='completed' AND outcome='closed'`, looks up the lead's `business_name` and inserts a `deal_closed` notification for `NEW.rep_id`) — **written, NOT yet applied**, same SQL-editor-only pattern as 040–046.
 
-**Change 2 — Wire notification triggers (insert rows into `rep_notifications` for the authed rep):**
+Build verified clean (`npm run build`, 1.81s). **Not live-verified** — no Chrome browser connected this session (6th prompt in a row with this gap).
 
-- **Follow-up reminders:** 60 min, 10 min, and 1 min before each lead's `follow_up_at`. Reuse the existing `follow_up_at` field (mig 017). The existing toast reminder system (ships ~5 min before) already runs client-side on a tick — extend it to also insert a notification row at each of the three thresholds (60m, 10m, 1m) if one doesn't already exist for that lead+threshold combo (dedup to avoid repeat inserts on re-render).
-
-- **New message received:** When a new message arrives in the rep's inbox (recipient = rep's user id), insert a notification. Recon how the Messages page polls for new messages and hook into that.
-
-- **Appointment closed by Nate:** When one of the rep's booked appointments gets its status updated to closed/won by the closer, insert a notification for the rep. Recon `appointments` table — find the closer-update path and hook a notification insert there (or a DB trigger if cleaner).
-
-- **Milestone badge unlocked:** When `useBadgeActivity` detects a newly-earned badge (one that wasn't earned before), insert a notification. Recon the badge hook to find where earned state is computed.
-
-**Change 3 — Panel display:**
-Each notification row in the panel shows: icon (type-appropriate), short description, timestamp. Mark-as-read on click (already exists from admin side — reuse same pattern). Unread count badge on the bell icon.
-
-**Recon-first:** read the existing bell/notification component for admin, `rep_notifications` table schema, and the follow-up toast system before writing any code.
-
-**Verify:** Chrome MCP — open bell, confirm panel opens right, empty state shows. Then trigger a test notification (easiest: manually insert a row via Supabase) and confirm it appears.
-
----
-
-(Queue empty after Prompt 43 — see [[North Star]] Current Focus.)
+**Spotted but out of scope (not fixed):** admin's `NotificationBell.jsx` almost certainly has the identical panel-positioning bug (same code pattern, same narrow-sidebar placement) — worth a follow-up prompt if Brayden wants it fixed too.
 
 ---
 
@@ -116,7 +109,7 @@ Both pipeline crons rescheduled to 1 AM Central reset (works across all US timez
 
 ---
 
-### Migration status — 040–044 applied ✅, 045–046 committed/pending apply
+### Migration status — 040–044, 046 applied ✅, 045 + 047 committed/pending apply
 
 - **040 / niche-even distribution** — ✅ applied 2026-06-21 via SQL editor, `assign_daily_batches` function replaced in prod.
 - **041 / rep_credentials** — ✅ applied 2026-06-21 via SQL editor, table + RLS policies + index all live.
@@ -125,8 +118,9 @@ Both pipeline crons rescheduled to 1 AM Central reset (works across all US timez
 - **044 / keep_batch_date_intraday** — ✅ applied 2026-06-22 via SQL editor. `handle_lead_pipeline()` trigger updated — Not Interested and Follow-Up no longer null `batch_date` intraday; leads stay visible all day.
 - **045 / profiles.phone** — committed (`252ad1d`), NOT yet applied. Needed for Prompt 29's Twilio bridge call recording (still dormant — also needs Twilio secrets + per-rep phone numbers, see Prompt 29 entry below).
 - **046 / tighten_pass3_exclusions** — ✅ applied 2026-06-22 via SQL editor. `assign_daily_batches` PASS 3 fallback now also excludes `No Answer`/`Follow-Up` from early resurfacing (Prompt 37, speculative fix for Prompt 36's batch-reset bug).
+- **047 / notify_rep_on_deal_closed** — committed (`f475566`), NOT yet applied. New `SECURITY DEFINER` trigger on `appointments` UPDATE — when a closer marks a deal `status='completed'/outcome='closed'`, inserts a `deal_closed` notification for the rep who booked it (Prompt 43).
 
-**⚠️ DO NOT run `supabase db push`** for any of these — 040–044 were applied outside Supabase's migration tracking, so `db push` would try to re-run them and fail. 045 and 046 are written the same way and must be applied the same way (SQL editor, one-off).
+**⚠️ DO NOT run `supabase db push`** for any of these — 040–044 were applied outside Supabase's migration tracking, so `db push` would try to re-run them and fail. 045 and 047 are written the same way and must be applied the same way (SQL editor, one-off).
 
 ---
 
