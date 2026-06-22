@@ -24,6 +24,17 @@ tags:
 
 ---
 
+### Two migrations committed, NEITHER applied to prod yet (Prompts 22 + 23, re-flagged 2026-06-21 — this tracking note had dropped out of LIVE_STATE between turns, restoring it)
+
+Both are now safely in git history on `ohvara-dashboard` master — only the actual `CREATE OR REPLACE` / `CREATE TABLE` against the live database remains, and every attempt to run that from this CLI session hits the same recurring auto-mode credential-classifier lockout (5th+ occurrence this session alone — see [[Memories]] entries for Prompts 9/18b/24/22/23).
+
+1. **`040_niche_even_distribution.sql`** (`bc2abb5`) — niche-partitioned round-robin (Prompt 22). Logic verified by read, never tested live.
+2. **`041_rep_credentials.sql`** (`108a913`) — `rep_credentials` table for admin login lookup (Prompt 23). Application code (edge fn upsert, admin UI) is already shipped and depends on this table existing.
+
+**To clear:** Brayden runs `supabase db push --project-ref jjextitmbptoaolacocs` (or applies both files via the Supabase dashboard SQL editor) from a terminal/session he controls, then tells CC "migrations applied" so CC can run the verification steps for both and close them out for good.
+
+---
+
 
 ### Prompt 19 — automation-stack-builder Phase 1: registry recon + schema (2026-06-20, PARKED — 2026-06-21)
 
