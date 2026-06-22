@@ -39,23 +39,11 @@ tags:
 
 ---
 
-### ⚠️ Prompt 33 SHIPPED 2026-06-22 (`07adb84`) — timezone support — LIVE-VERIFIED PARTIAL, 1 BUG OPEN
+### ⚠️ Prompt 33 SHIPPED 2026-06-22 (`07adb84`) — timezone support — BUG FIXED (`9e71bf4`), PENDING FINAL CHROME VERIFY
 
 `src/lib/timezones.js` (new): 50-state IANA lookup, `zonedTimeToUtcIso`/`utcIsoToZonedDatetimeLocal` conversion helpers (unit-tested against known DST offsets before commit), `formatInTimezone` display formatter. Setter's booking input (`CallModal.jsx`) and Nate's reschedule input (`AppointmentCard.jsx`) now interpret the typed time as the LEAD's inferred local time (from `lead.state`), not the typist's browser timezone — this also fixed a pre-existing bug where `AppointmentCard.jsx` displayed the edit field in UTC but saved it as browser-local (two different assumptions for the same field). All appointment-time displays (`AppointmentCard`, `CloserPipeline`, admin `Overview`, admin `LeadPipeline`) now format in the VIEWING user's own `profile.timezone`. Admin create-user form has a timezone Select; `admin-create-user` edge fn stores it non-fatally. **Migration 042 applied 2026-06-22 via SQL editor — `profiles.timezone` column is live.**
 
-**🔴 LIVE-VERIFIED 2026-06-22 via Claude in Chrome (separate Chrome-profile session, see [[Gotchas]] for the account-binding context):** 5 of 6 surfaces PASS — `AppointmentCard` reschedule input, `CallModal` booking input, `CloserPipeline` list, admin `Overview` Recent Bookings, and the admin create-user timezone Select all correctly show/convert times in the lead's local tz (input) or viewer's `profile.timezone` (display). **1 surface FAILS: admin `LeadPipeline` "Booked" tab crashes with `ReferenceError: tz is not defined`** in the `renderRow` function (minified as `LZ` in the built bundle, `index-CjLsqY1W.js` ~line 116/pos 10809) — `tz` (viewer's `profile.timezone`) isn't captured in that closure. **This same bug blocks Prompt 26's click-through verification too** (admin can't open the Booked tab to click "Open Dashboard →" on a card). **NEXT FIX NEEDED:** find `renderRow`/the Booked-tab row renderer in `LeadPipeline.jsx` (or wherever it lives pre-minification) and pass `profile.timezone` into its closure/props — same pattern already working in the other 5 surfaces. Re-run the Chrome verification prompt after the fix to confirm both Prompt 33 and Prompt 26 close out. Full verification report: [[Memories]] 2026-06-22 entry.
-
----
-
-### 🔴 Prompt 34 — URGENT bug fix: `tz is not defined` crashes admin Booked tab (2026-06-22, found during Chrome verification — JUMP THIS TO TOP OF QUEUE)
-
-Found live-verifying Prompts 26 + 33 (see those entries above for full repro). Admin `LeadPipeline` "Booked" tab throws `ReferenceError: tz is not defined` in its row-render function — `profile.timezone` isn't captured in that closure, unlike the 5 other surfaces that already handle it correctly. This single bug currently blocks: (a) Prompt 33 from being marked fully live, (b) Prompt 26's click-through verification (admin can't reach the appointment card to click "Open Dashboard →").
-
-Steps:
-1. Find the Booked-tab row renderer in `LeadPipeline.jsx` (admin) — minified bundle reference: `index-CjLsqY1W.js`, `renderRow`/`LZ`, ~pos 10809.
-2. Pass the viewer's `profile.timezone` into that render function/closure the same way it's already wired into `AppointmentCard`/`CloserPipeline`/admin `Overview`.
-3. Build verify, commit + push.
-4. Log to [[Memories]] + delete this block. Then flag for a re-run of the Chrome verification pass to confirm Prompt 26 + 33 both close out fully live.
+**🟡 LIVE-VERIFIED 2026-06-22 via Claude in Chrome:** 5 of 6 surfaces passed. 1 crash (`tz is not defined` in `BookedTab`) fixed in `9e71bf4` (2-line prop-pass fix). **Pending:** one more Chrome re-verify pass on the Booked tab to confirm Prompt 33 fully live and Prompt 26 click-through unblocked. Next person with browser: open admin → Pipeline → Booked tab (should load without crash) → click "Open Dashboard →" on any appointment card (Prompt 26 verify).
 
 ---
 
