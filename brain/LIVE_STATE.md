@@ -16,52 +16,35 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–36 shipped — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–37 shipped — see [[Memories]] for the full trail.)*
 
-### Prompt 37 — Tighten PASS 3 exclusion list in assign_daily_batches (queued 2026-06-22, Falcon)
-
-**Context:** Prompt 36 identified a latent gap in `assign_daily_batches` (migration 040, live version): PASS 3's "FINAL GUARANTEE" fallback only excludes `Not Interested` and `Appointment Booked` from resurfacing — meaning it can pull a rep's own `No Answer`/`Follow-Up` leads back into today's batch ahead of their dedicated 4h/24h requeue timers (migrations 017/019/025). Brayden chose option B: ship the code fix speculatively, verify behaviorally at next day-rollover.
-
-**Task:**
-1. Recon-first: read the live `assign_daily_batches` function in the dashboard repo (the migration 040 version — confirmed live per LIVE_STATE migration-status block). Find the PASS 3 `WHERE` clause that currently excludes `Not Interested` and `Appointment Booked`.
-2. Write migration 046 (`046_tighten_pass3_exclusions.sql`) — a `CREATE OR REPLACE FUNCTION assign_daily_batches()` with PASS 3's exclusion list expanded to also exclude `No Answer` and `Follow-Up`. Everything else in the function is **unchanged**.
-3. Commit the migration file to `ohvara-dashboard`. Do NOT apply it — same SQL-editor apply pattern as 040–044.
-4. Add a note to LIVE_STATE migration-status block: "046 — committed, needs SQL editor apply."
-5. Update Prompt 36's LIVE_STATE entry: mark it fully resolved (the header bug is shipped, the PASS 3 fix is shipped as 046). Clear Prompt 36 from the queue and log both to Memories.
-
-**Verify:** build clean (`npm run build`). No behavior change visible until Brayden applies the migration — that's expected and fine.
+(Queue empty — see [[North Star]] Current Focus.)
 
 ---
 
-### Prompt 36 — BUG: My Leads stuck at 53/53, not resetting to 150/day (queued 2026-06-22, Eagle) — PARTIALLY SHIPPED, BLOCKED on deeper fix
+### ✅ Prompt 36 + 37 SHIPPED 2026-06-22 — My Leads batch-reset bug: header fixed + PASS 3 hardened (migration 046 pending apply)
 
-**⚠️ The referenced prompt file `cc-prompt-2026-06-22-leads-not-resetting.md` does NOT exist in the vault** — never saved, despite LIVE_STATE pointing to it. CC did the recon directly against the dashboard repo instead.
+**Prompt 36 (header bug, confirmed + fixed, `38e73ba`):** `MyLeads.jsx`'s top bar hardcoded the literal text `150` regardless of actual batch size — now renders `kpis.total`, the real fetched-lead count. This alone explains "header says 150, body says 53" in Brayden's screenshot.
 
-**Shipped (`38e73ba`):** `MyLeads.jsx` header hardcoded the literal text `150` regardless of actual batch size — fixed to render `kpis.total` (the real fetched-lead count). This was a confirmed, code-certain bug contributing to the "header says 150 but body shows 53" confusion in Brayden's screenshot. Build clean, pushed.
+**Deeper rotation root cause was never confirmed** — blocked on prod DB read access (auto-mode classifier denial, no Chrome browser connected this session; see [[Memories]] 2026-06-22 entry for the full blocker writeup). Brayden chose **option B**: ship the most credible code hardening speculatively rather than wait on the permission fix.
 
-**Root cause of the deeper "not resetting to a fresh 150" symptom — NOT CONFIRMED, blocked.** Code review of `assign_daily_batches` (migration 040, the live version) shows the rotation logic itself is sound: PASS 1 rolls each rep's own stale `New` leads forward, PASS 2 deals the unassigned pool round-robin per niche, PASS 3 tops up from the rep's own non-(`Not Interested`/`Appointment Booked`) leads as a last resort, then trims excess. Two real candidates, unconfirmed without live data:
-1. **Data exhaustion, not a logic bug** — the unassigned `New` pool may simply be smaller than 150 right now (the 147-lead Prompt-28 load is the only real-lead source ever added; days of test-rep churn may have consumed most of it), so 53 could be the legitimate ceiling given current pool size — not a rotation failure.
-2. **PASS 3's "FINAL GUARANTEE" fallback** only excludes `Not Interested` and `Appointment Booked` from re-surfacing — it can pull a rep's own `No Answer`/`Follow-Up` leads back into today's batch ahead of their dedicated 4h/24h requeue timers (migrations 017/019/025), which could explain stale-looking rows reappearing out of cadence.
+**Prompt 37 (speculative hardening, `41564ed`, migration 046, NOT yet applied):** `assign_daily_batches`'s PASS 3 "FINAL GUARANTEE" fallback previously only excluded `Not Interested`/`Appointment Booked` from resurfacing when a rep's batch was short — meaning it could pull `No Answer`/`Follow-Up` leads back into today's batch ahead of their own dedicated 4h/24h requeue timers (migrations 017/019/025). Migration 046 adds both to the exclusion list; no other logic changed (PASS 1/PASS 2/trim are byte-identical to 040). Build clean.
 
-**Blocked:** confirming which of these (or something else) is the actual cause requires reading live `leads` rows (status/batch_date) for the test rep. The auto-mode credential classifier denied a read-only diagnostic script against prod ("explicit user approval naming that production target" needed) — same recurring block class as Prompts 9/18b/22/24. No Chrome browser was connected this session (`list_connected_browsers` → empty), so the usual workaround (SQL editor via Claude in Chrome, used for migrations 031/032) wasn't available either.
-
-**Two options for Brayden (per standing rule — CC never asks you to run SQL/terminal manually):**
-- **(A, recommended)** Add a Bash permission rule allowing read-only Supabase REST queries against this project (durably unblocks this whole recurring classifier-block class, not just this task).
-- **(B)** Leave it blocked for now — CC ships best-guess code fixes (e.g. tightening PASS 3's exclusion list) without live confirmation, and you verify behaviorally by watching the test rep's batch over the next day-rollover.
-
-Queue stays open until one of these resolves.
+**Still open / not excluded by this fix:** the unassigned `New` pool may simply be smaller than 150 right now (the 147-lead Prompt-28 load is the only real-lead source ever added) — if so, 53 could be a legitimate data ceiling, not a logic bug, and would persist even after 046 is applied. No way to confirm without live data or more seed leads. Watch behaviorally at the next day-rollover after 046 is applied.
 
 ---
 
-### Migration status — 040–044 applied ✅
+### Migration status — 040–044 applied ✅, 045–046 committed/pending apply
 
 - **040 / niche-even distribution** — ✅ applied 2026-06-21 via SQL editor, `assign_daily_batches` function replaced in prod.
 - **041 / rep_credentials** — ✅ applied 2026-06-21 via SQL editor, table + RLS policies + index all live.
 - **042 / profiles.timezone** — ✅ applied 2026-06-22 via SQL editor. `profiles.timezone` column live (`text NOT NULL DEFAULT 'America/Chicago'`).
 - **043 / rep_notifications** — ✅ applied + live-verified 2026-06-22 via Chrome click-through (admin bell badge/panel/mark-as-read confirmed).
 - **044 / keep_batch_date_intraday** — ✅ applied 2026-06-22 via SQL editor. `handle_lead_pipeline()` trigger updated — Not Interested and Follow-Up no longer null `batch_date` intraday; leads stay visible all day.
+- **045 / profiles.phone** — committed (`252ad1d`), NOT yet applied. Needed for Prompt 29's Twilio bridge call recording (still dormant — also needs Twilio secrets + per-rep phone numbers, see Prompt 29 entry below).
+- **046 / tighten_pass3_exclusions** — committed (`41564ed`), NOT yet applied. `assign_daily_batches` PASS 3 fallback now also excludes `No Answer`/`Follow-Up` from early resurfacing (Prompt 37, speculative fix for Prompt 36's batch-reset bug — see Problems & Resolutions below).
 
-**⚠️ DO NOT run `supabase db push`** for any of these — 040–044 were applied outside Supabase's migration tracking, so `db push` would try to re-run them and fail.
+**⚠️ DO NOT run `supabase db push`** for any of these — 040–044 were applied outside Supabase's migration tracking, so `db push` would try to re-run them and fail. 045 and 046 are written the same way and must be applied the same way (SQL editor, one-off).
 
 ---
 
