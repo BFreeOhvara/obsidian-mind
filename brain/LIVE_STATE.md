@@ -20,6 +20,8 @@ tags:
 
 *(Prompts 5–17 shipped + live-verified 2026-06-20 — see [[Memories]] for the full build + verify trail.)*
 
+*(Prompt 32 SHIPPED 2026-06-22 (`a048974`) — see [[Memories]] for detail.)*
+
 ### ✅ Prompt 26 SHIPPED 2026-06-21 (`adc4ba4`) — client preview merged into ohvara-dashboard, client-portal repo abandoned
 
 `/preview/:appointmentId` ported into `ohvara-dashboard/src/pages/ClientPreview.jsx` (public route, no auth guard), `AppointmentCard.jsx`'s "Open Dashboard →" now a same-origin relative link (no more dead `VITE_CLIENT_PORTAL_URL`/`ohvara-client-portal.vercel.app`). Build clean, pushed. **Supersedes Prompt 18b entirely** — the separate `ohvara-client-portal` repo (local-only, stuck at `49c27e0`) can be ignored; that whole dead-PAT push thread is moot now. **One gap remains:** Chrome MCP still unreachable from CLI (`list_connected_browsers: []`, standing gap every session) — verified functionally instead (curl'd `get-demo-preview` directly, got a correct structured 404 for a fake id, confirming the fn parses/queries correctly) but never click-through-tested with a REAL appointment's demo data in an actual browser. **Next person with browser access:** open `/admin` → any appointment card → "Open Dashboard →" → confirm the preview renders real numbers, not just that it doesn't error. Full detail: [[Memories]] 2026-06-21 entry.
@@ -31,27 +33,15 @@ tags:
 - **040 / niche-even distribution** — ✅ applied 2026-06-21 via SQL editor, `assign_daily_batches` function replaced in prod.
 - **041 / rep_credentials** — ✅ applied 2026-06-21 via SQL editor, table + RLS policies + index all live.
 - **042 / profiles.timezone** — ✅ applied 2026-06-22 via SQL editor. `profiles.timezone` column live (`text NOT NULL DEFAULT 'America/Chicago'`). Prompt 33 fully complete.
+- **043 / rep_notifications** — ⏳ COMMITTED (`a048974`), NOT YET APPLIED. Brayden must run via SQL editor before the rep bell shows notifications. Adds `profile_id` + `badge_id` to `notifications`, rep RLS, DB trigger for message reply.
 
-**⚠️ DO NOT run `supabase db push`** for any of these — 040/041/042 were applied outside Supabase's migration tracking, so `db push` would try to re-run them and fail.
+**⚠️ DO NOT run `supabase db push`** for any of these — 040/041/042/043 were applied or need to be applied outside Supabase's migration tracking, so `db push` would try to re-run them and fail.
 
 ---
 
 ### ✅ Prompt 33 SHIPPED + FULLY LIVE 2026-06-22 (`07adb84`) — timezone support
 
 `src/lib/timezones.js` (new): 50-state IANA lookup, `zonedTimeToUtcIso`/`utcIsoToZonedDatetimeLocal` conversion helpers (unit-tested against known DST offsets before commit), `formatInTimezone` display formatter. Setter's booking input (`CallModal.jsx`) and Nate's reschedule input (`AppointmentCard.jsx`) now interpret the typed time as the LEAD's inferred local time (from `lead.state`), not the typist's browser timezone — this also fixed a pre-existing bug where `AppointmentCard.jsx` displayed the edit field in UTC but saved it as browser-local (two different assumptions for the same field). All appointment-time displays (`AppointmentCard`, `CloserPipeline`, admin `Overview`, admin `LeadPipeline`) now format in the VIEWING user's own `profile.timezone`. Admin create-user form has a timezone Select; `admin-create-user` edge fn stores it non-fatally. **Migration 042 applied 2026-06-22 via SQL editor — `profiles.timezone` column is live.** No live browser verification (Chrome MCP unreachable from CLI, standing gap). Full detail: [[Memories]] 2026-06-22 entry.
-
----
-
-### Prompt 32 — In-dashboard notification system (2026-06-21)
-
-**Decision (Brayden, 2026-06-21):** Reps get real-time in-dashboard notifications for: new message received, badge unlocked, follow-up due soon. Bell icon in nav with unread count badge. Clicking opens a notification panel/dropdown. Notifications should persist (not just toast) so reps can see what they missed.
-
-Steps:
-1. Recon: check if a `notifications` table exists. If not, design a simple schema: `id, profile_id, type (message|badge|follow_up), body text, read bool, created_at`.
-2. Migration if needed — apply via SQL editor (Brayden will run it), same pattern as 031/032.
-3. Bell icon in rep nav with unread count. Notification panel on click showing recent notifications, mark-as-read on open.
-4. Wire up triggers: (a) new message → insert notification row for recipient; (b) badge unlocked → insert notification; (c) follow-up due within 30 min → insert notification (can be done client-side on a timer or a DB trigger on the queue).
-5. Build verify, commit + push, log + delete this block.
 
 ---
 
