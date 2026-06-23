@@ -16,7 +16,7 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–41, 43, 44 (both fixes) shipped — Prompt 42 superseded by Fix 2 below — see [[Memories]] for the full trail. Prompts 45–46 still queued below, not started this session.)*
+*(Prompts 1, 2, 5–17, 26, 28–41, 43, 44, 45 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail. Prompt 46 still queued below.)*
 
 ### ✅ Prompt 44 SHIPPED 2026-06-22 (`c462476`, `52c2b99`) — both fixes complete
 
@@ -28,24 +28,17 @@ Both build-verified clean and pushed. **Not live-verified** — no Chrome browse
 
 ---
 
-### Prompt 45 — ScriptFlowchart redesign: separate fork boxes, spoken-only mid-flow, real back-reference lines (queued 2026-06-22, Falcon)
+### ✅ Prompt 45 SHIPPED 2026-06-22 (`6aa4016`) — flowchart redesign: separate fork boxes, terminal-only actions, real backref connectors
 
-**File:** `src/components/ScriptFlowchart.jsx` (or wherever the Training Center flowchart lives — recon first)
+**Recon:** `src/components/rep/ScriptFlowchart.jsx` (254 lines) + `buildScriptFlow()`/`DISCOVERY_SCRIPT` in `src/lib/discoveryScript.js` — confirmed only 2 actual back-references exist in the script data (both point to `branchA`, nested inside fork options in Branch B and Branch C — "run BRANCH A from the top"). All other routes target `close` (the natural forward funnel, left as the existing pill).
 
-**Context:** The flowchart renders the discovery script as a top-down decision tree. Three structural issues from Brayden's screenshot:
+**Change 1 (separate fork boxes):** `ForkNode`'s option columns previously shared ONE outer bordered container divided by a vertical border line. Now each option renders as its own fully separate card (own background/border/radius), laid out in a `gap`-separated row instead of border-divided columns.
 
-**Change 1 — If/else forks as separate boxes:**
-When a branch splits (e.g. "Transferring" vs "Not available"), each option must be its own distinct box — not combined or shown inline. The fork question sits above, then two separate boxes below it, one per path.
+**Change 2 (terminal-only actions):** new `visibleSteps(steps)` filter — `actions` only render if they're the literal last element of their own steps array (no further steps follow in that path). Applied at every level steps get mapped (branch top-level, close, and each fork option) so it's contextual per-path, not global. This is a display-only filter inside the flowchart component; the click-through `ScriptWalk` (live call modal) is untouched and still shows every step including mid-flow coaching actions, since a rep walking the call live still needs those — only the static flowchart view hides them.
 
-**Change 2 — Action/directive steps only at terminal nodes:**
-Mid-flow nodes should only show what the rep SAYS (spoken lines). Coaching actions (e.g. "Keep it short and warm", "Set status Not Interested", "Do not push, do not rebut") should only render when they are the LAST step in a branch (no further clicks possible). If an action step appears before another spoken line, hide it — the rep will figure out the action from context. This prevents reps from accidentally reading a directive out loud mid-call.
+**Change 3 (real backref connectors):** added a `useBackrefOverlay(containerRef)` hook (named as a hook since it's called directly, not via JSX) that collects two ref maps via a new `FlowRefsContext` — branch header boxes register as anchors (`registerBranchAnchor`), and `RouteNode` instances whose target `dest.kind === 'branch'` register as connector sources (`registerBackref`). A `useLayoutEffect` measures `getBoundingClientRect()` on both ends post-paint (recomputed on window resize) and renders an absolutely-positioned `<svg>` overlay with cubic-bezier paths + arrowhead markers connecting each backref source to its target branch's header — a genuine drawn line, not just the existing text pill (which is kept alongside it for clarity).
 
-**Change 3 — Back-references as real visual connections:**
-When a branch route points back to an existing node (e.g. "→ Owner / Decision-Maker"), render an actual curved arrow/line connecting back up to that node visually, like an org chart loop. Do not just render a text label — draw the connection.
-
-Recon `ScriptFlowchart.jsx` and `buildScriptFlow()` / `DISCOVERY_SCRIPT` structure before writing any code.
-
-**Verify:** Chrome MCP screenshot of Training Center flowchart tab as apex11.
+Build verified clean (`npx vite build`, 2.17s) AND linted clean (`npx eslint src/components/rep/ScriptFlowchart.jsx`, zero output). **Not live-verified** — no Chrome browser connected this session; this is the riskiest unverified prompt so far given the SVG-measurement complexity (ref timing, bezier curve placement, whether the overlay actually lines up visually) — strongly recommend an actual Chrome MCP pass on the Training Center flowchart tab before trusting this looks right, more so than the simpler heatmap/countdown prompts that preceded it.
 
 ---
 
