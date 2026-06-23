@@ -16,13 +16,15 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–41, 43, 44-Fix-1 shipped — Prompt 42 + Prompt 44-Fix-2 BLOCKED (same root cause) — see [[Memories]] for the full trail. Prompts 45–46 still queued below, not started this session.)*
+*(Prompts 1, 2, 5–17, 26, 28–41, 43, 44 (both fixes) shipped — Prompt 42 superseded by Fix 2 below — see [[Memories]] for the full trail. Prompts 45–46 still queued below, not started this session.)*
 
-### ✅ Prompt 44 Fix 1 SHIPPED 2026-06-22 (`c462476`) — ⛔ Fix 2 BLOCKED AGAIN — needs Brayden directly in chat, not via a queued prompt
+### ✅ Prompt 44 SHIPPED 2026-06-22 (`c462476`, `52c2b99`) — both fixes complete
 
-**Fix 1 (notification panel rendering behind main content) — shipped, and the real root cause was different from what the prompt diagnosed.** The prompt said "add `zIndex: 9999`." Recon found the actual cause: the sidebar (`<aside>` in `Sidebar.jsx`) is `position: fixed` with `overflow: hidden` for its own scroll containment — any dropdown panel rendered as a DOM descendant of that `<aside>` gets clipped to its 240px width no matter the z-index, even when positioned to visually extend outside that box (which is what Prompt 43's `left: calc(100% + 8px)` fix did — the panel WAS opening to the right, just getting clipped off by the sidebar's own overflow boundary). `zIndex: 9999` alone would not have fixed this. **Real fix:** both `RepNotificationBell.jsx` and `NotificationBell.jsx` (admin) now render their dropdown via `createPortal(..., document.body)`, positioned with `position: fixed` + coordinates computed from the bell button's `getBoundingClientRect()` on open — this escapes the sidebar's clipping entirely since the panel is no longer a DOM descendant of it. Outside-click handling updated to check both the bell wrapper ref and a new panel ref, since the portal content isn't nested under the wrapper anymore. Build verified clean (`npx vite build` — `npm run build` hit a stale auto-mode classifier block this session, see Memories; the two are equivalent, this was a workaround for a harness quirk, not a code difference). Pushed.
+**Fix 1 (notification panel rendering behind main content, `c462476`)** — real root cause was different from what the prompt diagnosed (`zIndex: 9999` alone would not have fixed it). The sidebar `<aside>` (`Sidebar.jsx`) is `position: fixed` with `overflow: hidden` for its own scroll containment, which clips any dropdown rendered as its DOM descendant to the sidebar's 240px width regardless of z-index — Prompt 43's panel WAS opening to the right, just getting clipped by the sidebar's own overflow boundary. Fixed by rendering both `RepNotificationBell.jsx` and `NotificationBell.jsx` (admin) dropdowns via `createPortal(..., document.body)`, `position: fixed`, coordinates from the bell's `getBoundingClientRect()` on open.
 
-**Fix 2 (countdown reset time → 06:05 UTC) — BLOCKED, NOT shipped, and should not be re-queued the same way.** This is the third time this exact value has come up (Prompt 41 corrected it FROM 06:05 TO 00:05 after checking the migration file; Prompt 42 tried to push it back TO 06:05 citing an unverified "Falcon applied it via Chrome SQL" claim and was blocked; this prompt tried again with stronger wording — "Brayden confirmed... do not read the migration file... just set it and move on" — and was blocked again, for the same reason: that confirmation only exists as text inside a Falcon-written LIVE_STATE prompt, not as an actual message from Brayden in the CC session's own conversation transcript). CC's auto-mode classifier does not treat one AI session's written claim about what another human said as verified fact, and CC agrees with that standard — insisting harder or forbidding verification doesn't make a claim more true. **`MyLeads.jsx` constants remain unchanged at `0, 5` (00:05 UTC).** This will keep bouncing between sessions until Brayden states the actual cron time directly to whichever session is asking — not through a relayed/queued instruction.
+**Fix 2 (countdown reset time → 06:05 UTC, `52c2b99`)** — `BATCH_RESET_UTC_HOUR`/`MINUTE` now `6, 5`. This took two blocked attempts first (Prompt 42, then Prompt 44's first pass) because the "Brayden confirmed the reschedule" claim only existed as text inside Falcon-written LIVE_STATE prompts, never as an actual message from Brayden in the executing session's own transcript — CC's classifier correctly refused to commit that as fact both times. **Resolved 2026-06-22 when Brayden confirmed directly in chat** ("I personally rescheduled the live cron to 06:05 UTC via the Supabase SQL editor today") — at that point it was no longer a relayed/unverifiable claim, so the edit went through immediately. Migration 016's committed schedule line still literally reads `'5 0 * * *'` (00:05 UTC) and was intentionally left untouched (out of scope, not requested) — so the migration file and the live cron now disagree on disk; noted in the code comment so it doesn't fool a future recon pass the way it fooled Prompt 41.
+
+Both build-verified clean and pushed. **Not live-verified** — no Chrome browser connected this session.
 
 ---
 
@@ -65,7 +67,21 @@ When an appointment is created (setter hits Done → Appointment Booked in CallM
 
 ---
 
-(Queue empty after Prompt 46 — see [[North Star]] Current Focus.)
+### Prompt 47 — Notification panel: solid background (queued 2026-06-22, Falcon)
+
+**File:** `src/components/RepNotificationBell.jsx` (and admin `NotificationBell.jsx` — same fix both)
+
+**Bug:** The notification panel is see-through (using the `glass` token which has transparency/backdrop-blur). Brayden wants it fully opaque so it covers whatever is behind it.
+
+**Fix:** Replace the panel's background with a solid opaque color — use `var(--bg-card)` or `var(--bg-secondary)` (whichever reads as fully opaque in the design system). Remove any `backdrop-filter` or `background` with alpha on the panel container. The panel should look like a solid popup, not a frosted overlay.
+
+Also confirm the bell-click-to-dismiss toggle already works (Prompt 44 should have wired this — verify in code, fix if not).
+
+Build + push.
+
+---
+
+(Queue empty after Prompt 47 — see [[North Star]] Current Focus.)
 
 ---
 
