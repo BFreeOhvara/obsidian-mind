@@ -16,7 +16,7 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–41, 43, 44, 45, 46 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail. Prompt 47 still queued below.)*
+*(Prompts 1, 2, 5–17, 26, 28–41, 43, 44, 45, 46, 47 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail. Prompt 48 still queued below.)*
 
 ### ✅ Prompt 44 SHIPPED 2026-06-22 (`c462476`, `52c2b99`) — both fixes complete
 
@@ -54,17 +54,13 @@ Build verified clean (`npx vite build`, 2.19s). Lint run on changed files — pr
 
 ---
 
-### Prompt 47 — Notification panel: solid background (queued 2026-06-22, Falcon)
+### ✅ Prompt 47 SHIPPED 2026-06-22 (`4681ced`) — notification panel now solid, toggle-dismiss confirmed already working
 
-**File:** `src/components/RepNotificationBell.jsx` (and admin `NotificationBell.jsx` — same fix both)
+**Note on the suggested CSS vars:** neither `var(--bg-card)` nor `var(--bg-secondary)` exist in this codebase's design tokens (checked `src/index.css`) — the only tokens close to those names (`--bg-surface`/`--bg-elevated`/`--bg-overlay`) are all `rgba(255,255,255,…)` with alpha, NOT opaque, so using any of them would have left the panel translucent, just less so. Used the literal `#13131F` solid hex instead — already the established convention for solid dropdown/tooltip surfaces in these exact two files (both bells' own tooltip elements already use it). Removed `className="glass"` (the source of the transparency + `backdrop-filter: blur(20px)`) from both `RepNotificationBell.jsx` and `NotificationBell.jsx`'s portal panels, replaced with explicit `background: '#13131F', border: '0.5px solid var(--border)'` inline.
 
-**Bug:** The notification panel is see-through (using the `glass` token which has transparency/backdrop-blur). Brayden wants it fully opaque so it covers whatever is behind it.
+**Toggle-to-dismiss — confirmed already correct, no fix needed.** Traced the click handling: the bell button sits inside the wrapper `ref`, and the outside-click handler only calls `setOpen(false)` when the click target is outside BOTH `ref` and `panelRef` — clicking the bell itself is always inside `ref`, so the outside-click handler is a no-op there and the button's own `onClick={() => setOpen(v => !v)}` toggles normally. This was already correct from Prompt 44's portal rewrite; nothing was broken.
 
-**Fix:** Replace the panel's background with a solid opaque color — use `var(--bg-card)` or `var(--bg-secondary)` (whichever reads as fully opaque in the design system). Remove any `backdrop-filter` or `background` with alpha on the panel container. The panel should look like a solid popup, not a frosted overlay.
-
-Also confirm the bell-click-to-dismiss toggle already works (Prompt 44 should have wired this — verify in code, fix if not).
-
-Build + push.
+Build + lint verified clean (`npx vite build`, `npx eslint` both files, zero errors). **Not live-verified** — no Chrome browser connected this session.
 
 ---
 
