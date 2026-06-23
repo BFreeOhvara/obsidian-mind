@@ -16,7 +16,19 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–41, 43, 44, 45, 46, 47, 48, 50 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail. Prompt 49 still queued below.)*
+*(Prompts 1, 2, 5–17, 26, 28–50 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+
+(Queue empty — see [[North Star]] Current Focus.)
+
+---
+
+### ✅ Prompt 49 SHIPPED 2026-06-23 (`cfb1ea2`) — CallModal cleanup: Source/Phone rows dropped, live header+hint hidden, status menu portaled
+
+Recon confirmed `CallModal.jsx` lives at `src/components/rep/CallModal.jsx` and its right panel is just `<ScriptWalk mode="live" />` (so changes 2/3 are in ScriptWalk, now CallModal's only caller after Prompt 48). **(1) Left panel:** removed the Phone row (redundant with the green call button below) and Source row; kept Contact/Niche/City. Dropped the now-unused `Globe` import. **(2) Script header + (3) coaching hint:** the "Fixed Opener / Same words, every single call" header card is ScriptWalk's per-section track header, and the hint is its `section.tips` line — gated BOTH on `mode !== 'live'` rather than deleting outright. Rationale: ScriptWalk is only used live right now, so this removes them from the modal exactly as asked, but keeps the component general (a future practice-mode reuse still gets its header/tips) — more reversible than deletion. **(4) Status dropdown:** it's a CUSTOM dropdown (absolutely-positioned `<div>`, not a native `<select>`), so the portal fix applies — menu now renders via `createPortal(document.body)` with `position: fixed` + coords from the trigger's `getBoundingClientRect()` (same fix as Prompt 44's bells); outside-click handler updated to check both the trigger wrapper and the portaled menu refs. Previously the menu was `position:absolute` inside the left panel's `overflow:auto`, which clipped it.
+
+Build clean (`npx vite build`), lint clean on both files (only the 1 pre-existing `useMemo` deps warning at CallModal:105, not mine). **Not live-verified** — no Chrome browser connected this session (the prompt marked a screenshot "ideal but not blocking"). Worth eyeballing the status menu opens unclipped and the modal reads cleaner next time a browser's reachable.
+
+---
 
 ### ✅ Prompt 50 SHIPPED 2026-06-23 (`33534bf`) — weekday-only streak track + cumulative total-days track
 
@@ -28,23 +40,6 @@ Build clean (`npx vite build`), lint clean on changed files (only 2 pre-existing
 
 ---
 
-### Prompt 49 — CallModal cleanup: remove redundant fields, fix status dropdown clipping (queued 2026-06-23, Falcon)
-
-**File:** `src/pages/rep/MyLeads.jsx` or wherever `CallModal` lives — recon first.
-
-**Four changes:**
-
-1. **Left info panel — remove Source and Phone rows.** Keep: Contact name, Niche, City. Remove: Source (e.g. "Google Maps") and Phone (already present as the green call button at the bottom — redundant here).
-
-2. **Script header — remove "Fixed Opener" title + subtitle.** The right panel currently shows a header card with the label "Fixed Opener" and the subtitle "Same words, every single call." Remove both. The script text itself stays.
-
-3. **Coaching hint text — remove.** Below the Next button there's italic muted text (e.g. "Say it word for word, friendly and casual. You're not pitching — you're asking who to talk to. Then listen to WHO answers and HOW, and pick your branch below."). Remove it entirely.
-
-4. **Status dropdown — fix clipping.** The Status `<select>` or custom dropdown inside CallModal is getting clipped by an ancestor with `overflow: hidden` (same pattern as the notification bell in Prompt 44). Apply the same fix: render it via `createPortal(..., document.body)` with `position: fixed` + coordinates from `getBoundingClientRect()` so it floats above all content. If it's a native `<select>`, the browser handles its own z-stacking and a portal isn't needed — check what component it actually is before deciding the fix.
-
-**Verify:** build clean + confirm no existing tests break. Chrome MCP screenshot of the modal open (with status dropdown visible) would be ideal but not blocking.
-
----
 
 ### ✅ Prompt 48 SHIPPED 2026-06-23 (`a7b346c`) — interactive React Flow script canvas (built on Opus per the prompt's model flag)
 
