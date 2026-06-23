@@ -16,9 +16,33 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–41, 43, 44, 45, 46, 47, 48 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–41, 43, 44, 45, 46, 47, 48, 50 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail. Prompt 49 still queued below.)*
 
-(Queue empty — see [[North Star]] Current Focus.)
+### ✅ Prompt 50 SHIPPED 2026-06-23 (`33534bf`) — weekday-only streak track + cumulative total-days track
+
+Three files in sync. **`useProfiles.js` `useBadgeActivity`:** `longestStreak` rewritten to count consecutive WEEKDAY completed days — a `nextWeekdayTs` helper skips Sat/Sun so Fri→Mon is consecutive, weekend completed days are filtered out entirely (neither add to nor break the streak), and a streak breaks only on a missed Mon–Fri. New `totalCompletedDays` = lifetime cumulative completed-day count (weekends included, never resets). Removed `bestWeekDials` (only the deleted `full_week` badge used it). Math hand-verified in Node against 7 calendar cases (Fri→Mon→Tue = 3; Mon→Wed = 1; full Mon–Fri = 5; weekend-completed-days ignored; two full weeks = 10; single = 1; empty = 0) — all pass. **`MyGoals.jsx`:** old "Streak & Consistency" group (streak_3/7/14/21/30 + `full_week`) replaced by two groups — "Streak" (streak_3 / streak_5 "Full Work Week" / streak_10 "Two-Week Run") and "Days Completed" (days_10/25/50/75/100 on `totalCompletedDays`). **`useRepNotificationTriggers.js`:** `ALL_BADGES` mirror synced to the same new ids/labels/conditions (it must match BADGE_GROUPS for the badge-unlock notifier). `perfect_day` kept untouched in both (Special group).
+
+**Judgment call flagged:** the old `full_week` volume badge (750 dials in a rolling 7 days, backed by `bestWeekDials`) was REMOVED, not kept — its "Full Week" label directly collides with the new "Full Work Week" 5-day-streak badge, and `bestWeekDials` would otherwise be dead. The prompt only explicitly named the 7/14-day streak badges for removal, so this is CC's call; trivially revertible if Brayden wanted the 750-dials badge kept (would need a new non-colliding label). Pre-existing dead fields `earlyBird`/`nightOwl` (no badge references them) left alone — out of scope.
+
+Build clean (`npx vite build`), lint clean on changed files (only 2 pre-existing `exhaustive-deps` warnings in the notifier's effects, unrelated to the badge-array edit). **Not live-verified** — no Chrome browser connected. **DB note:** any old streak badge rows (`streak_7` etc.) already inserted for a rep stay as harmless orphans in the `notifications` table — they just never re-earn; only test data (apex11) is affected.
+
+---
+
+### Prompt 49 — CallModal cleanup: remove redundant fields, fix status dropdown clipping (queued 2026-06-23, Falcon)
+
+**File:** `src/pages/rep/MyLeads.jsx` or wherever `CallModal` lives — recon first.
+
+**Four changes:**
+
+1. **Left info panel — remove Source and Phone rows.** Keep: Contact name, Niche, City. Remove: Source (e.g. "Google Maps") and Phone (already present as the green call button at the bottom — redundant here).
+
+2. **Script header — remove "Fixed Opener" title + subtitle.** The right panel currently shows a header card with the label "Fixed Opener" and the subtitle "Same words, every single call." Remove both. The script text itself stays.
+
+3. **Coaching hint text — remove.** Below the Next button there's italic muted text (e.g. "Say it word for word, friendly and casual. You're not pitching — you're asking who to talk to. Then listen to WHO answers and HOW, and pick your branch below."). Remove it entirely.
+
+4. **Status dropdown — fix clipping.** The Status `<select>` or custom dropdown inside CallModal is getting clipped by an ancestor with `overflow: hidden` (same pattern as the notification bell in Prompt 44). Apply the same fix: render it via `createPortal(..., document.body)` with `position: fixed` + coordinates from `getBoundingClientRect()` so it floats above all content. If it's a native `<select>`, the browser handles its own z-stacking and a portal isn't needed — check what component it actually is before deciding the fix.
+
+**Verify:** build clean + confirm no existing tests break. Chrome MCP screenshot of the modal open (with status dropdown visible) would be ideal but not blocking.
 
 ---
 
