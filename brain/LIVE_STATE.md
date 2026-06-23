@@ -16,7 +16,7 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–51 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–52 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
 
 ### ✅ Prompt 52 SHIPPED 2026-06-23 (`eff83fb`) — badge cleanup: perfect_day → Perfect Days, drift fixed, rate badges dropped
 
@@ -141,7 +141,117 @@ Build + lint verified clean (`npx vite build`, `npx eslint` both files, zero err
 
 ---
 
-(Queue empty after Prompt 48 — see [[North Star]] Current Focus.)
+### Prompt 53 — Twilio browser WebRTC calling (replaces Prompt 29 bridge) (queued 2026-06-23, Falcon)
+
+**Context:** Prompt 29 shipped a rep-first bridge call (Twilio REST API calls rep's phone first, then bridges to lead = 2 call legs, ~$0.013/min × 2). Decision locked this session: replace with Twilio Voice SDK (browser WebRTC). Rep's audio runs through computer mic/headset, Twilio calls lead directly = 1 leg, ~$0.0065/min. ~$20/rep/month at volume. Prompt 29's `bridgeCall()` + `twilio-call` edge function are fully replaced — don't extend them.
+
+**What to build:**
+
+1. **New edge function `twilio-token`** (auth-required, NOT `--no-verify-jwt`):
+   - Takes no body params
+   - Reads secrets: `TWILIO_ACCOUNT_SID`, `TWILIO_API_KEY_SID`, `TWILIO_API_KEY_SECRET`, `TWILIO_TWIML_APP_SID`
+   - Generates a Twilio Access Token (JWT) with a Voice grant scoped to the TwiML App
+   - Identity = the calling rep's `profile_id` (from the JWT sub claim)
+   - Returns `{ token: string }`
+   - Use the Twilio JWT library — install it as a vendor dep or use the REST approach (build the JWT manually with the standard `alg: HS256` header + `sub`/`iss`/`nbf`/`exp`/`grants` claims — Twilio's Access Token format is documented; no SDK needed if building manually)
+
+2. **New edge function `twilio-voice-webhook`** (deploy with `--no-verify-jwt` — Twilio calls this):
+   - POST handler responding with TwiML
+   - Body will have `To` param (the lead's phone number, passed via `device.connect()` params)
+   - Returns TwiML: `<Response><Dial record="record-from-answer-dual-channel" recordingStatusCallback="/twilio-voice-webhook/recording"><Number>${To}</Number></Dial></Response>`
+   - Recording callback logs to console (no DB storage yet — Phase 2 when AI grading pipeline is built)
+   - Validate that `To` is non-empty before connecting; return `<Response><Hangup/></Response>` if missing
+   - Reads `TWILIO_PHONE_NUMBER` for the `callerId` on the `<Dial>` — use `callerId` attribute
+
+3. **`CallModal.jsx` rewrite of the call section:**
+   - Remove the old `bridgeCall()` import and `twilio-call` references entirely
+   - Install `@twilio/voice-sdk` npm package (recon if already installed, install if not)
+   - On CallModal open (useEffect with `lead` dep): fetch `twilio-token`, instantiate a Twilio `Device`, register it
+   - Call button states: idle → "Call (Recorded)" → calling (spinner + "Connecting…") → in-call (green badge + "Connected · 0:00" timer + Mute + Hang Up buttons) → ended (reset)
+   - `device.connect({ params: { To: lead.phone } })` on button click
+   - `call.mute()` / `call.disconnect()` for mute/hang up
+   - On disconnect/error: reset state + destroy Device
+   - Gate the whole WebRTC path on `profile?.phone` being falsy OR just always show it (WebRTC doesn't need the rep's personal number — only the bridge did). **The `profile.phone` gate from Prompt 29 is no longer needed for WebRTC; remove it.** tel: link fallback kept only for when `lead.phone` is missing.
+   - Migration 045 (`profiles.phone`) was for the bridge — still fine to apply but the WebRTC feature no longer depends on it.
+
+4. **Required Supabase secrets to set before deploy:**
+   - `TWILIO_ACCOUNT_SID`
+   - `TWILIO_API_KEY_SID`
+   - `TWILIO_API_KEY_SECRET`
+   - `TWILIO_TWIML_APP_SID` (Brayden creates this in Twilio console — Voice URL = `https://jjextitmbptoaolacocs.supabase.co/functions/v1/twilio-voice-webhook`)
+   - `TWILIO_PHONE_NUMBER` (existing $1.15/mo number)
+   - Keep `TWILIO_AUTH_TOKEN` for any future REST-only calls
+
+**Build order:** recon CallModal + Prompt 29 code → build + deploy `twilio-voice-webhook` → build + deploy `twilio-token` → rewrite CallModal call section → build verify → log.
+
+**⚠️ Brayden must create the TwiML App in Twilio console before this works end-to-end.** CC can ship the code; the TwiML App SID needs to be pasted as a Supabase secret. Note that in the console at console.twilio.com → Voice → TwiML Apps.
+
+---
+
+### Prompt 54 — Stripe Connect for rep commission payouts (queued 2026-06-23, Falcon)
+
+**Context:** When Brayden closes a deal, the rep earns 10% of the total (setup + first month or recurring — see [[North Star]] commission math). Currently Brayden pays manually. Stripe Connect lets reps onboard their bank once, and Brayden can approve payouts from the admin dashboard — money lands in the rep's bank in 2 days. Stripe handles KYC + 1099 generation. No App Store, no custom payout logic.
+
+**What to build:**
+
+1. **Schema — migration 049:**
+   ```sql
+   ALTER TABLE profiles ADD COLUMN IF NOT EXISTS stripe_account_id text;
+   ALTER TABLE profiles ADD COLUMN IF NOT EXISTS stripe_onboarding_complete boolean NOT NULL DEFAULT false;
+   
+   CREATE TABLE IF NOT EXISTS commission_payouts (
+     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+     rep_profile_id uuid NOT NULL REFERENCES profiles(id),
+     appointment_id uuid NOT NULL REFERENCES appointments(id),
+     amount_cents int NOT NULL,
+     stripe_transfer_id text,
+     status text NOT NULL DEFAULT 'pending', -- pending | approved | paid | failed
+     created_at timestamptz DEFAULT now(),
+     paid_at timestamptz,
+     notes text
+   );
+   
+   ALTER TABLE commission_payouts ENABLE ROW LEVEL SECURITY;
+   CREATE POLICY "reps view own payouts" ON commission_payouts FOR SELECT USING (rep_profile_id = auth.uid());
+   CREATE POLICY "admin full access" ON commission_payouts FOR ALL USING (
+     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
+   );
+   ```
+
+2. **New edge function `stripe-connect-onboard`** (auth-required):
+   - Creates a Stripe Connect Express account for the rep (if `stripe_account_id` not yet set)
+   - Returns a Stripe Account Link URL (onboarding hosted flow)
+   - On completion Stripe redirects to the dashboard with `?onboarding=complete`; a second call to this fn with the account's status check sets `stripe_onboarding_complete = true`
+   - Reads secret `STRIPE_SECRET_KEY`
+
+3. **New edge function `stripe-pay-commission`** (admin-only, verify via profile role check):
+   - Takes `{ payout_id: string }`
+   - Reads the `commission_payouts` row, gets the rep's `stripe_account_id`
+   - Creates a Stripe Transfer to the rep's connected account
+   - Updates the row: `status = 'paid'`, `stripe_transfer_id`, `paid_at`
+   - Returns `{ success: true, transfer_id: string }`
+
+4. **Rep-side UI — new "My Payouts" section in My Commissions page:**
+   - If `stripe_onboarding_complete = false`: show "Connect your bank" button → calls `stripe-connect-onboard` → opens the Stripe hosted onboarding URL in a new tab
+   - If `stripe_onboarding_complete = true`: show connected badge (bank icon + "Bank connected")
+   - List of `commission_payouts` rows for this rep: appointment name / date, amount, status chip (pending/approved/paid/failed)
+
+5. **Admin-side UI — new "Payouts" tab in the admin dashboard (add to admin sidebar nav):**
+   - Table of all `commission_payouts` rows with rep name, appointment, amount, status
+   - "Approve & Pay" button per pending row → calls `stripe-pay-commission` → updates UI
+   - "Create payout" button: admin manually enters rep + appointment + amount (for back-filling existing closes)
+   - Filter by rep name and status
+
+6. **Auto-create pending payout on deal close:**
+   - In `AppointmentCard.jsx`'s `handleComplete()` (closer side) where `outcome = 'closed'`: after saving, call a new edge function `create-commission-payout` with the appointment ID + deal total
+   - Edge fn: fetch `appointments` row → calc 10% of `deal_total` (the `override_price` or formula price) → insert `commission_payouts` row with `status='pending'`
+   - This just creates the pending record; admin still approves before money moves
+
+**Required secrets:** `STRIPE_SECRET_KEY` (already exists from Prompt 9's checkout session work).
+
+**Build order:** migration 049 → `stripe-connect-onboard` → `stripe-pay-commission` → `create-commission-payout` → rep My Payouts UI → admin Payouts tab → auto-create on deal close → build verify → log.
+
+---
 
 ---
 
