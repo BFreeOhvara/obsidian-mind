@@ -16,7 +16,7 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–41, 43, 44, 45 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail. Prompt 46 still queued below.)*
+*(Prompts 1, 2, 5–17, 26, 28–41, 43, 44, 45, 46 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail. Prompt 47 still queued below.)*
 
 ### ✅ Prompt 44 SHIPPED 2026-06-22 (`c462476`, `52c2b99`) — both fixes complete
 
@@ -42,21 +42,15 @@ Build verified clean (`npx vite build`, 2.17s) AND linted clean (`npx eslint src
 
 ---
 
-### Prompt 46 — Business research enrichment on appointment book (queued 2026-06-22, Falcon)
+### ✅ Prompt 46 SHIPPED 2026-06-22 (`0b8874a`) — business research enrichment, migration 048 + new edge function BOTH pending deploy
 
-**Context:** When a setter books an appointment, we currently only have what the lead record carries (niche, city, phone, call notes). Richer data (Google reviews, rating, website presence) would improve `recommend-stack`'s output and give Nate better context on the close call.
+**Recon:** chose to store enrichment on `leads`, not `appointments` — the data describes the BUSINESS (rating/reviews/website), and `leads` already carries `place_id` (migration 019, Maps-scraper dedup), so reusing it lets the new lookup skip a redundant Text Search whenever a lead already has one (Maps-sourced leads). `appointments` already joins `leads` everywhere it's displayed, so no `appointments` schema change was needed to surface this. Read `maps-scraper`'s edge function for the existing Text-Search-then-Place-Details pattern and reused it directly.
 
-**What to build:**
-When an appointment is created (setter hits Done → Appointment Booked in CallModal), trigger a background lookup on the business using the existing `GOOGLE_MAPS_API_KEY` (already set in Supabase secrets):
-1. Google Places Text Search for `"{business_name} {city}"` → get `place_id`, `rating`, `user_ratings_total`, `website` (present/absent), `business_status`
-2. Store results on the `appointments` row (or `leads` row — recon which makes more sense): `google_rating`, `google_review_count`, `has_website` (boolean), `place_id`
-3. Surface on Nate's `AppointmentCard`: show rating (⭐ 4.2 · 87 reviews) and a "No website" or "Has website" tag — small, secondary info, doesn't clutter the card
+**Built:** migration 048 (`google_rating numeric(2,1)`, `google_review_count int`, `has_website boolean` on `leads`). New edge function `enrich-business-info` — resolves a `place_id` via Text Search if the lead doesn't already have one, fetches `rating`/`user_ratings_total`/`website`/`business_status` via Place Details, writes the first three to the lead row (no `business_status` column — wasn't in the prompt's storage list, fetched but not persisted). `CallModal.jsx`'s `handleDone()` fires it independently alongside (not chained to) the existing `recommend-stack` fire-and-forget call when status is `Appointment Booked` — never awaited, `.catch(() => {})` swallows any failure so it truly can't block or surface errors in the booking flow. `useMyAppointments`'s lead select gained the three new fields; `AppointmentCard.jsx`'s collapsed card row now shows a ⭐ rating+review-count tag and a "Has website"/"No website" tag (both small/secondary, matching the existing niche/city tag row styling).
 
-**Recon first:** check `appointments` vs `leads` schema to decide where to store, and check how the existing Maps scraper does its Places lookup (reuse that pattern). Use an edge function for the lookup (same pattern as the maps-scraper's phone enrichment).
+**⚠️ Two separate deploy steps needed, not just one** — unlike the pure-SQL prompts this session, this one needs BOTH: (1) migration 048 applied via SQL editor (same pattern as 040–047), AND (2) the new `enrich-business-info` edge function actually deployed (`supabase functions deploy enrich-business-info` or via the dashboard) — CC has no CLI/dashboard access to do this deploy step itself. Until both are done, the fire-and-forget call will silently fail (404 on the function) and nothing will populate — by design, this won't break booking, it just won't enrich anything yet.
 
-**Do NOT block the booking flow** — if the lookup fails or times out, the appointment still saves normally. The enrichment is fire-and-forget.
-
-**Verify:** book a test appointment as apex11, check the Supabase `appointments` (or `leads`) row for the enrichment fields, then check Nate's AppointmentCard for the new display.
+Build verified clean (`npx vite build`, 2.19s). Lint run on changed files — pre-existing unrelated debt in `AppointmentCard.jsx` (unused imports, one `setState`-in-effect warning) confirmed NOT touched by this change (none of the flagged lines overlap with the new code). **Not live-verified** — no Chrome browser connected this session, and live verification here also requires both deploy steps above to be done first anyway.
 
 ---
 
@@ -74,7 +68,35 @@ Build + push.
 
 ---
 
-(Queue empty after Prompt 47 — see [[North Star]] Current Focus.)
+### Prompt 48 — Interactive zoomable script canvas (React Flow) (queued 2026-06-22, Falcon)
+
+**Context:** The current ScriptFlowchart + Practice tabs in Training Center are being replaced with a single interactive canvas — every node is a box, every connection is a drawn arrow, you zoom/pan/drag to explore the full map, and click-through practice happens ON the canvas (no separate tab).
+
+**Library:** Install `@xyflow/react` (React Flow v12). This gives zoom, pan, drag, nodes, and edges out of the box.
+
+**What to build:**
+
+1. **Canvas view (default):** All script steps rendered as nodes (boxes), all connections as edges (arrows). Back-references (e.g. "→ Branch A") draw as curved edges looping back to the target node — native to React Flow, no custom SVG overlay needed. User can zoom in/out (scroll wheel) and pan (click-drag). Show a minimap (React Flow built-in) so the rep can see the full picture while zoomed in.
+
+2. **Node types:**
+   - Say node (spoken line) — standard box, white text
+   - Action node (coaching directive) — visually distinct, muted/secondary style
+   - Fork node (if/else question) — diamond or wider box, question text, two outgoing edges labeled with the option text
+   - Branch header — larger, colored by branch letter (A/B/C/D/E), acts as the entry point for each branch
+
+3. **Click-through practice mode:** A "Start Practice" button on the canvas (top-right or floating). When clicked: highlights the opener node, dims everything else. Rep clicks the highlighted node to advance to the next step (or selects a fork option when at a fork). Exit button returns to full canvas view with all nodes visible. No separate Practice tab needed — this replaces it entirely.
+
+4. **Training Center integration:** Replace the existing "Flowchart" and "Practice" tab content with this single `<ScriptCanvas />` component. The "Full Script" tab (text view) can stay as-is.
+
+5. **Data source:** Derive from the existing `DISCOVERY_SCRIPT` / `buildScriptFlow()` — do not duplicate script content. Recon these before writing the node/edge builder.
+
+**This is a large build — use Fable 5 (opus) model.** Install the npm package first, verify it builds, then build incrementally: node/edge layout first, then zoom/pan, then practice mode.
+
+**Verify:** Chrome MCP screenshot of Training Center Flowchart tab as apex11 — confirm canvas renders, zoom/pan works, and Start Practice highlights the opener node.
+
+---
+
+(Queue empty after Prompt 48 — see [[North Star]] Current Focus.)
 
 ---
 
@@ -165,7 +187,7 @@ Both pipeline crons rescheduled to 1 AM Central reset (works across all US timez
 
 ---
 
-### Migration status — 040–044, 046 applied ✅, 045 + 047 committed/pending apply
+### Migration status — 040–044, 046 applied ✅, 045 + 047 + 048 committed/pending apply
 
 - **040 / niche-even distribution** — ✅ applied 2026-06-21 via SQL editor, `assign_daily_batches` function replaced in prod.
 - **041 / rep_credentials** — ✅ applied 2026-06-21 via SQL editor, table + RLS policies + index all live.
@@ -175,8 +197,9 @@ Both pipeline crons rescheduled to 1 AM Central reset (works across all US timez
 - **045 / profiles.phone** — committed (`252ad1d`), NOT yet applied. Needed for Prompt 29's Twilio bridge call recording (still dormant — also needs Twilio secrets + per-rep phone numbers, see Prompt 29 entry below).
 - **046 / tighten_pass3_exclusions** — ✅ applied 2026-06-22 via SQL editor. `assign_daily_batches` PASS 3 fallback now also excludes `No Answer`/`Follow-Up` from early resurfacing (Prompt 37, speculative fix for Prompt 36's batch-reset bug).
 - **047 / notify_rep_on_deal_closed** — committed (`f475566`), NOT yet applied. New `SECURITY DEFINER` trigger on `appointments` UPDATE — when a closer marks a deal `status='completed'/outcome='closed'`, inserts a `deal_closed` notification for the rep who booked it (Prompt 43).
+- **048 / leads_business_enrichment** — committed (`0b8874a`), NOT yet applied. Adds `google_rating`/`google_review_count`/`has_website` to `leads` (Prompt 46). **Also needs the new `enrich-business-info` edge function deployed** — a migration apply alone isn't enough for this one, see Prompt 46 entry below.
 
-**⚠️ DO NOT run `supabase db push`** for any of these — 040–044 were applied outside Supabase's migration tracking, so `db push` would try to re-run them and fail. 045 and 047 are written the same way and must be applied the same way (SQL editor, one-off).
+**⚠️ DO NOT run `supabase db push`** for any of these — 040–044 were applied outside Supabase's migration tracking, so `db push` would try to re-run them and fail. 045, 047, and 048 are written the same way and must be applied the same way (SQL editor, one-off).
 
 ---
 
