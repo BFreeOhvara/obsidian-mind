@@ -18,7 +18,11 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–50 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
 
-(Queue empty — see [[North Star]] Current Focus.)
+### ✅ Prompt 51 SHIPPED 2026-06-23 (`19fc8c0`) — perfect-day badges + streak subtitle fixes
+
+All three files reconned and edited in sync. **`useProfiles.js` `useBadgeActivity`:** added `perfectDaysArr` (days with ≥150 dials AND ≥2 bookings), `perfectDay` now derives from it; new `totalPerfectDays` (lifetime cumulative, never resets) and `perfectStreak` (longest run of consecutive WEEKDAY perfect days, reusing the existing `isWeekendTs`/`nextWeekdayTs` helpers from Prompt 50's `longestStreak` — weekend gaps skip, never break). Both added to the returned object. **`MyGoals.jsx`:** (Change 1) streak subtitles reworded — `streak_3` detail is now a 2-line array `['Complete 3 days in a row', 'A completed day = 150 dials']`, `streak_5` → "Complete a work week (5 days in a row)", `streak_10` → "Complete two work weeks in a row". The detail renderer now accepts a string OR string[] (maps each line to its own `<p>`). (Change 2) two perfect-streak badges appended to the Streak group: `perfect_streak_3` (✨, perfectStreak≥3) and `perfect_week` (🌈, perfectStreak≥5). (Change 3) new "Perfect Days" group inserted after Streak, before Days Completed: `perfect_5`/`perfect_25`/`perfect_50` on `totalPerfectDays`. **`useRepNotificationTriggers.js`:** `ALL_BADGES` mirror synced — all 5 new ids/labels/conditions added in matching order.
+
+Build clean (`npx vite build`, 2.08s). Lint clean on all 3 changed files — the only 2 warnings are pre-existing `exhaustive-deps` in the notifier's own effects (lines 89/146), not the badge edit. **Not live-verified** — no Chrome browser connected. Note: pre-existing mirror drift left untouched (the `perfect_day` row in ALL_BADGES checks `bestDayDials` while MyGoals checks `!!perfectDay` — out of scope, not introduced here).
 
 ---
 
