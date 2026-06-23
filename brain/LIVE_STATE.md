@@ -16,7 +16,15 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–50 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–51 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+
+### ✅ Prompt 52 SHIPPED 2026-06-23 (`eff83fb`) — badge cleanup: perfect_day → Perfect Days, drift fixed, rate badges dropped
+
+Two files. **`MyGoals.jsx`:** (Change 2) `perfect_day` moved out of the Special group and inserted as the FIRST badge in Perfect Days, so the section now reads Perfect Day → 5 → 25 → 50; Special is now just `five_a_day` + `back_to_back`. (Change 3) the entire "Booking Rate" group (rate_5/10/15/20/25) deleted. Header comment refreshed (was "37 badges in six groups" naming rate badges — now "seven groups", count noted as derived via `TOTAL_BADGES`). **`useRepNotificationTriggers.js` `ALL_BADGES`:** (Change 1) `perfect_day` condition changed from `bestDayDials >= DAILY_BATCH_TARGET` to `!!c.activity?.perfectDay` — now matches MyGoals exactly, drift gone. (Change 3) the five `rate_*` entries removed. The now-unused `DAILY_BATCH_TARGET` import (it was only referenced by the old perfect_day condition) was also removed to avoid a no-unused lint.
+
+**No `useBadgeActivity` change needed** — `bookingRate` is computed in `useRepStats` (powers the headline Booking-rate goal card and month stats), NOT in `useBadgeActivity`, so removing the rate badges left no dead field there. Build clean (`npx vite build`), MyGoals lint fully clean, notifier file only carries its 2 pre-existing `exhaustive-deps` warnings. **Not live-verified** — no Chrome browser connected.
+
+---
 
 ### ✅ Prompt 51 SHIPPED 2026-06-23 (`19fc8c0`) — perfect-day badges + streak subtitle fixes
 
