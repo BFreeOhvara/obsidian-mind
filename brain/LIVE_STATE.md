@@ -16,8 +16,34 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–57 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–58 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
 
+
+
+### Prompt 59 — New notification types: messages, follow-ups, deal closed (queued 2026-06-24, Falcon)
+
+Three new notification triggers added to the existing notification system. **Recon first:** read `src/hooks/useRepNotificationTriggers.js` (full file — understand how the existing Supabase realtime subscriptions and badge polling work), `src/components/rep/RepNotificationBell.jsx` (how notifications are stored/displayed), and the `messages` and `leads` table schemas (check what columns exist for follow-up dates and message recipients).
+
+---
+
+**Trigger 1 — New message:**
+Subscribe to realtime inserts on the `messages` table where `recipient_id = user.id` (or equivalent — recon the schema to find the correct column). On insert, fire a notification: title "New message", body the sender name + first ~60 chars of message content. Use the same notification pattern as existing triggers.
+
+---
+
+**Trigger 2 — Follow-up reminder (5 minutes before):**
+On mount, start a 1-minute polling interval (`setInterval`, 60 000ms) that queries leads where `follow_up_date` is between `now()` and `now() + 6 minutes` AND `assigned_rep_id = user.id` (recon the exact column names). For each matching lead not already notified this session, fire a notification: title "Follow-up in 5 min", body the lead/business name. Track already-fired reminders in a `useRef` Set (keyed by `lead.id + follow_up_date`) so the same follow-up doesn't repeat every poll cycle. Clear the interval on unmount.
+
+---
+
+**Trigger 3 — Deal closed:**
+Subscribe to realtime inserts on `commission_payouts` where `rep_id = user.id`. On insert (status = 'pending'), fire a notification: title "Deal closed!", body "You'll earn $[amount_cents/100] from [business name]" — join to get business name via appointment → lead (recon if the realtime payload includes enough data; if not, do a one-time fetch of the payout row with joins on insert). Use JetBrains Mono for the dollar amount per the rules.
+
+---
+
+**Build:** all three triggers added to `useRepNotificationTriggers.js`. Build + lint → commit + push. No migration needed. Log completion and delete this entry.
+
+---
 
 ### ✅ Prompt 52 SHIPPED 2026-06-23 (`eff83fb`) — badge cleanup: perfect_day → Perfect Days, drift fixed, rate badges dropped
 
