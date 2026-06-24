@@ -16,21 +16,47 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–64 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–65 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
 
-### Prompt 63 — My Payouts empty despite real closed-deal stats; backfill test rep's payout history (queued 2026-06-24, Eagle, from Brayden's screenshot)
+### Prompt 65 — My Leads: default tab on load should be "New", not "All" (queued 2026-06-24, Eagle)
 
-**Context:** Test Rep apex11's My Commissions page shows real-looking KPIs — Total Earned $842, Closed Deals 5, Last 7 Days $594, and a 30-day bar chart with 3 visible green bars (closes) — but the "My Payouts" section below still says "No payouts yet." Brayden wants the payout list to actually show rows for those existing closes — "as if this feature was already there the whole time" — not just the empty state.
+**Context:** An earlier prompt removed the "Old" tab and moved "All" to the end (New is now the first tab in the row). But the page still opens on the "All" tab by default on load — Brayden wants it to open on "New" by default every time, since that's the actual working queue.
 
-**Step 1 — recon the discrepancy first, don't assume.** Find out what data source powers the KPI cards (Total Earned / Closed Deals / Last 7 Days / the 30-day chart) — likely `useMyCommission` reading the legacy `commissions` table (migration 014) directly. Then check why `usePayouts.js`'s parallel `commission_payouts` + `commissions` query (added Prompt 60, Change 3) isn't surfacing those same rows for this rep — candidates: `rep_profile_id` filter mismatch, a join failing silently (e.g. business-name join on a null/mismatched key), a query error being swallowed, or the legacy rows genuinely lacking a field `MyPayouts` requires to render a row. Confirm in Supabase (read-only query, don't write yet) whether apex11 actually HAS rows in `commissions` matching the 5 closed deals.
+**Step:** Recon `MyLeads.jsx`'s tab state (likely a `useState` initialized to `'all'` or similar). Change the initial value to whatever the "New" tab's filter key is. Don't reorder the tabs again — they're already New-first; this is purely which one is pre-selected on mount.
 
-**Step 2 — fix or backfill, whichever the recon points to.**
-- If it's a bug (query/join/filter issue) — fix `usePayouts.js` so the real legacy rows render with business name, deal amount, 10%, and a "Legacy"/paid status (this is the most likely path since the chart data has to be coming from real rows somewhere).
-- If apex11 genuinely has no underlying rows at all (KPIs are computed some other way, e.g. hardcoded/seeded for demo purposes) — write a one-off backfill (SQL, run via the Supabase SQL editor per the established pattern, NOT a migration file) inserting 5 `commission_payouts` rows for apex11 matching the existing stats (business names can be pulled from apex11's actual closed `appointments`/`leads` rows if any exist, otherwise reasonable placeholders), statuses `paid`, dates spread to match the chart's bar positions (~Jun 9, Jun 19, Jun 22 plus 2 more to hit 5 total / $842).
+**Verify:** reload `/rep/leads` as apex11 — page should land on the New tab, not All.
 
-**This is test/demo data (apex11 only)** — purely cosmetic so Brayden can see the feature's full intended look before it matters for real reps. Don't touch any other rep's data.
+---
 
-**Verify:** reload My Commissions as apex11 (Chrome MCP if connected) and confirm My Payouts now lists rows instead of the empty state.
+### Prompt 66 — Messaging: auto-add new reps to Brayden+Nate inbox, richer right-panel context (queued 2026-06-24, Eagle)
+
+**Context:** Current messaging model (built earlier): a rep can message Brayden ("Dashboard Questions") or Nate ("Sales Questions") via a shared `Inbox` component; Brayden's admin inbox shows `recipient='brayden'` threads, Nate's closer inbox shows `recipient='nate'` threads (visible to any closer role, not just Nate — known v1 caveat, still true).
+
+**Brayden's requested changes — rep side is unchanged** (reps still only message Brayden or Nate, nothing new there). Closer/admin side:
+
+1. **Brayden and Nate should each see a thread for EVERY rep, automatically — not lazily-created on first message.** Today a rep only shows up in the inbox once they send a message. Brayden wants: the moment a new rep account is created, a conversation thread for that rep appears in both Brayden's and Nate's inbox immediately (even with zero messages sent yet — an empty/ready thread, not absent). Recon how rep accounts are created (`create-rep`/`admin-create-user` edge fn or wherever) and add a hook there that ensures a thread exists for the new rep in both inboxes. **Flag for Brayden before building:** he also said "or if a new portal has been made" — the `ohvara-client-portal` repo is abandoned (see CURRENT STATE), so confirm what "portal" means here before scoping it (a new client account? something else) rather than guessing.
+
+2. **Right-side detail panel needs more context, not just the type label.** Currently when a conversation is selected, the right side shows a flat label like "Dashboard Question." Add a short explanatory subtitle per type describing what that category actually covers (recon the existing type-styling object for messages and extend it with a description field, similar to how notification types already have descriptive copy).
+
+**Recon first** — read the messaging schema (the `messages` table migration — likely 029 per CURRENT STATE), the `Inbox` shared component, and wherever rep-account-creation happens, before writing code. Report findings before building, especially on the "portal" ambiguity in (1).
+
+---
+
+### Prompt 67 — Script canvas: revert to back-ref arrows, bound pan/zoom, white background (queued 2026-06-24, Eagle)
+
+**Context:** Prompt 53's Change 1 replaced the canvas's back-reference arrows with inlining — when Branch B/C routed back to Branch A, instead of drawing a looping arrow to Branch A's header, it duplicated Branch A's full step sequence inline in B and C's columns (so no two boxes show the same content, but the canvas got much taller). **Brayden wants this reverted** — he prefers the arrows; repeated boxes are fine.
+
+**Three changes to `ScriptCanvas.jsx` (Training Center → Script):**
+
+1. **Revert Change 1 from Prompt 53.** Remove the inline-recursion logic for `dest.kind === 'branch'` routes; restore the back-ref edge rendering from Prompt 45/48 — a real drawn arrow (curved/dashed, looping) from the route node back to the target branch's header, instead of duplicating that branch's steps as new nodes in the current column. This is a straight revert of that one change, not a new design — pull the prior back-ref edge logic from git history (the commit before `0bfafd9`/`07a8f61`, i.e. Prompt 48's `a7b346c` or Prompt 45's `6aa4016` era) rather than rebuilding from scratch.
+
+2. **Bound the pan range.** Right now you can drag the canvas far enough that the whole diagram disappears off-screen. Use React Flow's `translateExtent` (and/or `minZoom`) to clamp panning to roughly the diagram's bounding box plus a reasonable margin, so the script is always at least partially on screen — never fully scrollable away.
+
+3. **White canvas background.** The canvas background is currently gray/dark; change it to white so the diagram pops more. Find wherever the `<Background>` / canvas container background is set (likely a `colorMode`/background-color prop or inline style in `ScriptCanvas.jsx`) and swap to white. Check [[DESIGN]] for an existing white/light token first; if none exists for this purpose, use literal white and note it as a deliberate one-off exception (canvas backgrounds aren't really a UI surface token, but flag it rather than silently hardcoding).
+
+**Not a CC task, just FYI:** Brayden + Nate still need to do a human content review of the actual script wording — no code change for that, just noting it's an open item on their side.
+
+**Verify:** Chrome MCP pass on Training Center → Script as apex11 — confirm arrows are back (no duplicated Branch A content in B/C), background is white, and dragging far in any direction can't lose the diagram off-screen.
 
 ---
 

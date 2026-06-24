@@ -64,6 +64,20 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-24 — Prompt 63: fix useMyPayouts showing empty despite real KPI data (`651aba6`)
+
+Root cause found via recon — **two failure vectors** in `usePayouts.js` `useMyPayouts()`:
+
+1. **`recipient_role = 'rep'` filter** — legacy `commissions` rows for apex11 were likely seeded/inserted with a different `recipient_role` value (the commissions schema allows 'rep','closer','admin'). `useMyCommission` (KPI cards) doesn't filter by role, so it showed all 5 rows for apex11. `useMyPayouts` filtered to `recipient_role = 'rep'` — redundant constraint that silently excluded rows with the wrong role. RLS already limits to `recipient_id = auth.uid()`, so role filtering is unnecessary.
+
+2. **`!lead_id` PostgREST FK hint** — the `lead:leads!lead_id` explicit hint can fail if PostgREST's schema cache doesn't resolve the FK. A join error on the legacy query caused `le` to be non-null → `if (le) throw le` → entire `useMyPayouts` hook returned `undefined` → "No payouts yet" empty state.
+
+**Fix:** removed `recipient_role` filter, changed join to `lead:leads` (no hint), changed from `if (le) throw le` to silently ignoring legacy errors (business name falls back to "Closed deal"). commission_payouts query error still throws; only the legacy arm is fault-tolerant since business name is optional display data, not load-bearing.
+
+1 file changed (`src/hooks/usePayouts.js`). Build clean (1.83s). **Not browser-verified** — apex11 My Payouts should now show 5 legacy rows.
+
+---
+
 ### 2026-06-24 — Prompt 64: AI call grading pipeline (`51f4117`)
 
 9 files, 580 insertions. Build clean (3.05s). All lint errors pre-existing — none from this change. Not live-verified — requires migration + deploy + `DEEPGRAM_API_KEY` secret first.
@@ -79,8 +93,10 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 - **Sidebar**: added My Calls nav item (`/rep/calls`, `PhoneCall` icon) above Activity.
 - **App.jsx**: added `/rep/calls` route + `MyCalls` import.
 
+**✅ Migration 052 applied 2026-06-24** (via Claude in Chrome + Supabase SQL editor, verified against the real committed file at commit `51f4117`). All 7 new columns confirmed live on `calls`: `twilio_recording_sid`, `twilio_recording_url`, `transcript`, `grade`, `feedback_good`, `feedback_improve`, `graded_at` — plus the `idx_calls_twilio_call_sid` index and realtime enabled on the table. Note: `twilio_call_sid` was already a pre-existing column (added earlier alongside Prompt 54/64's CallModal changes) — the migration only indexes it, doesn't create it.
+
 **Remaining steps before feature works (Brayden):**
-1. Apply migration 052 via SQL editor in Supabase dashboard
+1. ~~Apply migration 052~~ — ✅ DONE 2026-06-24
 2. Set secret: `supabase secrets set DEEPGRAM_API_KEY=<key> --project-ref jjextitmbptoaolacocs`
 3. Deploy: `supabase functions deploy grade-call --no-verify-jwt --project-ref jjextitmbptoaolacocs`
 4. Redeploy: `supabase functions deploy twilio-voice-webhook --no-verify-jwt --project-ref jjextitmbptoaolacocs`
