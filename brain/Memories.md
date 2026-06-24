@@ -64,6 +64,14 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-24 — Prompt 75 SHIPPED: Brayden↔Nate mutual messages + closer My Stats (`49ead8f`)
+
+**Part 1 — Mutual messaging:** The existing `messages` table uses a fixed `recipient` enum ('brayden'/'nate'). Admin and closer inboxes filtered strictly on `recipient='brayden'`/`'nate'`, so neither could see their own sent messages to the other. Fix: migration 053 updated both SELECT policies to also allow `sender_id = auth.uid()` on the opposite bucket. In `MessageCenter.jsx`: added `useClosers()`/`useAdmins()` hooks; manager contacts seeded at the top of each inbox with a "Direct" badge; manager threads render individual chat bubbles per INSERT row (not the reply-slot pattern). `handleSend` calls `useSendMessage` (INSERT) for manager threads. **⚠️ Migration 053 must be applied manually in Supabase dashboard — no DATABASE_URL for programmatic push.**
+
+**Part 2 — Closer My Stats:** New page `/closer/stats` — Close Rate, Show Rate, Deals Closed, Avg Deal cards from `appointments WHERE closer_id=profile.id`; weekly bar chart; earnings summary from `commissions`. Nav item added after Pipeline in closer sidebar.
+
+---
+
 ### 2026-06-24 — Prompt 74 SHIPPED: My Payouts root cause found and fixed (`8fd606e`)
 
 Root cause was a wrong column name in the PostgREST join: `appointment:appointments!appointment_id ( appointment_at, ... )` — the column is `scheduled_at` on the live `appointments` table, not `appointment_at`. PostgREST returned a `42703` column-not-found error on every query, `if (pe) throw pe` threw it, React Query stored `data: undefined`, and the component rendered the empty state. 1-file fix: `appointment_at` → `scheduled_at` in both `useMyPayouts` and `useAllPayouts` in `usePayouts.js`. Verified live with service role: 5 rows returned, business names populated, no error. Build clean. **Not browser-verified** (Chrome MCP unavailable this session) but the DB-side query is now confirmed working.
