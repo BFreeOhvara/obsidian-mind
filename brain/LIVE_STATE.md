@@ -212,7 +212,27 @@ Until steps 1–2 are done, the call button silently falls back to the `tel:` li
 
 ---
 
-### Prompt 55 — Stripe Connect for rep commission payouts (queued 2026-06-23, Falcon)
+### ✅ Prompt 55 SHIPPED 2026-06-23 (`cca5c5d`) — Stripe Connect rep commission payouts — ⚠️ MIGRATION 049 + 3 EDGE DEPLOYS PENDING
+
+Full feature built + pushed (10 files, +864). The new `commission_payouts` table is a SEPARATE Stripe-payout workflow layer (pending → approved/paid → failed) — deliberately NOT merged with the existing `commissions` earned-ledger (migration 014) that `useMyCommission` reads; the two coexist.
+
+**Built:**
+- **`migration 049`** — `profiles.stripe_account_id` + `stripe_onboarding_complete`; `commission_payouts` table (rep/appointment FKs, `amount_cents`, status, `stripe_transfer_id`, `paid_at`) + RLS (reps SELECT own, admin ALL). Idempotent (`IF NOT EXISTS`, `DROP POLICY IF EXISTS` before each CREATE). **NOT applied** — same SQL-editor-only pattern as 040–048.
+- **`stripe-connect-onboard`** (auth) — resolves rep from JWT; default mode creates an Express account (`capabilities[transfers]`, business_type individual) if none, stores `stripe_account_id`, returns a hosted Account Link URL (return_url `/rep/commissions?onboarding=complete`); `{checkStatus:true}` mode retrieves the account and flips `stripe_onboarding_complete` when charges+payouts+details all enabled.
+- **`stripe-pay-commission`** (admin-only role check) — `{payout_id}` → loads payout + rep's connected account, guards already-paid / no-bank, fires a Stripe **Transfer** (amount_cents → rep's `stripe_account_id`), marks row `paid` + `stripe_transfer_id` + `paid_at`; on any Stripe error marks row `failed` with the message in `notes`.
+- **`create-commission-payout`** (closer/admin) — service-role insert (closer can't write another rep's row under RLS); fetches the appointment server-side (never trusts a client amount), computes 10% of `deal_value` (fallback `lead.custom_monthly_price`), inserts a `pending` row. **Idempotent per appointment** (skips if one already exists).
+- **`AppointmentCard.handleComplete`** — on `outcome==='closed'`, fire-and-forget `create-commission-payout` (never blocks the close), matching the existing recommend-stack/enrich pattern.
+- **Rep UI** (`MyCommissions.jsx` → new `MyPayouts` section + `usePayouts.js`): "Connect your bank" (opens Stripe onboarding in a new tab + an "I'm done — refresh" re-check) or a green "Bank connected" badge; payout list with business/date, mono `$` amount, status chip. Handles the `?onboarding=complete` return (checkStatus then clean-URL reload, since useAuth holds the profile in React state, not react-query).
+- **Admin UI** (`Payouts.jsx`, route `/admin/payouts` admin-only, sidebar "Payouts" w/ Wallet icon): filterable table (rep-name search + status pills), per-row "Approve & Pay" (disabled w/ "Bank not connected" when the rep isn't onboarded), inline per-row errors, and a "Create payout" back-fill form (rep dropdown + appointment-id + amount).
+
+Build clean (`npx vite build`). Lint: my 4 new/edited files (`MyCommissions`, `Payouts`, `usePayouts`, `App`) are 0-error; the 10 errors eslint reports are ALL pre-existing in `AppointmentCard.jsx` (unused imports + the known set-state-in-effect, flagged back in Prompts 46/48) and `Sidebar.jsx` (`List`/`RefreshCw` already-unused before I added `Wallet`) — none introduced here. **Not live-verified** — no Chrome, and it can't work until the steps below.
+
+**🔧 REMAINING (feature is dead until all done; CC can do the deploys on request like Twilio, but the migration is Brayden-only):**
+1. **Brayden:** apply `migration 049` in the Supabase SQL editor (table + columns + RLS). Everything references these — until applied, every fn 500s and the UI shows empty/errors.
+2. **Deploy 3 edge fns:** `supabase functions deploy stripe-connect-onboard --project-ref jjextitmbptoaolacocs`, `… stripe-pay-commission …`, `… create-commission-payout …` (all default jwt-verify; no `--no-verify-jwt`). `STRIPE_SECRET_KEY` already set (Prompt 9); optional `DASHBOARD_URL` defaults to `https://ohvara-dashboard.vercel.app`.
+3. **Stripe dashboard:** enable **Connect** (Express) on the Ohvara Stripe account if not already (one-time toggle) so account/transfer APIs work.
+
+<details><summary>Original queued spec (Prompt 55)</summary>
 
 **Context:** When Brayden closes a deal, the rep earns 10% of the total (setup + first month or recurring — see [[North Star]] commission math). Currently Brayden pays manually. Stripe Connect lets reps onboard their bank once, and Brayden can approve payouts from the admin dashboard — money lands in the rep's bank in 2 days. Stripe handles KYC + 1099 generation. No App Store, no custom payout logic.
 
@@ -274,6 +294,8 @@ Until steps 1–2 are done, the call button silently falls back to the `tel:` li
 **Required secrets:** `STRIPE_SECRET_KEY` (already exists from Prompt 9's checkout session work).
 
 **Build order:** migration 049 → `stripe-connect-onboard` → `stripe-pay-commission` → `create-commission-payout` → rep My Payouts UI → admin Payouts tab → auto-create on deal close → build verify → log.
+
+</details>
 
 ---
 
