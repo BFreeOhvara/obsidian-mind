@@ -64,6 +64,31 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-24 — Prompt 64: AI call grading pipeline (`51f4117`)
+
+9 files, 580 insertions. Build clean (3.05s). All lint errors pre-existing — none from this change. Not live-verified — requires migration + deploy + `DEEPGRAM_API_KEY` secret first.
+
+**What was built:**
+- **Migration 052** (`052_call_grading.sql`): `ALTER TABLE calls ADD COLUMN IF NOT EXISTS` for `twilio_recording_sid`, `twilio_recording_url`, `transcript`, `grade`, `feedback_good`, `feedback_improve`, `graded_at`. Index on `twilio_call_sid`. Enables realtime on calls table. Apply via SQL editor — NOT `db push`.
+- **New edge fn `grade-call`**: Fetches Twilio MP3 → Deepgram nova-2 transcription (`diarize=true`) → Claude Haiku grade (F/D/C/C+/B-/B/B+/A-/A/A+ scale, 1 good line + 1 improve line) → writes grade to calls row → inserts `call_graded` bell notification. Uses `SUPABASE_SERVICE_ROLE_KEY` to bypass RLS. Deploys `--no-verify-jwt`.
+- **Updated `twilio-voice-webhook`**: recording handler now (on `RecordingStatus=completed`) writes `twilio_recording_sid/url` to the calls row and fires grade-call fire-and-forget.
+- **Updated `CallModal.jsx`**: stores `call.parameters?.CallSid` on accept via `callSidRef`. Includes `twilio_call_sid` in `calls.insert()`. After Done, if a call was made, shows post-call `PostCallCard` (spinner → grade card) instead of closing. Realtime subscription on the specific calls row ID polls for `graded_at` — updates card when grade arrives. X closes early; grade still lands in My Calls + notification.
+- **New `MyCalls.jsx`**: `/rep/calls` page. Lists graded calls with grade badge (green/blue/amber/red), feedback lines, "Play" link to MP3. Empty state explains 30–60s delay.
+- **`useCallGradedNotifier`**: realtime UPDATE on `calls` where `rep_id = repId`; invalidates notifications + my-calls cache when `graded_at` transitions null → set.
+- **`RepNotificationBell`**: added `call_graded` TYPE_STYLES (PhoneCall icon, info/blue), wired `useCallGradedNotifier`.
+- **Sidebar**: added My Calls nav item (`/rep/calls`, `PhoneCall` icon) above Activity.
+- **App.jsx**: added `/rep/calls` route + `MyCalls` import.
+
+**Remaining steps before feature works (Brayden):**
+1. Apply migration 052 via SQL editor in Supabase dashboard
+2. Set secret: `supabase secrets set DEEPGRAM_API_KEY=<key> --project-ref jjextitmbptoaolacocs`
+3. Deploy: `supabase functions deploy grade-call --no-verify-jwt --project-ref jjextitmbptoaolacocs`
+4. Redeploy: `supabase functions deploy twilio-voice-webhook --no-verify-jwt --project-ref jjextitmbptoaolacocs`
+
+**Race condition note:** if recording webhook fires before rep hits Done (rare — recording processing takes time), `grade-call` returns 404 and the call isn't graded. Grade still appears in bell notification and My Calls once/if the rep hits Done next time. Edge case, acceptable for MVP.
+
+---
+
 ### 2026-06-24 — Session housekeeping (vault `ec97995`)
 
 Prompt 62 logged and queue cleared. Stale `.git/HEAD.lock` removed (OneDrive lock — same recurring gotcha, see [[Gotchas]]). No new code changes after Prompt 62 commit. LIVE_STATE shipped count updated to 1–62, queue empty.

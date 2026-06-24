@@ -16,7 +16,21 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–62 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–64 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+
+### Prompt 63 — My Payouts empty despite real closed-deal stats; backfill test rep's payout history (queued 2026-06-24, Eagle, from Brayden's screenshot)
+
+**Context:** Test Rep apex11's My Commissions page shows real-looking KPIs — Total Earned $842, Closed Deals 5, Last 7 Days $594, and a 30-day bar chart with 3 visible green bars (closes) — but the "My Payouts" section below still says "No payouts yet." Brayden wants the payout list to actually show rows for those existing closes — "as if this feature was already there the whole time" — not just the empty state.
+
+**Step 1 — recon the discrepancy first, don't assume.** Find out what data source powers the KPI cards (Total Earned / Closed Deals / Last 7 Days / the 30-day chart) — likely `useMyCommission` reading the legacy `commissions` table (migration 014) directly. Then check why `usePayouts.js`'s parallel `commission_payouts` + `commissions` query (added Prompt 60, Change 3) isn't surfacing those same rows for this rep — candidates: `rep_profile_id` filter mismatch, a join failing silently (e.g. business-name join on a null/mismatched key), a query error being swallowed, or the legacy rows genuinely lacking a field `MyPayouts` requires to render a row. Confirm in Supabase (read-only query, don't write yet) whether apex11 actually HAS rows in `commissions` matching the 5 closed deals.
+
+**Step 2 — fix or backfill, whichever the recon points to.**
+- If it's a bug (query/join/filter issue) — fix `usePayouts.js` so the real legacy rows render with business name, deal amount, 10%, and a "Legacy"/paid status (this is the most likely path since the chart data has to be coming from real rows somewhere).
+- If apex11 genuinely has no underlying rows at all (KPIs are computed some other way, e.g. hardcoded/seeded for demo purposes) — write a one-off backfill (SQL, run via the Supabase SQL editor per the established pattern, NOT a migration file) inserting 5 `commission_payouts` rows for apex11 matching the existing stats (business names can be pulled from apex11's actual closed `appointments`/`leads` rows if any exist, otherwise reasonable placeholders), statuses `paid`, dates spread to match the chart's bar positions (~Jun 9, Jun 19, Jun 22 plus 2 more to hit 5 total / $842).
+
+**This is test/demo data (apex11 only)** — purely cosmetic so Brayden can see the feature's full intended look before it matters for real reps. Don't touch any other rep's data.
+
+**Verify:** reload My Commissions as apex11 (Chrome MCP if connected) and confirm My Payouts now lists rows instead of the empty state.
 
 ---
 
