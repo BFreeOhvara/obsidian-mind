@@ -203,12 +203,12 @@ Code complete and pushed; **not yet live — three manual steps remain (see "REM
 
 Build clean (`npx vite build`). Lint: CallModal carries only its 1 pre-existing `useMemo` exhaustive-deps warning (was :105, now :112 after the added hooks) — no new lint. **Not live-verified** — no Chrome browser connected, AND it cannot work until the steps below are done.
 
-**🔧 REMAINING — Brayden + a deploy step (none done by CC, no Supabase/Twilio access this session):**
-1. **Brayden:** create a **TwiML App** in the Twilio console (console.twilio.com → Voice → TwiML Apps), Voice Request URL = `https://jjextitmbptoaolacocs.supabase.co/functions/v1/twilio-voice-webhook` (POST). Copy its `APxxxx` SID.
-2. **Brayden:** create a standard **API Key** (console → Account → API keys & tokens) → gives `SKxxxx` SID + secret. Then set the 5 Supabase secrets: `TWILIO_ACCOUNT_SID`, `TWILIO_API_KEY_SID`, `TWILIO_API_KEY_SECRET`, `TWILIO_TWIML_APP_SID`, `TWILIO_PHONE_NUMBER` (existing number). `TWILIO_AUTH_TOKEN` can stay for any REST use. (Also enable mic permission in the browser on first call.)
-3. **Deploy both functions:** `supabase functions deploy twilio-token --project-ref jjextitmbptoaolacocs` and `supabase functions deploy twilio-voice-webhook --no-verify-jwt --project-ref jjextitmbptoaolacocs`. (Header comments in each file restate this.)
+**🔧 REMAINING — only Brayden's Twilio-console steps left (deploy DONE):**
+1. **Brayden (PENDING):** create a **TwiML App** in the Twilio console (console.twilio.com → Voice → TwiML Apps), Voice Request URL = `https://jjextitmbptoaolacocs.supabase.co/functions/v1/twilio-voice-webhook` (POST). Copy its `APxxxx` SID.
+2. **Brayden (PENDING):** create a standard **API Key** (console → Account → API keys & tokens) → gives `SKxxxx` SID + secret. Then set the 5 Supabase secrets: `TWILIO_ACCOUNT_SID`, `TWILIO_API_KEY_SID`, `TWILIO_API_KEY_SECRET`, `TWILIO_TWIML_APP_SID`, `TWILIO_PHONE_NUMBER` (existing number). `TWILIO_AUTH_TOKEN` can stay for any REST use. (Also enable mic permission in the browser on first call.)
+3. **✅ DONE 2026-06-23 — both functions deployed by CC** via `npx supabase functions deploy` to project `jjextitmbptoaolacocs`. Verified live: `functions list` shows `twilio-token verify_jwt:true` and `twilio-voice-webhook verify_jwt:false` (both correct); webhook smoke test (`POST … -d "To="`) returned `<Response><Hangup/></Response>` exactly as written. They will 503 ("Twilio Voice not configured") until the secrets in step 2 are set — expected.
 
-Until 1–3 are done, the call button silently falls back to the `tel:` link (no error shown to the rep) — so shipping this now is safe even pre-deploy.
+Until steps 1–2 are done, the call button silently falls back to the `tel:` link (no error shown to the rep) — so this is safe live as-is.
 
 ---
 
