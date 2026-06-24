@@ -64,6 +64,21 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-24 — Session wrap: Prompts 63, 65, 66, 67 shipped (vault `ee5296d`)
+
+Continued from a prior context-compacted session (Prompt 64 already logged). This session cleared the remaining queue: **4 prompts, 5 dashboard commits** (`651aba6` → `ae1f72c`), all pushed to master + vault pushed to main.
+
+**What shipped:** Prompt 63 (`useMyPayouts` empty-state bug — removed `recipient_role` filter + PostgREST FK hint) · Prompt 65 (MyLeads default tab → New) · Prompt 66 (inbox seeds all reps immediately + contact panel description) · Prompt 67 (ScriptCanvas: back-ref arrows restored, bounded pan, white background).
+
+**Remaining open items (Brayden must do for Prompt 64 to go live):**
+- Set Deepgram secret: `supabase secrets set DEEPGRAM_API_KEY=<key> --project-ref jjextitmbptoaolacocs`
+- Deploy grade-call fn: `supabase functions deploy grade-call --no-verify-jwt --project-ref jjextitmbptoaolacocs`
+- Redeploy twilio-voice-webhook: `supabase functions deploy twilio-voice-webhook --no-verify-jwt --project-ref jjextitmbptoaolacocs`
+
+**Not browser-verified this session** — Chrome MCP not connected. Recommend a quick visual pass on: My Payouts (apex11 should now show 5 rows), Script canvas (back-ref arrows + white bg), Messages inbox (all reps present immediately).
+
+---
+
 ### 2026-06-24 — Prompt 67: script canvas back-ref arrows, bounded pan, white background (`ae1f72c`)
 
 3 changes in `ScriptCanvas.jsx`:
