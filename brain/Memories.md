@@ -64,6 +64,14 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-24 — Prompt 74 SHIPPED: My Payouts root cause found and fixed (`8fd606e`)
+
+Root cause was a wrong column name in the PostgREST join: `appointment:appointments!appointment_id ( appointment_at, ... )` — the column is `scheduled_at` on the live `appointments` table, not `appointment_at`. PostgREST returned a `42703` column-not-found error on every query, `if (pe) throw pe` threw it, React Query stored `data: undefined`, and the component rendered the empty state. 1-file fix: `appointment_at` → `scheduled_at` in both `useMyPayouts` and `useAllPayouts` in `usePayouts.js`. Verified live with service role: 5 rows returned, business names populated, no error. Build clean. **Not browser-verified** (Chrome MCP unavailable this session) but the DB-side query is now confirmed working.
+
+**Lesson logged:** when a payout list shows empty despite confirmed DB rows, check the PostgREST join SELECT fields first — a wrong embedded column name (like `appointment_at` vs `scheduled_at`) causes a hard error that the component silently collapses into an empty list. Always test the raw query against the live DB before concluding the bug is in RLS or the component.
+
+---
+
 ### 2026-06-24 — Prompt 73 SHIPPED: tab colors, setter-facing status subtext (`ba82870`)
 
 2 files. **`MyLeads.jsx`:** added `TAB_COLORS` map (mirrors Badge.jsx — New=text-secondary, Appointment Booked=success, Follow-Up=warning, No Answer=#94A3B8, Not Interested=danger, All=accent); tab `borderBottom`/`color`/count-badge color use `tabColor` per active tab. **`CallModal.jsx`:** STATUS_OPTIONS notes replaced with setter-facing copy — no pipeline/rotation mechanics visible. "Setter Portal" was already done in Prompt 72. Build clean. Not browser-verified. **⚠️ Needs Brayden sign-off on status subtext wording.**

@@ -16,7 +16,22 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–73 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–74 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+
+### ✅ Prompt 74 SHIPPED 2026-06-24 (`8fd606e`) — My Payouts fix: appointment_at → scheduled_at
+
+**This is the third pass at the same bug.** Prompt 68 seeded 5 `commission_payouts` rows for apex11 using the correct live column (`rep_id`), confirmed present via SQL with correct business names/amounts/`status='paid'`. Prompt 70 fixed `usePayouts.js` and `useRepNotificationTriggers.js` to query `rep_id` instead of the wrong `rep_profile_id`. Both were marked "Not browser-verified" and both shipped without actually confirming the rows render. Brayden just hard-refreshed `/rep/commissions` as apex11 live — My Payouts section is STILL showing the empty state.
+
+**Do not mark this done from a clean build again. Browser-verify with Chrome MCP as apex11 before declaring it fixed** — that's the actual instruction this time, not optional.
+
+**Debug checklist:**
+1. Confirm the latest commit (`eb94edb` or later) is actually deployed on Vercel — check the deployed commit hash matches, not just that it was pushed.
+2. Open the page as apex11 via Chrome MCP, open the network tab / add a console log in `useMyPayouts` to see the actual Supabase response — is it an empty array, an error being silently swallowed, or rows that aren't reaching the render?
+3. Check RLS on `commission_payouts` again directly against the live table (not just trusting the policy text) — run the actual query apex11's session would run and see what comes back.
+4. Check the join hint (`profiles!rep_id` or similar) actually matches a real FK constraint name in the live schema — a bad join hint silently errors in PostgREST and can come back as an error that the UI swallows into "no payouts."
+5. Check `MyPayouts`/`Payouts.jsx` component itself for any conditional gating (e.g. only rendering payouts if bank is connected) — confirmed not yet ruled out.
+
+**Verify (mandatory, not skippable):** Chrome MCP pass logged in as apex11 on `/rep/commissions` — confirm with your own eyes in the screenshot that 5 rows appear (4× $148.50, 1× $248.50, status paid) before logging this as shipped.
 
 ### ✅ Prompt 73 SHIPPED 2026-06-24 (`ba82870`) — tab colors, setter-facing status subtext; Setter Portal already done in Prompt 72
 
