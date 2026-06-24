@@ -16,34 +16,72 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–58 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–59 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
 
+### Prompt 60 — My Commissions + My Leads + canvas fixes (queued 2026-06-24, Falcon)
 
-
-### Prompt 59 — New notification types: messages, follow-ups, deal closed (queued 2026-06-24, Falcon)
-
-Three new notification triggers added to the existing notification system. **Recon first:** read `src/hooks/useRepNotificationTriggers.js` (full file — understand how the existing Supabase realtime subscriptions and badge polling work), `src/components/rep/RepNotificationBell.jsx` (how notifications are stored/displayed), and the `messages` and `leads` table schemas (check what columns exist for follow-up dates and message recipients).
+Four changes across three pages. Recon each file before editing.
 
 ---
 
-**Trigger 1 — New message:**
-Subscribe to realtime inserts on the `messages` table where `recipient_id = user.id` (or equivalent — recon the schema to find the correct column). On insert, fire a notification: title "New message", body the sender name + first ~60 chars of message content. Use the same notification pattern as existing triggers.
+**Change 1 — Connect bank button: popup window**
+
+In `MyCommissions.jsx`, change the "Connect bank" button handler. Instead of `window.location.href = url` (same tab), use:
+```js
+const popup = window.open(url, 'stripe-connect', 'popup,width=500,height=700,left=' + ((screen.width-500)/2) + ',top=' + ((screen.height-700)/2))
+```
+Centered on screen.
+
+In the `/rep/commissions` route handler (or at the top of `MyCommissions.jsx`), detect the `?onboarding=complete` query param. When present AND `window.opener` exists (we're in a popup): call `window.opener.postMessage('stripe-onboarding-complete', window.location.origin)` then `window.close()`. If `window.opener` is null (opened in same tab fallback), run the existing checkStatus logic normally.
+
+In the main `MyCommissions.jsx` mount effect, add a `window.addEventListener('message', ...)` that listens for `stripe-onboarding-complete` and triggers the existing checkStatus re-fetch + URL cleanup.
 
 ---
 
-**Trigger 2 — Follow-up reminder (5 minutes before):**
-On mount, start a 1-minute polling interval (`setInterval`, 60 000ms) that queries leads where `follow_up_date` is between `now()` and `now() + 6 minutes` AND `assigned_rep_id = user.id` (recon the exact column names). For each matching lead not already notified this session, fire a notification: title "Follow-up in 5 min", body the lead/business name. Track already-fired reminders in a `useRef` Set (keyed by `lead.id + follow_up_date`) so the same follow-up doesn't repeat every poll cycle. Clear the interval on unmount.
+**Change 2 — Connect bank button position: own row above stat cards, right-aligned**
+
+The button currently sits beside the Last 7 Days card. Move it to its own `div` row above the three stat cards, `display: flex; justify-content: flex-end`. The three stat cards remain in their existing row below. If `stripe_onboarding_complete` is true, hide the button (rep doesn't need it again).
 
 ---
 
-**Trigger 3 — Deal closed:**
-Subscribe to realtime inserts on `commission_payouts` where `rep_id = user.id`. On insert (status = 'pending'), fire a notification: title "Deal closed!", body "You'll earn $[amount_cents/100] from [business name]" — join to get business name via appointment → lead (recon if the realtime payload includes enough data; if not, do a one-time fetch of the payout row with joins on insert). Use JetBrains Mono for the dollar amount per the rules.
+**Change 3 — My Payouts: show existing commission data**
+
+The `commission_payouts` table is empty — there are no rows to display yet. To show the rep what it will look like, update `usePayouts.js` to ALSO query the existing `commissions` table (migration 014 — recon the schema) and merge those rows into the payout list as display-only "legacy" entries. Show them with the same layout: business name (via appointment → lead join), deal value, rep cut. Mark these with a `source: 'legacy'` flag so they can be styled slightly differently (e.g. no status chip, just show the amount). This gives apex11 real data to see in the payout list immediately.
 
 ---
 
-**Build:** all three triggers added to `useRepNotificationTriggers.js`. Build + lint → commit + push. No migration needed. Log completion and delete this entry.
+**Change 4 — My Leads: tab order + empty state centering**
+
+In the My Leads component (recon the file path — likely `src/components/rep/MyLeads.jsx` or similar): reorder the filter tabs so "New" is first, then the existing middle tabs in their current order, then "Not Interested", then "Old" last. 
+
+For the empty state ("No leads" / "Try a different filter" message): find the container and add `display: flex; align-items: center; justify-content: center` with a `min-height` that matches the leads list area so the message appears vertically centered in the box, not near the top.
 
 ---
+
+**Build order:** `MyCommissions.jsx` (changes 1+2+3) → `usePayouts.js` (change 3) → My Leads file (change 4) → build + lint → commit + push. Log and delete this entry.
+
+---
+
+### Prompt 61 — Script canvas: full page + no drag + click-to-practice (queued 2026-06-24, Falcon)
+
+**Recon first:** read `src/components/rep/ScriptCanvas.jsx` (full), `src/components/rep/ScriptWalk.jsx` (full), `src/pages/TrainingCenter.jsx` (full — understand how the canvas is embedded and what space it gets).
+
+---
+
+**Change 1 — Full page height:**
+Make the canvas fill the full available page height. In `TrainingCenter.jsx`, give the canvas container `height: calc(100vh - <header-height>)` (recon the actual header height). In `ScriptCanvas.jsx`, ensure the `ReactFlow` wrapper is `width: 100%; height: 100%`. Remove any fixed pixel heights.
+
+**Change 2 — No dragging:**
+Add `nodesDraggable={false}` and `nodesConnectable={false}` to the `<ReactFlow>` component props. Nodes are fixed in place — zoom/pan still works.
+
+**Change 3 — Remove "Start Practice" button, click node to enter practice:**
+Remove the existing "Start Practice" floating button. Instead, every node is clickable. When a node is clicked, replace the canvas view entirely with a `ScriptWalk`-style practice view — same component/styling as the old ScriptWalk practice mode — starting from the clicked node's step. 
+
+Implementation: add `onClick` handlers to all custom node types that call a parent `onNodeClick(nodeId)` callback. In `ScriptCanvas.jsx` (or `TrainingCenter.jsx`), track `practiceNodeId` in state — when set, render `<PracticeView startNodeId={practiceNodeId} onExit={() => setPracticeNodeId(null)} />` instead of the ReactFlow canvas. `PracticeView` is a new thin wrapper that drives `ScriptWalk` starting from the given node (recon how ScriptWalk accepts a starting step — it may need a `startStepId` prop added, or the walk can be initiated by matching the step by ID from the script flow). An "Exit practice" button returns `practiceNodeId` to null, restoring the canvas.
+
+The practice experience inside `PracticeView` should look and behave exactly like `ScriptWalk` in practice mode: show step text, Next/Back buttons, fork choices, etc. No lead context needed (training mode — data_collect steps show "Continue" without saving, same as before).
+
+**Build:** `TrainingCenter.jsx` + `ScriptCanvas.jsx` + `ScriptWalk.jsx` (add `startStepId` prop if needed) → build + lint → commit + push. No migration. Log and delete.
 
 ### ✅ Prompt 52 SHIPPED 2026-06-23 (`eff83fb`) — badge cleanup: perfect_day → Perfect Days, drift fixed, rate badges dropped
 

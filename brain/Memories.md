@@ -64,6 +64,18 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-24 — Prompt 59: three new notification triggers (`3723b40`)
+
+Added `useMessageReplyNotifier`, `useFollowUp5MinNotifier`, and `useDealClosedNotifier` to `src/hooks/useRepNotificationTriggers.js`. Wired all three into `RepNotificationBell.jsx`.
+
+- **Message reply:** realtime UPDATE on `messages` where `sender_id = repId`; when `reply_body` transitions null → set, invalidates the notifications cache (DB trigger from migration 043 already inserts the row — we just surface it immediately).
+- **Follow-up 5 min:** `setInterval` 60s; direct Supabase query for leads with `follow_up_at` within 6 min, `assigned_rep_id = repId`, `status = 'Follow-Up'`; deduped by `useRef` Set keyed `${lead.id}:${follow_up_at}`.
+- **Deal closed:** realtime INSERT on `commission_payouts` where `rep_profile_id = repId`; one-time fetch with join for business name (realtime payload has no joins); inserts a `deal_closed` notification.
+- Fixed two pre-existing `react-hooks/exhaustive-deps` warnings in the existing `useBadgeNotifier` and `useFollowUpNotifier` (missing `qc` dep; `badgeCtx` sub-field deps replaced with the full object). Lint clean.
+- No migration needed. Not live-verified (no Chrome browser).
+
+---
+
 [CC | 2026-06-22 — Admin bell panel positioning fixed (`0175155`)] — Same bug as the rep-side fix (Prompt 43, `f475566`), applied to `src/components/admin/NotificationBell.jsx`. Bell sits in the narrow admin sidebar; dropdown was anchored `position: absolute, top: calc(100% + 8px), right: 0` relative to the bell's own small wrapper — 340px panel extended leftward over the sidebar nav instead of into the main content area. Fix: `top: -4, left: calc(100% + 8px)` (opens right of the bell) + `zIndex` bumped 100→200 to match the rep version. Build clean. Committed + pushed directly (Brayden's instruction already authorized commit/push for this task). Chrome MCP unreachable — no browser connected (`list_connected_browsers` returned `[]`) — visual verify not done, build-verified only.
 
 [CC | 2026-06-22 — Prompt 27 REBUILT (`609a97d`)] — Script literal lines + full recursive flowchart. **Problem 1 (literal spoken lines):** `discoveryScript.js` — removed `▸ You've got the decision-maker` directive from Branch A (next line "Awesome..." is the natural opener); added ⚡ CC DRAFT spoken opening line for Branch B gatekeeper (`"Oh hey — is the owner or manager around? Just had a real quick question about how y'all handle phones right now."`) — THIS LINE IS DRAFT, pending Brayden + Nate review; removed `Leave word for word:` meta intro from Branch E; restructured Close from broken `IF THEY ASK ABOUT PRICE: "..."` say step + `↳ ONCE THEY PICK:` bad sub-marker into proper `BRANCH — Did they ask about price?` fork + `▸ Once they pick a window...` action step. **Problem 2 (recursive flowchart):** `ScriptFlowchart.jsx` full rewrite — `ForkNode` renders if/else Q + side-by-side option columns, each recursing via `FlowStep` → `SayNode`/`ActionNode`/`RouteNode`/`ForkNode`. `BranchColumn` renders full flat steps array (forks expand in-place). `CloseColumn` renders close with its price-question fork visible. 5-branch grid + `overflowX:auto`. Every path visible without expansion or clicking.
