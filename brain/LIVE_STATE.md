@@ -141,38 +141,54 @@ Build + lint verified clean (`npx vite build`, `npx eslint` both files, zero err
 
 ---
 
-### ⛔ Prompt 53 BLOCKED 2026-06-23 — referenced spec file missing + Change 2 premise doesn't match the code
+### Prompt 53 — Script canvas iteration: inline paths + data collection (re-queued 2026-06-23, Falcon)
 
-**Blocked on recon, no code written.** Two problems found before building:
+**Prior block resolved.** Change 2 (Q&A forks) dropped — `discoveryScript.js` has no "If they ask…" forks, every fork is a real path-branch. Change 1 and Change 3 are fully specified inline below — no external file needed.
 
-1. **The referenced spec file does not exist.** The prompt says "Full spec in `cc-prompt-53-canvas-iteration.md` in the Ohvara folder." That file is nowhere on disk — not in the vault, not in `ohvara-dashboard`, and `git log --all` shows it was never committed to either repo. The inline summary below is all that exists; the detailed content Brayden produced in his live review is missing.
+**Recon before building:** read `src/components/rep/ScriptCanvas.jsx` (full file — focus on `placeSteps()`, back-ref edge logic, `backRefs` adjacency map), `src/lib/discoveryScript.js` (full file — understand branch structure, where `dest.kind === 'branch'` routes appear, and the discovery phase of Branch A where the data-collect step will be inserted), and `src/components/rep/ScriptWalk.jsx` (full file).
 
-2. **Change 2's premise contradicts the actual script.** It says to "move 'If they ask…' fork nodes out of the main flow into a `questions: [{q,a}]` array." But `discoveryScript.js` has **zero** "If they ask…" forks — `grep -ni "if they ask"` returns nothing. Every fork in the script is a genuine path-branch (gatekeeper transferring/not-available, pivot-landed/not, price-asked/not, has-someone/just-them), exactly the kind the prompt says to KEEP. There is nothing to move into a `questions` array. The actual Q&A content to add must live in the missing spec file. Authoring rep-call objection-handling Q&A myself would violate the standing "AI scripts are pending Brayden + Nate review" rule (branchB already carries a `⚡ CC DRAFT … Pending Brayden + Nate review` line for exactly this reason).
+---
 
-**What's unambiguous and could ship independently if Brayden wants partial progress:** migration 050 (the two `ADD COLUMN IF NOT EXISTS` lines — fully specified) and the `recommend-stack` fallback read (5 calls/wk, $300 ticket). But shipping those alone is half a feature — the columns have no data-entry UI until Change 3's `ScriptWalk` inputs exist, and that depends on the `data_collect` step shape that the missing spec should define. Held rather than ship a stranded migration.
+**Change 1 — Inline branch repeats, no back-reference arrows**
 
-**To unblock:** Brayden/Falcon either (a) create `cc-prompt-53-canvas-iteration.md` in the vault root with the real spec (the specific Q&A pairs, exact `data_collect` placement, and how `questions` should attach to steps given the marker-string script format), or (b) explicitly authorize CC to author the Q&A content and choose the data-model refactor direction. Until then this stays blocked. Moving to Prompt 54 was NOT done automatically — Prompt 54 (Twilio WebRTC) is independent and could be run next, but it also has a hard human dependency (Brayden must create the TwiML App + set 5 Supabase secrets), so flagging both rather than silently picking one.
+In `ScriptCanvas.jsx`'s `placeSteps()` (or wherever `dest.kind === 'branch'` is handled): instead of recording a back-ref edge, recurse into the target branch's steps and inline them as new nodes in the current column. Use path-unique ID prefixes to avoid node ID collisions — e.g. inlined Branch A nodes inside Branch B get IDs like `b_inline_a_0`, `b_inline_a_1`.
 
-<details><summary>Original queued spec (for re-queue once unblocked)</summary>
+Remove ALL back-ref edge logic: the `backRefs` adjacency map, the dashed-edge rendering loop, and any `animated: true` / `MarkerType` usage on back-ref edges. Every edge in the final graph is a plain forward edge. Forward-route edges to Close remain unchanged.
 
-Three changes from Brayden's live review of the Prompt 48 canvas. Full spec in `cc-prompt-53-canvas-iteration.md` in the Ohvara folder.
+Result: each branch column is a complete self-contained path from opener to close. The canvas gets taller but every path is fully readable without following cross-tree arrows.
 
-**Change 1 — No back-reference arrows, inline path repetition:**
-Anywhere a path routes to "→ Branch A", inline Branch A's nodes directly in that column instead of drawing a looping back-edge. Every path is self-contained (Branch B column flows all the way through Branch A nodes and down to Close). Remove all `backRefs` tracking, dashed edges, and animated back-ref edge rendering from `ScriptCanvas.jsx`. Use path-unique node ID prefixes (e.g. `b_inline_a_0`) to avoid collision.
+---
 
-**Change 2 — Questions/objection handling co-located with step:**
-In `discoveryScript.js`: move "If they ask…" fork nodes out of the main flow and into a `questions: [{ q, a }]` array on the preceding step. True path-branching forks (gatekeeper/DM) stay as fork nodes. In `ScriptCanvas.jsx`: render `questions` as an inline secondary panel at the bottom of the node. In `ScriptWalk.jsx` (live mode): render as a collapsible "Questions?" section — expanding shows the answer but does NOT advance the script position.
+**Change 3 — Inline data collection for pricing inputs**
 
-**Change 3 — Inline data collection for pricing inputs:**
-- **Migration 050:** `ALTER TABLE leads ADD COLUMN IF NOT EXISTS calls_missed_per_week int; ALTER TABLE leads ADD COLUMN IF NOT EXISTS avg_ticket_value int;`
-- **`discoveryScript.js`:** add a `data_collect` step in Branch A's discovery phase (after pain-surfacing questions, before close routing). Fields: `calls_missed_per_week`, `avg_ticket_value`.
-- **`ScriptCanvas.jsx`:** new `DataCollectNode` type — shows fields as non-interactive display in training/canvas mode (note: "Fill in during your actual call").
-- **`ScriptWalk.jsx`:** in live call mode, render as two number inputs + "Save & Continue" — on click, PATCH `leads/{id}` with the values, then advance. If PATCH fails, toast error but still advance (never block a live call).
-- **`recommend-stack` edge fn:** read `calls_missed_per_week` / `avg_ticket_value` from the lead object in the request; use explicit fallback constants (5 calls/wk, $300 ticket) if null — not silent zeros.
+**Migration 050** (write file, apply via SQL editor — do NOT `supabase db push`):
+```sql
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS calls_missed_per_week int;
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS avg_ticket_value int;
+```
 
-**Build order:** migration 050 → `discoveryScript.js` → `ScriptCanvas.jsx` → `ScriptWalk.jsx` → `recommend-stack` edge fn → `npx vite build` + lint → commit + push.
+**`discoveryScript.js`:** Add a `data_collect` step in Branch A's discovery phase. Recon the file to find the right placement — it belongs after the rep has asked about call volume and job value (pain-surfacing questions), before the close/booking routing. Add it as:
+```js
+{
+  type: 'data_collect',
+  label: 'Qualifying Numbers',
+  hint: 'Ask and fill in before continuing',
+  fields: [
+    { key: 'calls_missed_per_week', label: 'Missed calls / week', placeholder: '8' },
+    { key: 'avg_ticket_value',      label: 'Average job value ($)', placeholder: '350' }
+  ]
+}
+```
 
-</details>
+**`ScriptCanvas.jsx`:** New custom node type `DataCollectNode`. In canvas/training mode (non-practice): render with the label, hint, and two greyed-out input fields + a note "Fill these in during your actual call." Non-interactive — display only. In practice mode: same display, but include a "Continue" button that advances the practice state without saving (no lead context in training mode).
+
+**`ScriptWalk.jsx`:** When current step is `data_collect`, render two number `<input>` fields (label + placeholder from the step definition) and a "Save & Continue" button. On click: PATCH `leads/{leadId}` with `{ calls_missed_per_week: val1, avg_ticket_value: val2 }` using the existing Supabase client, then advance to the next step. If PATCH fails: show a brief inline error note but still advance — never block a live call. Confirm `ScriptWalk` has access to `leadId` during recon; if not, it's passed from `CallModal.jsx` which has `lead` in scope.
+
+**`recommend-stack` edge function:** Recon where pricing is computed. Read `calls_missed_per_week` and `avg_ticket_value` from the lead object passed in the request body. If either is null/0/missing, use explicit fallback constants: `FALLBACK_CALLS_MISSED = 5`, `FALLBACK_AVG_TICKET = 300`. Make these named constants, not silent zeros buried in the formula.
+
+---
+
+**Build order:** migration 050 (write file) → `discoveryScript.js` → `ScriptCanvas.jsx` → `ScriptWalk.jsx` → `recommend-stack` edge fn → `npx vite build` + lint → commit + push. Log migration 050 as pending apply (SQL editor).
 
 ---
 
