@@ -64,6 +64,40 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-24 — Prompt 67: script canvas back-ref arrows, bounded pan, white background (`ae1f72c`)
+
+3 changes in `ScriptCanvas.jsx`:
+
+1. **Revert Prompt 53 inlining → back-ref arrows:** `measureSteps` no longer recurses into branch route targets (they don't add column width). `placeSteps` route handler no longer calls `placeSteps` recursively for back-refs — instead draws a curved dashed animated accent-colored edge (`stroke: 'var(--accent)', strokeDasharray: '5 3', animated: true`) from the current tail to the target branch's header node. Forward routes (to close) still use the grey `pushEdge` path.
+
+2. **Bounded pan range:** `translateExtent` useMemo in `CanvasInner` computes bounding box from all graph nodes (x/y + NODE_W+60 width + 150 height) plus a 400px margin. Passed to `<ReactFlow translateExtent={...}>` so the diagram can't scroll off-screen in any direction.
+
+3. **White canvas background:** Container `background: '#0A0A12'` → `'#ffffff'`. `<Background color="#1C1C2A">` → `color="#e0e0ec"`. `colorMode="dark"` removed. Noted as deliberate one-off (no white canvas token exists in the design system).
+
+1 file changed. Build clean (1.81s). **Not browser-verified** — the spec requested a Chrome MCP pass; not connected this session.
+
+---
+
+### 2026-06-24 — Prompt 66: inbox shows all reps, contact panel description (`d4cafd8`)
+
+2 changes in `MessageCenter.jsx`:
+
+1. **Auto-show all reps in inbox:** Imported `useReps` from `useProfiles.js`. In the non-rep `conversations` useMemo, seeded every known rep from `allReps` into `bySender` BEFORE overlaying actual messages — so reps with no messages appear immediately. Sort: reps with messages by recency (float to top), silent reps alphabetically below. Empty thread shows "No messages yet — say hello below." Admin/closer can't initiate (no message schema for that) but the thread is visible and ready.
+
+2. **Contact panel descriptive subtitle:** `MESSAGE_CATEGORIES.hint` field already existed. Added `description: c.hint` to each rep-view conversation object. `ContactPanel` now renders `selected.description` as a second muted line below the role/category label when present (rep view only — non-rep view has no category, just "Rep").
+
+**Portal scope note:** "or if a new portal has been made" in the original spec — scoped to reps only. `ohvara-client-portal` repo is abandoned; clients are now `role = 'client'` in the same dashboard but are not part of the rep messaging flow.
+
+1 file changed. Build clean (1.87s). **Not browser-verified.**
+
+---
+
+### 2026-06-24 — Prompt 65: MyLeads default tab → New (`ca31e4f`)
+
+1-line change in `MyLeads.jsx` line 291: `sessionStorage.getItem(SS_FILTER) || 'All'` → `|| 'New'`. The sessionStorage key means a rep who manually switches tabs will persist that choice across navigations — the default only applies on a fresh session (no stored value). Build clean (1.75s).
+
+---
+
 ### 2026-06-24 — Prompt 63: fix useMyPayouts showing empty despite real KPI data (`651aba6`)
 
 Root cause found via recon — **two failure vectors** in `usePayouts.js` `useMyPayouts()`:

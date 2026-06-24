@@ -16,33 +16,9 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–65 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–67 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
 
-### Prompt 65 — My Leads: default tab on load should be "New", not "All" (queued 2026-06-24, Eagle)
-
-**Context:** An earlier prompt removed the "Old" tab and moved "All" to the end (New is now the first tab in the row). But the page still opens on the "All" tab by default on load — Brayden wants it to open on "New" by default every time, since that's the actual working queue.
-
-**Step:** Recon `MyLeads.jsx`'s tab state (likely a `useState` initialized to `'all'` or similar). Change the initial value to whatever the "New" tab's filter key is. Don't reorder the tabs again — they're already New-first; this is purely which one is pre-selected on mount.
-
-**Verify:** reload `/rep/leads` as apex11 — page should land on the New tab, not All.
-
----
-
-### Prompt 66 — Messaging: auto-add new reps to Brayden+Nate inbox, richer right-panel context (queued 2026-06-24, Eagle)
-
-**Context:** Current messaging model (built earlier): a rep can message Brayden ("Dashboard Questions") or Nate ("Sales Questions") via a shared `Inbox` component; Brayden's admin inbox shows `recipient='brayden'` threads, Nate's closer inbox shows `recipient='nate'` threads (visible to any closer role, not just Nate — known v1 caveat, still true).
-
-**Brayden's requested changes — rep side is unchanged** (reps still only message Brayden or Nate, nothing new there). Closer/admin side:
-
-1. **Brayden and Nate should each see a thread for EVERY rep, automatically — not lazily-created on first message.** Today a rep only shows up in the inbox once they send a message. Brayden wants: the moment a new rep account is created, a conversation thread for that rep appears in both Brayden's and Nate's inbox immediately (even with zero messages sent yet — an empty/ready thread, not absent). Recon how rep accounts are created (`create-rep`/`admin-create-user` edge fn or wherever) and add a hook there that ensures a thread exists for the new rep in both inboxes. **Flag for Brayden before building:** he also said "or if a new portal has been made" — the `ohvara-client-portal` repo is abandoned (see CURRENT STATE), so confirm what "portal" means here before scoping it (a new client account? something else) rather than guessing.
-
-2. **Right-side detail panel needs more context, not just the type label.** Currently when a conversation is selected, the right side shows a flat label like "Dashboard Question." Add a short explanatory subtitle per type describing what that category actually covers (recon the existing type-styling object for messages and extend it with a description field, similar to how notification types already have descriptive copy).
-
-**Recon first** — read the messaging schema (the `messages` table migration — likely 029 per CURRENT STATE), the `Inbox` shared component, and wherever rep-account-creation happens, before writing code. Report findings before building, especially on the "portal" ambiguity in (1).
-
----
-
-### Prompt 67 — Script canvas: revert to back-ref arrows, bound pan/zoom, white background (queued 2026-06-24, Eagle)
+### ✅ Prompt 67 SHIPPED — Script canvas back-ref arrows + bounded pan + white background
 
 **Context:** Prompt 53's Change 1 replaced the canvas's back-reference arrows with inlining — when Branch B/C routed back to Branch A, instead of drawing a looping arrow to Branch A's header, it duplicated Branch A's full step sequence inline in B and C's columns (so no two boxes show the same content, but the canvas got much taller). **Brayden wants this reverted** — he prefers the arrows; repeated boxes are fine.
 
