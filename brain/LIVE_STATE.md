@@ -16,7 +16,45 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–67 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–68 Change 1 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+
+### ⏳ Prompt 68 Change 2 — Payout seeding (PENDING SQL approval)
+
+Change 1 ✅ done (commit `c327fd1`). Change 2 blocked by auto-mode classifier — needs explicit Brayden approval to INSERT into production DB.
+
+**Run this in the Supabase SQL editor (`jjextitmbptoaolacocs`):**
+
+```sql
+INSERT INTO commission_payouts (rep_profile_id, appointment_id, amount_cents, deal_value_cents, status, created_at, paid_at)
+SELECT c.recipient_id, c.appointment_id, ROUND(c.amount * 100)::int, ROUND(c.amount * 1000)::int, 'paid', c.created_at, c.created_at
+FROM commissions c
+WHERE c.recipient_id = (SELECT id FROM profiles WHERE username = 'apex11' LIMIT 1)
+  AND c.appointment_id IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM commission_payouts cp WHERE cp.appointment_id = c.appointment_id);
+```
+
+Seeds 5 payout rows (4× $148.50, 1× $248.50) from apex11's existing `commissions`. Idempotent. Or tell CC "yes run it" and it will execute via CLI.
+
+**Verify after:** My Payouts shows rows with business name / amount / status. Canvas dark gray, no minimap.
+
+---
+
+### Prompt 69 — Toast/slide-in notification popups, suppressed during an active call (queued 2026-06-24, Eagle)
+
+**Context:** Reps currently only learn about a new notification (badge unlock, call graded, deal closed, follow-up due, etc.) by noticing the bell's unread state and clicking it open — there's no in-the-moment popup. Brayden wants a toast: when a new notification arrives while the dashboard is open, a small card slides in from the top-right, sits for a normal toast duration (~4-5s), then slides back out. The bell itself keeps its existing unread indicator (red dot/badge) regardless of whether the toast was seen — clicking the bell clears it as today.
+
+**The actual problem he's solving:** a rep can finish a call and immediately move to the next one; ~30-60s later the grading for the PREVIOUS call completes and fires a notification. He does NOT want the toast popping up over their screen while they're mid-call on the next lead — distracting during a live call. But he still wants the notification to exist normally (bell badge updates, it's sitting there waiting) — it just shouldn't interrupt with a slide-in popup while a call is active. Once the call ends, future toasts resume firing normally; the one that arrived during the call does NOT need to "catch up" with a delayed toast — it's enough that the bell shows it.
+
+**Recon first:** read `RepNotificationBell.jsx`, `useRepNotifications.js`/`useNotifications.js` (the poll/realtime source both pull from), `useRepNotificationTriggers.js` (where `useCallGradedNotifier`, `useFollowUpNotifier`, `useBadgeNotifier` etc. live), and `CallModal.jsx`'s call state machine (`idle/connecting/in-call/error`) — confirm exactly where "is there an active call right now" lives today (likely local state inside `CallModal.jsx`, not yet exposed anywhere else).
+
+**Build:**
+1. A toast/snackbar component — fixed top-right, slide-in/slide-out animation, auto-dismiss after a few seconds, stacks if more than one fires close together. Wire it to the same notification stream the bell already reads (don't double-fire — one underlying event, two presentations: bell badge + optional toast).
+2. Expose "rep is currently in an active call" as state reachable outside `CallModal.jsx` — a small context/provider at the rep layout level is the likely shape, since the toast needs to live at a level that's mounted regardless of which page the rep is on, but the call state currently lives inside the modal. Recon should confirm the cleanest way to lift or share this without restructuring the whole call flow.
+3. When a new notification arrives: if no active call → fire the toast as normal. If an active call IS in progress → skip the toast for that notification (still insert/update the bell's unread state normally) — no queueing/catch-up needed once the call ends.
+
+**Verify:** Chrome MCP pass as apex11 — trigger a notification (e.g. a badge unlock or test call-grade) with no call active → toast slides in/out top-right, bell shows red unread indicator. Then trigger one again while in an active call (or simulate the in-call state) → confirm no toast appears, but the bell still picks up the unread state once checked.
+
+---
 
 ### ✅ Prompt 67 SHIPPED — Script canvas back-ref arrows + bounded pan + white background
 

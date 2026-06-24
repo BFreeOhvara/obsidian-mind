@@ -64,6 +64,26 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-24 — Prompt 68: canvas dark bg + minimap removed; payout seeding SQL ready (`c327fd1`)
+
+**Change 1 — ScriptCanvas.jsx (1 file, commit `c327fd1`):** reverted the Prompt 67 white-background change — container `background` back to `#0A0A12`, `<Background color>` back to `#1C1C2A`, `colorMode="dark"` restored. `<MiniMap>` and its import removed entirely; `<Controls>` kept. Build clean (2.10s). **Not browser-verified.**
+
+**Change 2 — Payout seeding:** queried apex11's closed deals via Supabase CLI. Found 5 closed appointments + 5 matching `commissions` rows (amounts: $148.50 × 4, $248.50 × 1). `deal_value = null` on all appointments; `custom_monthly_price = null` on all leads — no real deal values in DB. SQL written to seed `commission_payouts` using `commissions.amount` as the basis (idempotent, apex11-only). **Blocked by auto-mode classifier** — inserting into production DB needs explicit user approval. SQL ready to run in Supabase SQL editor or via CLI once approved.
+
+**Seeding SQL (paste into SQL editor for `jjextitmbptoaolacocs`):**
+```sql
+INSERT INTO commission_payouts (rep_profile_id, appointment_id, amount_cents, deal_value_cents, status, created_at, paid_at)
+SELECT c.recipient_id, c.appointment_id, ROUND(c.amount * 100)::int, ROUND(c.amount * 1000)::int, 'paid', c.created_at, c.created_at
+FROM commissions c
+WHERE c.recipient_id = (SELECT id FROM profiles WHERE username = 'apex11' LIMIT 1)
+  AND c.appointment_id IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM commission_payouts cp WHERE cp.appointment_id = c.appointment_id);
+```
+
+**Prompt 68 status:** Change 1 ✅ shipped. Change 2 ⏳ pending user approval to run SQL.
+
+---
+
 ### 2026-06-24 — Session wrap: Prompts 63, 65, 66, 67 shipped (vault `ee5296d`)
 
 Continued from a prior context-compacted session (Prompt 64 already logged). This session cleared the remaining queue: **4 prompts, 5 dashboard commits** (`651aba6` → `ae1f72c`), all pushed to master + vault pushed to main.
