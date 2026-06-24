@@ -64,6 +64,19 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-24 — Prompt 60: commissions popup + button row + legacy payouts + leads tabs (`a3c009b`)
+
+Four changes across 3 files.
+
+- **`MyCommissions.jsx` Change 1 (popup):** `startOnboarding` now opens Stripe URL in a centered popup via `window.open(..., 'stripe-connect', 'popup,...')`. On load with `?onboarding=complete`: if `window.opener` is set (popup flow) → `postMessage('stripe-onboarding-complete', origin)` + `window.close()`; else same-tab fallback runs `checkStatus`. Main window listens for the message and runs `checkStatus` + cleans URL. The `checkStatus` logic + `useEffect` moved from `MyPayouts` to `MyCommissions` (parent owns the flow).
+- **`MyCommissions.jsx` Change 2 (button row):** "Connect bank" button moved to its own `display:flex; justify-content:flex-end` row above the three KPI cards. Removed `marginLeft:auto/alignSelf:center/flexShrink:0` (no longer in a flex row with cards).
+- **`usePayouts.js` Change 3 (legacy data):** `useMyPayouts` now does two parallel queries — `commission_payouts` + `commissions` (migration 014). Legacy rows mapped to `source:'legacy'`, `amount_cents = amount * 100`, `deal_value_cents = amount * 1000` (reverse 10%). Sorted by `created_at` desc. `MyPayouts` shows a "Legacy" muted tag instead of `StatusChip` for these rows.
+- **`MyLeads.jsx` Change 4:** Added `'Old'` to end of `STATUS_FILTERS`. Fixed empty state centering with `height:'100%', minHeight:240`. Fixed pre-existing lint warning: `countFollowUpsDueToday` now accepts `nowMs` param so `now` in the `useMemo` dep array is actually used.
+
+Build clean (1.85s). Lint clean on all three files. Not live-verified.
+
+---
+
 ### 2026-06-24 — Prompt 59: three new notification triggers (`3723b40`)
 
 Added `useMessageReplyNotifier`, `useFollowUp5MinNotifier`, and `useDealClosedNotifier` to `src/hooks/useRepNotificationTriggers.js`. Wired all three into `RepNotificationBell.jsx`.

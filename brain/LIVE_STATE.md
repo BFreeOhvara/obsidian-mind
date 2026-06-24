@@ -16,51 +16,7 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–59 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
-
-### Prompt 60 — My Commissions + My Leads + canvas fixes (queued 2026-06-24, Falcon)
-
-Four changes across three pages. Recon each file before editing.
-
----
-
-**Change 1 — Connect bank button: popup window**
-
-In `MyCommissions.jsx`, change the "Connect bank" button handler. Instead of `window.location.href = url` (same tab), use:
-```js
-const popup = window.open(url, 'stripe-connect', 'popup,width=500,height=700,left=' + ((screen.width-500)/2) + ',top=' + ((screen.height-700)/2))
-```
-Centered on screen.
-
-In the `/rep/commissions` route handler (or at the top of `MyCommissions.jsx`), detect the `?onboarding=complete` query param. When present AND `window.opener` exists (we're in a popup): call `window.opener.postMessage('stripe-onboarding-complete', window.location.origin)` then `window.close()`. If `window.opener` is null (opened in same tab fallback), run the existing checkStatus logic normally.
-
-In the main `MyCommissions.jsx` mount effect, add a `window.addEventListener('message', ...)` that listens for `stripe-onboarding-complete` and triggers the existing checkStatus re-fetch + URL cleanup.
-
----
-
-**Change 2 — Connect bank button position: own row above stat cards, right-aligned**
-
-The button currently sits beside the Last 7 Days card. Move it to its own `div` row above the three stat cards, `display: flex; justify-content: flex-end`. The three stat cards remain in their existing row below. If `stripe_onboarding_complete` is true, hide the button (rep doesn't need it again).
-
----
-
-**Change 3 — My Payouts: show existing commission data**
-
-The `commission_payouts` table is empty — there are no rows to display yet. To show the rep what it will look like, update `usePayouts.js` to ALSO query the existing `commissions` table (migration 014 — recon the schema) and merge those rows into the payout list as display-only "legacy" entries. Show them with the same layout: business name (via appointment → lead join), deal value, rep cut. Mark these with a `source: 'legacy'` flag so they can be styled slightly differently (e.g. no status chip, just show the amount). This gives apex11 real data to see in the payout list immediately.
-
----
-
-**Change 4 — My Leads: tab order + empty state centering**
-
-In the My Leads component (recon the file path — likely `src/components/rep/MyLeads.jsx` or similar): reorder the filter tabs so "New" is first, then the existing middle tabs in their current order, then "Not Interested", then "Old" last. 
-
-For the empty state ("No leads" / "Try a different filter" message): find the container and add `display: flex; align-items: center; justify-content: center` with a `min-height` that matches the leads list area so the message appears vertically centered in the box, not near the top.
-
----
-
-**Build order:** `MyCommissions.jsx` (changes 1+2+3) → `usePayouts.js` (change 3) → My Leads file (change 4) → build + lint → commit + push. Log and delete this entry.
-
----
+*(Prompts 1, 2, 5–17, 26, 28–60 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
 
 ### Prompt 61 — Script canvas: full page + no drag + click-to-practice (queued 2026-06-24, Falcon)
 
