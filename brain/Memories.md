@@ -64,6 +64,12 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-24 — Session housekeeping (vault `ec97995`)
+
+Prompt 62 logged and queue cleared. Stale `.git/HEAD.lock` removed (OneDrive lock — same recurring gotcha, see [[Gotchas]]). No new code changes after Prompt 62 commit. LIVE_STATE shipped count updated to 1–62, queue empty.
+
+---
+
 ### 2026-06-24 — Prompt 62: payout row detail, call button, blank notes, Back button, leads tabs (`3d9edf0`)
 
 Five changes across 4 files. Build clean (2.13s). Lint: 1 pre-existing `exhaustive-deps` on CallModal:112 (intentional `lead.id` dep), not introduced here.
