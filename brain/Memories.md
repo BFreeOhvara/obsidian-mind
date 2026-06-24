@@ -64,6 +64,10 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-24 — Prompt 61 + vault housekeeping (`edca720`, vault `94c8be9`)
+
+LIVE_STATE "Next Up for CC" queue cleared (Prompt 61 item deleted, shipped count updated to 1–61). No new tasks queued; queue is empty — check [[North Star]] Current Focus for next priorities.
+
 ### 2026-06-24 — Prompt 61: script canvas full page + no drag + click-to-practice (`edca720`)
 
 Three changes across `ScriptCanvas.jsx`, `ScriptWalk.jsx`, `TrainingCenter.jsx`.
