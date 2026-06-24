@@ -192,50 +192,23 @@ ALTER TABLE leads ADD COLUMN IF NOT EXISTS avg_ticket_value int;
 
 ---
 
-### Prompt 54 — Twilio browser WebRTC calling (replaces Prompt 29 bridge) (queued 2026-06-23, Falcon)
+### ✅ Prompt 54 SHIPPED 2026-06-23 (`0f9f0ca`) — Twilio browser WebRTC calling, bridge fully replaced — ⚠️ DEPLOY + SECRETS + TWIML APP PENDING
 
-**Context:** Prompt 29 shipped a rep-first bridge call (Twilio REST API calls rep's phone first, then bridges to lead = 2 call legs, ~$0.013/min × 2). Decision locked this session: replace with Twilio Voice SDK (browser WebRTC). Rep's audio runs through computer mic/headset, Twilio calls lead directly = 1 leg, ~$0.0065/min. ~$20/rep/month at volume. Prompt 29's `bridgeCall()` + `twilio-call` edge function are fully replaced — don't extend them.
+Code complete and pushed; **not yet live — three manual steps remain (see "REMAINING" below).** The Prompt 29 bridge is gone, not extended: deleted `src/lib/twilio.js` (`bridgeCall`) and `supabase/functions/twilio-call/`.
 
-**What to build:**
+**Built:**
+- **`supabase/functions/twilio-token/index.ts`** (auth-required, deploy WITHOUT `--no-verify-jwt`): resolves the caller from the request JWT via `adminClient.auth.getUser()` (same pattern as `admin-create-user`) and mints a Twilio Voice Access Token **by hand** — no SDK. Standard JWT, `alg:HS256` + `cty:twilio-fpa;v=1` header, claims `jti/iss(apiKeySid)/sub(accountSid)/nbf/exp(+3600s)/grants{identity, voice:{incoming.allow, outgoing.application_sid}}`, signed with `TWILIO_API_KEY_SECRET` via Web Crypto HMAC. **Identity = the rep's own `user.id` from the JWT — never trusted from the body.** Returns `{ token, identity }`.
+- **`supabase/functions/twilio-voice-webhook/index.ts`** (deploy WITH `--no-verify-jwt` — Twilio posts here): returns `<Dial record="record-from-answer-dual-channel" recordingStatusCallback=".../recording" callerId="$TWILIO_PHONE_NUMBER"><Number>${To}</Number></Dial>`; empty/missing `To` → `<Hangup/>`. The `/recording` subpath is handled in the same function (path check) — logs recording metadata to console, returns 200 (no DB yet, Phase 2). `To` is XML-escaped.
+- **`CallModal.jsx`:** installed `@twilio/voice-sdk` (^2.18.3). On open, a `useEffect([lead.id])` invokes `twilio-token`, builds a `Device` (codec opus/pcmu), registers it, and on unmount disconnects any live call + `device.destroy()` (releases mic). Call state machine `idle → connecting → in-call → idle/error`: `startCall()` does `device.connect({ params:{ To: lead.phone } })` and wires `accept/disconnect/cancel/error`; in-call UI shows a green "Connected · m:ss" mono timer + Mute (`call.mute()`) and Hang Up (`call.disconnect()`). **The Prompt 29 `profile.phone` gate is removed** — WebRTC needs no rep phone. `tel:` fallback now only triggers when the Device couldn't register (secrets missing → token fails → `deviceReady=false`) or `lead.phone` is absent, so the feature degrades gracefully before secrets are set.
 
-1. **New edge function `twilio-token`** (auth-required, NOT `--no-verify-jwt`):
-   - Takes no body params
-   - Reads secrets: `TWILIO_ACCOUNT_SID`, `TWILIO_API_KEY_SID`, `TWILIO_API_KEY_SECRET`, `TWILIO_TWIML_APP_SID`
-   - Generates a Twilio Access Token (JWT) with a Voice grant scoped to the TwiML App
-   - Identity = the calling rep's `profile_id` (from the JWT sub claim)
-   - Returns `{ token: string }`
-   - Use the Twilio JWT library — install it as a vendor dep or use the REST approach (build the JWT manually with the standard `alg: HS256` header + `sub`/`iss`/`nbf`/`exp`/`grants` claims — Twilio's Access Token format is documented; no SDK needed if building manually)
+Build clean (`npx vite build`). Lint: CallModal carries only its 1 pre-existing `useMemo` exhaustive-deps warning (was :105, now :112 after the added hooks) — no new lint. **Not live-verified** — no Chrome browser connected, AND it cannot work until the steps below are done.
 
-2. **New edge function `twilio-voice-webhook`** (deploy with `--no-verify-jwt` — Twilio calls this):
-   - POST handler responding with TwiML
-   - Body will have `To` param (the lead's phone number, passed via `device.connect()` params)
-   - Returns TwiML: `<Response><Dial record="record-from-answer-dual-channel" recordingStatusCallback="/twilio-voice-webhook/recording"><Number>${To}</Number></Dial></Response>`
-   - Recording callback logs to console (no DB storage yet — Phase 2 when AI grading pipeline is built)
-   - Validate that `To` is non-empty before connecting; return `<Response><Hangup/></Response>` if missing
-   - Reads `TWILIO_PHONE_NUMBER` for the `callerId` on the `<Dial>` — use `callerId` attribute
+**🔧 REMAINING — Brayden + a deploy step (none done by CC, no Supabase/Twilio access this session):**
+1. **Brayden:** create a **TwiML App** in the Twilio console (console.twilio.com → Voice → TwiML Apps), Voice Request URL = `https://jjextitmbptoaolacocs.supabase.co/functions/v1/twilio-voice-webhook` (POST). Copy its `APxxxx` SID.
+2. **Brayden:** create a standard **API Key** (console → Account → API keys & tokens) → gives `SKxxxx` SID + secret. Then set the 5 Supabase secrets: `TWILIO_ACCOUNT_SID`, `TWILIO_API_KEY_SID`, `TWILIO_API_KEY_SECRET`, `TWILIO_TWIML_APP_SID`, `TWILIO_PHONE_NUMBER` (existing number). `TWILIO_AUTH_TOKEN` can stay for any REST use. (Also enable mic permission in the browser on first call.)
+3. **Deploy both functions:** `supabase functions deploy twilio-token --project-ref jjextitmbptoaolacocs` and `supabase functions deploy twilio-voice-webhook --no-verify-jwt --project-ref jjextitmbptoaolacocs`. (Header comments in each file restate this.)
 
-3. **`CallModal.jsx` rewrite of the call section:**
-   - Remove the old `bridgeCall()` import and `twilio-call` references entirely
-   - Install `@twilio/voice-sdk` npm package (recon if already installed, install if not)
-   - On CallModal open (useEffect with `lead` dep): fetch `twilio-token`, instantiate a Twilio `Device`, register it
-   - Call button states: idle → "Call (Recorded)" → calling (spinner + "Connecting…") → in-call (green badge + "Connected · 0:00" timer + Mute + Hang Up buttons) → ended (reset)
-   - `device.connect({ params: { To: lead.phone } })` on button click
-   - `call.mute()` / `call.disconnect()` for mute/hang up
-   - On disconnect/error: reset state + destroy Device
-   - Gate the whole WebRTC path on `profile?.phone` being falsy OR just always show it (WebRTC doesn't need the rep's personal number — only the bridge did). **The `profile.phone` gate from Prompt 29 is no longer needed for WebRTC; remove it.** tel: link fallback kept only for when `lead.phone` is missing.
-   - Migration 045 (`profiles.phone`) was for the bridge — still fine to apply but the WebRTC feature no longer depends on it.
-
-4. **Required Supabase secrets to set before deploy:**
-   - `TWILIO_ACCOUNT_SID`
-   - `TWILIO_API_KEY_SID`
-   - `TWILIO_API_KEY_SECRET`
-   - `TWILIO_TWIML_APP_SID` (Brayden creates this in Twilio console — Voice URL = `https://jjextitmbptoaolacocs.supabase.co/functions/v1/twilio-voice-webhook`)
-   - `TWILIO_PHONE_NUMBER` (existing $1.15/mo number)
-   - Keep `TWILIO_AUTH_TOKEN` for any future REST-only calls
-
-**Build order:** recon CallModal + Prompt 29 code → build + deploy `twilio-voice-webhook` → build + deploy `twilio-token` → rewrite CallModal call section → build verify → log.
-
-**⚠️ Brayden must create the TwiML App in Twilio console before this works end-to-end.** CC can ship the code; the TwiML App SID needs to be pasted as a Supabase secret. Note that in the console at console.twilio.com → Voice → TwiML Apps.
+Until 1–3 are done, the call button silently falls back to the `tel:` link (no error shown to the rep) — so shipping this now is safe even pre-deploy.
 
 ---
 
