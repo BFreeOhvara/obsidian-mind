@@ -16,28 +16,7 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–60 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
-
-### Prompt 61 — Script canvas: full page + no drag + click-to-practice (queued 2026-06-24, Falcon)
-
-**Recon first:** read `src/components/rep/ScriptCanvas.jsx` (full), `src/components/rep/ScriptWalk.jsx` (full), `src/pages/TrainingCenter.jsx` (full — understand how the canvas is embedded and what space it gets).
-
----
-
-**Change 1 — Full page height:**
-Make the canvas fill the full available page height. In `TrainingCenter.jsx`, give the canvas container `height: calc(100vh - <header-height>)` (recon the actual header height). In `ScriptCanvas.jsx`, ensure the `ReactFlow` wrapper is `width: 100%; height: 100%`. Remove any fixed pixel heights.
-
-**Change 2 — No dragging:**
-Add `nodesDraggable={false}` and `nodesConnectable={false}` to the `<ReactFlow>` component props. Nodes are fixed in place — zoom/pan still works.
-
-**Change 3 — Remove "Start Practice" button, click node to enter practice:**
-Remove the existing "Start Practice" floating button. Instead, every node is clickable. When a node is clicked, replace the canvas view entirely with a `ScriptWalk`-style practice view — same component/styling as the old ScriptWalk practice mode — starting from the clicked node's step. 
-
-Implementation: add `onClick` handlers to all custom node types that call a parent `onNodeClick(nodeId)` callback. In `ScriptCanvas.jsx` (or `TrainingCenter.jsx`), track `practiceNodeId` in state — when set, render `<PracticeView startNodeId={practiceNodeId} onExit={() => setPracticeNodeId(null)} />` instead of the ReactFlow canvas. `PracticeView` is a new thin wrapper that drives `ScriptWalk` starting from the given node (recon how ScriptWalk accepts a starting step — it may need a `startStepId` prop added, or the walk can be initiated by matching the step by ID from the script flow). An "Exit practice" button returns `practiceNodeId` to null, restoring the canvas.
-
-The practice experience inside `PracticeView` should look and behave exactly like `ScriptWalk` in practice mode: show step text, Next/Back buttons, fork choices, etc. No lead context needed (training mode — data_collect steps show "Continue" without saving, same as before).
-
-**Build:** `TrainingCenter.jsx` + `ScriptCanvas.jsx` + `ScriptWalk.jsx` (add `startStepId` prop if needed) → build + lint → commit + push. No migration. Log and delete.
+*(Prompts 1, 2, 5–17, 26, 28–61 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
 
 ### ✅ Prompt 52 SHIPPED 2026-06-23 (`eff83fb`) — badge cleanup: perfect_day → Perfect Days, drift fixed, rate badges dropped
 

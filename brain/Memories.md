@@ -64,6 +64,18 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-24 — Prompt 61: script canvas full page + no drag + click-to-practice (`edca720`)
+
+Three changes across `ScriptCanvas.jsx`, `ScriptWalk.jsx`, `TrainingCenter.jsx`.
+
+- **Change 1 — Full page height:** `DiscoveryScript` in TrainingCenter now has `display:flex; flex-direction:column; height:calc(100vh - 160px)`. Description `<p>` gets `flexShrink:0`. `<ScriptCanvas />` wrapped in `<div style={{ flex:1, minHeight:0 }}>`. Both `CanvasInner` and `PracticeView` use `height:'100%'` so they fill the flex container.
+- **Change 2 — No dragging:** Changed `nodesDraggable` (implicit true) to `nodesDraggable={false}`. Removed `positions` state and `onNodesChange` drag-tracking callback (now dead since nodes can't be dragged). `nodesConnectable={false}` was already present.
+- **Change 3 — Click node → practice:** Removed "Start Practice" floating button and all on-canvas practice state (`practice`, `activeId`, `history`, `pickable`). Every node click now calls `onPractice(node.data.sectionId)`, which sets `practiceSectionId` in `ScriptCanvas` and renders a new `PracticeView` component instead of the canvas. `PracticeView` wraps `ScriptWalk mode="practice"` with an "Exit practice" overlay button. `ScriptWalk` gains a `startSectionId` prop (initializes walk at any section, not just 'opener'). `buildGraph` now threads `sectionId` into every node's data so clicks can route to the correct section.
+
+Build clean (2.04s). Lint: 2 pre-existing errors in TrainingCenter.jsx (lines 68/951, unrelated `setState-in-effect`). Not live-verified — no Chrome browser connected.
+
+---
+
 ### 2026-06-24 — Prompt 60: commissions popup + button row + legacy payouts + leads tabs (`a3c009b`)
 
 Four changes across 3 files.
