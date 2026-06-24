@@ -141,7 +141,42 @@ Build + lint verified clean (`npx vite build`, `npx eslint` both files, zero err
 
 ---
 
-### Prompt 53 — Twilio browser WebRTC calling (replaces Prompt 29 bridge) (queued 2026-06-23, Falcon)
+### ⛔ Prompt 53 BLOCKED 2026-06-23 — referenced spec file missing + Change 2 premise doesn't match the code
+
+**Blocked on recon, no code written.** Two problems found before building:
+
+1. **The referenced spec file does not exist.** The prompt says "Full spec in `cc-prompt-53-canvas-iteration.md` in the Ohvara folder." That file is nowhere on disk — not in the vault, not in `ohvara-dashboard`, and `git log --all` shows it was never committed to either repo. The inline summary below is all that exists; the detailed content Brayden produced in his live review is missing.
+
+2. **Change 2's premise contradicts the actual script.** It says to "move 'If they ask…' fork nodes out of the main flow into a `questions: [{q,a}]` array." But `discoveryScript.js` has **zero** "If they ask…" forks — `grep -ni "if they ask"` returns nothing. Every fork in the script is a genuine path-branch (gatekeeper transferring/not-available, pivot-landed/not, price-asked/not, has-someone/just-them), exactly the kind the prompt says to KEEP. There is nothing to move into a `questions` array. The actual Q&A content to add must live in the missing spec file. Authoring rep-call objection-handling Q&A myself would violate the standing "AI scripts are pending Brayden + Nate review" rule (branchB already carries a `⚡ CC DRAFT … Pending Brayden + Nate review` line for exactly this reason).
+
+**What's unambiguous and could ship independently if Brayden wants partial progress:** migration 050 (the two `ADD COLUMN IF NOT EXISTS` lines — fully specified) and the `recommend-stack` fallback read (5 calls/wk, $300 ticket). But shipping those alone is half a feature — the columns have no data-entry UI until Change 3's `ScriptWalk` inputs exist, and that depends on the `data_collect` step shape that the missing spec should define. Held rather than ship a stranded migration.
+
+**To unblock:** Brayden/Falcon either (a) create `cc-prompt-53-canvas-iteration.md` in the vault root with the real spec (the specific Q&A pairs, exact `data_collect` placement, and how `questions` should attach to steps given the marker-string script format), or (b) explicitly authorize CC to author the Q&A content and choose the data-model refactor direction. Until then this stays blocked. Moving to Prompt 54 was NOT done automatically — Prompt 54 (Twilio WebRTC) is independent and could be run next, but it also has a hard human dependency (Brayden must create the TwiML App + set 5 Supabase secrets), so flagging both rather than silently picking one.
+
+<details><summary>Original queued spec (for re-queue once unblocked)</summary>
+
+Three changes from Brayden's live review of the Prompt 48 canvas. Full spec in `cc-prompt-53-canvas-iteration.md` in the Ohvara folder.
+
+**Change 1 — No back-reference arrows, inline path repetition:**
+Anywhere a path routes to "→ Branch A", inline Branch A's nodes directly in that column instead of drawing a looping back-edge. Every path is self-contained (Branch B column flows all the way through Branch A nodes and down to Close). Remove all `backRefs` tracking, dashed edges, and animated back-ref edge rendering from `ScriptCanvas.jsx`. Use path-unique node ID prefixes (e.g. `b_inline_a_0`) to avoid collision.
+
+**Change 2 — Questions/objection handling co-located with step:**
+In `discoveryScript.js`: move "If they ask…" fork nodes out of the main flow and into a `questions: [{ q, a }]` array on the preceding step. True path-branching forks (gatekeeper/DM) stay as fork nodes. In `ScriptCanvas.jsx`: render `questions` as an inline secondary panel at the bottom of the node. In `ScriptWalk.jsx` (live mode): render as a collapsible "Questions?" section — expanding shows the answer but does NOT advance the script position.
+
+**Change 3 — Inline data collection for pricing inputs:**
+- **Migration 050:** `ALTER TABLE leads ADD COLUMN IF NOT EXISTS calls_missed_per_week int; ALTER TABLE leads ADD COLUMN IF NOT EXISTS avg_ticket_value int;`
+- **`discoveryScript.js`:** add a `data_collect` step in Branch A's discovery phase (after pain-surfacing questions, before close routing). Fields: `calls_missed_per_week`, `avg_ticket_value`.
+- **`ScriptCanvas.jsx`:** new `DataCollectNode` type — shows fields as non-interactive display in training/canvas mode (note: "Fill in during your actual call").
+- **`ScriptWalk.jsx`:** in live call mode, render as two number inputs + "Save & Continue" — on click, PATCH `leads/{id}` with the values, then advance. If PATCH fails, toast error but still advance (never block a live call).
+- **`recommend-stack` edge fn:** read `calls_missed_per_week` / `avg_ticket_value` from the lead object in the request; use explicit fallback constants (5 calls/wk, $300 ticket) if null — not silent zeros.
+
+**Build order:** migration 050 → `discoveryScript.js` → `ScriptCanvas.jsx` → `ScriptWalk.jsx` → `recommend-stack` edge fn → `npx vite build` + lint → commit + push.
+
+</details>
+
+---
+
+### Prompt 54 — Twilio browser WebRTC calling (replaces Prompt 29 bridge) (queued 2026-06-23, Falcon)
 
 **Context:** Prompt 29 shipped a rep-first bridge call (Twilio REST API calls rep's phone first, then bridges to lead = 2 call legs, ~$0.013/min × 2). Decision locked this session: replace with Twilio Voice SDK (browser WebRTC). Rep's audio runs through computer mic/headset, Twilio calls lead directly = 1 leg, ~$0.0065/min. ~$20/rep/month at volume. Prompt 29's `bridgeCall()` + `twilio-call` edge function are fully replaced — don't extend them.
 
@@ -188,7 +223,7 @@ Build + lint verified clean (`npx vite build`, `npx eslint` both files, zero err
 
 ---
 
-### Prompt 54 — Stripe Connect for rep commission payouts (queued 2026-06-23, Falcon)
+### Prompt 55 — Stripe Connect for rep commission payouts (queued 2026-06-23, Falcon)
 
 **Context:** When Brayden closes a deal, the rep earns 10% of the total (setup + first month or recurring — see [[North Star]] commission math). Currently Brayden pays manually. Stripe Connect lets reps onboard their bank once, and Brayden can approve payouts from the admin dashboard — money lands in the rep's bank in 2 days. Stripe handles KYC + 1099 generation. No App Store, no custom payout logic.
 
