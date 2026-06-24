@@ -208,22 +208,9 @@ ALTER TABLE leads ADD COLUMN IF NOT EXISTS avg_ticket_value int;
 
 ---
 
-### Prompt 56 — Deploy all pending edge functions (queued 2026-06-23, Falcon)
+### ✅ Prompt 56 DONE 2026-06-23 — all 4 edge functions deployed
 
-Four edge functions committed but never deployed. Run in one pass:
-
-```bash
-cd ohvara-dashboard
-git pull
-supabase functions deploy enrich-business-info --project-ref jjextitmbptoaolacocs
-supabase functions deploy stripe-connect-onboard --project-ref jjextitmbptoaolacocs
-supabase functions deploy stripe-pay-commission --project-ref jjextitmbptoaolacocs
-supabase functions deploy create-commission-payout --project-ref jjextitmbptoaolacocs
-```
-
-Verify all four appear in `supabase functions list --project-ref jjextitmbptoaolacocs` with recent deployment timestamps. Log each as deployed. Commit nothing (code-only deploy, no file changes). Log completion to [[Memories]] and delete this entry from LIVE_STATE.
-
-**Note:** Migrations 049 (Stripe Connect schema) and 050 (leads pricing columns) both still need SQL editor apply — those are manual steps Brayden does via Chrome, not CC. Don't block on them.
+`enrich-business-info`, `stripe-connect-onboard`, `stripe-pay-commission`, `create-commission-payout` all live on `jjextitmbptoaolacocs`. Verified via `functions list`. **Still pending (Brayden):** migration 049 (Stripe Connect schema) + migration 050 (leads pricing columns) via SQL editor.
 
 ---
 
