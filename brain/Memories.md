@@ -64,6 +64,20 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-24 — Prompt 62: payout row detail, call button, blank notes, Back button, leads tabs (`3d9edf0`)
+
+Five changes across 4 files. Build clean (2.13s). Lint: 1 pre-existing `exhaustive-deps` on CallModal:112 (intentional `lead.id` dep), not introduced here.
+
+- **Change 1 — MyPayouts row detail:** `usePayouts.js` already selected `deal_value_cents` and joined `business_name` — display-only change. Row subline changed from `Closed $X · Your cut: $Y` → `Closed $X · 10% · $Y earned` to surface the commission rate explicitly.
+- **Change 2 — Drop "(Recorded)" from call button:** `CallModal.jsx` line 831: `Call {lead.phone} (Recorded)` → `Call {lead.phone}`. Call still recorded server-side via Twilio `<Dial record=...>` (Prompt 54) — label was just noise.
+- **Change 3 — Call notes field starts blank:** `useState('')` instead of `useState(lead.notes || '')`. Scrape metadata (e.g. "Manual Indeed scrape...") was pre-populating the rep-facing textarea; reps now start with a blank field and type their own notes. Old `lead.notes` value is cleared from the DB on next Done save.
+- **Change 4 — Back button visual weight:** `ScriptWalk.jsx` controls footer. Active Back button now has `background: var(--accent-dim)`, `border: 0.5px solid var(--accent-border)`, `borderRadius: 8`, `color: var(--accent)`, `padding: 5px 10px`. Disabled state reverts to transparent/muted. Design tokens only — no hardcoded hex.
+- **Change 5 — Leads tab fix:** `STATUS_FILTERS` in `MyLeads.jsx` changed from `['All', 'New', ..., 'Old']` → `['New', 'Appointment Booked', 'Follow-Up', 'No Answer', 'Not Interested', 'All']`. 'Old' removed, 'New' is now first, 'All' is last.
+
+Not live-verified — no Chrome browser connected.
+
+---
+
 ### 2026-06-24 — Prompt 61 + vault housekeeping (`edca720`, vault `94c8be9`)
 
 LIVE_STATE "Next Up for CC" queue cleared (Prompt 61 item deleted, shipped count updated to 1–61). No new tasks queued; queue is empty — check [[North Star]] Current Focus for next priorities.
