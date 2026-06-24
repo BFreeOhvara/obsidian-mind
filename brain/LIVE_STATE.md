@@ -214,9 +214,9 @@ ALTER TABLE leads ADD COLUMN IF NOT EXISTS avg_ticket_value int;
 
 ---
 
-### ✅ Prompt 54 SHIPPED 2026-06-23 (`0f9f0ca`) — Twilio browser WebRTC calling, bridge fully replaced — ⚠️ DEPLOY + SECRETS + TWIML APP PENDING
+### ✅ Prompt 54 SHIPPED 2026-06-23 (`0f9f0ca`) — Twilio browser WebRTC calling, bridge fully replaced — ✅ FULLY LIVE 2026-06-24
 
-Code complete and pushed; **not yet live — three manual steps remain (see "REMAINING" below).** The Prompt 29 bridge is gone, not extended: deleted `src/lib/twilio.js` (`bridgeCall`) and `supabase/functions/twilio-call/`.
+Code complete and pushed. The Prompt 29 bridge is gone, not extended: deleted `src/lib/twilio.js` (`bridgeCall`) and `supabase/functions/twilio-call/`.
 
 **Built:**
 - **`supabase/functions/twilio-token/index.ts`** (auth-required, deploy WITHOUT `--no-verify-jwt`): resolves the caller from the request JWT via `adminClient.auth.getUser()` (same pattern as `admin-create-user`) and mints a Twilio Voice Access Token **by hand** — no SDK. Standard JWT, `alg:HS256` + `cty:twilio-fpa;v=1` header, claims `jti/iss(apiKeySid)/sub(accountSid)/nbf/exp(+3600s)/grants{identity, voice:{incoming.allow, outgoing.application_sid}}`, signed with `TWILIO_API_KEY_SECRET` via Web Crypto HMAC. **Identity = the rep's own `user.id` from the JWT — never trusted from the body.** Returns `{ token, identity }`.
@@ -225,12 +225,7 @@ Code complete and pushed; **not yet live — three manual steps remain (see "REM
 
 Build clean (`npx vite build`). Lint: CallModal carries only its 1 pre-existing `useMemo` exhaustive-deps warning (was :105, now :112 after the added hooks) — no new lint. **Not live-verified** — no Chrome browser connected, AND it cannot work until the steps below are done.
 
-**🔧 REMAINING — only Brayden's Twilio-console steps left (deploy DONE):**
-1. **Brayden (PENDING):** create a **TwiML App** in the Twilio console (console.twilio.com → Voice → TwiML Apps), Voice Request URL = `https://jjextitmbptoaolacocs.supabase.co/functions/v1/twilio-voice-webhook` (POST). Copy its `APxxxx` SID.
-2. **Brayden (PENDING):** create a standard **API Key** (console → Account → API keys & tokens) → gives `SKxxxx` SID + secret. Then set the 5 Supabase secrets: `TWILIO_ACCOUNT_SID`, `TWILIO_API_KEY_SID`, `TWILIO_API_KEY_SECRET`, `TWILIO_TWIML_APP_SID`, `TWILIO_PHONE_NUMBER` (existing number). `TWILIO_AUTH_TOKEN` can stay for any REST use. (Also enable mic permission in the browser on first call.)
-3. **✅ DONE 2026-06-23 — both functions deployed by CC** via `npx supabase functions deploy` to project `jjextitmbptoaolacocs`. Verified live: `functions list` shows `twilio-token verify_jwt:true` and `twilio-voice-webhook verify_jwt:false` (both correct); webhook smoke test (`POST … -d "To="`) returned `<Response><Hangup/></Response>` exactly as written. They will 503 ("Twilio Voice not configured") until the secrets in step 2 are set — expected.
-
-Until steps 1–2 are done, the call button silently falls back to the `tel:` link (no error shown to the rep) — so this is safe live as-is.
+**✅ ALL REMAINING STEPS DONE 2026-06-24 (Brayden):** TwiML App created in Twilio console (Voice Request URL → `twilio-voice-webhook`), standard API Key created, all 5 Supabase secrets set (`TWILIO_ACCOUNT_SID`, `TWILIO_API_KEY_SID`, `TWILIO_API_KEY_SECRET`, `TWILIO_TWIML_APP_SID`, `TWILIO_PHONE_NUMBER`). Both edge functions were already deployed (2026-06-23). **Feature should now be fully live** — still not Chrome-MCP-verified in an actual session; worth a real test call as a rep to confirm the WebRTC device registers and the call connects/records before fully trusting it.
 
 ---
 
