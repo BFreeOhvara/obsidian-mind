@@ -16,7 +16,29 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–68 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–73 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+
+### ✅ Prompt 73 SHIPPED 2026-06-24 (`ba82870`) — tab colors, setter-facing status subtext; Setter Portal already done in Prompt 72
+
+**⚠️ Needs Brayden verify:** status subtext wording is CC's proposal — confirm before treating as final. Proposed copy: Appointment Booked → "Nice work! Fill in the appointment details below"; No Answer → "No one picked up — try again later or set a follow-up date"; Not Interested → "Lead declined — removed from your active list"; Follow-Up → "Lead stays in your list — pick a date below to come back to this one".
+
+### ✅ Prompt 72 SHIPPED 2026-06-24 (`c993ae2`) — canvas white text, start-here badge, sidebar reorder, leads relabel
+
+### ✅ Prompt 71 SHIPPED (already done) — admin NotificationBell portal fix was in commit `0175155`; no new code needed.
+
+### 🔴 Prompt 70 — My Payouts still shows empty state despite seeded rows (PRIORITY, queued 2026-06-24, Eagle)
+
+**Bug:** Prompt 68 Change 2 seeded 5 `commission_payouts` rows for apex11 (confirmed in DB per Memories log). Brayden just checked `/rep/commissions` as apex11 live and the My Payouts section still shows the empty state: "No payouts yet — a pending payout appears here when the closer signs a deal you booked." Screenshot confirms Total Earned/Closed Deals/chart above are populated correctly — only the My Payouts block at the bottom is empty.
+
+**Known suspect (already logged in Memories from Prompt 68):** `commission_payouts.rep_profile_id` per the migration 049 FILE doesn't match the LIVE schema column, which is actually `rep_id`. `usePayouts.js` selects/joins on `rep_profile_id`. The seeding INSERT used `rep_profile_id` as the column name and reportedly succeeded — so confirm first whether that column actually exists live (maybe both exist, or the insert silently went to the wrong place, or query-side filter is the only thing broken).
+
+**Also check:** whether `MyPayouts`/the component rendering this block has any gating logic tied to "bank connected" (the UI shows a "Connect bank" CTA above it) — payout rows should display regardless of whether a bank is connected; bank connection should only affect actual transfer, not visibility.
+
+**Fix:** find the real disconnect (column mismatch, RLS policy blocking the seeded rows for this query shape, or a UI conditional), fix it, and confirm the 5 seeded rows (4× $148.50, 1× $248.50, status paid) actually render in the My Payouts list.
+
+**Verify:** Chrome MCP pass as apex11 on `/rep/commissions` — My Payouts section shows 5 rows with business name, amount, 10%, status.
+
+---
 
 ### Prompt 69 — Toast/slide-in notification popups, suppressed during an active call (queued 2026-06-24, Eagle)
 

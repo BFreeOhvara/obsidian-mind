@@ -64,6 +64,36 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-24 — Prompt 73 SHIPPED: tab colors, setter-facing status subtext (`ba82870`)
+
+2 files. **`MyLeads.jsx`:** added `TAB_COLORS` map (mirrors Badge.jsx — New=text-secondary, Appointment Booked=success, Follow-Up=warning, No Answer=#94A3B8, Not Interested=danger, All=accent); tab `borderBottom`/`color`/count-badge color use `tabColor` per active tab. **`CallModal.jsx`:** STATUS_OPTIONS notes replaced with setter-facing copy — no pipeline/rotation mechanics visible. "Setter Portal" was already done in Prompt 72. Build clean. Not browser-verified. **⚠️ Needs Brayden sign-off on status subtext wording.**
+
+---
+
+### 2026-06-24 — Prompts 71 + 72 SHIPPED: canvas white text + start-here, sidebar reorder, leads relabel (`c993ae2`)
+
+Prompt 71 was already done in `0175155` (admin bell portal fix). **Prompt 72:** ScriptCanvas — SayNode/ActionNode/ForkNode/CloseNode text changed from text-secondary/text-muted → text-primary; OpenerNode got `▶ Start here` accent badge chip. Sidebar.jsx — My Calls moved to slot 3 (after Training); ROLE_LABELS.rep `'Rep Portal'` → `'Setter Portal'`. MyLeads.jsx — countdown label `'Resets in'` → `'Leads refresh'`; refresh button + Button import + RefreshCw import + `refetch` destructure all removed. Build clean (1.79s). Not browser-verified.
+
+---
+
+### 2026-06-24 — Prompt 69 SHIPPED: notification toasts with in-call suppression (`f9dae58`)
+
+4 files. New `src/contexts/ActiveCallContext.jsx` — simple React context `{ isInCall, setIsInCall }`. New `src/components/rep/NotificationToast.jsx` — fixed top-right toast stack: reads `useRepNotifications(profileId, 30)` (same poll the bell uses), seeds existing IDs on first load without toasting, fires a toast for every new notification that arrives while `isInCallRef.current === false`; auto-dismisses at 4.5s with 300ms slide-out transition; stacks if multiple arrive together; X button for manual dismiss. `DashboardLayout.jsx` — wrapped in `<ActiveCallProvider>`, mounts `<RepToastMount>` (renders `<NotificationToast>` only for `profile.role === 'rep'`). `CallModal.jsx` — `useActiveCall()` pulled in, `useEffect([callState])` calls `setIsInCall(callState === 'in-call')` so the context tracks live call status. Build clean (1.81s). **Not browser-verified.**
+
+---
+
+### 2026-06-24 — Prompt 70 SHIPPED: fix My Payouts empty state — rep_profile_id → rep_id (`eb94edb`)
+
+Root cause confirmed: the `commission_payouts` table was created with column `rep_id` in the live DB (migration 049 file incorrectly says `rep_profile_id` — a discrepancy that was logged but not acted on). Three references in the codebase still used the wrong name:
+1. `usePayouts.js` `useMyPayouts`: `.eq('rep_profile_id', repId)` → `.eq('rep_id', repId)` — this was silently returning empty (PostgREST filtered on nonexistent column)
+2. `usePayouts.js` `useAllPayouts`: select string `rep_profile_id` + join hint `profiles!rep_profile_id` → `rep_id` / `profiles!rep_id`
+3. `usePayouts.js` `useCreatePayout`: INSERT `rep_profile_id` → `rep_id`
+4. `useRepNotificationTriggers.js` realtime filter `rep_profile_id=eq.${repId}` → `rep_id=eq.${repId}`
+
+RLS policy in live DB was already correct (`rep_id = auth.uid()`). 2 files, 4 changes. Build clean (2.14s). **Not browser-verified.**
+
+---
+
 ### 2026-06-24 — Prompt 68 SHIPPED: canvas dark bg + minimap removed; apex11 payouts seeded (`c327fd1`)
 
 **Change 1 — ScriptCanvas.jsx (commit `c327fd1`):** dark background `#0A0A12` restored, `<Background color="#1C1C2A" colorMode="dark">` back, `<MiniMap>` + import removed, Controls kept. Build clean.
