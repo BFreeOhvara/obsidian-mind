@@ -64,6 +64,18 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-24 — Prompt 76 SHIPPED: closer Leads page, scrollable appointments, Closed tab split (`2da65e9`)
+
+1. **MyAppointments.jsx**: removed the Closed tab — Appointments now shows pending only, wrapped in a scrollable glass box (maxHeight 560, empty state "No appointments"). Closed stays on Pipeline (CloserPipeline.jsx unchanged).
+2. **CloserLeads.jsx** (new `/closer/leads`): table list of leads where `assigned_closer_id = closer.id`; "Request Leads" count input + button calling `request_closer_leads` RPC (migration 054). Empty state guides closer to use the button.
+3. **Migration 054**: `SECURITY DEFINER` RPC bypasses RLS to SELECT unassigned leads and batch-assign them to the closer. Cap enforced server-side at 500.
+4. **Sidebar + App.jsx**: "My Leads" added after Appointments in closer nav.
+
+**⚠️ Two migrations still need manual Supabase dashboard application: 053 (mutual messages) and 054 (request leads RPC).**
+**⚠️ Assumption pending Brayden confirm:** Request Leads source = `assigned_closer_id IS NULL`, oldest-first. Update `request_closer_leads` WHERE clause if pool should be filtered differently.
+
+---
+
 ### 2026-06-24 — Prompt 75 SHIPPED: Brayden↔Nate mutual messages + closer My Stats (`49ead8f`)
 
 **Part 1 — Mutual messaging:** The existing `messages` table uses a fixed `recipient` enum ('brayden'/'nate'). Admin and closer inboxes filtered strictly on `recipient='brayden'`/`'nate'`, so neither could see their own sent messages to the other. Fix: migration 053 updated both SELECT policies to also allow `sender_id = auth.uid()` on the opposite bucket. In `MessageCenter.jsx`: added `useClosers()`/`useAdmins()` hooks; manager contacts seeded at the top of each inbox with a "Direct" badge; manager threads render individual chat bubbles per INSERT row (not the reply-slot pattern). `handleSend` calls `useSendMessage` (INSERT) for manager threads. **⚠️ Migration 053 must be applied manually in Supabase dashboard — no DATABASE_URL for programmatic push.**
