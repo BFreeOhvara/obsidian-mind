@@ -18,22 +18,6 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–57 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
 
-### Fix: stripe-connect-onboard — add card_payments capability (queued 2026-06-24, Falcon)
-
-One-line fix in `supabase/functions/stripe-connect-onboard/index.ts`. Stripe is rejecting account creation because the function requests `transfers` capability without `card_payments`. Both are required.
-
-Find the account creation call (the `POST /v1/accounts` or equivalent Stripe API call) and add `card_payments: { requested: true }` to the capabilities object so it reads:
-
-```json
-{
-  "card_payments": { "requested": true },
-  "transfers": { "requested": true }
-}
-```
-
-After the fix: `git pull → edit → commit → push → supabase functions deploy stripe-connect-onboard --project-ref jjextitmbptoaolacocs`. Log completion to [[Memories]] and delete this entry.
-
----
 
 ### ✅ Prompt 52 SHIPPED 2026-06-23 (`eff83fb`) — badge cleanup: perfect_day → Perfect Days, drift fixed, rate badges dropped
 
