@@ -64,7 +64,13 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
-### 2026-06-24 — Prompt 68: canvas dark bg + minimap removed; payout seeding SQL ready (`c327fd1`)
+### 2026-06-24 — Prompt 68 SHIPPED: canvas dark bg + minimap removed; apex11 payouts seeded (`c327fd1`)
+
+**Change 1 — ScriptCanvas.jsx (commit `c327fd1`):** dark background `#0A0A12` restored, `<Background color="#1C1C2A" colorMode="dark">` back, `<MiniMap>` + import removed, Controls kept. Build clean.
+
+**Change 2 — commission_payouts seeded (no migration — direct INSERT via CLI):** Queried live DB — all 5 apex11 closed appointments have `deal_value = null`; amounts sourced from `commissions` table ($148.50 × 4, $248.50 × 1). Inserted 5 rows into `commission_payouts` using `rep_id` (live column name — migration file says `rep_profile_id` but live schema uses `rep_id`, a discrepancy to note for future recon). All 5 rows confirmed present with correct business names, amounts, `status = 'paid'`. **Not browser-verified.**
+
+**Gotcha logged:** `commission_payouts.rep_profile_id` in migration 049 file ≠ `rep_id` in the live schema — the migration applied with a different column name than the file shows. `usePayouts.js` selects `rep_profile_id` in its join hints but the actual column is `rep_id`. Worth auditing if payout queries ever break.
 
 **Change 1 — ScriptCanvas.jsx (1 file, commit `c327fd1`):** reverted the Prompt 67 white-background change — container `background` back to `#0A0A12`, `<Background color>` back to `#1C1C2A`, `colorMode="dark"` restored. `<MiniMap>` and its import removed entirely; `<Controls>` kept. Build clean (2.10s). **Not browser-verified.**
 

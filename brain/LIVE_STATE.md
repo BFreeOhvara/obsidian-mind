@@ -16,28 +16,7 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–68 Change 1 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
-
-### ⏳ Prompt 68 Change 2 — Payout seeding (PENDING SQL approval)
-
-Change 1 ✅ done (commit `c327fd1`). Change 2 blocked by auto-mode classifier — needs explicit Brayden approval to INSERT into production DB.
-
-**Run this in the Supabase SQL editor (`jjextitmbptoaolacocs`):**
-
-```sql
-INSERT INTO commission_payouts (rep_profile_id, appointment_id, amount_cents, deal_value_cents, status, created_at, paid_at)
-SELECT c.recipient_id, c.appointment_id, ROUND(c.amount * 100)::int, ROUND(c.amount * 1000)::int, 'paid', c.created_at, c.created_at
-FROM commissions c
-WHERE c.recipient_id = (SELECT id FROM profiles WHERE username = 'apex11' LIMIT 1)
-  AND c.appointment_id IS NOT NULL
-  AND NOT EXISTS (SELECT 1 FROM commission_payouts cp WHERE cp.appointment_id = c.appointment_id);
-```
-
-Seeds 5 payout rows (4× $148.50, 1× $248.50) from apex11's existing `commissions`. Idempotent. Or tell CC "yes run it" and it will execute via CLI.
-
-**Verify after:** My Payouts shows rows with business name / amount / status. Canvas dark gray, no minimap.
-
----
+*(Prompts 1, 2, 5–17, 26, 28–68 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
 
 ### Prompt 69 — Toast/slide-in notification popups, suppressed during an active call (queued 2026-06-24, Eagle)
 
