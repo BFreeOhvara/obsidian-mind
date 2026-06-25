@@ -18,6 +18,139 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–81 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
 
+### 🔴 Prompt 89 — Closer dashboard notification bell (queued 2026-06-25, Eagle)
+
+Add a notification bell to the closer dashboard, same UI pattern as the rep bell (`RepNotificationBell.jsx` / `notifications` table, `profile_id`-scoped, mark-as-read-on-open per Prompt 85 change 5 — build this one with that same open-marks-read behavior from the start).
+
+**Build these 2 confirmed types now:**
+1. **`appointment_booked`** — fires when an appointment setter books an appointment for this closer. Message should name the lead/business, e.g. "New appointment booked: {business_name}."
+2. **`appointment_reminder_5min`** — fires 5 minutes before a scheduled appointment. "You have an appointment in 5 minutes: {business_name}."
+
+**Suggested additional types — do NOT build yet, just confirm feasibility and report back to Eagle/Brayden for approval before building:**
+- Appointment cancelled/rescheduled (by the setter or the lead)
+- Payout paid confirmation (mirrors rep's `deal_closed`, but on the payout-completed side)
+- New lead available in the request-leads pool (ties to Prompt 86's Request Leads move)
+
+**Recon first:** confirm closer profiles already have `profile_id` rows compatible with the `notifications` table (same table, just a different `type` set and a closer-side bell component) — don't build a parallel table.
+
+**Verify:** closer dashboard shows a bell; triggering an appointment booking and being within 5 min of a scheduled appointment produces the two notifications above.
+
+---
+
+### 🔴 Prompt 88 — Closer Revenue page: add-bank button + switch weekly revenue from bar to line/area chart (queued 2026-06-25, Eagle)
+
+Two changes on the closer dashboard's Revenue page:
+
+1. **Add a button to link/add a bank account** for payouts. **Recon first** — check whether any bank-linking infra already exists anywhere in the app (Stripe Connect onboarding, Plaid, manual bank-details form, etc.) before building new. If nothing exists, this likely needs Stripe Connect (or whatever processor Ohvara already uses for payouts — check `commission_payouts`/Stripe references) — flag back to Eagle/Brayden if it requires a new Stripe Connect integration decision rather than just building it blind, since this touches real banking/payout flow. Do NOT have CC handle actual bank credentials directly — the button should hand off to the processor's own secure onboarding flow (e.g. Stripe Connect's hosted onboarding link), never a custom form collecting account/routing numbers.
+
+2. **Weekly revenue chart:** currently a bar chart — change to a line/area chart (continuous trend line showing up/down movement over time, "stock market chart" style) instead of discrete bars. Find the revenue chart component and swap chart type while keeping the same underlying data/query.
+
+**Verify:** closer Revenue page shows an "Add bank" (or similar) button that doesn't collect raw bank details directly in-app, and weekly revenue renders as a line/area trend chart instead of bars.
+
+---
+
+### 🔴 Prompt 87 — Nate's pipeline needs both Appointment Setting and Closer status tabs (queued 2026-06-25, Eagle)
+
+Context: Nate is dual-role — he now calls leads himself as an appointment setter AND closes them himself (per Brayden, business priority right now is getting Nate leads to call; appointment goes straight back to him since he's both setter and closer). His pipeline view currently only reflects one side.
+
+**Build:** Nate's pipeline needs tabs to switch between **Appointment Setting** statuses (the rep/setter-side stages — New, No Answer, Appointment Booked, Follow-Up, Not Interested, etc.) and **Closer** statuses (the closer-side deal stages he already has). Same person, two stages of the same leads — he needs to see both views.
+
+**Recon first:** find Nate's profile (role flags — likely needs both `rep` and `closer` role access, or a dual-role flag) and whatever pipeline/dashboard component currently renders his closer-side view. Confirm whether Nate already has a rep profile/portal access at all, or whether this requires granting him one. Don't assume — check the `profiles` table and existing dashboard routing logic first.
+
+**Verify:** Nate's dashboard shows an Appointment Setting tab and a Closer tab on his pipeline, each showing the correct statuses for that stage.
+
+---
+
+### 🔴 Prompt 86 — Closer dashboard: remove old My Leads page, rename Call Leads → My Leads, fixed scroll box, fold in Request Leads (queued 2026-06-25, Eagle)
+
+Closer-side dashboard restructure (CLOSER, not rep — confirm which routes/components belong to the closer portal before touching anything):
+
+1. **Delete the existing "My Leads" page** on the closer dashboard (the one separate from Call Leads).
+2. **Rename "Call Leads" → "My Leads"** — keep all of Call Leads' existing behavior/layout, just retitle the nav item and page heading.
+3. **Lead list must live in a fixed, internally-scrollable box** — same pattern as the appointment-setter's leads box (a bounded container with its own scrollbar), NOT a list that makes the whole page scroll. Brayden specifically likes how Call Leads currently looks/behaves — preserve that, just make sure the box scrolls internally rather than the page.
+4. **Move "Request Leads" onto this page** — whatever currently lets a closer pull from the lead pool (the "Request Leads" feature, likely the same lead-pool logic confirmed correct in Prompt 76 — `assigned_closer_id IS NULL`, oldest-first, capped) should now live on this renamed My Leads page, not wherever it currently is.
+
+**Recon first:** find the closer-portal routes/components (likely `MyLeads.jsx` and `CallLeads.jsx` or similar under a closer directory, distinct from the rep-side `MyLeads.jsx` already touched in Prompt 80 — don't confuse the two portals) and the current location of "Request Leads" before making changes.
+
+**Verify:** closer dashboard nav shows one "My Leads" item (old one gone), it has Call Leads' layout/behavior, leads list scrolls in its own box, and Request Leads is accessible from this page.
+
+---
+
+### ✅ Prompt 85 SHIPPED 2026-06-25 (`a70344c`) — Rep bell wording/logic + open-marks-read
+
+**Code changes (all in commit `a70344c`):**
+
+1. **`deal_closed`** (`useRepNotificationTriggers.js`): message is now `Deal closed: {biz}` — dollar amount removed.
+
+2. **`follow_up`** (`useRepNotificationTriggers.js`): `FOLLOW_UP_THRESHOLDS_MIN` changed from `[60, 10, 1]` to `[5]`; `useFollowUp5MinNotifier` removed entirely (redundant with the single 5-min threshold). Message is `Follow-up in 5 min: {biz}`.
+
+3. **Open-marks-read** (`RepNotificationBell.jsx`): bell button onClick now fires `markAll.mutate()` when opening. Badge clears immediately on open.
+
+4. **`call_graded`**: no code change needed — `grade-call` edge function already stores and displays letter grades (F/D/C/C+/B-/B/B+/A-/A/A+) from Claude Haiku. Grade bucketing is Haiku-driven directly (not a static numeric mapping). Notification message already: `Your call with {biz} was graded: {letter}`.
+
+5. **`message`**: DB-side only — trigger must be updated via Supabase SQL editor. See migration SQL below.
+
+**⚠️ MANUAL STEP — Brayden runs in Supabase SQL editor:**
+
+```sql
+-- Update notify_rep_on_message_reply to include replier's name
+-- Uses NEW.recipient ('brayden'/'nate') since that's who replies
+CREATE OR REPLACE FUNCTION notify_rep_on_message_reply()
+RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER AS $$
+DECLARE
+  v_sender_name text;
+BEGIN
+  IF NEW.reply_body IS NOT NULL AND OLD.reply_body IS NULL THEN
+    v_sender_name := initcap(NEW.recipient);
+    INSERT INTO notifications (profile_id, type, message, data)
+    VALUES (
+      NEW.sender_id,
+      'message',
+      v_sender_name || ' replied to your message',
+      jsonb_build_object(
+        'message_id', NEW.id,
+        'reply_preview', left(NEW.reply_body, 120)
+      )
+    );
+  END IF;
+  RETURN NEW;
+END;
+$$;
+```
+
+**⚠️ MANUAL STEP — update apex11 sample rows to reflect new wording (Brayden runs in Supabase SQL editor):**
+
+```sql
+-- Update existing sample rows for apex11 to match new message copy
+-- Profile id: 67bdea10-62d0-44c6-81b0-a321ca9ea52e
+
+UPDATE notifications SET
+  message = 'Brayden replied to your message'
+WHERE profile_id = '67bdea10-62d0-44c6-81b0-a321ca9ea52e'
+  AND type = 'message';
+
+UPDATE notifications SET
+  message = 'Follow-up in 5 min: Riverside Plumbing & Heating',
+  data = data || '{"threshold": 5}'::jsonb
+WHERE profile_id = '67bdea10-62d0-44c6-81b0-a321ca9ea52e'
+  AND type = 'follow_up';
+
+UPDATE notifications SET
+  message = 'Deal closed: Riverside Plumbing & Heating'
+WHERE profile_id = '67bdea10-62d0-44c6-81b0-a321ca9ea52e'
+  AND type = 'deal_closed';
+
+UPDATE notifications SET
+  message = 'Your call with Riverside Plumbing & Heating was graded: A',
+  data = data || '{"grade": "A"}'::jsonb
+WHERE profile_id = '67bdea10-62d0-44c6-81b0-a321ca9ea52e'
+  AND type = 'call_graded';
+```
+
+**Verify:** `/rep` bell as apex11 — corrected wording on all 4 types; opening the bell clears the red badge without clicking "Mark all read."
+
+---
+
 ### ✅ Prompt 84 SHIPPED 2026-06-25 (`03d95aa`) — Bell truncation fixed; sample SQL for all 5 notification types
 
 **Types confirmed (all real, all implemented):**
