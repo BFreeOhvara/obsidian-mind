@@ -64,6 +64,20 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-25 — Prompt 80 SHIPPED: Badge.jsx 'New' colored; ScriptWalk action-skip + say+fork combined (`73d0b54` + prior)
+
+**Change 1 — `Badge.jsx`:** `STATUS_STYLES['New']` was transparent/muted. Changed to `background: var(--info-dim), color: var(--info), border: rgba(56,189,248,0.20)` — matches CallModal's #38BDF8 = `var(--info)`. `MyLeads.jsx`'s table status pill uses `<Badge label={lead.status} />`, picks it up automatically.
+
+**Change 2 — `ScriptWalk.jsx`:** 4 additions for `mode="live"`:
+- `applyLiveSkip(ns)` helper (before component): skips consecutive `action` steps from top of stack — called in advance(), chooseOption(), navigateTo(), advanceThenPick(). Action steps never render standalone during live calls.
+- `advanceThenPick(forkIdx, opt)`: atomically advances past say + fork, enters chosen branch, applies live skip.
+- `nextForkForSay`: computed before JSX return — peeks ahead from current `say` step (skipping actions) for an adjacent fork.
+- `SayWithFork` component (bottom of file): combined say card + fork buttons. When a say precedes a fork in live mode, both render on one screen — rep says the line, picks the branch, zero extra tap.
+
+Context carries from prior session (context compaction hit mid-task).
+
+---
+
 ### 2026-06-25 — Prompt 81 SHIPPED: My Payouts date display (`f20e031`); bell preview SQL manual
 
 **Change 2 (code):** `MyPayouts` in `MyCommissions.jsx` — added `dateLabel` derived from `p.status`: pending → `Closed on {created_at}`; paid → `Paid on {paid_at}`. Format: `toLocaleDateString('en-US', { month: 'short', day: 'numeric' })` consistent with `RepNotificationBell` `fmtTime`. Both columns already selected by `useMyPayouts` (confirmed via recon). Build clean, pushed `f20e031`.
