@@ -18,6 +18,44 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–81 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
 
+### ✅ Prompt 93 SHIPPED 2026-06-25 (`16f346f`) — MyAppointments fixed-height box
+
+`MyAppointments.jsx` inner scrollable div was `maxHeight: 560` — box shrank to content height when empty. Changed to `height: 560`. Box now holds its size at all fill levels; `overflowY: 'auto'` already present so scrollbar only appears when rows exceed 560px. **Not Chrome-verified.**
+
+---
+
+### 🔴 Prompt 92 — Closer Pipeline (Appointment Setting tab) lead box: click-anywhere popup, match rep box sizing, color-coded filters, reorder tabs (queued 2026-06-25, Eagle)
+
+Screenshot confirms: `/closer/pipeline` Appointment Setting tab (built in Prompt 87) currently has a smaller-looking empty-state box than the rep `/rep/leads` ("My Leads") page, plain/uncolored filter tab pills (All/New/No Answer/Follow-Up/Appointment Booked/Not Interested), "All" tab first, and clicking a lead row presumably doesn't open the detail popup the way rep My Leads does. Four fixes, all making this tab match the rep My Leads page it's modeled on:
+
+1. **Click anywhere on a lead row → opens the same lead detail popup/modal used elsewhere** (the rep `CallModal`-equivalent or whatever this closer portal already uses for lead detail). Currently this tab's rows may not be clickable at all — confirm and add `onClick` to open the modal.
+
+2. **Match the rep My Leads box's size/min-height even when empty.** Right now with 0 leads this box renders smaller than the rep page's empty state. Give it the same fixed min-height/container sizing as `/rep/leads` so it doesn't visually shrink when empty.
+
+3. **Color-coordinate the filter tab pills** the same way rep My Leads' status badges are colored (Prompt 80's `Badge.jsx` `STATUS_STYLES` — New=blue, Appointment Booked=green, No Answer=slate, Not Interested=red, Follow-Up=amber). Apply matching colors to these filter tab pills/counts, not just the row status badges.
+
+4. **Reorder the filter tabs:** move "All" to the END (last tab), and "New" should be FIRST. Current order is All, New, No Answer, Follow-Up, Appointment Booked, Not Interested — change to New, No Answer, Follow-Up, Appointment Booked, Not Interested, All.
+
+**Recon first:** find the component rendering this Appointment Setting tab (likely `CloserPipeline.jsx` per Prompt 87's shipped notes) and compare directly against `MyLeads.jsx` (rep side) for the popup-on-click and box-sizing patterns to copy.
+
+**Verify:** `/closer/pipeline` Appointment Setting tab — clicking any lead row opens the detail popup; empty-state box is the same size as rep My Leads' empty state; filter tabs are colored to match their status; tab order is New, No Answer, Follow-Up, Appointment Booked, Not Interested, All.
+
+---
+
+### 🔴 Prompt 91 — Training Center script CANVAS (flowchart view): combine say+fork into one node visually, replace cross-canvas jump arrows with terminal "Go to X" nodes (queued 2026-06-25, Eagle)
+
+This is about the **flowchart/canvas view** on `/rep/training` (Script tab) — the visual decision-tree diagram, NOT the live call-walk (`ScriptWalk.jsx` in `mode="live"`, already fixed in Prompt 80). Screenshot confirms: canvas still shows a `say` node ("Who's handling your calls right now?") followed by a separate arrow down to an `if/else` fork node ("Do they have someone on the phones, or is it just them?") with branch answers below that. Brayden wants two changes to how the canvas RENDERS this, mirroring the live-mode fix from Prompt 80:
+
+1. **Combine say+fork into a single visual node.** Don't render the say text and its immediately-following fork as two separate boxes connected by an arrow — render them as one node: question text + the fork's branch options together, matching the same say+fork merge logic already built for live mode (`nextForkForSay` / `SayWithFork` from Prompt 80) — reuse/adapt that logic for the canvas renderer if it's a separate component from `ScriptWalk`.
+
+2. **Replace long cross-canvas jump arrows with a terminal node.** Where a branch currently draws an arrow across the whole canvas to a distant node (example in screenshot: a dashed arrow over to a separate "Owner / Decision-Maker" branch start), instead make that branch's last visible node simply read "→ Go to Owner / Decision-Maker" (or whatever the actual jump target is) and END there visually — no arrow drawn across the canvas. The live practice walkthrough should still actually jump to that branch when clicked/practiced — this change is purely about how the static flowchart diagram renders, not actual navigation logic.
+
+**Recon first:** find the canvas/flowchart rendering component for the Training Center Script tab (likely separate from `ScriptWalk.jsx`'s live-mode rendering — could be a React Flow-based component or custom SVG layout) and confirm how nodes/edges are currently generated from `discoveryScript.js` before changing anything.
+
+**Verify:** `/rep/training` Script tab — say nodes with an immediately-following fork show combined on one box; any node that jumps to a distant branch (e.g. Owner/Decision-Maker) shows as a "Go to {branch}" terminal node with no long arrow across the canvas; clicking that terminal node to practice still works correctly (jumps to the real branch).
+
+---
+
 ### 🔴 Prompt 90 — Slide-in toast only for live notifications, not on login/backlog (queued 2026-06-25, Eagle)
 
 Both the rep and closer notifier hooks currently slide in a toast/banner whenever an unread notification is detected — including ones that already existed before the page loaded (e.g. accumulated while logged off). Brayden wants:

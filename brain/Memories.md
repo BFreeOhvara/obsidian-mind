@@ -64,6 +64,12 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-25 — Prompt 93 SHIPPED: MyAppointments fixed-height box (`16f346f`)
+
+`maxHeight: 560` → `height: 560` on the inner scrollable div in `MyAppointments.jsx`. Same pattern as Prompt 86/92 — box holds 560px at all fill levels, scrollbar only appears once content exceeds it.
+
+---
+
 ### 2026-06-25 — Session wrap-up: vault log + push for Prompts 85–89 (`344b812`)
 
 Context compaction mid-session; resumed and completed vault logging. Appended Prompts 85–89 session log entry to Memories.md, committed LIVE_STATE.md + Memories.md (`344b812`), pushed vault to GitHub. Dashboard repo already fully pushed (`33b009e`) before compaction. No new code written this continuation — wrap-up only.
