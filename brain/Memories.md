@@ -64,6 +64,12 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-25 — Prompt 77 SHIPPED: My Payouts deduplication + Legacy badge removal (`9921caf`)
+
+Root cause: `useMyPayouts` queried both `commission_payouts` AND `commissions`, merged results with synthetic `source='legacy'` rows. Any deal with a real `commission_payouts` row appeared twice — once with the actual status, once as "Legacy". Fix: dropped the `commissions` dual-query entirely; `useMyPayouts` now queries only `commission_payouts`. `StatusChip` simplified from 4-state map to binary: `paid` → green "Paid", anything else → amber "Pending". Removed `p.source === 'legacy'` branch in `MyPayouts` render — always shows `<StatusChip>`. The `commissions` table untouched — still the source for the earnings chart / total-earned via `useMyCommission`. **Not Chrome-MCP-verified (extension offline) — Brayden should check `/rep/commissions` live.**
+
+---
+
 ### 2026-06-24 — Prompt 76 SHIPPED: closer Leads page, scrollable appointments, Closed tab split (`2da65e9`)
 
 1. **MyAppointments.jsx**: removed the Closed tab — Appointments now shows pending only, wrapped in a scrollable glass box (maxHeight 560, empty state "No appointments"). Closed stays on Pipeline (CloserPipeline.jsx unchanged).
