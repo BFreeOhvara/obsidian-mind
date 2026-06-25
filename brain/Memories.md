@@ -64,6 +64,22 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-25 — Prompts 85–89 SHIPPED: rep bell fixes + closer dashboard features
+
+**Prompt 85** (`a70344c`): rep bell wording/logic — `deal_closed` drops dollar amount → "Deal closed: {biz}"; `follow_up` collapsed to 5-min only (removed 60m/10m/1m thresholds + `useFollowUp5MinNotifier`); open-marks-read: bell open fires `markAll.mutate()` immediately; `call_graded` already uses letter grades (A+/A/B+/B etc.) — no code change needed; `message` sender name needs DB trigger update (SQL in LIVE_STATE for Brayden to run).
+
+**Prompt 86** (`60e864d`): closer My Leads consolidation — removed old `CloserLeads.jsx` route, renamed Call Leads nav → My Leads, added Request Leads control to CallLeads.jsx, wrapped rows in fixed scroll box (`maxHeight: calc(100vh - 280px)`).
+
+**Prompt 87** (`ae5c6bc`): dual-role pipeline for Nate — `CloserPipeline.jsx` now has "Appointment Setting" tab (queries `leads` where `assigned_rep_id = profile.id`, status filter tabs) + "Closer" tab (existing pipeline unchanged). All closers see both tabs; setter tab shows empty if not doing rep work.
+
+**Prompt 88** (`b1c4d4b`): closer Revenue page — "Add Bank Account" button opens modal explaining Stripe Connect needed (no raw credentials). Bar chart → Recharts `AreaChart` area/gradient. **⚠️ Stripe Connect decision still needed** before bank button does anything real.
+
+**Prompt 89** (`33b009e`): closer notification bell — `CloserNotificationBell.jsx` (new, same pattern as rep bell, open-marks-read built in); `useCloserNotificationTriggers.js` (new: `useAppointmentBookedNotifier` realtime INSERT + `useAppointmentReminder5MinNotifier` 60s poll). Three additional types flagged feasible in LIVE_STATE but not built.
+
+**Standing pattern:** closer bell reuses `useRepNotifications`/`useRepUnreadCount`/`useRepMarkNotificationRead`/`useRepMarkAllRead` hooks from `useNotifications.js` — they scope by `profile_id` regardless of role. No parallel notification infrastructure needed.
+
+---
+
 ### 2026-06-25 — Prompt 84 SHIPPED: bell truncation fixed, sample SQL for all 5 notification types
 
 **Types confirmed:** `badge` (useBadgeNotifier, badge_id unique), `message` (DB trigger migration 043), `follow_up` (client hooks — useFollowUpNotifier 60m/10m/1m + useFollowUp5MinNotifier 5m), `deal_closed` (realtime commission_payouts INSERT listener), `call_graded` (grade-call edge function inserts; useCallGradedNotifier only cache-invalidates). All 5 real and implemented.
