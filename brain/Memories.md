@@ -64,6 +64,12 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-25 — Prompt 92 SHIPPED: Pipeline setter tab — click popup, fixed box, colored tabs (`00a1b24`)
+
+4 changes to `CloserPipeline.jsx`: (1) `LeadDetailOverlay` portal modal — click any setter-tab lead row to open detail (business name, status badge, phone, niche, city, follow-up date); (2) `QueueTable` inner div `maxHeight: 480` → `height: 480` fixes across all pipeline tabs; (3) `STATUS_TAB_COLORS` map added — active tab underline + count badge use per-status color tokens matching `Badge.jsx`; (4) tab order changed to `[...SETTER_STATUSES, 'All']`.
+
+---
+
 ### 2026-06-25 — Prompt 93 SHIPPED: MyAppointments fixed-height box (`16f346f`)
 
 `maxHeight: 560` → `height: 560` on the inner scrollable div in `MyAppointments.jsx`. Same pattern as Prompt 86/92 — box holds 560px at all fill levels, scrollbar only appears once content exceeds it.

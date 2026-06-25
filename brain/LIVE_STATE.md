@@ -24,6 +24,18 @@ tags:
 
 ---
 
+### ✅ Prompt 92 SHIPPED 2026-06-25 (`00a1b24`) — Pipeline setter tab: click popup, fixed box, colored+reordered tabs
+
+4 changes to `CloserPipeline.jsx`:
+1. **Click-to-open:** lead rows in `SetterView` now have `onClick={() => setSelectedLead(l)}` + hover highlight. New `LeadDetailOverlay` component (portal overlay) shows business name, status badge, phone, niche, city, follow-up date. Click backdrop or X to close.
+2. **Fixed box size:** `QueueTable` inner scrollable div changed `maxHeight: 480` → `height: 480`. Box holds 480px at all fill levels across all tabs (Pending/Closed/Lost/Setter).
+3. **Colored filter tabs:** added `STATUS_TAB_COLORS` map matching `Badge.jsx STATUS_STYLES` tokens exactly (New=info, No Answer=slate, Follow-Up=warning, Appointment Booked=success, Not Interested=danger, All=accent). Active tab underline + count badge use the status color; inactive tabs stay muted.
+4. **Tab reorder:** `['All', ...SETTER_STATUSES]` → `[...SETTER_STATUSES, 'All']` — New first, All last.
+
+**Not Chrome-verified.**
+
+---
+
 ### 🔴 Prompt 92 — Closer Pipeline (Appointment Setting tab) lead box: click-anywhere popup, match rep box sizing, color-coded filters, reorder tabs (queued 2026-06-25, Eagle)
 
 Screenshot confirms: `/closer/pipeline` Appointment Setting tab (built in Prompt 87) currently has a smaller-looking empty-state box than the rep `/rep/leads` ("My Leads") page, plain/uncolored filter tab pills (All/New/No Answer/Follow-Up/Appointment Booked/Not Interested), "All" tab first, and clicking a lead row presumably doesn't open the detail popup the way rep My Leads does. Four fixes, all making this tab match the rep My Leads page it's modeled on:
