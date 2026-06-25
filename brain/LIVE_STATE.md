@@ -18,51 +18,6 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–79 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
 
-### 🔴 Prompt 79 — My Leads tab color always-on, move pricing-input fields into script flow, trim Follow-Up subtext (queued 2026-06-25, Eagle)
-
-**Change 1 — My Leads tabs should show their color at rest, not just when active.** `MyLeads.jsx`'s `TAB_COLORS` map (added Prompt 73) only applies the per-status color when a tab is selected/active — unselected tabs fall back to a neutral/default style. Brayden wants every tab color-coded all the time, active or not (active can still have its own emphasis — bolder text, underline, whatever already distinguishes "selected" — but the color itself shouldn't only appear on click).
-
-**Change 2 — Move the pricing/qualifying-numbers inputs out of the booking form sidebar and into the script flow itself.** Context: Prompt 53 built a `data_collect` step (`calls_missed_per_week`, `avg_ticket_value`) that renders inline in `ScriptWalk.jsx` as part of the live script flow on the right side — but there's ALSO a separate avg_ticket-style field living in `CallModal.jsx`'s left-side booking form (shown when status = Appointment Booked), per the divergence flagged at the time ("avg_ticket" in the booking form vs "avg_ticket_value" in the script's data_collect step — never reconciled). Brayden wants these numbers gathered ONLY in the script flow, formatted consistently with how forks/options already render there (i.e. it should feel like part of the natural script progression, just with free-text number inputs instead of multiple-choice buttons) — not as a separate form off to the side. Recon both `CallModal.jsx`'s booking-form fields and `ScriptWalk.jsx`'s existing `DataCollectCard` before changing anything; the goal is ONE place these numbers get captured, living in the script flow, and the booking form's duplicate field(s) removed. Confirm with Brayden which underlying column (`avg_ticket` vs `avg_ticket_value`) survives as canonical if recon shows downstream code (e.g. `recommend-stack`) depends on a specific one — don't silently drop a column other code reads from.
-
-**Change 3 — Trim Follow-Up status subtext.** In `CallModal.jsx`'s status picker (the dropdown/menu where a rep picks New/Appointment Booked/Follow-Up/No Answer/Not Interested), the Follow-Up option's helper text currently reads "Lead stays in your list — pick a date below to come back to this one" (Prompt 73). Remove the "Lead stays in your list" clause entirely — final text should just be "Pick a date below to come back to this one."
-
-**Verify:** Chrome MCP pass as apex11 — My Leads tabs show color at rest before any click; booking flow for Appointment Booked no longer shows a separate pricing field, the script flow's data_collect step is the only place those numbers are entered; CallModal status picker's Follow-Up subtext reads only "Pick a date below to come back to this one."
-
----
-
-### 🔴 Prompt 78 — Twilio browser WebRTC calling fails live: "Call failed, try again or use your phone" (PRIORITY, queued 2026-06-25, Eagle)
-
-**Context:** Prompt 54 (browser WebRTC calling, shipped 2026-06-23) was marked fully live 2026-06-24 after Brayden completed all manual setup — TwiML App created, API Key created, all 5 secrets set (`TWILIO_ACCOUNT_SID`, `TWILIO_API_KEY_SID`, `TWILIO_API_KEY_SECRET`, `TWILIO_TWIML_APP_SID`, `TWILIO_PHONE_NUMBER`), both edge functions deployed. It was explicitly flagged at the time as "not Chrome-MCP-verified — worth a real test call before trusting it." Brayden just tried a real call as a rep (clicked the green call button on a lead) and got: **"Call failed. Try again or use your phone."** That's the literal fallback message in `CallModal.jsx` for when the Twilio Device fails to register or the call itself errors — so something in the token → Device → call chain is breaking, not working as shipped.
-
-**Do not guess and patch blind — find the actual failure point first:**
-1. Check browser console/network tab on the actual call attempt: does `twilio-token` return a valid token, or does it error? If it errors, read the actual error body (JWT signing failure, missing secret, wrong claim shape, etc.)
-2. If token comes back fine, check whether `device.register()` succeeds — Twilio Device emits `registered`/`error` events; confirm which one fires and log the error detail if `error`.
-3. If Device registers fine, check the actual `device.connect()` call/TwiML App config in the Twilio console — confirm the Voice Request URL on the TwiML App actually points at the deployed `twilio-voice-webhook` URL (a typo'd or stale URL here would let registration succeed but calls fail).
-4. Confirm browser mic permission was actually granted for the dashboard's domain — a denied/blocked mic permission can also surface as a generic call failure depending on how the SDK handles it; check `navigator.permissions.query({name:'microphone'})` or just confirm via the browser's own permission UI.
-5. Double check `twilio-voice-webhook` is deployed WITHOUT `--no-verify-jwt`... actually opposite — confirm `twilio-token` requires auth (deployed WITHOUT `--no-verify-jwt`) and `twilio-voice-webhook` does NOT require auth (deployed WITH `--no-verify-jwt`, since Twilio posts to it directly) — a flipped deploy flag here would break one half of the chain silently.
-
-**Fix whatever the actual root cause turns out to be** — this is explicitly a "the previous fix shipped but was never tested live" situation, same shape as the My Payouts saga (Prompts 70/74). Don't mark this done without confirming a real call connects.
-
-**Verify (mandatory):** Chrome MCP pass as apex11 (or have Brayden test directly) — click Call Now on a real lead, confirm the call actually connects (no fallback message), talk/audio path works, and the call still gets recorded + graded as designed.
-
----
-
-### 🔴 Prompt 77 — My Payouts: duplicate rows + "Legacy" badge confusing reps (queued 2026-06-25, Eagle)
-
-**Context:** Prompt 74's data-layer fix is confirmed working — Brayden just screenshotted `/rep/commissions` live and rows are rendering. But each business shows TWICE: one row tagged "Paid" (green), one row tagged "Legacy" (gray), same amount, same business. Brayden wants only two possible states shown to reps: **Paid** or **Pending** — no "Legacy" label, no duplicates.
-
-**Likely root cause (confirm via recon, don't assume):** `usePayouts.js` is pulling from BOTH the older `commissions` ledger table (migration 014, what `useMyCommission` already reads) and the newer `commission_payouts` table (migration 049's Stripe-payout workflow) — the two were deliberately built as separate coexisting tables (see Prompt 55 log), and it looks like `usePayouts.js` is merging/displaying both for the same closed deal instead of treating `commission_payouts` as the single source of truth for this list. The "Legacy" tag is presumably a hardcoded label CC added to distinguish a `commissions`-table row from a `commission_payouts`-table row.
-
-**Fix:**
-1. Recon `usePayouts.js` (`useMyPayouts`/`useAllPayouts`) and confirm where the "Legacy" tag and the duplicate query/merge come from.
-2. My Payouts should show ONE row per appointment/deal, sourced only from `commission_payouts` (the real payout-status table) — drop the `commissions`-table rows from this specific list entirely (that table can stay the source for other displays like the earnings chart/Total Earned, just not for this status list).
-3. Status badge logic: `paid` → green "Paid". Anything else (`pending`, `approved`, or missing) → "Pending". No "Legacy", no other status strings surfaced to reps.
-4. If a deal genuinely has no `commission_payouts` row yet (older closes from before migration 049 existed), decide whether to backfill via the same `create-commission-payout` insert flow used by `AppointmentCard.handleComplete`, or just leave it absent from the list — don't show a fake "Legacy" status as a workaround.
-
-**Verify:** Chrome MCP pass as apex11 on `/rep/commissions` — confirm each closed deal appears exactly once, with only "Paid" or "Pending" shown, no duplicates, no "Legacy" anywhere.
-
----
-
 ### ✅ Prompt 79 SHIPPED 2026-06-25 (`4a276dc`) — Tab colors always-on, pricing in script, Follow-Up trim
 
 3 changes: (1) My Leads tab colors always visible at rest (color/count badge always use `tabColor`, `fontWeight` distinguishes active). (2) Pricing inputs (`calls_missed_per_week`, `avg_ticket`) removed from CallModal Discovery sidebar — captured once in script flow via `DataCollectCard`; callback keeps CallModal state fresh for `recommend-stack`. (3) Follow-Up note trimmed. **Not Chrome-verified.**
@@ -84,7 +39,7 @@ Root cause: `useMyPayouts` merged `commission_payouts` + `commissions`, causing 
 - Migration 054 (`054_closer_request_leads.sql`) — Request Leads RPC (without this, the button errors)
 Both must be run in Supabase dashboard SQL editor.
 
-⚠️ **ASSUMPTION to confirm with Brayden:** Request Leads pulls from `assigned_closer_id IS NULL` leads, oldest-first, up to the count requested. If the source pool should be different (rep-touched leads, specific niches, etc.) the `request_closer_leads` function in migration 054 needs updating before deploying.
+✅ **Confirmed by Brayden 2026-06-25:** Request Leads pool (`assigned_closer_id IS NULL`, oldest-first, capped at requested count) is correct as-is. No change needed.
 
 ### ✅ Prompt 75 SHIPPED 2026-06-24 (`49ead8f`) — Brayden↔Nate mutual messages + closer My Stats
 
@@ -107,7 +62,7 @@ Both must be run in Supabase dashboard SQL editor.
 
 ### ✅ Prompt 73 SHIPPED 2026-06-24 (`ba82870`) — tab colors, setter-facing status subtext; Setter Portal already done in Prompt 72
 
-**⚠️ Needs Brayden verify:** status subtext wording is CC's proposal — confirm before treating as final. Proposed copy: Appointment Booked → "Nice work! Fill in the appointment details below"; No Answer → "No one picked up — try again later or set a follow-up date"; Not Interested → "Lead declined — removed from your active list"; Follow-Up → "Lead stays in your list — pick a date below to come back to this one".
+✅ **Confirmed by Brayden 2026-06-25:** status subtext wording approved as final — Appointment Booked → "Nice work! Fill in the appointment details below"; No Answer → "No one picked up — try again later or set a follow-up date"; Not Interested → "Lead declined — removed from your active list"; Follow-Up → "Pick a date below to come back to this one" (per Prompt 79's trim).
 
 ### ✅ Prompt 72 SHIPPED 2026-06-24 (`c993ae2`) — canvas white text, start-here badge, sidebar reorder, leads relabel
 
@@ -848,3 +803,4 @@ Non-CC sessions (Manager chats, no filesystem) re-ground from the most recent pa
 - [[North Star]] — who we are, packages, pricing, goals, hard rules
 - [[session-flow]] — reload/handoff chain, context alarm, artifact + auto-log rules
 - [[ohvara-dashboard]] — dashboard architecture brain doc
+                                                                                                                                                                                                  
