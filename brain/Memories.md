@@ -64,6 +64,20 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-25 — Prompt 79 SHIPPED: tab colors always-on, pricing into script flow, Follow-Up trim (`4a276dc`)
+
+3 files, 3 changes:
+
+1. **MyLeads.jsx** (`TAB_COLORS` always visible): tab `color` was `isActive ? tabColor : 'var(--text-secondary)'` — changed to always `tabColor`. Added `fontWeight: isActive ? 500 : 400` for active emphasis. Count badge also always `tabColor`.
+
+2. **ScriptWalk.jsx + CallModal.jsx** (pricing fields → script flow): `DataCollectCard` already captured `calls_missed_per_week` and `avg_ticket` in the script flow (Prompt 53). CallModal's Discovery section had a duplicate flex-row with the same two number inputs. Removed the inputs from CallModal. Added `onDataCollect` callback prop (ScriptWalk → DataCollectCard): fires with saved values after a successful `data_collect` save. CallModal's `handleDataCollect` updates `callsMissedPerWeek`/`avgTicket` state, keeping them live for `recommend-stack` in `handleDone`. Remaining Discovery fields (`primaryPain`, `currentSetup`, `secondaryPain`) are not in the script flow — they stay. Canonical column confirmed: `avg_ticket` (not `avg_ticket_value`).
+
+3. **CallModal.jsx** (Follow-Up note trim): `note` for Follow-Up status changed from `'Lead stays in your list — pick a date below to come back to this one'` → `'Pick a date below to come back to this one'`.
+
+**Not Chrome-MCP-verified** (extension offline). Verify: tab colors visible at rest on My Leads; Appointment Booked booking form has no pricing inputs (only pain/setup fields); Follow-Up status picker shows trimmed text.
+
+---
+
 ### 2026-06-25 — Prompt 78 SHIPPED: Twilio race condition fix — wait for `registered` event (`02859db`)
 
 Root cause: `device.register()` is async, but `setDeviceReady(true)` was called synchronously on the next line — before the Twilio Device had actually registered. The Twilio SDK emits a `'registered'` event when registration is complete; the original code never waited for it. A rep who clicked "Call Now" immediately after the modal opened would reach `device.connect()` while the Device was still mid-registration → SDK threw → `callState` → `'error'` → "Call failed" message.
