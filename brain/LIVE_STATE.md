@@ -16,7 +16,57 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–79 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–81 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+
+### ✅ Prompt 81 SHIPPED 2026-06-25 (`f20e031`) — My Payouts date display; bell preview SQL manual step
+
+**Change 2 (code):** `MyCommissions.jsx` `MyPayouts` now shows a date line per row — pending rows show "Closed on {date}" using `created_at`; paid rows show "Paid on {date}" using `paid_at`. Both columns already selected by `useMyPayouts`. Date formatted with `toLocaleDateString('en-US', { month: 'short', day: 'numeric' })` matching the bell's fmtTime pattern.
+
+**Change 1 (manual SQL required):** CC cannot call the Supabase REST API with the new `sb_secret_*` key format. apex11's profile_id is `67bdea10-62d0-44c6-81b0-a321ca9ea52e`. Run this in the Supabase SQL editor:
+
+```sql
+-- Option A: idempotent badge insert (no-op if dial_1 already exists for apex11)
+INSERT INTO notifications (profile_id, type, message, badge_id, data)
+VALUES (
+  '67bdea10-62d0-44c6-81b0-a321ca9ea52e',
+  'badge',
+  'Badge unlocked: First Dial',
+  'dial_1',
+  '{"badge_id": "dial_1", "label": "First Dial"}'::jsonb
+)
+ON CONFLICT ON CONSTRAINT notifications_profile_badge_unique DO NOTHING;
+
+-- Option B: if bell still empty after A (bypass unique constraint, no badge_id)
+INSERT INTO notifications (profile_id, type, message, data)
+VALUES (
+  '67bdea10-62d0-44c6-81b0-a321ca9ea52e',
+  'badge',
+  'Badge unlocked: First Dial',
+  '{"badge_id": "dial_1", "label": "First Dial"}'::jsonb
+);
+```
+
+**Not Chrome-verified** (extension offline). Verify: `/rep/commissions` as apex11 — payout rows show date line; bell shows at least one notification after running SQL above.
+
+---
+
+### 🔴 Prompt 80 — My Leads status badge color, and live script flow: no standalone "do this" pages, fork answers attached to their question (queued 2026-06-25, Eagle)
+
+**Context:** Brayden screenshotted `/rep` (My Leads table) and `/rep/training` (script canvas) live and flagged two real UX problems, neither cosmetic-only — the second one risks a rep accidentally reading an internal instruction out loud to a prospect.
+
+**Change 1 — My Leads table Status column isn't colored.** On `/rep` (`MyLeads.jsx`), each row's `STATUS` column renders the lead's status ("New", etc.) as a plain/muted pill — no color. Compare to `CallModal.jsx`'s own status badge (top-right of the call-prep modal, next to the business name) which already renders "New" in a colored (blue) pill using the established status-color scheme (the same `TAB_COLORS`-style mapping used for the tab filters: New/Appointment Booked/Follow-Up/No Answer/Not Interested). Brayden wants the table's per-row Status pill to use that same color mapping — "New" rows show the blue pill, "Appointment Booked" rows show green, etc. — matching CallModal's badge, not a separate undyed style. Recon `MyLeads.jsx`'s table row status pill and `CallModal.jsx`'s header status badge to find the exact color tokens/map CallModal already uses, then reuse it (don't invent new colors) for the table.
+
+**Change 2 — Live script walk (`ScriptWalk.jsx`, the call-prep modal's "SAY THIS" / "Next" flow): two structural problems, not just visual.**
+
+1. **No standalone action-only ("do this") screens.** Today some steps in the live walk render as their own full "page" that is an internal coaching/action directive rather than something to say out loud (e.g. an `action` type step). Brayden's concern: a rep reading straight down the screen, page after page, will sometimes hit one of these and read the internal instruction out loud to the prospect by mistake. Every screen the rep sees while live on a call should always be something to actually SAY — action/coaching directives should never render as their own clickable "page" in the live flow. Recon how `ScriptWalk.jsx` currently renders `action` steps in `mode="live"` and change this so action content either (a) doesn't get its own page at all in live mode — folded as a small non-primary hint attached to the say-step before/after it — or (b) is visually unmistakable as "don't say this" (e.g. clearly labeled, de-emphasized, never in the big readable "say this" card styling) — recon first, then make the call on which, but the end result must be: a rep scrolling through live can never mistake an action page for a line to say.
+
+2. **Fork question + its answer options must be on the same screen, not split across a Next click.** Today, reaching a fork (e.g. "Who's handling your calls right now... do they have someone on the phones, or is it just them?") shows the question as a "say this" card with a "Next" button — clicking Next is a separate step before the rep can pick which branch the prospect's answer maps to. Brayden wants the fork's branch options visible and selectable on the SAME screen as the question being asked — the rep reads the question, hears the answer, and picks the branch right there, no intermediate "Next" page in between. Recon `ScriptWalk.jsx`'s fork-step rendering (the `fork` step type, likely similar structure to `ScriptCanvas.jsx`'s `ForkNode`) to see exactly how say-step and fork-step are currently sequenced, then combine them into a single screen per fork: the question text + the branch-option buttons together.
+
+**Recon first, in this order:** `src/components/rep/ScriptWalk.jsx` (full file — focus on step-type rendering, particularly how `action` and `fork` steps differ from `say` steps and from each other in live mode), `src/lib/discoveryScript.js` (confirm whether a fork's question text and its options are already one logical step or two separate ones in the data — if they're already one step in the data and ScriptWalk is just rendering them as two screens, this is a pure rendering fix; if the data itself splits question from options into separate steps, that's a bigger restructure — report back which is true before changing the data shape), and `src/components/rep/MyLeads.jsx` + `CallModal.jsx` (status badge color tokens for Change 1).
+
+**Verify:** Chrome MCP pass as apex11 — My Leads table status pills show the same colors as CallModal's badge (blue New, etc.); live call walk on a lead that reaches a fork shows question + options on one screen with no intermediate Next click; no action/"do this" step ever renders as its own full say-style page during a live call walk.
+
+---
 
 ### ✅ Prompt 79 SHIPPED 2026-06-25 (`4a276dc`) — Tab colors always-on, pricing in script, Follow-Up trim
 
@@ -803,4 +853,3 @@ Non-CC sessions (Manager chats, no filesystem) re-ground from the most recent pa
 - [[North Star]] — who we are, packages, pricing, goals, hard rules
 - [[session-flow]] — reload/handoff chain, context alarm, artifact + auto-log rules
 - [[ohvara-dashboard]] — dashboard architecture brain doc
-                                                                                                                                                                                                  
