@@ -64,6 +64,12 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-25 — Session wrap-up: vault log + push for Prompts 85–89 (`344b812`)
+
+Context compaction mid-session; resumed and completed vault logging. Appended Prompts 85–89 session log entry to Memories.md, committed LIVE_STATE.md + Memories.md (`344b812`), pushed vault to GitHub. Dashboard repo already fully pushed (`33b009e`) before compaction. No new code written this continuation — wrap-up only.
+
+---
+
 ### 2026-06-25 — Prompts 85–89 SHIPPED: rep bell fixes + closer dashboard features
 
 **Prompt 85** (`a70344c`): rep bell wording/logic — `deal_closed` drops dollar amount → "Deal closed: {biz}"; `follow_up` collapsed to 5-min only (removed 60m/10m/1m thresholds + `useFollowUp5MinNotifier`); open-marks-read: bell open fires `markAll.mutate()` immediately; `call_graded` already uses letter grades (A+/A/B+/B etc.) — no code change needed; `message` sender name needs DB trigger update (SQL in LIVE_STATE for Brayden to run).
