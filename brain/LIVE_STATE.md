@@ -16,7 +16,44 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–81 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–93 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+
+### ✅ Prompt 94 SHIPPED 2026-06-25 (`824f92b`) — Closer Script + dual-script tab on closer dashboard
+
+**4 files changed:**
+
+1. **`src/lib/discoveryScript.js`** — `buildScriptFlow` now accepts `script` as an optional 3rd parameter (defaults to `DISCOVERY_SCRIPT`). All existing callers unchanged.
+
+2. **`src/lib/closerScript.js`** (new) — `CLOSER_SCRIPT` array (3 sections) + `buildCloserScriptFlow(lead, rep)`. Sections:
+   - `opener` (kind: opener) — Reconnect & Confirm Pain: warm greeting, reference rep + pain, pain-confirmed/changed fork → routes to Stack
+   - `stack` (kind: branch) — The Locked Stack: AI Receptionist pitch, dispatch-heavy fork (AI Dispatcher alternate), website/chatbot nested fork (has site? → has chatbot? → 3 outcomes), then all 5 sub-agents (Review Generation, Lead Follow-Up, Appointment Reminders, Appointment Cancellation, SMS Marketing) → routes to Close
+   - `close` (kind: close) — Price & Close: $297 setup + monthly formula price, price-objection fork (ROI anchor = human hire), ready/hesitating fork (Stripe links + lock follow-up). Tips include rule: always generate both Stripe links immediately.
+
+3. **`src/pages/closer/CloserScript.jsx`** (new) — Two sub-tabs: "Appointment Setting Script" (setter flow) | "Closer Script" (closer flow, default). Each renders `<ScriptCanvas flow={...} />` with full click-to-practice. Demo lead tokens used (no live lead required).
+
+4. **`Sidebar.jsx`** + **`App.jsx`** — `/closer/script` route added (role: closer), "Script" nav item added after Pipeline in closer sidebar (BookOpen icon).
+
+**Not Chrome-verified.** Verify: closer sidebar shows "Script" nav item; clicking it shows two sub-tabs; both canvases render the flowchart; clicking any node launches the walk; website/chatbot nested fork renders correctly on the closer canvas; "Closer Script" tab is the default.
+
+---
+
+### 🔴 Prompt 94 — Build a Closer Script for Nate + a Script tab on the closer dashboard holding BOTH scripts (queued 2026-06-25, Eagle)
+
+**Context:** The standard stack is now LOCKED (2026-06-25, Brayden — see [[North Star]] correction): every client gets the same stack — front-runner **AI Receptionist** (AI Dispatcher as the alternate front-runner for dispatch-heavy niches) + fixed sub-agents **Review Generation, Lead Follow-Up, Appointment Reminders, Appointment Cancellation, SMS Marketing** + default-included **Website/Chatbot** (excluded only if the lead already has both). Nate (closer) is currently winging Call 2 — improvising the pitch each time instead of having a repeatable flow, because there used to be a different custom stack every call. Now that the stack is fixed, Brayden wants a **closer script built the exact same way the rep discovery script works** — same infra pattern (`discoveryScript.js` + `ScriptWalk.jsx`/`ScriptCanvas.jsx`), just authored for Call 2 instead of Call 1.
+
+**Where it surfaces — UPDATED (2026-06-25):** Nate is dual-role (appointment setter + closer, per Prompt 87's pipeline tabs). The closer dashboard needs a **"Script" tab/page** that holds BOTH scripts side by side — the existing rep/appointment-setter script AND the new closer script — each working identically: a flowchart/canvas view where clicking a node walks you through that part of the script (same `ScriptCanvas` + `ScriptWalk` pattern as `/rep/training`'s Script tab). Likely two sub-tabs or a toggle within the closer Script page: "Appointment Setting Script" | "Closer Script". Both render with the same component, just fed different script data.
+
+**What the closer script needs to cover (Call 2 flow):**
+1. Review the pain the rep already gathered on Call 1 (not re-discovering it from scratch).
+2. Walk through the SAME stack every time — same problems/fixes framing for AI Receptionist (or AI Dispatcher alternate) + the 5 fixed sub-agents + the website/chatbot check — instead of improvising a custom pitch.
+3. Website/chatbot exclusion check baked into the flow (ask: do they have a site? does it have a chatbot? — branch accordingly per the locked logic in North Star).
+4. End in the close: present price (formula-priced per North Star, setup fee $297 + monthly), generate the two Stripe links, ask for the close.
+
+**Recon first:** read `src/lib/discoveryScript.js` (rep script's data structure — branches, say/fork/action step shape) and `src/components/rep/ScriptWalk.jsx` + `ScriptCanvas.jsx` (rendering/practice infra) to understand the existing pattern before authoring new content. Confirm whether the new closer script should be a NEW data file (e.g. `closerScript.js`) reusing the same `ScriptWalk`/`ScriptCanvas` components, or whether those components need minor generalization (e.g. they're currently rep-route-coupled) to be reusable on a closer-side page that needs to render TWO different scripts. Recommend reusing existing rendering logic and only swapping script DATA + adding the setter-script reuse on the closer side, to avoid duplicating UI work.
+
+**Verify:** Chrome MCP pass (Brayden runs it) on the closer dashboard's new Script tab — both "Appointment Setting Script" and "Closer Script" are visible/selectable, each renders as a clickable flowchart, clicking a node walks through that part of the script, closer script follows the locked stack order and ends in pricing + close.
+
+---
 
 ### ✅ Prompt 93 SHIPPED 2026-06-25 (`16f346f`) — MyAppointments fixed-height box
 
@@ -36,24 +73,6 @@ tags:
 
 ---
 
-### 🔴 Prompt 92 — Closer Pipeline (Appointment Setting tab) lead box: click-anywhere popup, match rep box sizing, color-coded filters, reorder tabs (queued 2026-06-25, Eagle)
-
-Screenshot confirms: `/closer/pipeline` Appointment Setting tab (built in Prompt 87) currently has a smaller-looking empty-state box than the rep `/rep/leads` ("My Leads") page, plain/uncolored filter tab pills (All/New/No Answer/Follow-Up/Appointment Booked/Not Interested), "All" tab first, and clicking a lead row presumably doesn't open the detail popup the way rep My Leads does. Four fixes, all making this tab match the rep My Leads page it's modeled on:
-
-1. **Click anywhere on a lead row → opens the same lead detail popup/modal used elsewhere** (the rep `CallModal`-equivalent or whatever this closer portal already uses for lead detail). Currently this tab's rows may not be clickable at all — confirm and add `onClick` to open the modal.
-
-2. **Match the rep My Leads box's size/min-height even when empty.** Right now with 0 leads this box renders smaller than the rep page's empty state. Give it the same fixed min-height/container sizing as `/rep/leads` so it doesn't visually shrink when empty.
-
-3. **Color-coordinate the filter tab pills** the same way rep My Leads' status badges are colored (Prompt 80's `Badge.jsx` `STATUS_STYLES` — New=blue, Appointment Booked=green, No Answer=slate, Not Interested=red, Follow-Up=amber). Apply matching colors to these filter tab pills/counts, not just the row status badges.
-
-4. **Reorder the filter tabs:** move "All" to the END (last tab), and "New" should be FIRST. Current order is All, New, No Answer, Follow-Up, Appointment Booked, Not Interested — change to New, No Answer, Follow-Up, Appointment Booked, Not Interested, All.
-
-**Recon first:** find the component rendering this Appointment Setting tab (likely `CloserPipeline.jsx` per Prompt 87's shipped notes) and compare directly against `MyLeads.jsx` (rep side) for the popup-on-click and box-sizing patterns to copy.
-
-**Verify:** `/closer/pipeline` Appointment Setting tab — clicking any lead row opens the detail popup; empty-state box is the same size as rep My Leads' empty state; filter tabs are colored to match their status; tab order is New, No Answer, Follow-Up, Appointment Booked, Not Interested, All.
-
----
-
 ### ✅ Prompt 91 SHIPPED 2026-06-25 (`4d86bdb`) — Canvas say+fork combined node + GoTo terminal
 
 2 changes to `ScriptCanvas.jsx`:
@@ -67,20 +86,6 @@ Screenshot confirms: `/closer/pipeline` Appointment Setting tab (built in Prompt
 
 ---
 
-### 🔴 Prompt 91 — Training Center script CANVAS (flowchart view): combine say+fork into one node visually, replace cross-canvas jump arrows with terminal "Go to X" nodes (queued 2026-06-25, Eagle)
-
-This is about the **flowchart/canvas view** on `/rep/training` (Script tab) — the visual decision-tree diagram, NOT the live call-walk (`ScriptWalk.jsx` in `mode="live"`, already fixed in Prompt 80). Screenshot confirms: canvas still shows a `say` node ("Who's handling your calls right now?") followed by a separate arrow down to an `if/else` fork node ("Do they have someone on the phones, or is it just them?") with branch answers below that. Brayden wants two changes to how the canvas RENDERS this, mirroring the live-mode fix from Prompt 80:
-
-1. **Combine say+fork into a single visual node.** Don't render the say text and its immediately-following fork as two separate boxes connected by an arrow — render them as one node: question text + the fork's branch options together, matching the same say+fork merge logic already built for live mode (`nextForkForSay` / `SayWithFork` from Prompt 80) — reuse/adapt that logic for the canvas renderer if it's a separate component from `ScriptWalk`.
-
-2. **Replace long cross-canvas jump arrows with a terminal node.** Where a branch currently draws an arrow across the whole canvas to a distant node (example in screenshot: a dashed arrow over to a separate "Owner / Decision-Maker" branch start), instead make that branch's last visible node simply read "→ Go to Owner / Decision-Maker" (or whatever the actual jump target is) and END there visually — no arrow drawn across the canvas. The live practice walkthrough should still actually jump to that branch when clicked/practiced — this change is purely about how the static flowchart diagram renders, not actual navigation logic.
-
-**Recon first:** find the canvas/flowchart rendering component for the Training Center Script tab (likely separate from `ScriptWalk.jsx`'s live-mode rendering — could be a React Flow-based component or custom SVG layout) and confirm how nodes/edges are currently generated from `discoveryScript.js` before changing anything.
-
-**Verify:** `/rep/training` Script tab — say nodes with an immediately-following fork show combined on one box; any node that jumps to a distant branch (e.g. Owner/Decision-Maker) shows as a "Go to {branch}" terminal node with no long arrow across the canvas; clicking that terminal node to practice still works correctly (jumps to the real branch).
-
----
-
 ### ✅ Prompt 90 SHIPPED 2026-06-25 (`7a9799d`) — Toast only on live notifications, not login backlog
 
 **Root cause:** `NotificationToast.jsx` seeded `seenRef` on the first render when `notifications = []` (data not yet loaded). When the real data arrived on the next render, `seenRef` was a non-null empty Set, so all backlog notifications were treated as "new" and toasted.
@@ -90,20 +95,6 @@ This is about the **flowchart/canvas view** on `/rep/training` (Script tab) — 
 **Closer coverage (`DashboardLayout.jsx`):** Renamed `RepToastMount` → `ToastMount`, added `closer` to allowed roles (`['rep', 'closer']`). Closers now get the same toast behavior (live-only).
 
 **Not Chrome-verified.** Verify: log in with pre-existing unread notifications — bell shows red dot, no toasts. Then insert a new notification via SQL — toast slides in. Both rep and closer roles should behave identically.
-
----
-
-### 🔴 Prompt 90 — Slide-in toast only for live notifications, not on login/backlog (queued 2026-06-25, Eagle)
-
-Both the rep and closer notifier hooks currently slide in a toast/banner whenever an unread notification is detected — including ones that already existed before the page loaded (e.g. accumulated while logged off). Brayden wants:
-
-- **Slide-in toast only fires for notifications that arrive in real time while the user is actively on the dashboard** (a genuinely new realtime INSERT event received while the page/tab is open).
-- **On login/page load, any pre-existing unread notifications should NOT slide in** — they should just sit in the bell, with the bell showing its red unread dot. No flood of toasts on login.
-- Clicking the bell still clears the red dot (per Prompt 85's open-marks-read behavior) — that part is unchanged.
-
-**Recon first:** find wherever toasts currently fire (likely inside `useRepNotificationTriggers.js` / `useCloserNotificationTriggers.js`, or a shared toast hook) — distinguish "notification existed in an initial fetch/query" vs. "notification arrived via a live realtime subscription event after mount." Only the latter should toast. Apply the fix to BOTH rep and closer notifier hooks (not just one).
-
-**Verify:** log in with unread notifications already pending — no toasts slide in, bell just shows red dot. Then, while staying on the dashboard, trigger a new notification (e.g. insert one via SQL) — toast should slide in this time.
 
 ---
 

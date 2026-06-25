@@ -64,6 +64,12 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-25 — Prompt 94 SHIPPED: Closer Script + dual-script tab (`824f92b`)
+
+`closerScript.js` — 3-section CLOSER_SCRIPT (opener: reconnect+pain confirm; stack: AI Receptionist + dispatch fork + nested website/chatbot fork + all 5 sub-agents; close: $297+monthly, price fork, Stripe links). `buildCloserScriptFlow` wraps `buildScriptFlow` with the new optional `script` param (min change to `discoveryScript.js`). `CloserScript.jsx` — two sub-tabs ("Appointment Setting Script" / "Closer Script") each rendering `<ScriptCanvas>`. Route `/closer/script` + sidebar "Script" (BookOpen icon after Pipeline).
+
+---
+
 ### 2026-06-25 — Prompt 90 SHIPPED: Toast only on live notifications, not login backlog (`7a9799d`)
 
 **Bug:** `seenRef` in `NotificationToast.jsx` seeded from `notifications = []` (default before data loaded). When real fetch arrived, `seenRef` was an empty Set (not null) → all backlog toasted. **Fix:** gate on `isFetched` from `useRepNotifications` — skip until first real fetch settles, then seed. **Also:** extended `DashboardLayout` toast mount from rep-only to `['rep', 'closer']`.
@@ -2066,6 +2072,31 @@ ecommend-stack when status → Appointment Booked, writes result to leads (recom
 ## [Eagle | 2026-06-25 — Pricing model correction: standard stack for everyone, not custom-per-lead]
 **Topic:** Brayden corrected the stack/pricing model documented in North Star.
 **Decision:** No more AI-generated custom stack per lead. Everyone gets the SAME standard stack (same automations). During discovery, check off what the lead already has — those items get excluded, which lowers price (exact discount math not yet formalized). In practice the only likely overlap is a website; if they have one but no chatbot, add the chatbot; if no website, include the full web piece. Pricing formula itself (`callsMissedPerWeek × 4.33 × avgTicket × 0.15`, floor $397/ceiling $1,997) is UNCHANGED — only stack composition logic changed. Context: current lead source is Indeed receptionist-hiring businesses, so AI Receptionist is the headline product the stack sells "on top of."
-**Found:** `strategy/automation-stack-builder.md` (2026-06-20) has the automation catalog (AI Receptionist, AI Dispatcher, Missed Call Text Back, Review Generation, Lead Follow-Up, Appointment Reminders, SMS Marketing, Website) — likely candidate for "the stack" Brayden referenced, but it predates this correction and needs his confirmation.
-**State:** North Star "Custom Stack Pricing" section marked SUPERSEDED with a correction block added below it.
-**Resume:** Confirm the automation-stack-builder.md catalog with Brayden as the actual standard stack; formalize the exclusion-discount math once confirmed; this likely needs a dashboard checklist UI for closers/reps eventually (not built yet, no decision made on building it this session).
+**Found:** `strategy/automation-stack-builder.md` (2026-06-20) has the automation catalog (AI Receptionist, AI Dispatcher, Missed Call Text Back, Review Generation, Lead Follow-Up, Appointment Reminders, SMS Marketing, Website) — likely candida
+## 2026-06-25 (later) | Lead sourcing workflow + fulfillment outsourcing plan (logged for the first time — confirmed not previously in Atlas)
+
+**Brayden's actual lead sourcing process (not previously documented):** He personally scrapes leads himself using his own Google Chrome extension — searches a town/city + "receptionist" on Indeed, downloads the resulting lead list to his computer. This is SEPARATE from the in-dashboard Indeed/Maps scrapers already built (`/admin/scraper`, `indeed-scraper`/`maps-scraper` edge functions). He wants to bulk-import these manually-scraped lead lists directly into the dashboard so appointment setters can call through them with the universal pain-discovery script (script already confirmed niche-agnostic, see 2026-06-16 distill). **Action needed:** dashboard needs a bulk lead-import path (CSV or similar) that doesn't depend on the in-dashboard scraper edge functions running — flag to CC as a build item if it doesn't already exist.
+
+**Fulfillment plan confirmed:** Brayden is NOT building the automation-stack-builder registry himself or via Brayden/CC — he's outsourcing the build to a contractor, triggered by the first real deal closing (not building speculatively ahead of a close, reversing the 2026-06-20 "UN-PARKED, build ahead of close" decision in `automation-stack-builder.md`). He already has candidates saved on Upwork who specialize in HIPAA-compliant builds. Client-facing buffer: new clients get told "~1 week to launch" after close, which is the window the outsourced builder uses to actually build out the sold automations. Note: HIPAA specialization is future-proofing more than urgent need — Veterinary (current niche lineup) was specifically chosen as the HIPAA-SAFE alternative to dental, i.e. not actually a HIPAA-covered entity under the current 6-niche lineup.
+
+**Resume note:** automation-stack-builder.md status should be corrected from "Building" (un-parked 2026-06-20) to reflect the new plan — outsourced, triggered by first close, ~1 week build window, not built speculatively by CC ahead of time. Also still open: stack list final lock (Review Generation, Lead Follow-Up, Appointment Reminders, Appointment Cancellation, SMS Marketing — Missed Call Text Back removed 2026-06-25), Appointment Cancellation cascade logic (re-engage canceller → offer slot to next-booked customers, first-confirm-wins, flagged for race-condition handling), bulk lead-import feature need.
+
+## 2026-06-25 (later still) | Stack LOCKED + Appointment Cancellation logic finalized + Prompt 94 queued (closer script)
+
+**Stack locked.** Brayden confirmed he likes the corrected stack and confirmed everyone gets it: front-runner AI Receptionist (+AI Dispatcher alternate) + sub-agents Review Generation, Lead Follow-Up, Appointment Reminders, Appointment Cancellation, SMS Marketing + default-included Website/Chatbot (excluded only if both already owned). North Star updated with a 🔒 LOCKED marker.
+
+**Appointment Cancellation behavior finalized:** cancellation → try to rebook the canceller first → if no luck, text next several upcoming-appointment customers "earlier slot opened, first come first served, reply YES" → first YES locks it → everyone else gets instant "spot's taken" auto-reply so no one wastes time on a dead offer. Logged to North Star.
+
+**Lead Follow-Up "quiet lead" threshold** — not formally defined yet, Brayden's working read (not locked): ~24-48hrs for standard follow-up, shorter same-day for missed-call scenarios, longer 2-3 days for big quotes under decision.
+
+**Prompt 94 queued in LIVE_STATE:** build a Closer Script for Nate using the same infra pattern as the rep discovery script (`discoveryScript.js` + `ScriptWalk`/`ScriptCanvas`) — Call 2 script walks the locked standard stack every time instead of Nate improvising, ends in pricing + Stripe links + close ask.
+
+**Also cleaned up LIVE_STATE:** removed 3 stale duplicate 🔴 queued blocks for Prompts 90/91/92 that were already shipped above them (left over from an earlier incomplete cleanup pass).
+
+**Lead sourcing clarification:** bulk lead-import (personal Chrome-extension-scraped lists → dashboard) is already on Brayden's radar for the admin dashboard build — not a gap needing a separate CC prompt right now.
+
+**Resume note:** Prompt 94 (closer script) is next in CC's queue. Open items still unresolved: Stripe Connect decision (bank button), Nate's `assigned_rep_id` confirmation, new-lead-pool notification scoping, exclusion-discount pricing math, quiet-lead threshold formal lock, `automation-stack-builder.md` still has lingering Missed Call Text Back text to clean in its earlier "Gap" section.
+
+## 2026-06-25 (later still 2) | Prompt 94 expanded — closer dashboard Script tab holds BOTH scripts
+
+Brayden clarified Prompt 94 scope: the closer dashboard needs a Script tab that shows BOTH the appointment-setter script and the new closer script, same flowchart-click-to-walk-through UI for each (mirrors `/rep/training` Script tab pattern). Makes sense given Nate is dual-role. Updated LIVE_STATE Prompt 94 accordingly — recon should check if ScriptWalk/ScriptCanvas need generalizing beyond their current rep-route coupling to render on a closer-side page hosting two scripts.
