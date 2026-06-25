@@ -64,6 +64,12 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-25 — Prompt 90 SHIPPED: Toast only on live notifications, not login backlog (`7a9799d`)
+
+**Bug:** `seenRef` in `NotificationToast.jsx` seeded from `notifications = []` (default before data loaded). When real fetch arrived, `seenRef` was an empty Set (not null) → all backlog toasted. **Fix:** gate on `isFetched` from `useRepNotifications` — skip until first real fetch settles, then seed. **Also:** extended `DashboardLayout` toast mount from rep-only to `['rep', 'closer']`.
+
+---
+
 ### 2026-06-25 — Prompt 91 SHIPPED: Canvas say+fork combined + GoTo terminal nodes (`4d86bdb`)
 
 `ScriptCanvas.jsx` — two changes: (1) `placeSteps` loop converted to indexed `while`; say+adjacent-fork pairs (action steps skipped in between) merged into single `SayForkNode` — italic say text above divider + if/else question; options still fan out as edges; (2) back-reference routes (branch→branch) replaced from long dashed cross-canvas arrows to inline `GoToNode` terminal (dashed border, "→ Branch Title", no source handle). Clicking GoTo starts practice at the TARGET branch via `targetSectionId`. `nodeTypes` updated with `sayFork` and `goTo`.
@@ -2056,10 +2062,10 @@ ecommend-stack when status → Appointment Booked, writes result to leads (recom
 ## [Eagle | 2026-06-25 — Prompt 81 Change 1 schema correction; Prompt 82 queued]
 **Topic:** Bell notification preview for apex11 — CC's original SQL was wrong.
 **What happened:** Brayden ran CC's Option A/B inserts via his own Claude in Chrome session (per his new standing instruction: Eagle gives prompts, Brayden runs them himself in Chrome, not Eagle driving Chrome directly). Both failed — `notifications` table has no `profile_id` or `badge_id` columns and no `notifications_profile_badge_unique` constraint. Real schema: `id, type, message, data jsonb, read, created_at`. Brayden then ran a diagnostic query at Eagle's request: all 5 existing rows are admin/closer events (`new_client`, `client_live`) with rep identity embedded in `data.closerId`, not a dedicated user column. apex11's real user id confirmed: `67bdea10-62d0-44c6-81b0-a321ca9ea52e`.
-**Decision:** None of the existing rows look like rep badge-unlock notifications — the rep bell's badge notifications may not be sourced from this table at all. Queued Prompt 82 for CC: recon the actual bell component/hook before writing any more SQL, then either insert correctly or report there's no insertable row.
-**State:** LIVE_STATE Prompt 81 entry corrected in place (Change 1 marked CORRECTED with full schema findings); Prompt 82 queued at top of "Next Up for CC".
-**Resume:** Read LIVE_STATE Prompt 82 — recon bell notification source, fix or report back.
- landing on a separate screen after Next — wants question and its answer options combined on ONE screen, no intermediate click. Wrote up as Prompt 80 in LIVE_STATE with explicit recon order (ScriptWalk.jsx, discoveryScript.js — flagged whether fork question/options are already one data step being mis-rendered as two, or actually split in the data) before CC touches anything. No code changes this session — vault-only, queue prompt only.
-
-
-[Eagle | 2026-06-25 — Prompt 81 queued: sample bell notification for apex11 + My Payouts closed/paid date display] — Brayden asked to see what a notification looks like in the bell as apex11 (doesn't matter which type, e.g. a badge-unlock he already has — just wants to preview the UI). Also wants My Payouts rows to show a date: pending rows → "Closed on {date}" (deal-close date), paid rows → "Paid on {date}" (replaces the closed-date text once paid). Wrote up as Prompt 81 with recon-first instructions (notification schema columns via RepNotificationBell/useBadgeNotifier; confirm created_at = close date and paid_at is already selected in usePayouts.js before editing). No code/DB changes this session — vault-only, queue only.
+**Decision:** None of the existing rows look like rep badge-unlock notifications — the rep bell's badge notifications may not be sourced from this table at all. Queued Prompt 82 for CC: recon the actual bell component/hook be
+## [Eagle | 2026-06-25 — Pricing model correction: standard stack for everyone, not custom-per-lead]
+**Topic:** Brayden corrected the stack/pricing model documented in North Star.
+**Decision:** No more AI-generated custom stack per lead. Everyone gets the SAME standard stack (same automations). During discovery, check off what the lead already has — those items get excluded, which lowers price (exact discount math not yet formalized). In practice the only likely overlap is a website; if they have one but no chatbot, add the chatbot; if no website, include the full web piece. Pricing formula itself (`callsMissedPerWeek × 4.33 × avgTicket × 0.15`, floor $397/ceiling $1,997) is UNCHANGED — only stack composition logic changed. Context: current lead source is Indeed receptionist-hiring businesses, so AI Receptionist is the headline product the stack sells "on top of."
+**Found:** `strategy/automation-stack-builder.md` (2026-06-20) has the automation catalog (AI Receptionist, AI Dispatcher, Missed Call Text Back, Review Generation, Lead Follow-Up, Appointment Reminders, SMS Marketing, Website) — likely candidate for "the stack" Brayden referenced, but it predates this correction and needs his confirmation.
+**State:** North Star "Custom Stack Pricing" section marked SUPERSEDED with a correction block added below it.
+**Resume:** Confirm the automation-stack-builder.md catalog with Brayden as the actual standard stack; formalize the exclusion-discount math once confirmed; this likely needs a dashboard checklist UI for closers/reps eventually (not built yet, no decision made on building it this session).

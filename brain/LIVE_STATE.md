@@ -81,6 +81,18 @@ This is about the **flowchart/canvas view** on `/rep/training` (Script tab) — 
 
 ---
 
+### ✅ Prompt 90 SHIPPED 2026-06-25 (`7a9799d`) — Toast only on live notifications, not login backlog
+
+**Root cause:** `NotificationToast.jsx` seeded `seenRef` on the first render when `notifications = []` (data not yet loaded). When the real data arrived on the next render, `seenRef` was a non-null empty Set, so all backlog notifications were treated as "new" and toasted.
+
+**Fix (`NotificationToast.jsx`):** Added `isFetched` from `useRepNotifications`. The `useEffect` now returns early if `!isFetched`. On the first settled fetch, all existing IDs are seeded into `seenRef` (no toast). Only IDs appearing in subsequent refetches/realtimes trigger a toast.
+
+**Closer coverage (`DashboardLayout.jsx`):** Renamed `RepToastMount` → `ToastMount`, added `closer` to allowed roles (`['rep', 'closer']`). Closers now get the same toast behavior (live-only).
+
+**Not Chrome-verified.** Verify: log in with pre-existing unread notifications — bell shows red dot, no toasts. Then insert a new notification via SQL — toast slides in. Both rep and closer roles should behave identically.
+
+---
+
 ### 🔴 Prompt 90 — Slide-in toast only for live notifications, not on login/backlog (queued 2026-06-25, Eagle)
 
 Both the rep and closer notifier hooks currently slide in a toast/banner whenever an unread notification is detected — including ones that already existed before the page loaded (e.g. accumulated while logged off). Brayden wants:
