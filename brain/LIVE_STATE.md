@@ -18,6 +18,20 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–81 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
 
+### 🔴 Prompt 90 — Slide-in toast only for live notifications, not on login/backlog (queued 2026-06-25, Eagle)
+
+Both the rep and closer notifier hooks currently slide in a toast/banner whenever an unread notification is detected — including ones that already existed before the page loaded (e.g. accumulated while logged off). Brayden wants:
+
+- **Slide-in toast only fires for notifications that arrive in real time while the user is actively on the dashboard** (a genuinely new realtime INSERT event received while the page/tab is open).
+- **On login/page load, any pre-existing unread notifications should NOT slide in** — they should just sit in the bell, with the bell showing its red unread dot. No flood of toasts on login.
+- Clicking the bell still clears the red dot (per Prompt 85's open-marks-read behavior) — that part is unchanged.
+
+**Recon first:** find wherever toasts currently fire (likely inside `useRepNotificationTriggers.js` / `useCloserNotificationTriggers.js`, or a shared toast hook) — distinguish "notification existed in an initial fetch/query" vs. "notification arrived via a live realtime subscription event after mount." Only the latter should toast. Apply the fix to BOTH rep and closer notifier hooks (not just one).
+
+**Verify:** log in with unread notifications already pending — no toasts slide in, bell just shows red dot. Then, while staying on the dashboard, trigger a new notification (e.g. insert one via SQL) — toast should slide in this time.
+
+---
+
 ### ✅ Prompt 89 SHIPPED 2026-06-25 (`33b009e`) — Closer notification bell
 
 - `CloserNotificationBell.jsx` (new): same pattern as rep bell; `notifications` table + `profile_id` scoping; open-marks-read built in from day one.
@@ -453,34 +467,11 @@ Both must be run in Supabase dashboard SQL editor.
 
 ### ✅ Prompt 71 SHIPPED (already done) — admin NotificationBell portal fix was in commit `0175155`; no new code needed.
 
-### 🔴 Prompt 70 — My Payouts still shows empty state despite seeded rows (PRIORITY, queued 2026-06-24, Eagle)
-
-**Bug:** Prompt 68 Change 2 seeded 5 `commission_payouts` rows for apex11 (confirmed in DB per Memories log). Brayden just checked `/rep/commissions` as apex11 live and the My Payouts section still shows the empty state: "No payouts yet — a pending payout appears here when the closer signs a deal you booked." Screenshot confirms Total Earned/Closed Deals/chart above are populated correctly — only the My Payouts block at the bottom is empty.
-
-**Known suspect (already logged in Memories from Prompt 68):** `commission_payouts.rep_profile_id` per the migration 049 FILE doesn't match the LIVE schema column, which is actually `rep_id`. `usePayouts.js` selects/joins on `rep_profile_id`. The seeding INSERT used `rep_profile_id` as the column name and reportedly succeeded — so confirm first whether that column actually exists live (maybe both exist, or the insert silently went to the wrong place, or query-side filter is the only thing broken).
-
-**Also check:** whether `MyPayouts`/the component rendering this block has any gating logic tied to "bank connected" (the UI shows a "Connect bank" CTA above it) — payout rows should display regardless of whether a bank is connected; bank connection should only affect actual transfer, not visibility.
-
-**Fix:** find the real disconnect (column mismatch, RLS policy blocking the seeded rows for this query shape, or a UI conditional), fix it, and confirm the 5 seeded rows (4× $148.50, 1× $248.50, status paid) actually render in the My Payouts list.
-
-**Verify:** Chrome MCP pass as apex11 on `/rep/commissions` — My Payouts section shows 5 rows with business name, amount, 10%, status.
+### ✅ Prompt 70 RESOLVED 2026-06-25 — My Payouts empty state fixed (confirmed by Brayden)
 
 ---
 
-### Prompt 69 — Toast/slide-in notification popups, suppressed during an active call (queued 2026-06-24, Eagle)
-
-**Context:** Reps currently only learn about a new notification (badge unlock, call graded, deal closed, follow-up due, etc.) by noticing the bell's unread state and clicking it open — there's no in-the-moment popup. Brayden wants a toast: when a new notification arrives while the dashboard is open, a small card slides in from the top-right, sits for a normal toast duration (~4-5s), then slides back out. The bell itself keeps its existing unread indicator (red dot/badge) regardless of whether the toast was seen — clicking the bell clears it as today.
-
-**The actual problem he's solving:** a rep can finish a call and immediately move to the next one; ~30-60s later the grading for the PREVIOUS call completes and fires a notification. He does NOT want the toast popping up over their screen while they're mid-call on the next lead — distracting during a live call. But he still wants the notification to exist normally (bell badge updates, it's sitting there waiting) — it just shouldn't interrupt with a slide-in popup while a call is active. Once the call ends, future toasts resume firing normally; the one that arrived during the call does NOT need to "catch up" with a delayed toast — it's enough that the bell shows it.
-
-**Recon first:** read `RepNotificationBell.jsx`, `useRepNotifications.js`/`useNotifications.js` (the poll/realtime source both pull from), `useRepNotificationTriggers.js` (where `useCallGradedNotifier`, `useFollowUpNotifier`, `useBadgeNotifier` etc. live), and `CallModal.jsx`'s call state machine (`idle/connecting/in-call/error`) — confirm exactly where "is there an active call right now" lives today (likely local state inside `CallModal.jsx`, not yet exposed anywhere else).
-
-**Build:**
-1. A toast/snackbar component — fixed top-right, slide-in/slide-out animation, auto-dismiss after a few seconds, stacks if more than one fires close together. Wire it to the same notification stream the bell already reads (don't double-fire — one underlying event, two presentations: bell badge + optional toast).
-2. Expose "rep is currently in an active call" as state reachable outside `CallModal.jsx` — a small context/provider at the rep layout level is the likely shape, since the toast needs to live at a level that's mounted regardless of which page the rep is on, but the call state currently lives inside the modal. Recon should confirm the cleanest way to lift or share this without restructuring the whole call flow.
-3. When a new notification arrives: if no active call → fire the toast as normal. If an active call IS in progress → skip the toast for that notification (still insert/update the bell's unread state normally) — no queueing/catch-up needed once the call ends.
-
-**Verify:** Chrome MCP pass as apex11 — trigger a notification (e.g. a badge unlock or test call-grade) with no call active → toast slides in/out top-right, bell shows red unread indicator. Then trigger one again while in an active call (or simulate the in-call state) → confirm no toast appears, but the bell still picks up the unread state once checked.
+### ✅ Prompt 69 RESOLVED 2026-06-25 — Toast notifications already built (confirmed by Brayden)
 
 ---
 
