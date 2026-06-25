@@ -64,6 +64,12 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-25 — Prompt 83 DONE: full SQL for migrations 043 + 047 pasted into LIVE_STATE for Brayden
+
+Eagle needed the literal file contents to build the Supabase paste-back artifact. CC read both files and pasted them verbatim into LIVE_STATE (fenced sql blocks), plus the Step 3 badge-insert SQL. No code changes; vault-only commit.
+
+---
+
 ### 2026-06-25 — Prompt 82 RESOLVED: rep bell broken because migrations 043 + 047 never applied to live DB
 
 Root cause of the notifications "no profile_id column" mystery: migration 043 (`043_rep_notifications.sql`) adds `profile_id UUID` and `badge_id TEXT` to the `notifications` table, creates the `notifications_profile_badge_unique` constraint, RLS policies, and the message-reply DB trigger — but it was **never applied to the live Supabase DB**. Migration 047 (deal-closed trigger) also unapplied. All `useRepNotifications` queries and badge inserts silently return nothing against the live DB because the column doesn't exist. No code fix — Brayden must run both migration files in the Supabase SQL editor. After that, original Prompt 81 badge-insert SQL is correct as-is. **Standing rule:** when the rep bell appears empty/broken, check whether 043 + 047 have been applied before assuming a code bug.
