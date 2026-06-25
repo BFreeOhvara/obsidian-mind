@@ -16,7 +16,7 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–77 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–78 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
 
 ### 🔴 Prompt 79 — My Leads tab color always-on, move pricing-input fields into script flow, trim Follow-Up subtext (queued 2026-06-25, Eagle)
 
@@ -62,6 +62,12 @@ tags:
 **Verify:** Chrome MCP pass as apex11 on `/rep/commissions` — confirm each closed deal appears exactly once, with only "Paid" or "Pending" shown, no duplicates, no "Legacy" anywhere.
 
 ---
+
+### ✅ Prompt 78 SHIPPED 2026-06-25 (`02859db`) — Twilio race condition fix: wait for `registered` event
+
+`setDeviceReady(true)` now fires only from `device.on('registered', ...)` — not synchronously after `device.register()`. Race condition was causing "Call failed" immediately (device.connect reached before SDK finished registering). Added console.error logging throughout for DevTools visibility. **Not live-verified — test a real call; if it still fails, DevTools will now show the exact error.**
+
+Deploy-flag check (Supabase Functions dashboard): `twilio-token` WITHOUT `--no-verify-jwt`, `twilio-voice-webhook` WITH `--no-verify-jwt`.
 
 ### ✅ Prompt 77 SHIPPED 2026-06-25 (`9921caf`) — My Payouts: drop legacy dual-query, Paid/Pending only
 

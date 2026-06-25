@@ -64,6 +64,22 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-25 — Prompt 78 SHIPPED: Twilio race condition fix — wait for `registered` event (`02859db`)
+
+Root cause: `device.register()` is async, but `setDeviceReady(true)` was called synchronously on the next line — before the Twilio Device had actually registered. The Twilio SDK emits a `'registered'` event when registration is complete; the original code never waited for it. A rep who clicked "Call Now" immediately after the modal opened would reach `device.connect()` while the Device was still mid-registration → SDK threw → `callState` → `'error'` → "Call failed" message.
+
+Fix: removed `setDeviceReady(true)` from the synchronous flow; moved it into `device.on('registered', ...)` callback. Now the green Call button only appears after Twilio confirms the Device is registered and ready. Also added `console.error` logging to all failure paths (token fetch, device error, call error, connect catch) so the actual error is visible in browser DevTools.
+
+Additionally tightened `device.on('error')`: during registration failure (callState = 'idle'), the Device never reaches 'registered' → `deviceReady` stays false → tel: link shows (correct fallback). During a call in flight (callState = 'connecting' | 'in-call'), device error now sets callState → 'error' as before.
+
+**⚠️ Still unverified live** (Chrome MCP offline). Brayden: test a real call, and if it still fails, open DevTools Console — the exact error will now be logged starting with `[Twilio Device]` or `[Twilio startCall]`. That error tells you if the issue is the TwiML App Voice URL, mic permission, API Key, or something else.
+
+**Deploy-flag reminder (check in Supabase dashboard Functions):**
+- `twilio-token` → should be deployed WITHOUT `--no-verify-jwt` (requires auth — reps must be logged in)
+- `twilio-voice-webhook` → should be deployed WITH `--no-verify-jwt` (Twilio posts to it with no Supabase JWT)
+
+---
+
 ### 2026-06-25 — Prompt 77 SHIPPED: My Payouts deduplication + Legacy badge removal (`9921caf`)
 
 Root cause: `useMyPayouts` queried both `commission_payouts` AND `commissions`, merged results with synthetic `source='legacy'` rows. Any deal with a real `commission_payouts` row appeared twice — once with the actual status, once as "Legacy". Fix: dropped the `commissions` dual-query entirely; `useMyPayouts` now queries only `commission_payouts`. `StatusChip` simplified from 4-state map to binary: `paid` → green "Paid", anything else → amber "Pending". Removed `p.source === 'legacy'` branch in `MyPayouts` render — always shows `<StatusChip>`. The `commissions` table untouched — still the source for the earnings chart / total-earned via `useMyCommission`. **Not Chrome-MCP-verified (extension offline) — Brayden should check `/rep/commissions` live.**
