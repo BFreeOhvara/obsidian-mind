@@ -18,14 +18,20 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–81 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
 
-### ✅ Prompt 81 SHIPPED 2026-06-25 (`f20e031`) — My Payouts date display; bell preview SQL manual step
+### ✅ Prompt 82 RESOLVED 2026-06-25 — Migrations 043 + 047 never applied; no code fix needed
 
-**Change 2 (code):** `MyCommissions.jsx` `MyPayouts` now shows a date line per row — pending rows show "Closed on {date}" using `created_at`; paid rows show "Paid on {date}" using `paid_at`. Both columns already selected by `useMyPayouts`. Date formatted with `toLocaleDateString('en-US', { month: 'short', day: 'numeric' })` matching the bell's fmtTime pattern.
+**Root cause:** `useRepNotifications` queries `notifications` with `.eq('profile_id', profileId)`. Migration 043 adds `profile_id UUID` and `badge_id TEXT` to `notifications` — but migration 043 was **never applied to the live DB**. That's why Brayden's manual schema check found only the 5 original columns (id, type, message, data, read, created_at) from migration 012. The original Prompt 81 Change 1 SQL was correct all along; it just can't work until the column exists.
 
-**Change 1 (manual SQL required):** CC cannot call the Supabase REST API with the new `sb_secret_*` key format. apex11's profile_id is `67bdea10-62d0-44c6-81b0-a321ca9ea52e`. Run this in the Supabase SQL editor:
+Migration 047 (deal-closed notifications trigger) also inserts `profile_id` and is likewise unapplied.
 
+**⚠️ MANUAL STEPS — Brayden must run both in Supabase SQL editor:**
+
+1. **Apply migration 043** — run `supabase/migrations/043_rep_notifications.sql` in full. This adds `profile_id`, `badge_id`, the unique constraint `notifications_profile_badge_unique`, the index, RLS policies, and the message-reply DB trigger. After this, the rep bell queries and badge inserts will work.
+
+2. **Apply migration 047** — run `supabase/migrations/047_notify_rep_on_deal_closed.sql` in full. This adds the `notify_rep_on_deal_closed` DB trigger that fires when Nate closes a deal.
+
+3. **Then insert the bell preview** for apex11 (now that `profile_id` and `badge_id` exist):
 ```sql
--- Option A: idempotent badge insert (no-op if dial_1 already exists for apex11)
 INSERT INTO notifications (profile_id, type, message, badge_id, data)
 VALUES (
   '67bdea10-62d0-44c6-81b0-a321ca9ea52e',
@@ -35,18 +41,21 @@ VALUES (
   '{"badge_id": "dial_1", "label": "First Dial"}'::jsonb
 )
 ON CONFLICT ON CONSTRAINT notifications_profile_badge_unique DO NOTHING;
-
--- Option B: if bell still empty after A (bypass unique constraint, no badge_id)
-INSERT INTO notifications (profile_id, type, message, data)
-VALUES (
-  '67bdea10-62d0-44c6-81b0-a321ca9ea52e',
-  'badge',
-  'Badge unlocked: First Dial',
-  '{"badge_id": "dial_1", "label": "First Dial"}'::jsonb
-);
 ```
 
-**Not Chrome-verified** (extension offline). Verify: `/rep/commissions` as apex11 — payout rows show date line; bell shows at least one notification after running SQL above.
+**Verify:** `/rep` sidebar bell as apex11 — shows "Badge unlocked: First Dial" notification.
+
+---
+
+### ✅ Prompt 81 SHIPPED 2026-06-25 (`f20e031`) — My Payouts date display; bell preview SQL manual step
+
+**Change 2 (code):** `MyCommissions.jsx` `MyPayouts` now shows a date line per row — pending rows show "Closed on {date}" using `created_at`; paid rows show "Paid on {date}" using `paid_at`. Both columns already selected by `useMyPayouts`. Date formatted with `toLocaleDateString('en-US', { month: 'short', day: 'numeric' })` matching the bell's fmtTime pattern.
+
+**Change 1 — CORRECTION 2026-06-25 (Eagle, via Brayden running SQL in Claude Chrome):** CC's original Change 1 SQL was wrong — it assumed columns `profile_id`/`badge_id` and a `notifications_profile_badge_unique` constraint that DON'T EXIST. Live schema check confirms `notifications` table is actually just: `id, type, message, data (jsonb), read, created_at` — no user-scoping column at all. The 5 existing rows are all admin/closer-facing events (`new_client`, `client_live`) with rep identity embedded inside `data` as `closerId` (e.g. `"closerId":"3f2b2df7-..."`), not `profile_id`/`rep_id`. apex11's actual user id is `67bdea10-62d0-44c6-81b0-a321ca9ea52e` (confirmed via `auth.users`).
+
+**Open question CC needs to resolve before any insert will actually work:** none of the 5 existing rows look like rep "badge unlocked" notifications — they're all admin new-client/onboarding events. This strongly suggests the rep bell's badge notifications (the kind Brayden is trying to preview, e.g. "First Dial") are NOT sourced from this `notifications` table at all — they may be computed client-side from an achievements/badges table, or there's a different mechanism entirely. **CC: before writing any SQL, read whatever component backs the rep bell (likely `NotificationBell.jsx` / a `useNotifications` hook) and confirm what table/query it actually reads from, and how it scopes to the logged-in rep.** Once that's known, either (a) write the correct insert against the right table/column, or (b) if badge notifications are computed client-side with no insertable row, tell Eagle/Brayden that directly so we stop chasing a SQL insert that can't work.
+
+**Not Chrome-verified** (extension offline for direct driving; schema probed manually by Brayden via Claude Chrome per his request). Verify once correct source is found: `/rep/commissions` as apex11 — bell shows at least one notification matching the real data source.
 
 ---
 
