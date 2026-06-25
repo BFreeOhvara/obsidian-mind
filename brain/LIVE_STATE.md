@@ -18,7 +18,63 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–81 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
 
-### ✅ Prompt 83 DONE 2026-06-25 — Full SQL for migrations 043 + 047 (run both in Supabase SQL editor, in order)
+### ✅ Prompt 84 SHIPPED 2026-06-25 (`03d95aa`) — Bell truncation fixed; sample SQL for all 5 notification types
+
+**Types confirmed (all real, all implemented):**
+- `badge` — client-side `useBadgeNotifier`; `badge_id` unique constraint. Already have `dial_1` row.
+- `message` — DB trigger (migration 043 `messages_reply_notify`); client cache-invalidated by `useMessageReplyNotifier`.
+- `follow_up` — client-side `useFollowUpNotifier` (60m/10m/1m) + `useFollowUp5MinNotifier` (5m). Inserts directly to `notifications`.
+- `deal_closed` — client-side realtime `useDealClosedNotifier` listens for `commission_payouts` INSERT, inserts notification.
+- `call_graded` — `useCallGradedNotifier` invalidates cache; actual row insert is in the `grade-call` edge function server-side.
+
+**Truncation fix (code):** `RepNotificationBell.jsx` message `<p>` was `whiteSpace: 'nowrap'` (single-line hard cut). Changed to `display: '-webkit-box' / WebkitLineClamp: 2 / WebkitBoxOrient: 'vertical'` — allows up to 2 lines before ellipsis, handles long business names cleanly.
+
+**Sample SQL — run in Supabase SQL editor to populate all 4 remaining types for apex11:**
+
+```sql
+-- Sample notifications for apex11 (profile_id 67bdea10-62d0-44c6-81b0-a321ca9ea52e)
+-- badge row (dial_1) already inserted — these cover the other 4 types
+
+INSERT INTO notifications (profile_id, type, message, data, read) VALUES
+(
+  '67bdea10-62d0-44c6-81b0-a321ca9ea52e',
+  'message',
+  'You received a reply to your message',
+  '{"message_id": "00000000-0000-0000-0000-000000000001", "reply_preview": "Great work — I''ll follow up with them first thing tomorrow."}'::jsonb,
+  false
+),
+(
+  '67bdea10-62d0-44c6-81b0-a321ca9ea52e',
+  'follow_up',
+  'Follow-up in 10m: Riverside Plumbing & Heating',
+  '{"lead_id": "00000000-0000-0000-0000-000000000002", "business_name": "Riverside Plumbing & Heating", "threshold": 10}'::jsonb,
+  false
+),
+(
+  '67bdea10-62d0-44c6-81b0-a321ca9ea52e',
+  'deal_closed',
+  'Deal closed! You''ll earn $148 from Riverside Plumbing & Heating',
+  '{"payout_id": "00000000-0000-0000-0000-000000000003", "amount_cents": 14850}'::jsonb,
+  false
+),
+(
+  '67bdea10-62d0-44c6-81b0-a321ca9ea52e',
+  'call_graded',
+  'Your call with Riverside Plumbing & Heating was graded: 8/10',
+  '{"call_id": "00000000-0000-0000-0000-000000000004", "grade": 8, "business_name": "Riverside Plumbing & Heating"}'::jsonb,
+  false
+);
+```
+
+**Verify:** `/rep` sidebar bell as apex11 — shows 5 notifications (badge + 4 above), full message text wraps to 2 lines without clipping on long names.
+
+---
+
+### ✅ Prompt 83 DONE + APPLIED 2026-06-25 — Migrations 043 + 047 run live by Brayden via Claude Chrome, bell preview row confirmed inserted
+
+All 3 steps confirmed successful on the live DB: `profile_id`/`badge_id` columns + unique constraint + index + 3 RLS policies + message-reply trigger (043) all created; `notify_rep_on_deal_closed()` corrected and its trigger confirmed present (047); badge preview row for apex11 (`profile_id 67bdea10-...`, `badge_id dial_1`, "Badge unlocked: First Dial", `read: false`) confirmed inserted via SELECT. Pending: Brayden to confirm the bell actually renders it on `/rep` — if not, front-end query likely needs `profile_id = auth.uid()` filter, which RLS now supports.
+
+
 
 **Step 1 — `043_rep_notifications.sql`**
 

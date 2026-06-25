@@ -64,6 +64,16 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-25 — Prompt 84 SHIPPED: bell truncation fixed, sample SQL for all 5 notification types
+
+**Types confirmed:** `badge` (useBadgeNotifier, badge_id unique), `message` (DB trigger migration 043), `follow_up` (client hooks — useFollowUpNotifier 60m/10m/1m + useFollowUp5MinNotifier 5m), `deal_closed` (realtime commission_payouts INSERT listener), `call_graded` (grade-call edge function inserts; useCallGradedNotifier only cache-invalidates). All 5 real and implemented.
+
+**Truncation fix (`03d95aa`):** `RepNotificationBell.jsx` message `<p>` changed from `whiteSpace: 'nowrap'` (hard 1-line cut) to `WebkitLineClamp: 2` — 2-line wrap, ellipsis only if needed.
+
+**Sample SQL:** in LIVE_STATE — 4 INSERTs for `message`, `follow_up`, `deal_closed`, `call_graded` (badge/dial_1 already present). Brayden runs in SQL editor to populate the bell preview.
+
+---
+
 ### 2026-06-25 — Prompt 83 DONE: full SQL for migrations 043 + 047 pasted into LIVE_STATE for Brayden
 
 Eagle needed the literal file contents to build the Supabase paste-back artifact. CC read both files and pasted them verbatim into LIVE_STATE (fenced sql blocks), plus the Step 3 badge-insert SQL. No code changes; vault-only commit.
