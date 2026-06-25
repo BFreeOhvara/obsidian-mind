@@ -54,6 +54,19 @@ Screenshot confirms: `/closer/pipeline` Appointment Setting tab (built in Prompt
 
 ---
 
+### ✅ Prompt 91 SHIPPED 2026-06-25 (`4d86bdb`) — Canvas say+fork combined node + GoTo terminal
+
+2 changes to `ScriptCanvas.jsx`:
+
+1. **Say+fork merge:** `placeSteps` loop converted to indexed `while`. When a `say` step is followed (possibly through interstitial `action` steps) by a `fork`, both are consumed into a single `SayForkNode` — shows the say text (italic, with a divider) above the if/else question, options still fan out as edges. Standalone says (no adjacent fork) still render as `SayNode`. Action steps between say and fork are absorbed (not rendered separately, same as live-mode Prompt 80 logic).
+2. **GoTo terminal node:** Back-reference routes (branch → another branch) no longer draw a long dashed cross-canvas arrow. Instead a `GoToNode` is placed inline (dashed accent border, "→ Branch Title" text). Clicking it in practice mode starts `ScriptWalk` at the TARGET branch (`targetSectionId` on node data). No outgoing source handle on `GoToNode`.
+
+`onNodeClick` updated: prefers `node.data.targetSectionId` over `node.data.sectionId` so GoTo nodes jump to the correct branch.
+
+**Not Chrome-verified.**
+
+---
+
 ### 🔴 Prompt 91 — Training Center script CANVAS (flowchart view): combine say+fork into one node visually, replace cross-canvas jump arrows with terminal "Go to X" nodes (queued 2026-06-25, Eagle)
 
 This is about the **flowchart/canvas view** on `/rep/training` (Script tab) — the visual decision-tree diagram, NOT the live call-walk (`ScriptWalk.jsx` in `mode="live"`, already fixed in Prompt 80). Screenshot confirms: canvas still shows a `say` node ("Who's handling your calls right now?") followed by a separate arrow down to an `if/else` fork node ("Do they have someone on the phones, or is it just them?") with branch answers below that. Brayden wants two changes to how the canvas RENDERS this, mirroring the live-mode fix from Prompt 80:

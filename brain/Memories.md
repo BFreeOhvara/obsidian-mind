@@ -64,6 +64,12 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-25 — Prompt 91 SHIPPED: Canvas say+fork combined + GoTo terminal nodes (`4d86bdb`)
+
+`ScriptCanvas.jsx` — two changes: (1) `placeSteps` loop converted to indexed `while`; say+adjacent-fork pairs (action steps skipped in between) merged into single `SayForkNode` — italic say text above divider + if/else question; options still fan out as edges; (2) back-reference routes (branch→branch) replaced from long dashed cross-canvas arrows to inline `GoToNode` terminal (dashed border, "→ Branch Title", no source handle). Clicking GoTo starts practice at the TARGET branch via `targetSectionId`. `nodeTypes` updated with `sayFork` and `goTo`.
+
+---
+
 ### 2026-06-25 — Prompt 92 SHIPPED: Pipeline setter tab — click popup, fixed box, colored tabs (`00a1b24`)
 
 4 changes to `CloserPipeline.jsx`: (1) `LeadDetailOverlay` portal modal — click any setter-tab lead row to open detail (business name, status badge, phone, niche, city, follow-up date); (2) `QueueTable` inner div `maxHeight: 480` → `height: 480` fixes across all pipeline tabs; (3) `STATUS_TAB_COLORS` map added — active tab underline + count badge use per-status color tokens matching `Badge.jsx`; (4) tab order changed to `[...SETTER_STATUSES, 'All']`.
