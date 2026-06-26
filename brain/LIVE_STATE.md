@@ -18,6 +18,8 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–117 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
+### ✅ Prompt 118 SHIPPED 2026-06-26
+
 ### ✅ Prompts 116+117 SHIPPED 2026-06-26
 
 ---

@@ -2351,3 +2351,21 @@ Copied `src/components/rep/CallModal.jsx` to `src/components/closer/AppointmentC
 ### Prompt 116 — SAY THIS text-style values
 
 `brain/say-this-text-style-check.md` created. Confirmed: ONE element at `CallPrepModal.jsx:336`, shared by both setter and closer. Style: `fontSize: 14, lineHeight: 1.65, fontStyle: 'italic', color: 'var(--text-primary)', margin: 0`. No separate setter/closer branches. If Brayden sees a visual difference it's browser zoom, stale cache, or the [ASK] badge adding vertical space above the text — not two different style objects.
+
+---
+
+## Session Log — 2026-06-26 (Prompt 118)
+
+**Dashboard commit:** `11fc3b7` — master
+
+### Prompt 118 — Closer data swap + kill Missed everywhere
+
+**`AppointmentCardModal.jsx`** — fully rewritten (from 719-line CallModal copy → 130-line closer popup). Exports `CallModal` (name kept so AppointmentCard's existing import alias works unchanged). Props changed to `{appt, onClose}`. STATUS_OPTIONS: Closed, Lost, No Show, Needs Reschedule (no Missed). SAY_LINES from `closerScript.js`. Badge: `appt.status || 'Pending'`. handleComplete writes to appointments table, fires commission/cleanup edge functions. Loss-reason field shows on Lost + No Show; deal-value on Closed.
+
+**`AppointmentCard.jsx`** — prop changed from `lead={appt.lead}` to `appt={appt}`.
+
+**`CloserPipeline.jsx`** — Missed tab renamed to No Show throughout: tab key `'missed'` → `'no_show'`, `MissedTab` → `NoShowTab`, `CLOSER_TAB_COLORS.missed` → `no_show` (color changed from warning yellow to slate #94A3B8 to match No Show token). Filter catches both `status === 'no_show'` and legacy `status === 'missed'` from old DB rows.
+
+**`CloserModal.jsx`** (orphaned — nothing imports it) — removed 'Missed' from STATUS_OPTIONS, updated handleComplete guard.
+
+**Grep check:** `value: 'missed'`, `label: 'Missed'`, `key: 'missed'` — zero occurrences. Only remaining `'missed'` is inside the no_show backward-compat filter.
