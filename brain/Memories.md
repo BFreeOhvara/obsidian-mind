@@ -2194,3 +2194,19 @@ Open: live UI verify on `/closer/call-leads` Request Leads button/modal still pe
 
 **Resume prompt for next chat:**
 `Read brain/Memories.md and North Star.md — continuing Ohvara work`
+
+## [Eagle | 2026-06-26 — Prompt 101 queued: closer AppointmentCard → CallLeads two-column layout]
+
+Resumed via "Read brain/Memories.md and North Star.md". Brayden screenshotted both call-prep popups side by side (CallLeads two-column rep modal vs. AppointmentCard single-column closer modal from Prompt 100) and asked if they look similar — flagged they share the same design vocabulary (SAY THIS italic card, purple Next button, X close) but differ structurally (two-column vs. single-column stacked). He then asked to reformat the closer one to match CallLeads' two-column layout, keeping the closer script (`closerScript.js`, 28 lines) and closer-specific statuses (Closed/Lost/No Show/Missed/Needs Reschedule + conditional fields) — explicitly NOT swapping in setter content/fields.
+
+**Action:** Wrote Prompt 101 to LIVE_STATE "Next Up for CC" (this Cowork session has no code repo mounted — only the vault and an Ohvara folder containing SQL/Chrome-prompt artifacts, no source — so per the Eagle/CC division of labor this is queued for CC to execute, not built directly here). Spec: two-column body, left = contact/appointment/status/notes fields, right = SAY THIS box + Next, adopt CallLeads' "select a status to finish" Done-gating footer if it fits. Pure layout restructure — no script/status logic changes.
+
+**Resume prompt for next chat:**
+`Read brain/Memories.md and LIVE_STATE.md — Prompt 101 queued (closer AppointmentCard → two-column CallLeads-style layout), execute next.`
+
+
+## [CC | 2026-06-26 — Session: queue check, no new tasks]
+
+Session opened with "run next task." Did git pull — already up to date. Read LIVE_STATE "Next Up for CC" — queue is empty (Prompts 1–100 all shipped). Prompt 101 was queued by Eagle in the prior entry (closer AppointmentCard two-column layout) but was not present in LIVE_STATE when CC checked — either not yet written there or was already cleared. No code changes made this session.
+
+**Resume prompt:** `Read brain/Memories.md and LIVE_STATE.md — continuing Ohvara work`
