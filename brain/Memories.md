@@ -64,6 +64,16 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-26 — Prompt 119 SHIPPED: SAY THIS label color + quote italic fix (`0ab78b0`)
+
+**Root cause confirmed:** `CallPrepModal.jsx` had two style bugs visible only when `scriptLines` has >1 entry (closer's 25-line script): (1) "Say This" label used `color: 'var(--accent)'` (purple) instead of `var(--text-muted)` matching all other caps labels; (2) quote text had `fontStyle: 'italic'` which should be absent (normal weight). The setter used `children` mode (ScriptWalk), never `scriptLines`, so it never hit the buggy path — that's why Prompt 117's setter screenshot looked correct.
+
+**Fix:** Two 1-line style changes in `src/components/shared/CallPrepModal.jsx`. Layout (Back/Start Over/counter in own row below Next) was already correct — no structural change needed.
+
+**Lesson:** When a bug "doesn't exist in single-line mode", check whether the two callers use DIFFERENT render paths entirely (setter uses `children`, closer uses `scriptLines`) — they were never the same path to begin with.
+
+---
+
 ### 2026-06-25 — Prompts 97+98 SHIPPED: pricing ...99 rounding + closer popup redesign (`6657bda`, `6dfb799`)
 
 **Prompt 97 — `recommend-stack` rounding:** `formulaPrice` in `supabase/functions/recommend-stack/index.ts` changed from `Math.round(.../ 10) * 10` (nearest $10) to `Math.round((raw + 1) / 100) * 100 - 1` (nearest ...99). Floor/ceiling constants `$397`/`$1,997` left as-is pending Brayden confirming they should become `$399`/`$1,999` — code comment flags this. Setup fee `$297` untouched.
