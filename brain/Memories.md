@@ -2327,3 +2327,11 @@ Step 4 only difference: `back` row appears on closer (278×14) — EXPECTED, set
 **Step 5** (handleComplete, commission payout, default status "Pending"): behavior-only, zero visual impact by definition — already wired in CloserModal (Prompt 114).
 
 **Conclusion:** no drift found across any step. The quote box and Next button remain at exactly the same dimensions whether scriptLines.length is 1 (setter) or 25 (closer). The Back/Start Over row correctly appears only for multi-line, on its own row below Next, not sharing horizontal space.
+
+---
+
+## Session Log — 2026-06-26 (queue cleanup)
+
+**Commit:** `e49d01b` — vault only
+
+Removed stale 🔴 Prompt 107 entry from LIVE_STATE. The consultative bullet-point script rewrite was already live in `closerScript.js` since `036c52c` — the queue entry was never cleaned up when 107+109 shipped. Queue is now empty.
