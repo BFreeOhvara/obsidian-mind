@@ -90,21 +90,6 @@ tags:
 
 ---
 
-### 🔴 Prompt 107 — Replace closerScript.js content with bullet-point consultative rewrite (queued 2026-06-26, Eagle)
-
-**Why:** Brayden: script felt like explaining the product instead of solving the client's problem, and needs more client engagement. Also: "Nate is a pretty good salesman so a bullet point script type could work really well for him" — so this rewrite swaps verbatim sentences for bullet-point talking points Nate delivers in his own words, with explicit **[ASK]** questions woven in for engagement.
-
-**Read first:** `brain/closer-script-rewrite.md` in the vault — full rewritten content for all 3 sections (Opener / Stack / Close), plus implementation notes at the bottom.
-
-**Do this:**
-1. Open `src/lib/closerScript.js`.
-2. Replace the line arrays in the Opener, Stack, and Close sections with the new bullet-point content from `closer-script-rewrite.md`, one bullet = one array entry (same flattened format as today, so the existing SAY THIS stepper UI needs zero markup changes).
-3. Keep bracketed placeholders ([Rep Name], [monthly price], etc.) exactly as styled today — Nate fills them live, no new templating.
-4. Optional/nice-to-have, don't block on it: lines marked **[ASK]** in the rewrite render with a small visual tag/accent in the SAY THIS box so Nate can spot the question beats at a glance. Skip this if it adds real complexity — content swap is the priority.
-5. Leave `buildCloserScriptFlow` and the canvas wiring untouched structurally — same section/line shape, new text.
-
-**Verify:** open `/closer` pipeline, click a lead, step through SAY THIS — should show the new bullet-point talking points (not the old verbatim sentences), 3 sections, same step-through behavior as before.
-
 ---
 
 ### ✅ Prompt 106 DONE 2026-06-26 — Closer script exported to vault
