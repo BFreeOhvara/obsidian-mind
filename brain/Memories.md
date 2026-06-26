@@ -2242,3 +2242,9 @@ Commit `6f0adc0`, pushed to origin/master.
 ## [CC | 2026-06-26 — Prompt 106 done: closer script exported to vault]
 
 Created `brain/closer-script-current-export.md` — all 28 say-this lines from `src/lib/closerScript.js` grouped by section (Opener 5 lines / Stack 14 lines / Close 9 lines) with section triggers and rewrite guidance for Eagle. No code changes. Next step: Eagle rewrites, queues CC prompt to paste back into closerScript.js.
+
+## [CC | 2026-06-26 — Prompts 107+109 shipped]
+
+**Prompt 109** (`56766b0`): Structural fix for style drift between setter and closer popups. Created `src/components/shared/CallPrepModal.jsx` — modal box only (no portal, callers wrap in createPortal + backdrop). Owns: header, left col shell, status dropdown (portaled menu, outside-click, controlled via onStatusSelect callback), call notes textarea, footer. Exports `Field` component so both callers use identical field row styling. `CallModal.jsx` refactored to use it (keeps Twilio logic, PostCallCard, ModalErrorBoundary, all unchanged). `AppointmentCard.jsx` simplified by ~270 lines — SAY THIS stepper passed as children to right column slot. Style drift is now structurally impossible.
+
+**Prompt 107** (`5f6f522`): `closerScript.js` rewritten with consultative bullet-point talking points from Eagle's `closer-script-rewrite.md`. 25 lines across 3 sections (was 28). Lines marked `[ASK]` detected in `AppointmentCard.jsx` with `rawLine.startsWith('[ASK]')` — renders an accent "Ask" chip above the line text so Nate can spot question beats at a glance.

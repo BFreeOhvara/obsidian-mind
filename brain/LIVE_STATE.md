@@ -16,7 +16,73 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–106 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–109 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109 — see [[Memories]] for the full trail.)*
+
+### ✅ Prompts 107+109 SHIPPED 2026-06-26
+
+**Prompt 109** (`56766b0`): Created `src/components/shared/CallPrepModal.jsx` — shared modal box used by both setter popup (CallModal) and closer popup (AppointmentCard). `Field` component exported so both callers use identical field rows. `CallModal.jsx` and `AppointmentCard.jsx` both import `CallPrepModal` — zero duplicated chrome JSX. Style drift is now structurally impossible.
+
+**Prompt 107** (`5f6f522`): `closerScript.js` rewritten with consultative bullet-point talking points (25 lines vs old 28). Lines marked `[ASK]` now render with an "ASK" chip in the SAY THIS stepper so Nate can spot question beats at a glance.
+
+**Verify:** `/closer` pipeline → click appointment → popup opens; `/closer/call-leads` → click a row → same modal. Both should have identical fonts, box, button sizes. Step through SAY THIS — should show new consultative lines, [ASK] lines show accent chip.
+
+### ~~Prompt 108 — superseded by Prompt 109, do not execute~~
+
+**This replaces Prompt 108 — do this instead, not that.** Three rounds (101/103/104) of "copy CallModal's JSX/styling into AppointmentCard" have each produced visible drift — text size, box size, button size all differ between the two popups even after CC reported success each time. Brayden's exact words: *"the text is way smaller and the box is bigger, the next button is bigger... why is that so hard literally take the pop from the setter but add the setter statuses and the setter script AND THATS IT THEY SHOULD LOOK THE SAME."*
+
+**Root cause:** hand-recreating styles by reading and re-typing values is lossy no matter how careful — small drift is inevitable. The only way to guarantee pixel-identical output is for both popups to run through the exact same render code, not two copies of similar-looking JSX.
+
+**Do this:**
+1. Find `CallModal.jsx` (the setter's popup component, rendered from `CallLeads.jsx`).
+2. Generalize it in place — turn it into a single shared modal component (keep the filename `CallModal.jsx` or rename to something neutral like `CallPrepModal.jsx`, whichever is the smaller diff) that takes **props** for the parts that legitimately differ between setter and closer:
+   - `statusOptions` (array of status values + labels + colors) — setter passes its statuses, closer passes Closed/Lost/No Show/Missed/Needs Reschedule
+   - `conditionalFields` or similar — closer needs deal-value input (Closed) and loss-reason input (Lost/No Show); setter doesn't. Pass as a render prop / config, not a parallel hand-built block.
+   - `scriptLines` (array of SAY THIS lines) — setter passes its line(s), closer passes the 28-line `SAY_LINES` from `closerScript.js`. If the setter's box doesn't currently support multi-line stepping (Back/Start Over/counter), ADD that capability to the shared component generically — controlled by whether `scriptLines.length > 1` — rather than building a second divergent SAY THIS box just for closer.
+   - `onComplete` handler — setter's vs closer's `handleComplete`/`handleDone` logic
+   - Header fields (CONTACT/NICHE/CITY vs phone/SET BY) — pass as a generic `infoFields` array of `{icon, label, value}` so both popups render the exact same field-row component, just different data.
+   - Call button — keep it in the shared component for both (closer's appointment has a phone number too, so there's no reason to drop it — include it for closer as well unless Brayden says otherwise).
+3. `CallLeads.jsx` and `AppointmentCard.jsx` (or wherever closer's pipeline opens it) both import and render the SAME component, passing their own data via props. **Zero duplicated JSX between the two call sites** — if you find yourself writing a style value in two places, stop, that's the bug pattern that caused this.
+4. Delete whatever bespoke JSX `AppointmentCard.jsx` currently has for the popup body — it gets replaced entirely by a call to the shared component.
+
+**Do NOT change:** `handleComplete` logic itself, `STATUS_OPTIONS` values, `SAY_LINES` content, commission payout, cleanup-lost-demo — only how the popup is rendered, not what it does.
+
+**Verify:** Since it's the same component instance, there is nothing to visually compare — if there's any visual difference left after this, it can only be due to different prop data (which is expected/correct), not styling drift. Open both `/closer` (click an appointment) and `/closer/call-leads` (click a lead) and confirm both popups share identical fonts, box sizes, button sizes — same component, different content.
+
+---
+
+### ~~Prompt 108 — superseded by Prompt 109, do not execute~~
+
+**Context:** Brayden screenshotted both popups again after Prompt 104/105 shipped (`NorthStar Heating` closer vs `FastDrain Services` setter) and asked directly "do these look the same?" — answer is no, three concrete gaps, listed below. Prompt 104 claimed verbatim JSX copy but missed these.
+
+**Confirmed visual gaps (compare the two screenshots if needed — closer popup vs `/closer/call-leads` popup):**
+1. **Setter's left column has labeled icon+caps-label field rows** — `CONTACT` (person icon, contact name), `NICHE` (tag icon), `CITY` (pin icon) — each its own block with a small caps label above the value, matching CallModal's field-row component. **Closer's left column has no equivalent** — it just shows a bare phone number row and a `SET BY` label with no icon/field-row styling. Fix: give AppointmentCard's phone/set-by info the exact same field-row markup/styling CallModal uses for CONTACT/NICHE/CITY — icon + caps label + value, same spacing — even though the underlying data is different (phone + set-by instead of contact/niche/city).
+2. **Setter has a full-width green Call button** (phone icon + number, green fill) directly under its fields. **Closer has none** — just a plain phone number text row with a small icon. Fix: add the same green Call button component to AppointmentCard, wired to call the appointment's phone number (reuse whatever calling mechanism CallModal's Call button uses, if there is dialer integration — check before assuming a `tel:` link is sufficient).
+3. **SAY THIS box shape differs** — closer's box has a step counter (`1/28`) plus `← Back` / `Start Over` / `Next →` controls below the quote; setter's box only has a `Next` button, nothing else. This makes closer's box taller/different proportions even with identical quote styling. This difference is somewhat inherent (closer has 28 lines to step through, setter likely has fewer/one) — but check whether the box container itself (border, padding, background) matches CallModal's exactly, and whether the counter/Back/Start Over controls can be styled to look like a natural extension of CallModal's Next-button footer rather than visually bolted on.
+
+**Read first:** `src/pages/closer/CallLeads.jsx` (or its modal component, confirm exact file) for the CONTACT/NICHE/CITY field-row markup and the Call button component — copy both verbatim into `AppointmentCard.jsx`, same approach as Prompt 104 (copy markup, swap only the data/values).
+
+**Do NOT change:** `handleComplete`, `STATUS_OPTIONS`, `SAY_LINES` stepper logic, commission payout, cleanup-lost-demo.
+
+**Verify:** side-by-side, closer's left column should show field-row-styled info (phone + set-by, using the same icon+caps-label treatment as setter's contact/niche/city) and an actual green Call button — not just bare text rows.
+
+---
+
+### 🔴 Prompt 107 — Replace closerScript.js content with bullet-point consultative rewrite (queued 2026-06-26, Eagle)
+
+**Why:** Brayden: script felt like explaining the product instead of solving the client's problem, and needs more client engagement. Also: "Nate is a pretty good salesman so a bullet point script type could work really well for him" — so this rewrite swaps verbatim sentences for bullet-point talking points Nate delivers in his own words, with explicit **[ASK]** questions woven in for engagement.
+
+**Read first:** `brain/closer-script-rewrite.md` in the vault — full rewritten content for all 3 sections (Opener / Stack / Close), plus implementation notes at the bottom.
+
+**Do this:**
+1. Open `src/lib/closerScript.js`.
+2. Replace the line arrays in the Opener, Stack, and Close sections with the new bullet-point content from `closer-script-rewrite.md`, one bullet = one array entry (same flattened format as today, so the existing SAY THIS stepper UI needs zero markup changes).
+3. Keep bracketed placeholders ([Rep Name], [monthly price], etc.) exactly as styled today — Nate fills them live, no new templating.
+4. Optional/nice-to-have, don't block on it: lines marked **[ASK]** in the rewrite render with a small visual tag/accent in the SAY THIS box so Nate can spot the question beats at a glance. Skip this if it adds real complexity — content swap is the priority.
+5. Leave `buildCloserScriptFlow` and the canvas wiring untouched structurally — same section/line shape, new text.
+
+**Verify:** open `/closer` pipeline, click a lead, step through SAY THIS — should show the new bullet-point talking points (not the old verbatim sentences), 3 sections, same step-through behavior as before.
+
+---
 
 ### ✅ Prompt 106 DONE 2026-06-26 — Closer script exported to vault
 
