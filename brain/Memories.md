@@ -2335,3 +2335,19 @@ Step 4 only difference: `back` row appears on closer (278×14) — EXPECTED, set
 **Commit:** `e49d01b` — vault only
 
 Removed stale 🔴 Prompt 107 entry from LIVE_STATE. The consultative bullet-point script rewrite was already live in `closerScript.js` since `036c52c` — the queue entry was never cleaned up when 107+109 shipped. Queue is now empty.
+
+---
+
+## Session Log — 2026-06-26 (Prompts 116+117)
+
+**Dashboard commit:** `ad6085b` — master
+
+### Prompt 117 — Literal file copy: closer appointment click renders setter popup
+
+Copied `src/components/rep/CallModal.jsx` to `src/components/closer/AppointmentCardModal.jsx` (byte-identical, one import path fix: `./ScriptWalk` → `../rep/ScriptWalk`). `AppointmentCard.jsx` now imports `{ CallModal as AppointmentCardModal }` from the copy and renders `<AppointmentCardModal lead={appt.lead} onClose={...} />` — no data swap, setter's own data/script/statuses. `CallModal.jsx` and its setter call site untouched.
+
+**Note on Twilio:** The copied file includes Twilio Device setup. On the closer route it will attempt to fetch a token on mount — if it fails (network/auth), the modal still renders; the call button shows an error state. The visual chrome (SAY THIS, status, notes, footer) is unaffected.
+
+### Prompt 116 — SAY THIS text-style values
+
+`brain/say-this-text-style-check.md` created. Confirmed: ONE element at `CallPrepModal.jsx:336`, shared by both setter and closer. Style: `fontSize: 14, lineHeight: 1.65, fontStyle: 'italic', color: 'var(--text-primary)', margin: 0`. No separate setter/closer branches. If Brayden sees a visual difference it's browser zoom, stale cache, or the [ASK] badge adding vertical space above the text — not two different style objects.
