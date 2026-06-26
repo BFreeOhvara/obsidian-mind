@@ -2210,3 +2210,11 @@ Resumed via "Read brain/Memories.md and North Star.md". Brayden screenshotted bo
 Session opened with "run next task." Did git pull — already up to date. Read LIVE_STATE "Next Up for CC" — queue is empty (Prompts 1–100 all shipped). Prompt 101 was queued by Eagle in the prior entry (closer AppointmentCard two-column layout) but was not present in LIVE_STATE when CC checked — either not yet written there or was already cleared. No code changes made this session.
 
 **Resume prompt:** `Read brain/Memories.md and LIVE_STATE.md — continuing Ohvara work`
+
+## [CC | 2026-06-26 — Prompt 101 shipped: AppointmentCard two-column layout]
+
+Restructured `src/components/closer/AppointmentCard.jsx` from single-column (520px) to two-column (880px) modal matching CallLeads' layout pattern. Left col: contact info + appointment datetime/Set/reminders + status picker (5 buttons + conditional fields) + notes textarea. Right col: SAY THIS card grows to fill height + stepper controls below. Footer bar: "Select a status to finish" hint + Save button gated on outcome selection. All logic (handleComplete, handleSchedule, commission payout, cleanup-lost-demo) untouched. Build clean. Commit `d7010e5`.
+
+**Verify outstanding:** Brayden Chrome MCP pass on `/closer` pipeline — two-column layout, 28-line stepper on right, status picker + Save gating on left.
+
+**Resume prompt:** `Read brain/Memories.md and LIVE_STATE.md — continuing Ohvara work`
