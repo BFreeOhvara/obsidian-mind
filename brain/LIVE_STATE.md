@@ -16,34 +16,38 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–96 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–98 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
 
-### 🔴 Prompt 97 — Monthly retainer pricing must always end in `99` (queued 2026-06-25, Eagle)
+### ✅ Prompt 96b DONE 2026-06-25 — Migration 055 SQL pasted into LIVE_STATE
 
-**Change:** the `recommend-stack`/pricing formula's rounding logic changes from "round to nearest `$10`" to "round to nearest value ending in `99`" — e.g. `$599`, `$899`, `$1,299`, `$1,499`. The underlying formula (`callsMissedPerWeek × 4.33 × avgTicket × 0.15`) is unchanged, only the final rounding step changes. **Setup fee stays `$297` flat — does NOT need to end in 99, do not touch it.**
+SQL content pasted in the ⚠️ Prompt 96b section below for manual apply.
 
-**⚠️ Open question — do NOT assume:** current floor (`$397/mo`) and ceiling (`$1,997/mo`) both end in `97`, not `99`. Under the new convention these arguably should become `$399`/`$1,999` for consistency — but Brayden has only confirmed the ROUNDING LOGIC for prices between the floor and ceiling, not that the floor/ceiling values themselves change. Flag this back to Brayden before touching the floor/ceiling constants; only implement the `...99` rounding for the formula's computed output.
+### ✅ Prompt 97 SHIPPED 2026-06-25 (`6657bda`) — Monthly pricing rounds to nearest value ending in 99
 
-**Recon first:** find wherever the monthly price gets rounded (`recommend-stack` edge function, or client-side pricing display logic) — likely a `Math.round(price / 10) * 10` or similar. Replace with logic that rounds to the nearest value ending in 99 (e.g. `Math.round((price + 1) / 100) * 100 - 1`).
+**`supabase/functions/recommend-stack/index.ts`** — `formulaPrice` rounding changed:
+- Before: `Math.round(clamp(...) / 10) * 10` (nearest $10)
+- After: `const raw = clamp(...); return Math.round((raw + 1) / 100) * 100 - 1` (nearest ...99)
 
-**Verify:** test a few raw formula outputs (e.g. simulate `callsMissedPerWeek=5, avgTicket=300`) and confirm the displayed/quoted price always ends in 99, setup fee still shows `$297` unaffected.
+Examples: raw $974 → $999, raw $620 → $599, raw $410 → $399, raw $1990 → $1999.
+
+**⚠️ Floor/ceiling flag:** current constants are `$397`/`$1,997`. Under the ...99 convention they naturally round to `$399`/`$1,999`, but the constants themselves are unchanged pending Brayden's explicit confirmation. Code comment added in `index.ts`.
+
+**Verify:** simulate `callsMissedPerWeek=5, avgTicket=300` → price ends in 99. Setup fee `$297` unaffected.
 
 ---
 
-### 🔴 Prompt 98 — Closer appointment detail popup: redesign to match the Appointment Setting lead detail popup pattern (queued 2026-06-25, Eagle)
+### ✅ Prompt 98 SHIPPED 2026-06-25 (`6dfb799`) — Closer appointment popup redesign
 
-**Context:** When the closer clicks on one of their appointments (in `/closer/pipeline`'s Closer tab, or `/closer/appointments`), the current popup just says something like "Mark as Closed" — it doesn't match the nicer `LeadDetailOverlay` pattern built for the Appointment Setting tab in Prompt 92. Brayden wants the closer's appointment popup overhauled to look and work the same way:
+**`src/components/closer/AppointmentCard.jsx`** — full modal body restructure:
 
-1. **Layout, confirmed via question to Brayden:** caller/call notes go on the **LEFT side** of the popup. Status picker + "mark outcome" action go at the **bottom** of the popup (not labeled "Mark as Closed" — should be a status PICKER like the Appointment Setting popup, not a single binary action).
-2. **Add the closer script inline.** The popup should surface the locked closer script (from Prompt 94's `closerScript.js`/`CloserScript.jsx`) so Nate can reference it directly from the appointment popup — similar in spirit to how the Appointment Setting popup surfaces lead info for the rep script. Exact placement (right side, since notes are on the left) — show relevant script content or a way to jump into the script canvas from here.
-3. **Status options should be a picker, not a single "mark closed" button** — mirror the Appointment Setting popup's status-selection pattern (e.g. dropdown/buttons for Closed / Lost / Missed / Needs Rescheduling — pulling in the two new statuses from Prompt 96 once that's built).
-4. **The stack itself isn't changing** — this is purely a UI/layout overhaul of the existing popup, not a change to what's sold or how pricing works.
+1. **Two-column layout:** LEFT = contact info (phone, email, set-by) + appointment time + call notes textarea. RIGHT = `ScriptQuickRef` panel showing each `CLOSER_SCRIPT` section (short label, title, trigger) with color-coded cards + "Open full →" link to `/closer/script`.
+2. **Status picker:** dropdown replaced with 5 button-style options — Closed (success), Lost (danger), No Show (slate), Missed (warning), Needs Reschedule (info). Active button shows color; click again to deselect.
+3. **Conditional fields:** deal value input appears only for Closed; loss reason appears for Lost/No Show; neither for Missed/Needs Reschedule.
+4. **Save button:** appears only when a status is selected.
+5. **handleComplete updated:** `missed` and `needs_rescheduling` set `status` directly without completing the appointment (not `status: 'completed'` + outcome path).
+6. Modal widened from 720px → 900px.
 
-**Build order note:** this depends on Prompt 96 (Missed / Needs Rescheduling statuses) existing first if the status picker is meant to include them — sequence Prompt 96 before Prompt 98, or stub the status options now and wire in the new statuses once 96 ships.
-
-**Recon first:** find the closer's current appointment-click popup component (likely in `CloserPipeline.jsx`'s ClosedView/PendingView or a separate `MyAppointments.jsx` row click handler) and compare directly against `LeadDetailOverlay` (Prompt 92, Appointment Setting tab) for the layout/pattern to copy.
-
-**Verify:** Chrome MCP pass (Brayden runs it) — clicking a closer appointment opens a popup with notes on the left, script reference visible, and a status picker (not a single "mark closed" button) at the bottom matching the Appointment Setting popup's look and feel.
+**⚠️ Not Chrome-verified.** Brayden runs Chrome MCP pass — clicking an appointment in `/closer` should open popup with left/right columns and button-style status picker at bottom.
 
 ---
 
@@ -54,6 +58,19 @@ tags:
 1. **Missed (manual status, NOT auto-flip).** Set when Nate calls for the scheduled appointment and the client doesn't answer. This is a manual status Nate sets after a no-pickup — there is NO 24hr auto-flip logic, no pg_cron job. Purely client-didn't-answer-the-call tracking. Name is "Missed" specifically to avoid colliding with the rep-side "No Answer" (Call 1) status elsewhere in the dashboard — confirm with Brayden if further naming clarity is needed (e.g. "Missed Appointment") once it's actually built and visible next to other tabs.
 
 2. **Needs Rescheduling (manual status).** A status Nate can manually set on an appointment — for cases where it needs to be moved but isn't lost (e.g. client asked to push it, or came out of a Missed/Cancellation flow and needs a new time). Add as a selectable status option + its own filter tab.
+
+---
+
+### ⚠️ Prompt 96b — MANUAL STEP: Apply migration 055 in Supabase SQL editor
+
+Run the following SQL in the Supabase dashboard → SQL editor. No `supabase db push`.
+
+```sql
+ALTER TYPE appointment_status ADD VALUE IF NOT EXISTS 'missed';
+ALTER TYPE appointment_status ADD VALUE IF NOT EXISTS 'needs_rescheduling';
+```
+
+Once applied, the Missed and Needs Rescheduling pipeline tabs (Prompt 96, `f98ddb0`) become functional. Delete this entry after Brayden confirms it ran.
 
 ---
 

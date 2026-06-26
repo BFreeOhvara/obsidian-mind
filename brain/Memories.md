@@ -64,6 +64,21 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-25 — Prompts 97+98 SHIPPED: pricing ...99 rounding + closer popup redesign (`6657bda`, `6dfb799`)
+
+**Prompt 97 — `recommend-stack` rounding:** `formulaPrice` in `supabase/functions/recommend-stack/index.ts` changed from `Math.round(.../ 10) * 10` (nearest $10) to `Math.round((raw + 1) / 100) * 100 - 1` (nearest ...99). Floor/ceiling constants `$397`/`$1,997` left as-is pending Brayden confirming they should become `$399`/`$1,999` — code comment flags this. Setup fee `$297` untouched.
+
+**Prompt 98 — `AppointmentCard.jsx` popup redesign:**
+- Modal widened 720 → 900px
+- Two-column body: LEFT = contact + schedule + call notes; RIGHT = `ScriptQuickRef` (color-coded section cards + "Open full →" nav to `/closer/script`)
+- Status picker: 5 button-style options (Closed/Lost/No Show/Missed/Needs Reschedule) replace the old `<Select>` dropdown. Active button highlights with status color. Save button only appears when status selected.
+- `handleComplete` branched: `missed`/`needs_rescheduling` → `status: outcome` only (NOT completing); `closed`/`lost`/`no_show` → existing path (`status: completed` + outcome + downstream side effects).
+- `CLOSER_SCRIPT` import + `useNavigate` added; `STATUS_OPTIONS` constant added module-level.
+
+**Lesson:** `Edit` tool requires file to be Read in current session before editing — even if context-compaction injected the content. Always read 5 lines first if fresh session.
+
+---
+
 ### 2026-06-25 — Prompt 96 SHIPPED: Missed + Needs Rescheduling pipeline statuses (`f98ddb0`)
 
 **Task:** Two new manual closer pipeline statuses + filter tabs.
