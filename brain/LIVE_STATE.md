@@ -16,7 +16,13 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–105 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–106 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+
+### ✅ Prompt 106 DONE 2026-06-26 — Closer script exported to vault
+
+`brain/closer-script-current-export.md` created — all 28 say-this lines grouped by section (Opener / Stack / Close), section triggers noted, rewrite guidance for Eagle added at the bottom. **Next:** Eagle reads the export, rewrites to be consultative/Socratic, queues a CC prompt to paste the rewrite back into `closerScript.js`.
+
+---
 
 ### ✅ Prompts 104+105 SHIPPED 2026-06-26 (`6f0adc0`) — AppointmentCard verbatim CallModal JSX + row-click opens popup
 

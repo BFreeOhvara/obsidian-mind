@@ -2238,3 +2238,7 @@ Pulled `CallModal.jsx` as the visual reference (the setter's actual call popup).
 **Prompt 105:** `LeadRow` in `CallLeads.jsx` — added `modalOpen` state, `cursor: pointer` + `onClick` on row div. Action cell wrapped with `stopPropagation` so CallButton click doesn't double-fire. `CallModal` imported and rendered from `LeadRow` for row-click path.
 
 Commit `6f0adc0`, pushed to origin/master.
+
+## [CC | 2026-06-26 — Prompt 106 done: closer script exported to vault]
+
+Created `brain/closer-script-current-export.md` — all 28 say-this lines from `src/lib/closerScript.js` grouped by section (Opener 5 lines / Stack 14 lines / Close 9 lines) with section triggers and rewrite guidance for Eagle. No code changes. Next step: Eagle rewrites, queues CC prompt to paste back into closerScript.js.
