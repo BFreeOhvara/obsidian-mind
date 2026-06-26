@@ -2230,3 +2230,11 @@ Prompt 101 commit was local-only — 1 ahead of origin/master. `git push` succee
 Pulled `CallModal.jsx` as the visual reference (the setter's actual call popup). Removed appointment datetime block + handleSchedule + timezone imports. Matched header (Phone icon box + subtitle), modal maxWidth 960, left col 340px fixed, STATUS/CALL NOTES label style, raw textarea props, footer Done-button styling exactly to CallModal. Commit `ebc7ae4`, pushed to origin/master.
 
 **Verify outstanding:** Brayden Chrome MCP — `/closer` pipeline appointment popup matches setter popup visually.
+
+## [CC | 2026-06-26 — Prompts 104+105 shipped: AppointmentCard verbatim copy + row-click]
+
+**Prompt 104:** Rewrote AppointmentCard modal JSX by copying CallModal verbatim section-by-section (header, status dropdown with portaled menu, call notes textarea, footer). Only swapped data leaves and state variable names. Status control changed from pill buttons → dropdown matching CallModal exactly (ChevronDown trigger, dot indicators, Check on selected, outside-click handler, portaled at zIndex 2000).
+
+**Prompt 105:** `LeadRow` in `CallLeads.jsx` — added `modalOpen` state, `cursor: pointer` + `onClick` on row div. Action cell wrapped with `stopPropagation` so CallButton click doesn't double-fire. `CallModal` imported and rendered from `LeadRow` for row-click path.
+
+Commit `6f0adc0`, pushed to origin/master.

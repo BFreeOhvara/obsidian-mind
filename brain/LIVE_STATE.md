@@ -16,7 +16,24 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–103 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–105 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+
+### ✅ Prompts 104+105 SHIPPED 2026-06-26 (`6f0adc0`) — AppointmentCard verbatim CallModal JSX + row-click opens popup
+
+**Prompt 104 — `src/components/closer/AppointmentCard.jsx`:**
+- Modal JSX structure copied verbatim from `CallModal.jsx`: same outer shell (maxWidth 960, `#0E0E1A`, border, shadow), same header (Phone icon box, accent-dim/border, flex layout, business name, muted subtitle, Badge, X), same left col (`flex: '0 0 340px'`, `padding: '16px 18px'`), same status dropdown (ChevronDown trigger button, portaled menu with dot indicators + Check, outside-click handler, `zIndex: 2000`), same Call Notes section (StickyNote icon, caps label, raw textarea with exact same props), same footer (italic hint, accent Done button with identical disabled/opacity/transition styling)
+- Swapped only: data leaves (lead.business_name, lead.niche+city subtitle, `outcome`/`outcomeTouched` instead of `status`/`statusTouched`, closer's 5 STATUS_OPTIONS, SAY THIS right column instead of ScriptWalk, `handleComplete` instead of `handleDone`)
+- Added `outcomeTouched`, `outcomeOpen`, `outcomeMenuCoords`, `dropdownRef/triggerRef/menuRef` to match CallModal's dropdown state pattern exactly
+
+**Prompt 105 — `src/pages/closer/CallLeads.jsx`:**
+- `LeadRow` gains `const [modalOpen, setModalOpen] = useState(false)` + `cursor: pointer` on row div + `onClick={() => setModalOpen(true)}`
+- Action cell wrapped in `<div onClick={e => e.stopPropagation()}>` — CallButton's own `e.stopPropagation()` + the wrapper prevent double-fire
+- `CallModal` imported and rendered from `LeadRow` for row-click; `CallButton` still opens its own `CallModal` instance on button-click
+- Both paths open identical `CallModal` for the same lead
+
+**Verify:** `/closer/call-leads` — click anywhere on a row → CallModal opens; Call button still works. `/closer` pipeline appointment → popup matches CallModal visually (dropdown status, same header, same footer).
+
+---
 
 ### ✅ Prompt 103 SHIPPED 2026-06-26 (`ebc7ae4`) — AppointmentCard style parity with CallModal
 
