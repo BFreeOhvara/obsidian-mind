@@ -46,14 +46,34 @@ Bundled into the Elite package or standalone.
 
 ---
 
-## Custom Stack Pricing (replaces the old 4 fixed packages, 2026-06-20)
+## Stack Pricing (SUPERSEDED 2026-06-25 — standard stack, not custom-generated; see correction below)
 
 **No fixed packages.** Every client gets a custom-named automation stack and a custom price, generated from their specific discovery answers — not picked off a menu.
 
 - **Setup fee: `$297` flat, one-time** (was `$497` — lowered with the pivot to formula pricing).
-- **Monthly: formula-priced, value-based.** `callsMissedPerWeek × 4.33 × avgTicket × 0.15` = estimated monthly value lost to missed calls; that becomes the price. Floor `$397/mo`, ceiling `$1,997/mo` (raised from `$297`/`$1,797` — Prompt 10, 2026-06-20), rounded to the nearest `$10`.
+- **Monthly: formula-priced, value-based.** `callsMissedPerWeek × 4.33 × avgTicket × 0.15` = estimated monthly value lost to missed calls; that becomes the price. Floor `$397/mo`, ceiling `$1,997/mo` (raised from `$297`/`$1,797` — Prompt 10, 2026-06-20).
+- **🔒 CORRECTION 2026-06-25 (Brayden) — every monthly price must end in `99`.** Rounding changed from "nearest `$10`" to "nearest value ending in `99`" — e.g. `$599`, `$899`, `$1,299`. Setup fee is unchanged (`$297` flat, does NOT need to end in 99). **Open question flagged for CC:** the current floor/ceiling (`$397`/`$1,997`) themselves end in `97`, not `99` — under the new convention these probably need to become `$399`/`$1,999` for consistency, but Brayden hasn't explicitly confirmed that — ask before changing the floor/ceiling values themselves, only the rounding logic for everything in between is confirmed.
 - **Target average deal: ~`$1,200/mo`.**
-- **Automations are AI-generated per lead as a tiered stack** (Prompt 10, 2026-06-20): 1-2 **front-runner agents** that directly solve the 1-2 most critical stated problems (the headline of the sale) + 1-5 **sub-agents** that complement/amplify each front-runner (no standalone sub-agent — every one ties to a front-runner). Names are specific (e.g. "After-Hours Call Handler," not "AI Receptionist"). No catalog constraint — the AI invents whatever the lead's situation calls for.
+- ~~**Automations are AI-generated per lead as a tiered stack** (Prompt 10, 2026-06-20)...~~ **Superseded — see correction directly below.**
+
+### ⚠️ CORRECTION 2026-06-25 (Brayden, via Eagle) — same stack for everyone, not custom-generated
+
+Brayden decided **not** to do a custom AI-generated stack per lead. Instead: **everyone gets the same standard stack**, sold as the appeal layered on top of the actual headline product — the AI receptionist (since current lead source is Indeed businesses actively hiring a receptionist). The stack is a **checklist of what we've actually built**, not invented per call.
+
+- **Same stack, every client.** No more "AI invents whatever the lead's situation calls for" — that's gone.
+- **Still structured as main agent(s) + sub-agents — just fixed now, not AI-generated.** Brayden confirmed (2026-06-25) the front-runner/sub-agent structure itself stays (he and Falcon had already discussed this): **1-2 main/front-runner agents** (the headline — currently AI Receptionist, given Indeed receptionist-hiring lead source) **+ a fixed set of sub-agents** that complement it. The only thing that changed is the sub-agents are no longer invented per lead — they're the same fixed list for every client.
+  - **CORRECTION (2026-06-25, Brayden) — Missed Call Text Back is OUT, replaced with Appointment Cancellation handling.** Reasoning: voice AI (Retell) handles concurrent calls, unlike a human receptionist — once AI Receptionist is live for a client, there's no real "missed call" gap left for Missed Call Text Back to cover; redundant for this lead source.
+  - **🔒 LOCKED 2026-06-25 (Brayden) — final sub-agent list: Review Generation, Lead Follow-Up, Appointment Reminders, Appointment Cancellation, SMS Marketing.** Brayden confirmed he likes this stack and confirmed everyone gets it. `automation-stack-builder.md` updated to reflect this (Missed Call Text Back still needs removing from that doc's text — flag for next pass).
+  - **Appointment Cancellation — locked behavior (2026-06-25):** on cancellation, re-engage the canceller first to try to rebook them. If that fails, text the next several upcoming-appointment customers: "An earlier appointment slot just opened up — first come, first served, reply YES to grab it." First to reply YES locks the slot. Everyone else who replies after it's taken gets an immediate auto-reply ("spot's taken") so nobody wastes time waiting on a dead offer.
+  - **Lead Follow-Up — "quiet lead" threshold not yet formally defined**, Brayden's working read: ~24–48hrs non-response after last contact for a standard quote/follow-up; shorter (same-day/few hours) if it's a missed-call scenario; longer (2-3 days) for a bigger-ticket quote decision. Not locked, just a working default — confirm before building.
+- **Website + chatbot are part of the standard stack by default — not an exclusion, an inclusion that scales down.** CORRECTION (2026-06-25, Brayden): website/chatbot aren't "the one thing they might already have that gets excluded" — they're a default-included stack item with exactly two checkbox questions in discovery: (1) Do they have a website? (2) Does that website have an AI chatbot? Logic:
+  - No website + no chatbot → both get added (full web piece + chatbot).
+  - Website but no chatbot → chatbot gets added, website is excluded (they already have it).
+  - Website + chatbot already → both excluded — this is the ONLY case where nothing web-related gets added.
+  - There's no "no website but has chatbot" case.
+  - This is the only exclusion check in the whole stack — every other stack item (main + sub-agents) is assumed not-already-owned and just gets sold as-is. Exact discount math for the exclusion cases still not defined — flag to Brayden when building pricing logic.
+- **Pricing formula itself is UNCHANGED** for now (`callsMissedPerWeek × 4.33 × avgTicket × 0.15`, floor/ceiling as above) — only the stack COMPOSITION logic changed, not the price formula. Confirm with Brayden if/when the exclusion discount needs to be formalized into the formula.
+- **Found candidate for "the stack":** `strategy/automation-stack-builder.md` (2026-06-20) lists the automation catalog already built/planned: AI Receptionist, AI Dispatcher, Missed Call Text Back, Review Generation, Lead Follow-Up, Appointment Reminders, SMS Marketing, plus Website (Vertical 2). This is likely what Brayden means by "the stack" — confirm with him directly before treating it as final, since that doc predates this correction and was written for the now-superseded custom-per-lead model, not the standard-stack-for-everyone model.
 
 ### ROI Anchor (use in every close)
 

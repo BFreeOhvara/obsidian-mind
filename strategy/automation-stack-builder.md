@@ -49,8 +49,8 @@ On close:
 
 ## When to Build
 
-**Now (2026-06-20).** No real close exists yet to test against, so build against synthetic/test data first (a manually-created `clients` row with a realistic `front_runner_agents`/`sub_agents` payload from a real `recommend-stack` output) and re-verify against the first actual close once one happens.
+~~**Now (2026-06-20).** No real close exists yet to test against, so build against synthetic/test data first...~~ **SUPERSEDED 2026-06-25 (Brayden).** Not building this in-house ahead of a close anymore. Instead: **outsourcing to a contractor, triggered by the first real deal closing.** Brayden already has candidates sourced on Upwork (HIPAA-build specialization preferred, more future-proofing than urgent need given the current niche lineup). Client-facing buffer: new clients are told ~1 week to launch after close — that's the window the contractor uses to actually build the sold automations. This reverses the 2026-06-20 "un-parked, build ahead of close" call.
 
 ## Status
 
-Building — see [[LIVE_STATE]] queue, Prompt 19+.
+**Parked, pending first close.** Will be outsourced (not built by CC/Brayden) once a real deal closes. See [[Memories]] 2026-06-25 entry for full context. Stack contents this registry needs to support: front-runner (AI Receptionist, +AI Dispatcher alternate) + sub-agents (Review Generation, Lead Follow-Up, Appointment Reminders, Appointment Cancellation, SMS Marketing — Missed Call Text Back removed 2026-06-25) + Website/chatbot (default-included, exclusion-checked).

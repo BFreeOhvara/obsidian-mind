@@ -2168,3 +2168,29 @@ Session resumed from compacted context. Executed two queued prompts end-to-end:
 **Prompt 100** (`0286107`, pushed): Scrapped Prompt 98's two-column `AppointmentCard.jsx` design entirely. Rewrote as single-column 520px modal with SAY THIS stepper (28 say-lines, Next/Back/Start Over). Stripped all instructional meta-text from `closerScript.js` — only literal spoken lines remain. Kept Prompt 98's 5-button status picker. Canvas `/closer/script` now shows linear flow (side effect of removing BRANCH markers from source).
 
 Queue is now empty (Prompts 1–100 all shipped). LIVE_STATE and Memories updated, both repos pushed. No blockers.
+
+## 2026-06-25 — Migration 056 applied (request_closer_leads cap + scope fix)
+
+Brayden ran migration 056 in Supabase SQL editor via his own Claude Chrome session. `CREATE OR REPLACE FUNCTION request_closer_leads` succeeded, no errors. Confirms Prompt 99's two server-side fixes are live:
+- 500-lead cap now computed against the closer's current total (`500 - current_count`), not just request size.
+- WHERE clause scoped to truly unassigned leads (`assigned_closer_id IS NULL AND assigned_rep_id IS NULL`) — matches admin Unassigned pool.
+
+Open: live UI verify on `/closer/call-leads` Request Leads button/modal still pending — Brayden hit a 404 trying to refresh that route from inside the Supabase dashboard tab (expected — that route lives on the deployed app, not Supabase).
+
+## 2026-06-25 — Session wrap: Prompts 99/100 shipped + verified, migration 056 applied
+
+**Shipped this session:**
+- **Prompt 99** (`76db487`) — Closer "Request Leads": `request_closer_leads` RPC rewritten (500-cap now measured against current total, not request size; WHERE scoped to truly-unassigned leads), `CallLeads.jsx` UI changed from inline input+button to a single "Request Leads" button opening a modal.
+- **Prompt 100** (`0286107`) — Closer appointment popup (`AppointmentCard.jsx`) full rewrite after Brayden hated Prompt 98's two-column/ScriptQuickRef/AI-recommendation design. Rebuilt single-column to match the `CallLeads.jsx` "Say This" call-prep popup style: one say-this box, Next/Back/Start Over stepper through 28 flattened script lines, status picker kept from Prompt 98. `closerScript.js` stripped of all stage-direction/instructional meta-text — only literal say-this lines remain in source now. Side effect: `/closer/script` canvas lost its branch forks (BRANCH/↳/→ markers removed) — now renders as a linear flow only.
+- **Migration 056 applied live** (Brayden, via his own Claude Chrome session) — `request_closer_leads` function updated in Supabase. Confirmed success, no errors.
+- Cleaned a stale duplicate 🔴 Prompt 96 queue block out of LIVE_STATE (its shipped version already existed further down).
+
+**Decisions/state:**
+- LIVE_STATE queue is now empty — *(Prompts 1, 2, 5–17, 26, 28–100 shipped)*.
+- Open verify item: live click-through on `/closer/call-leads` Request Leads button/modal not yet done (Brayden tried refreshing from inside the Supabase tab, got a 404 — expected, that route lives on the deployed app not Supabase).
+- Open verify item: Prompt 100's popup not yet click-through verified by Brayden in the live app either.
+
+**Non-Ohvara aside (Claude desktop bug, not logged as Ohvara work but noted since it came up this session):** Brayden hit a Claude desktop voice-input bug — clicking or holding the mic button records ~1 second then auto-stops, reproducible across multiple mics, while muted, and after a full computer restart. Ruled out mic hardware/permissions and click-vs-hold UI behavior. Recommended he report it via Claude desktop's feedback/support.claude.com since it's reproducible and not resolved by standard troubleshooting. Unresolved as of session end — not an Atlas/dashboard issue, just flagging in case it resurfaces.
+
+**Resume prompt for next chat:**
+`Read brain/Memories.md and North Star.md — continuing Ohvara work`
