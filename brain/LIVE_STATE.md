@@ -16,7 +16,43 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–98 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–100 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+
+### ✅ Prompt 100 SHIPPED 2026-06-25 (`0286107`) — AppointmentCard single-column SAY THIS popup
+
+**`src/components/closer/AppointmentCard.jsx`** — full rewrite. Scraped Prompt 98's two-column design:
+- **Single column, 520px modal** — matches `CallLeads.jsx` proportions
+- **SAY THIS stepper** at the bottom: 28 say-this lines (all sections of `CLOSER_SCRIPT` flattened), one at a time. Next / ← Back / Start Over controls + step counter
+- **Kept Prompt 98's status picker** (Closed/Lost/No Show/Missed/Needs Reschedule) with conditional deal value / loss reason inputs and Save button
+- **Dropped entirely**: `ScriptQuickRef`, AI Recommendation panel, `RecommendationPanel`, `PresentationWalk`, `AgentStackList`, `ServiceChecklist`, PACKAGES, provision/payment-link flows, `useNavigate`, `useQueryClient`
+- `handleComplete` logic preserved: missed/needs_rescheduling → direct status update; others → completed + outcome + commission payout
+
+**`src/lib/closerScript.js`** — stripped all stage-direction / instructional meta-text from every `lines[]` array. Only literal say-this lines remain in the source (▸ action chips, BRANCH markers, ↳ IF labels, → route markers, `tips` fields all removed). `buildCloserScriptFlow` retained for canvas.
+
+**⚠️ Side effect:** `CloserScript.jsx` canvas (`/closer/script`) now shows a linear say-flow (no branch forks) since BRANCH/↳/→ markers were removed from the source. Canvas still renders — just no branching nodes.
+
+**⚠️ Verify:** open appointment in `/closer` pipeline — single-column popup with SAY THIS box; Next button steps through 28 lines; status picker selects outcome and saves.
+
+---
+
+### ✅ Prompt 99 SHIPPED 2026-06-25 (`76db487`) — Closer "Request Leads": scope fix, 500-cap, modal UI
+
+**2 files changed:**
+
+1. **`supabase/migrations/056_closer_request_leads_cap.sql`** (new) — Rewrites `request_closer_leads` RPC:
+   - Cap is now against the closer's **current total** (not just request amount): `v_allowed := GREATEST(0, 500 - v_current_count)`. A closer holding 480 leads can request at most 20.
+   - WHERE clause fixed to `assigned_closer_id IS NULL AND assigned_rep_id IS NULL` — only truly unassigned leads (admin "Unassigned" pool) are eligible.
+   - **⚠️ MANUAL STEP — Brayden applies migration 056 in Supabase SQL editor (same as 055 for Prompt 96).**
+
+2. **`src/pages/closer/CallLeads.jsx`** — Request Leads UI rebuilt as button → modal:
+   - Inline count input + "Request N" button removed
+   - Single "Request Leads" button (disabled + "At capacity (500)" label when at cap)
+   - `RequestLeadsModal` portal: shows current lead count, max requestable, number input capped to max, Request + Cancel buttons; success state shows "+N leads added" then Done
+   - `currentLeadCount` = `allLeads?.length` (all RLS-scoped closer leads, not filtered subset)
+
+**⚠️ Verify:** closer with N leads sees modal capping at `500 - N`; requesting more than cap is rejected server-side; requested leads always pulled from admin Unassigned pool.
+
+---
 
 ### ✅ Prompt 96b DONE 2026-06-25 — Migration 055 SQL pasted into LIVE_STATE
 
@@ -48,29 +84,6 @@ Examples: raw $974 → $999, raw $620 → $599, raw $410 → $399, raw $1990 →
 6. Modal widened from 720px → 900px.
 
 **⚠️ Not Chrome-verified.** Brayden runs Chrome MCP pass — clicking an appointment in `/closer` should open popup with left/right columns and button-style status picker at bottom.
-
----
-
-### 🔴 Prompt 96 — New closer pipeline statuses: manual "Needs Rescheduling" + "Missed" (queued 2026-06-25, Eagle, RE-CORRECTED — renamed back to Missed, redefined)
-
-> **Correction history (same session):** Originally "Missed" meant auto-flip if Nate never calls within 24hrs — Brayden dropped that (Nate's on top of every appointment, won't happen). Replaced with "No Answer." Then Brayden flipped the NAME back to **Missed** to avoid confusion with the rep-side "No Answer" status on Call 1 (different dashboard, different meaning — having two "No Answer" labels across the app would be confusing). Final definition: **Missed = client doesn't pick up when Nate calls for the scheduled appointment (Call 2)** — same underlying event as before, just renamed. Two new statuses for the closer pipeline, each with its own filter tab (alongside Pending/Closed/Lost):
-
-1. **Missed (manual status, NOT auto-flip).** Set when Nate calls for the scheduled appointment and the client doesn't answer. This is a manual status Nate sets after a no-pickup — there is NO 24hr auto-flip logic, no pg_cron job. Purely client-didn't-answer-the-call tracking. Name is "Missed" specifically to avoid colliding with the rep-side "No Answer" (Call 1) status elsewhere in the dashboard — confirm with Brayden if further naming clarity is needed (e.g. "Missed Appointment") once it's actually built and visible next to other tabs.
-
-2. **Needs Rescheduling (manual status).** A status Nate can manually set on an appointment — for cases where it needs to be moved but isn't lost (e.g. client asked to push it, or came out of a Missed/Cancellation flow and needs a new time). Add as a selectable status option + its own filter tab.
-
----
-
-### ⚠️ Prompt 96b — MANUAL STEP: Apply migration 055 in Supabase SQL editor
-
-Run the following SQL in the Supabase dashboard → SQL editor. No `supabase db push`.
-
-```sql
-ALTER TYPE appointment_status ADD VALUE IF NOT EXISTS 'missed';
-ALTER TYPE appointment_status ADD VALUE IF NOT EXISTS 'needs_rescheduling';
-```
-
-Once applied, the Missed and Needs Rescheduling pipeline tabs (Prompt 96, `f98ddb0`) become functional. Delete this entry after Brayden confirms it ran.
 
 ---
 
