@@ -16,7 +16,7 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–95 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–96 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
 
 ### 🔴 Prompt 97 — Monthly retainer pricing must always end in `99` (queued 2026-06-25, Eagle)
 
@@ -55,9 +55,19 @@ tags:
 
 2. **Needs Rescheduling (manual status).** A status Nate can manually set on an appointment — for cases where it needs to be moved but isn't lost (e.g. client asked to push it, or came out of a Missed/Cancellation flow and needs a new time). Add as a selectable status option + its own filter tab.
 
-**Recon first:** find the appointment/pipeline status enum (`CloserPipeline.jsx`, whatever migration defines pipeline statuses) — confirm whether this needs a DB enum migration. No auto-requeue/cron logic needed for either status — both are manual, closer-set.
+---
 
-**Verify:** Chrome MCP pass (Brayden runs it) — Missed and Needs Rescheduling both show as filter tab options on the closer pipeline, clearly distinguishable from the rep-side No Answer status; manually setting either status works and the appointment shows correctly under its new tab.
+### ✅ Prompt 96 SHIPPED 2026-06-25 (`f98ddb0`) — Missed + Needs Rescheduling pipeline statuses
+
+**2 files changed:**
+
+1. **`supabase/migrations/055_appointment_status_missed_rescheduling.sql`** (new) — Adds `missed` and `needs_rescheduling` to the `appointment_status` enum. **⚠️ MANUAL STEP — Brayden applies in Supabase SQL editor (NOT `supabase db push`).**
+
+2. **`src/pages/closer/CloserPipeline.jsx`** — `CLOSER_TABS` + `CLOSER_TAB_COLORS` expanded; `filteredAppts` + `closerKPIs` updated with two new buckets; `MissedTab` + `NeedsReschedulingTab` components added; KPI cards render per-tab. Missed = warning color (PhoneOff), Needs Rescheduling = info color (RefreshCw).
+
+**UI behavior:** Tabs appear in the closer pipeline filter bar. Status-setting UI comes in Prompt 98's popup redesign.
+
+**⚠️ Not Chrome-verified.** Pending migration 055 being applied in Supabase SQL editor. Verify: two new tabs appear; migration runs clean.
 
 ---
 

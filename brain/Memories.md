@@ -64,6 +64,17 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-25 — Prompt 96 SHIPPED: Missed + Needs Rescheduling pipeline statuses (`f98ddb0`)
+
+**Task:** Two new manual closer pipeline statuses + filter tabs.
+**Changes:**
+- `055_appointment_status_missed_rescheduling.sql` — `ALTER TYPE appointment_status ADD VALUE` for `missed` and `needs_rescheduling`. Manual apply in Supabase SQL editor required.
+- `CloserPipeline.jsx` — 5 new closer filter tabs (Missed=warning, Needs Rescheduling=info), `MissedTab`/`NeedsReschedulingTab` components, `filteredAppts`/`closerKPIs` extended with new buckets.
+**Lesson:** `appointment_status` enum (`001_initial_schema.sql`) was `pending/completed/no_show/rescheduled` — needed to confirm DB change required before building UI. `ALTER TYPE ... ADD VALUE IF NOT EXISTS` is the safe pattern.
+**Status:** Built clean, pushed. Migration 055 pending Brayden applying it. Status-setting UI for these two statuses deferred to Prompt 98.
+
+---
+
 ### 2026-06-25 — Prompt 95 SHIPPED: Pipeline polish — always-on colors, empty-state icons, closer KPIs-first (`59bf1b5`)
 
 **Task:** 4 `CloserPipeline.jsx` fixes on top of Prompt 92.
