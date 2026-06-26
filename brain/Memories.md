@@ -132,6 +132,21 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ---
 
+### 2026-06-26 — Cowork mic cutoff diagnosis (no code changes)
+
+**Issue:** Cowork tab mic records ~1 second then stops; Chat tab works fine.
+**Diagnosis findings:**
+- Registry consent (`Claude_pzs8sxrjxfjjc`): `LastUsedTimeStart 22:02:17 UTC`, `LastUsedTimeStop 22:02:20 UTC` — Windows records exactly 3 seconds of capture. Not a permissions deny; the session started and was actively terminated.
+- 4 active recording devices simultaneously: Yeti, Scarlett Solo USB, HD 1080P camera, Oculus Virtual Audio Device. Oculus VAD is a virtual device — common source of spurious `devicechange` browser events that tear down MediaStream.
+- No audio errors in renderer log (`unknown-window.log`), no Event Viewer audio warnings → failure is silent from JS layer, indicating Chromium/Electron closes the stream rather than the tab's JS throwing.
+- No default Communications device preference set in registry (no `HKCU DeviceCookie`) → Windows guessing which device to use for voice comms.
+- VM bundle (rootfs.vhdx) was actively downloading during test; not directly related to host-side capture.
+**Root cause hypothesis:** `devicechange` event from Oculus VAD firing after Cowork opens getUserMedia, causing Chromium to tear down the capture stream silently. OR default device mismatch between multimedia and communications roles causes a stream switch that Cowork doesn't survive.
+**Next steps queued for Brayden:** (1) Disable Oculus Virtual Audio Device in Device Manager and retest; (2) Open Sound Control Panel → Recording and verify default vs communications device; (3) Open DevTools in Cowork tab during a mic attempt to catch any devicechange/AbortError events.
+**No code changed this session.**
+
+---
+
 ### 2026-06-25 — Session wrap-up: vault log + push for Prompts 85–89 (`344b812`)
 
 Context compaction mid-session; resumed and completed vault logging. Appended Prompts 85–89 session log entry to Memories.md, committed LIVE_STATE.md + Memories.md (`344b812`), pushed vault to GitHub. Dashboard repo already fully pushed (`33b009e`) before compaction. No new code written this continuation — wrap-up only.
@@ -2369,3 +2384,29 @@ Copied `src/components/rep/CallModal.jsx` to `src/components/closer/AppointmentC
 **`CloserModal.jsx`** (orphaned — nothing imports it) — removed 'Missed' from STATUS_OPTIONS, updated handleComplete guard.
 
 **Grep check:** `value: 'missed'`, `label: 'Missed'`, `key: 'missed'` — zero occurrences. Only remaining `'missed'` is inside the no_show backward-compat filter.
+
+---
+
+## Session Log — 2026-06-26 (Prompt 119)
+
+**No dashboard code changes this session.**
+
+### Prompt 119 — Cowork mic stops after 1 second (Windows diagnostic)
+
+Brayden reported: clicking the mic button in the Cowork tab records for ~1 second then auto-stops. Regular Chat tab mic works fine. Started after a hard GPU crash / unexpected restart. Already tried: full restarts, toggling VMP, enabling Windows Hypervisor Platform.
+
+**Diagnostics run:**
+- `CoworkVMService`: Running, Automatic — healthy.
+- `vmms`: Not installed — expected. Cowork uses `vmcompute` (HCS) directly, which is running.
+- Log location found: `C:\ProgramData\Claude\Logs\cowork-service.log` + `coworkd\user-*.log` (not under `%LOCALAPPDATA%\Claude`).
+- Searched 11,879 lines for audio keywords — **zero hits**. VM config has no virtual audio device (no virtio-snd). Audio capture is 100% host-side (Windows), sent to VM via RPC/HvSocket after capture.
+- Event Viewer KP41: 4 crashes — today 3:38 PM, yesterday twice, 6/11. Recurring instability pattern.
+- TDR (Event 4101): AMD GPU driver (`amduw23g`) stopped responding 6/20 and 6/15.
+
+**Conclusion:** VM stack is a red herring — the 1-second cutoff is a host-side Windows audio capture failure. Most likely: MSIX app mic permission corruption from dirty shutdown, or stale WASAPI session lock.
+
+**Recommended fixes (in order):**
+1. Settings → Privacy → Microphone — toggle Claude off/on.
+2. Settings → Apps → Claude → Advanced options → Reset (clears MSIX state, preserves VHD session data).
+3. `Restart-Service -Name Audiosrv -Force` to clear stale WASAPI sessions.
+4. If still broken: recurring KP41s (3 in 2 days) suggest RAM/PSU instability — run MemTest86.

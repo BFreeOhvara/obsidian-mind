@@ -18,6 +18,22 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–117 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
+### 🔴 Prompt 119 — Found it: there are TWO render paths (single-line vs multi-line script), only one was ever fixed (queued 2026-06-26, Eagle)
+
+**Root cause, finally concrete:** Prompt 117's "pixel-identical" screenshot used the setter's SHORT/single-line script — that never triggers multi-line mode. Prompt 118 swapped in the closer's real 25-line script, which DOES trigger multi-line mode, and the old bugs reappeared instantly: quote text is italic again, "SAY THIS" label rendered in purple/accent instead of the muted gray caps label it should be, and the Back / Start Over / "1 / 25" counter row reappeared in the broken layout from before (Prompts 110/111 never actually fixed this — they were tested/marked shipped without ever rendering a multi-line script).
+
+**This confirms:** there are two separate style/JSX branches in the SAY THIS box keyed off `scriptLines.length` (or similar) — one for length 1, one for length >1 — and they diverge in: text `font-style` (italic vs normal), text/label color, and footer row layout (Back/Start Over/counter placement). This is not a guess — it reproduced the instant real data was used.
+
+**Do this:**
+1. In whatever file now renders the SAY THIS box (post-117 copy, `AppointmentCardModal.jsx`, or wherever the shared logic lives), grep for any conditional on `scriptLines.length`, `currentIndex`, or similar that branches the JSX/styling for the quote text, the "SAY THIS" label, or the footer (Back/Start Over/counter).
+2. Pick ONE branch as canonical — NOT based on Eagle's guess at what color/style anything "should" be, but based on exactly what rendered in the Prompt 117 screenshot Brayden already confirmed as correct (single-line setter script, working state). Whatever the "SAY THIS" label color/weight was in THAT screenshot is correct — match it exactly, don't invent a new value. Same for: quote text font-style/weight, the thin accent strip on the left edge of the quote box (stays exactly as it's always been, not tied to status/line-count), and Back/Start Over/counter placement (own row below Next, never sharing space with Next).
+3. Delete the other branch entirely. There should be exactly one JSX path for this box regardless of `scriptLines.length`.
+4. Test specifically with the closer's actual 25-line script (not a 1-line stand-in) since that's what exposed the bug — re-screenshot with real data, not a placeholder.
+
+**Verify:** screenshot the closer popup mid-script (e.g. step 5 of 25) — quote text normal style/weight matching setter's font, "SAY THIS" label same muted gray as other labels, Back/Start Over/counter in their own row, Next button unaffected. Paste literal grep results showing only one conditional-free render path remains.
+
+---
+
 ### ✅ Prompt 118 SHIPPED 2026-06-26
 
 ### ✅ Prompts 116+117 SHIPPED 2026-06-26
