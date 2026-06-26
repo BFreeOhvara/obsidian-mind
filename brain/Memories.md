@@ -2224,3 +2224,9 @@ Restructured `src/components/closer/AppointmentCard.jsx` from single-column (520
 Prompt 101 commit was local-only — 1 ahead of origin/master. `git push` succeeded; `git log origin/master -1` confirmed `d7010e5` on remote. Vercel auto-deploy triggered. Root cause of missing deployment: CC never pushed after committing Prompt 101.
 
 **Lesson:** Always push after committing dashboard changes — don't just commit.
+
+## [CC | 2026-06-26 — Prompt 103 shipped: AppointmentCard style parity with CallModal]
+
+Pulled `CallModal.jsx` as the visual reference (the setter's actual call popup). Removed appointment datetime block + handleSchedule + timezone imports. Matched header (Phone icon box + subtitle), modal maxWidth 960, left col 340px fixed, STATUS/CALL NOTES label style, raw textarea props, footer Done-button styling exactly to CallModal. Commit `ebc7ae4`, pushed to origin/master.
+
+**Verify outstanding:** Brayden Chrome MCP — `/closer` pipeline appointment popup matches setter popup visually.

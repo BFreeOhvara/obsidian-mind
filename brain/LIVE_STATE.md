@@ -16,7 +16,22 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–102 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–103 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+
+### ✅ Prompt 103 SHIPPED 2026-06-26 (`ebc7ae4`) — AppointmentCard style parity with CallModal
+
+**`src/components/closer/AppointmentCard.jsx`** — visual parity pass against `CallModal.jsx`:
+- **Removed:** entire appointment datetime block (Input + Set button + reminders), `handleSchedule`, `scheduledAt` state, timezone imports, `Bell`/`Textarea` imports
+- **Header:** Phone icon in accent-dim box + "Close prep · everything you need in one place" subtitle — matches CallModal exactly
+- **Modal:** maxWidth 960, left col fixed `flex: '0 0 340px'`
+- **STATUS:** uppercase 10px muted caps label; pills keep closer's 5 values + conditional fields
+- **CALL NOTES:** StickyNote icon + caps label; raw textarea matching CallModal's exact props
+- **Footer:** "Select a status to finish — X discards changes" italic + Done button fills accent on outcome, same styling as CallModal Done
+- All logic untouched: handleComplete, STATUS_OPTIONS, SAY_LINES stepper, commission payout, cleanup-lost-demo
+
+**Verify:** open appointment in `/closer` pipeline — no appointment time block; header/status/notes/SAY THIS visually match setter popup.
+
+---
 
 ### ✅ Prompt 102 DONE 2026-06-26 — `d7010e5` pushed to GitHub, Vercel deploy triggered
 
