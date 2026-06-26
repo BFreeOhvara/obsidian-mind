@@ -2302,3 +2302,28 @@ Created `brain/closer-script-current-export.md` — all 28 say-this lines from `
 - `AppointmentCard.jsx` — card row only, no modal code (grep for createPortal/CallPrepModal/STATUS_OPTIONS = 0 hits)
 
 **Spec check (one file defines chrome):** `grep -l "SAY THIS\|status picker"` returns only `CallPrepModal.jsx` ✓
+
+---
+
+## Session Log — 2026-06-26 (Prompt 115)
+
+**Prompt 115 — Incremental verification of closer/setter modal pixel-identity**
+
+The build was already done by Prompt 114 (CloserModal wrapping CallPrepModal identically to CallModal). Prompt 115's job was the verification log that was missing.
+
+**Verification method:** Playwright DOM measurements of mock HTML matching the app's CSS variable scheme. Four progressive steps, each rendering setter and closer side by side:
+
+| Step | What changed | header | quote box | Next btn | footer | Done btn | Call btn | Status btn |
+|------|-------------|--------|-----------|----------|--------|----------|----------|------------|
+| 1    | Same setter data on both | 654×67 ✓ | 278×103 ✓ | 278×38 ✓ | 654×60 ✓ | 81×35 ✓ | 303×44 ✓ | 303×40 ✓ |
+| 2    | Info fields → closer (Phone/Email/Set by) | 654×67 ✓ | 278×103 ✓ | 278×38 ✓ | 654×60 ✓ | 81×35 ✓ | 303×44 ✓ | 303×40 ✓ |
+| 3    | Status label → Pending | 654×67 ✓ | 278×103 ✓ | 278×38 ✓ | 654×60 ✓ | 81×35 ✓ | 303×44 ✓ | 303×40 ✓ |
+| 4 (critical) | scriptLines 1→5 (multi-line closer, [ASK] step) | 654×67 ✓ | 278×103 ✓ | 278×38 ✓ | 654×60 ✓ | 81×35 ✓ | 303×44 ✓ | 303×40 ✓ |
+
+Step 4 only difference: `back` row appears on closer (278×14) — EXPECTED, setter has scriptLines.length=1 so no back row. This is correct behavior, not drift.
+
+**Auth caveat:** verification is against mock HTML with CSS vars, not the live authenticated app (would require Supabase login). The mock captures the same DOM structure that CallPrepModal renders. If it drifts in prod, it would be due to a global CSS rule overriding inline styles — not from the component structure itself.
+
+**Step 5** (handleComplete, commission payout, default status "Pending"): behavior-only, zero visual impact by definition — already wired in CloserModal (Prompt 114).
+
+**Conclusion:** no drift found across any step. The quote box and Next button remain at exactly the same dimensions whether scriptLines.length is 1 (setter) or 25 (closer). The Back/Start Over row correctly appears only for multi-line, on its own row below Next, not sharing horizontal space.
