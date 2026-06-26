@@ -64,6 +64,18 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-25 — Prompt 95 SHIPPED: Pipeline polish — always-on colors, empty-state icons, closer KPIs-first (`59bf1b5`)
+
+**Task:** 4 `CloserPipeline.jsx` fixes on top of Prompt 92.
+**Changes:**
+- `STATUS_TAB_COLORS` applied unconditionally on Appointment Setting filter tabs (text + badge always colored, underline = active indicator).
+- `QueueTable` gains `emptyIcon` prop — renders 40px circle icon + text when empty, matching `MyLeads.jsx` pattern.
+- Closer view now renders KPI row first, filter tabs below — matching Appointment Setting order. Moved KPI computation into `closerKPIs` useMemo in parent; stripped KPI rows from `PendingTab`/`ClosedTab`/`LostTab`.
+- `CLOSER_TAB_COLORS` added (pending=accent, closed=success, lost=danger) with same always-on treatment.
+**Status:** Built clean, pushed. Not Chrome-verified.
+
+---
+
 ### 2026-06-25 — Prompt 94 SHIPPED: Closer Script + dual-script tab (`824f92b`)
 
 `closerScript.js` — 3-section CLOSER_SCRIPT (opener: reconnect+pain confirm; stack: AI Receptionist + dispatch fork + nested website/chatbot fork + all 5 sub-agents; close: $297+monthly, price fork, Stripe links). `buildCloserScriptFlow` wraps `buildScriptFlow` with the new optional `script` param (min change to `discoveryScript.js`). `CloserScript.jsx` — two sub-tabs ("Appointment Setting Script" / "Closer Script") each rendering `<ScriptCanvas>`. Route `/closer/script` + sidebar "Script" (BookOpen icon after Pipeline).

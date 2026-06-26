@@ -16,7 +16,62 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–93 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–95 shipped — Prompt 42 superseded by 44 Fix 2 — see [[Memories]] for the full trail.)*
+
+### 🔴 Prompt 97 — Monthly retainer pricing must always end in `99` (queued 2026-06-25, Eagle)
+
+**Change:** the `recommend-stack`/pricing formula's rounding logic changes from "round to nearest `$10`" to "round to nearest value ending in `99`" — e.g. `$599`, `$899`, `$1,299`, `$1,499`. The underlying formula (`callsMissedPerWeek × 4.33 × avgTicket × 0.15`) is unchanged, only the final rounding step changes. **Setup fee stays `$297` flat — does NOT need to end in 99, do not touch it.**
+
+**⚠️ Open question — do NOT assume:** current floor (`$397/mo`) and ceiling (`$1,997/mo`) both end in `97`, not `99`. Under the new convention these arguably should become `$399`/`$1,999` for consistency — but Brayden has only confirmed the ROUNDING LOGIC for prices between the floor and ceiling, not that the floor/ceiling values themselves change. Flag this back to Brayden before touching the floor/ceiling constants; only implement the `...99` rounding for the formula's computed output.
+
+**Recon first:** find wherever the monthly price gets rounded (`recommend-stack` edge function, or client-side pricing display logic) — likely a `Math.round(price / 10) * 10` or similar. Replace with logic that rounds to the nearest value ending in 99 (e.g. `Math.round((price + 1) / 100) * 100 - 1`).
+
+**Verify:** test a few raw formula outputs (e.g. simulate `callsMissedPerWeek=5, avgTicket=300`) and confirm the displayed/quoted price always ends in 99, setup fee still shows `$297` unaffected.
+
+---
+
+### 🔴 Prompt 98 — Closer appointment detail popup: redesign to match the Appointment Setting lead detail popup pattern (queued 2026-06-25, Eagle)
+
+**Context:** When the closer clicks on one of their appointments (in `/closer/pipeline`'s Closer tab, or `/closer/appointments`), the current popup just says something like "Mark as Closed" — it doesn't match the nicer `LeadDetailOverlay` pattern built for the Appointment Setting tab in Prompt 92. Brayden wants the closer's appointment popup overhauled to look and work the same way:
+
+1. **Layout, confirmed via question to Brayden:** caller/call notes go on the **LEFT side** of the popup. Status picker + "mark outcome" action go at the **bottom** of the popup (not labeled "Mark as Closed" — should be a status PICKER like the Appointment Setting popup, not a single binary action).
+2. **Add the closer script inline.** The popup should surface the locked closer script (from Prompt 94's `closerScript.js`/`CloserScript.jsx`) so Nate can reference it directly from the appointment popup — similar in spirit to how the Appointment Setting popup surfaces lead info for the rep script. Exact placement (right side, since notes are on the left) — show relevant script content or a way to jump into the script canvas from here.
+3. **Status options should be a picker, not a single "mark closed" button** — mirror the Appointment Setting popup's status-selection pattern (e.g. dropdown/buttons for Closed / Lost / Missed / Needs Rescheduling — pulling in the two new statuses from Prompt 96 once that's built).
+4. **The stack itself isn't changing** — this is purely a UI/layout overhaul of the existing popup, not a change to what's sold or how pricing works.
+
+**Build order note:** this depends on Prompt 96 (Missed / Needs Rescheduling statuses) existing first if the status picker is meant to include them — sequence Prompt 96 before Prompt 98, or stub the status options now and wire in the new statuses once 96 ships.
+
+**Recon first:** find the closer's current appointment-click popup component (likely in `CloserPipeline.jsx`'s ClosedView/PendingView or a separate `MyAppointments.jsx` row click handler) and compare directly against `LeadDetailOverlay` (Prompt 92, Appointment Setting tab) for the layout/pattern to copy.
+
+**Verify:** Chrome MCP pass (Brayden runs it) — clicking a closer appointment opens a popup with notes on the left, script reference visible, and a status picker (not a single "mark closed" button) at the bottom matching the Appointment Setting popup's look and feel.
+
+---
+
+### 🔴 Prompt 96 — New closer pipeline statuses: manual "Needs Rescheduling" + "Missed" (queued 2026-06-25, Eagle, RE-CORRECTED — renamed back to Missed, redefined)
+
+> **Correction history (same session):** Originally "Missed" meant auto-flip if Nate never calls within 24hrs — Brayden dropped that (Nate's on top of every appointment, won't happen). Replaced with "No Answer." Then Brayden flipped the NAME back to **Missed** to avoid confusion with the rep-side "No Answer" status on Call 1 (different dashboard, different meaning — having two "No Answer" labels across the app would be confusing). Final definition: **Missed = client doesn't pick up when Nate calls for the scheduled appointment (Call 2)** — same underlying event as before, just renamed. Two new statuses for the closer pipeline, each with its own filter tab (alongside Pending/Closed/Lost):
+
+1. **Missed (manual status, NOT auto-flip).** Set when Nate calls for the scheduled appointment and the client doesn't answer. This is a manual status Nate sets after a no-pickup — there is NO 24hr auto-flip logic, no pg_cron job. Purely client-didn't-answer-the-call tracking. Name is "Missed" specifically to avoid colliding with the rep-side "No Answer" (Call 1) status elsewhere in the dashboard — confirm with Brayden if further naming clarity is needed (e.g. "Missed Appointment") once it's actually built and visible next to other tabs.
+
+2. **Needs Rescheduling (manual status).** A status Nate can manually set on an appointment — for cases where it needs to be moved but isn't lost (e.g. client asked to push it, or came out of a Missed/Cancellation flow and needs a new time). Add as a selectable status option + its own filter tab.
+
+**Recon first:** find the appointment/pipeline status enum (`CloserPipeline.jsx`, whatever migration defines pipeline statuses) — confirm whether this needs a DB enum migration. No auto-requeue/cron logic needed for either status — both are manual, closer-set.
+
+**Verify:** Chrome MCP pass (Brayden runs it) — Missed and Needs Rescheduling both show as filter tab options on the closer pipeline, clearly distinguishable from the rep-side No Answer status; manually setting either status works and the appointment shows correctly under its new tab.
+
+---
+
+### ✅ Prompt 95 SHIPPED 2026-06-25 (`59bf1b5`) — Pipeline polish: always-on colors, empty-state icons, closer KPIs-first
+
+4 changes to `CloserPipeline.jsx`:
+1. **Always-on filter colors (Appointment Setting tab):** `STATUS_TAB_COLORS` now applied unconditionally — tab text and badge use status color at all times; underline is still the active indicator. Previously only active tab showed color.
+2. **Empty-state icon parity:** `QueueTable` gains `emptyIcon` prop. When empty, renders a 40px circle icon (matching `MyLeads.jsx` pattern) + text. Setter tab passes `Phone`, closer tabs pass `CalendarClock`/`CheckCircle`/`Ban`.
+3. **Closer tab layout swap:** KPI cards now render FIRST in the closer view (before filter tabs), matching Appointment Setting tab order. `closerKPIs` memo in parent computes `pendingCount`, `scheduledCount`, `closedCount`, `totalRevenue`, `lostCount` — sub-tab components no longer render their own KPI rows.
+4. **Always-on colors (Closer tab):** Added `CLOSER_TAB_COLORS` (`pending=accent`, `closed=success`, `lost=danger`). Applied same always-on pattern — Pending/Closed/Lost tabs all show their color at all times.
+
+**Not Chrome-verified.** Verify: both pipeline tabs show colored filter pills without clicking; empty table shows icon; Closer tab now shows KPI boxes above filter tabs.
+
+---
 
 ### ✅ Prompt 94 SHIPPED 2026-06-25 (`824f92b`) — Closer Script + dual-script tab on closer dashboard
 
@@ -37,23 +92,6 @@ tags:
 
 ---
 
-### 🔴 Prompt 94 — Build a Closer Script for Nate + a Script tab on the closer dashboard holding BOTH scripts (queued 2026-06-25, Eagle)
-
-**Context:** The standard stack is now LOCKED (2026-06-25, Brayden — see [[North Star]] correction): every client gets the same stack — front-runner **AI Receptionist** (AI Dispatcher as the alternate front-runner for dispatch-heavy niches) + fixed sub-agents **Review Generation, Lead Follow-Up, Appointment Reminders, Appointment Cancellation, SMS Marketing** + default-included **Website/Chatbot** (excluded only if the lead already has both). Nate (closer) is currently winging Call 2 — improvising the pitch each time instead of having a repeatable flow, because there used to be a different custom stack every call. Now that the stack is fixed, Brayden wants a **closer script built the exact same way the rep discovery script works** — same infra pattern (`discoveryScript.js` + `ScriptWalk.jsx`/`ScriptCanvas.jsx`), just authored for Call 2 instead of Call 1.
-
-**Where it surfaces — UPDATED (2026-06-25):** Nate is dual-role (appointment setter + closer, per Prompt 87's pipeline tabs). The closer dashboard needs a **"Script" tab/page** that holds BOTH scripts side by side — the existing rep/appointment-setter script AND the new closer script — each working identically: a flowchart/canvas view where clicking a node walks you through that part of the script (same `ScriptCanvas` + `ScriptWalk` pattern as `/rep/training`'s Script tab). Likely two sub-tabs or a toggle within the closer Script page: "Appointment Setting Script" | "Closer Script". Both render with the same component, just fed different script data.
-
-**What the closer script needs to cover (Call 2 flow):**
-1. Review the pain the rep already gathered on Call 1 (not re-discovering it from scratch).
-2. Walk through the SAME stack every time — same problems/fixes framing for AI Receptionist (or AI Dispatcher alternate) + the 5 fixed sub-agents + the website/chatbot check — instead of improvising a custom pitch.
-3. Website/chatbot exclusion check baked into the flow (ask: do they have a site? does it have a chatbot? — branch accordingly per the locked logic in North Star).
-4. End in the close: present price (formula-priced per North Star, setup fee $297 + monthly), generate the two Stripe links, ask for the close.
-
-**Recon first:** read `src/lib/discoveryScript.js` (rep script's data structure — branches, say/fork/action step shape) and `src/components/rep/ScriptWalk.jsx` + `ScriptCanvas.jsx` (rendering/practice infra) to understand the existing pattern before authoring new content. Confirm whether the new closer script should be a NEW data file (e.g. `closerScript.js`) reusing the same `ScriptWalk`/`ScriptCanvas` components, or whether those components need minor generalization (e.g. they're currently rep-route-coupled) to be reusable on a closer-side page that needs to render TWO different scripts. Recommend reusing existing rendering logic and only swapping script DATA + adding the setter-script reuse on the closer side, to avoid duplicating UI work.
-
-**Verify:** Chrome MCP pass (Brayden runs it) on the closer dashboard's new Script tab — both "Appointment Setting Script" and "Closer Script" are visible/selectable, each renders as a clickable flowchart, clicking a node walks through that part of the script, closer script follows the locked stack order and ends in pricing + close.
-
----
 
 ### ✅ Prompt 93 SHIPPED 2026-06-25 (`16f346f`) — MyAppointments fixed-height box
 
