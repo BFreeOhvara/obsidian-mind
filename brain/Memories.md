@@ -2218,3 +2218,9 @@ Restructured `src/components/closer/AppointmentCard.jsx` from single-column (520
 **Verify outstanding:** Brayden Chrome MCP pass on `/closer` pipeline — two-column layout, 28-line stepper on right, status picker + Save gating on left.
 
 **Resume prompt:** `Read brain/Memories.md and LIVE_STATE.md — continuing Ohvara work`
+
+## [CC | 2026-06-26 — Prompt 102: pushed d7010e5 to GitHub]
+
+Prompt 101 commit was local-only — 1 ahead of origin/master. `git push` succeeded; `git log origin/master -1` confirmed `d7010e5` on remote. Vercel auto-deploy triggered. Root cause of missing deployment: CC never pushed after committing Prompt 101.
+
+**Lesson:** Always push after committing dashboard changes — don't just commit.
