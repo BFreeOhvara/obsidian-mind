@@ -2282,3 +2282,23 @@ Created `brain/closer-script-current-export.md` — all 28 say-this lines from `
 - Box height difference is content-driven (closer has [ASK] chip + 2-line text vs setter's 1-line text) — correct
 
 **Files changed:** `src/components/shared/CallPrepModal.jsx`, `src/components/closer/AppointmentCard.jsx`
+
+---
+
+## Session Log — 2026-06-26 (Prompt 114)
+
+**Commit:** `b09066b` — `ohvara-dashboard` master
+
+### Prompt 114 — Extract CloserModal; AppointmentCard becomes card-only
+
+**Root cause of all prior drift rounds:** AppointmentCard defined its own copy of the modal chrome inline (portal, backdrop, CallPrepModal invocation with all its slots). Any divergence from CallModal's equivalent code produced visible differences.
+
+**Fix:** Extracted all closer modal logic into `src/components/closer/CloserModal.jsx` — a new file that wraps `CallPrepModal` exactly the same way `CallModal` does, with closer-specific data (STATUS_OPTIONS, SAY_LINES, handleComplete, infoContent, statusAddon, tel: callSection). `AppointmentCard.jsx` is now a pure card row (67 lines) that renders `{modalOpen && <CloserModal appt={appt} onClose={...} />}` — zero modal chrome.
+
+**Architecture after this prompt:**
+- `CallPrepModal.jsx` — ONE file that defines the modal box chrome (SAY THIS box, status picker, call notes, footer). Used by both CallModal and CloserModal.
+- `CallModal.jsx` — setter's wrapper (Twilio, ScriptWalk, leads table writes)
+- `CloserModal.jsx` — closer's wrapper (tel: link, appointments table writes, commission payout)
+- `AppointmentCard.jsx` — card row only, no modal code (grep for createPortal/CallPrepModal/STATUS_OPTIONS = 0 hits)
+
+**Spec check (one file defines chrome):** `grep -l "SAY THIS\|status picker"` returns only `CallPrepModal.jsx` ✓
