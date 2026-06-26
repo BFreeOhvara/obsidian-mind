@@ -16,7 +16,26 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–109 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–112 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111 — see [[Memories]] for the full trail.)*
+
+### ✅ Prompts 111+112 SHIPPED 2026-06-26
+
+### ~~Prompt 110 — superseded by Prompt 111, do not execute~~
+
+**Context:** Header/fields/status/notes/Call button now match correctly after Prompt 109 (Brayden confirmed left side + header are fine). Remaining issue is isolated to the right column — SAY THIS box. Two concrete bugs in `src/components/shared/CallPrepModal.jsx`'s multi-line mode (used when `scriptLines.length > 1`, i.e. closer's 25-line script):
+
+1. **Next button is narrower than the single-line version.** In multi-line mode, `← Back` and `Start Over` are rendered on the same row as the `Next →` button, which shrinks Next to fit beside them. In single-line mode (setter), there's nothing else on that row, so Next renders full-width. Fix: Next must always render at the same full width / same height / same font-size regardless of mode. Move `← Back` and `Start Over` to their own separate row — either above the Next button (small text-link row) or below it — so they never share horizontal space with Next and never affect its size.
+2. **Quote box has dead whitespace in multi-line mode.** Compare screenshots: closer's quote box (NorthStar Heating, line 4/25) has a large empty gap between the quote text and the bottom of the box; setter's box (TowMaster Pro) hugs the quote text tightly with consistent padding. The box should size to its content the same way in both modes — don't reserve extra fixed height for the step counter/Back/Start Over row if it makes the box taller than the single-line version's equivalent padding.
+3. The step counter (`4/25`) should sit in its own small row near Back/Start Over, not inside the quote box itself if that's contributing to the sizing issue — check where the counter is currently rendered and adjust as needed to keep box padding consistent with single-line mode.
+4. **Quote text itself must use the identical font-size/line-height/font-weight/font-style in both modes.** Check the actual CSS — if the multi-line branch and single-line branch each render their own `<p>`/text element instead of sharing one, that's almost certainly where the size differs (same root cause as the Next-button bug: two copies of styling instead of one shared element). Both should use literally the same text element/className/style object, only the string content (`scriptLines[currentIndex]`) changes.
+
+**Read first:** `src/components/shared/CallPrepModal.jsx` — find the multi-line branch and the single-line branch, compare their layout structure directly (they should differ ONLY in whether Back/Start Over/counter exist, not in box padding or Next button sizing).
+
+**Do NOT change:** script content, `STATUS_OPTIONS`, `handleComplete`, stepper advance/back logic itself — this is a pure CSS/layout fix to the SAY THIS box and footer row in multi-line mode.
+
+**Verify:** open closer popup (`/closer`) and setter popup (`/closer/call-leads`) side by side — Next button should be identical width/height/style in both. Quote box should have the same tight padding in both, no dead whitespace in closer's version, regardless of line count.
+
+---
 
 ### ✅ Prompts 107+109 SHIPPED 2026-06-26
 

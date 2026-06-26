@@ -2248,3 +2248,37 @@ Created `brain/closer-script-current-export.md` — all 28 say-this lines from `
 **Prompt 109** (`56766b0`): Structural fix for style drift between setter and closer popups. Created `src/components/shared/CallPrepModal.jsx` — modal box only (no portal, callers wrap in createPortal + backdrop). Owns: header, left col shell, status dropdown (portaled menu, outside-click, controlled via onStatusSelect callback), call notes textarea, footer. Exports `Field` component so both callers use identical field row styling. `CallModal.jsx` refactored to use it (keeps Twilio logic, PostCallCard, ModalErrorBoundary, all unchanged). `AppointmentCard.jsx` simplified by ~270 lines — SAY THIS stepper passed as children to right column slot. Style drift is now structurally impossible.
 
 **Prompt 107** (`5f6f522`): `closerScript.js` rewritten with consultative bullet-point talking points from Eagle's `closer-script-rewrite.md`. 25 lines across 3 sections (was 28). Lines marked `[ASK]` detected in `AppointmentCard.jsx` with `rawLine.startsWith('[ASK]')` — renders an accent "Ask" chip above the line text so Nate can spot question beats at a glance.
+
+---
+
+## Session Log — 2026-06-26 (Prompts 111+112)
+
+**Prompts executed:** 112 (STATUS default), 111 (unified SAY THIS)
+**Commit:** `7ef6716` — `ohvara-dashboard` master
+
+### Prompt 112 — Closer STATUS defaults to "Pending"
+
+- `outcome` state in `AppointmentCard` changed from `''` to `appt.status || 'pending'`
+- `triggerLabel` in `CallPrepModal` now capitalizes status value when not in `statusOptions` (e.g. "pending" → "Pending") instead of appending "— pick an outcome"
+- `statusAddon` conditional inputs now guard with `outcomeTouched &&` — prevents loss-reason input from showing when outcome is the "pending" default on open
+- `handleComplete` unchanged; `isDoneDisabled={!outcomeTouched}` unchanged — Done button stays locked until user explicitly picks an outcome
+
+### Prompt 111 — ONE shared SAY THIS render path
+
+**Root cause of drift (all prior rounds):** SAY THIS JSX lived in `AppointmentCard` as `sayThisPanel` passed as children. Each round "verbatim copied" styles but copy is lossy — inevitably drifted.
+
+**Fix:** Moved SAY THIS entirely into `CallPrepModal` as built-in right-column renderer. New props: `scriptLines`, `scriptStep`, `onScriptStepChange`. When `scriptLines` provided → built-in block. When not provided → `{children}` (setter's ScriptWalk).
+
+**Structural guarantees now in code:**
+1. ONE JSX block for the quote box (grep-confirmed: only in `CallPrepModal.jsx:315`)
+2. Quote box = `padding: 16px 18px, border-radius 10, bg-elevated, accent-border` — no `flex:1`, content-sized
+3. Next button = `width: 100%, height: 38px` — full width always
+4. Back/Start Over/counter = separate div BELOW Next, `{scriptLines.length > 1 && ...}` conditional
+
+**Playwright measurement (headless, mock HTML with real CSS vars):**
+- Closer (25 lines, step 4): box h=111px, btn 302×38px, hasBackRow=true ✓
+- Setter (1 line, no chip): box h=80px, btn 302×38px, hasBackRow=false ✓
+- Button sizes match: YES ✓ (identical 302×38 for both)
+- Box height difference is content-driven (closer has [ASK] chip + 2-line text vs setter's 1-line text) — correct
+
+**Files changed:** `src/components/shared/CallPrepModal.jsx`, `src/components/closer/AppointmentCard.jsx`
