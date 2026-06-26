@@ -2158,3 +2158,13 @@ Brayden clarified Prompt 94 scope: the closer dashboard needs a Script tab that 
 - `closerScript.js` cleaned simultaneously: all `▸` action chips, `BRANCH —` markers, `↳ IF` branch labels, `→` route markers, and `tips` fields removed from `lines[]` arrays. Only literal say-this lines remain.
 - **Side effect:** `CloserScript.jsx` canvas (`/closer/script`) now shows a linear say-flow — no branch nodes, since those depended on the removed markers. Canvas still renders.
 - **Lesson:** Brayden's UI preference is always "less surface, match the existing patterns" — don't add complexity to a new popup just because the underlying data is complex. The simpler UI is always the right UI until he asks for more.
+
+## [CC | 2026-06-25 — Prompts 99+100 shipped, queue clear]
+
+Session resumed from compacted context. Executed two queued prompts end-to-end:
+
+**Prompt 99** (`76db487`, pushed): Fixed `request_closer_leads` RPC (migration 056 — current-total-aware 500 cap + `AND assigned_rep_id IS NULL` scope fix) + rebuilt Request Leads UI as button → modal portal (`RequestLeadsModal`). ⚠️ Migration 056 still needs manual apply in Supabase SQL editor.
+
+**Prompt 100** (`0286107`, pushed): Scrapped Prompt 98's two-column `AppointmentCard.jsx` design entirely. Rewrote as single-column 520px modal with SAY THIS stepper (28 say-lines, Next/Back/Start Over). Stripped all instructional meta-text from `closerScript.js` — only literal spoken lines remain. Kept Prompt 98's 5-button status picker. Canvas `/closer/script` now shows linear flow (side effect of removing BRANCH markers from source).
+
+Queue is now empty (Prompts 1–100 all shipped). LIVE_STATE and Memories updated, both repos pushed. No blockers.
