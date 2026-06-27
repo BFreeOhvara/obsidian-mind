@@ -64,6 +64,19 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-27 — Prompts 131+132 SHIPPED (`f4e890c`, `c5d99d1`)
+
+**Prompt 132 — Floor/ceiling fix:** `supabase/functions/recommend-stack/index.ts` `formulaPrice` clamp changed from `(397, 1997)` to `(399, 1999)`. Brayden confirmed 2026-06-27: monthly retainer always ends in 99, no exceptions. Also updated `CLAUDE.md` and `brain/LIVE_STATE.md` references from $397/$1,997 to $399/$1,999.
+
+**Prompt 131 — Closer popup: stack display + price calc + Stripe links + setter notes:** Three fixes in `src/components/closer/AppointmentCardModal.jsx`:
+- **Fix 1 (Setter Notes):** `lead.notes` shown read-only above CALL NOTES in left column via `statusAddon` (renders just before the textarea). Uses same caps label style. Only renders if non-empty.
+- **Fix 2 (Stack panel):** "THE STACK" section in `callSection` (below call notes). Front-runner auto-derived from `lead.niche` via `NICHE_TO_AGENT` map (HVAC/Electrical/Roofing/Landscaping/Pressure Washing/Veterinary → AI Receptionist; Towing/Trucking/Hotshot → AI Dispatcher; unknown → AI Receptionist). Fixed sub-agents: Review Generation, Lead Follow-Up, Appointment Reminders, Appointment Cancellation, SMS Marketing. Two checkboxes: "No website?" and "No chatbot?" (chatbot only shown if website is present). `noWebsite` pre-filled from `lead.has_website`.
+- **Fix 3 (Price calc + Stripe links):** "CLOSE" section with two inputs (pre-filled from `lead.calls_missed_per_week` / `lead.avg_ticket`). Formula: `missed × 4.33 × ticket × 0.15`, clamp $399–$1,999, round to ...99. Price shown live in JetBrains Mono. "Copy Setup Link" and "Copy Monthly Link" buttons both call `generate-stripe-links` edge function with tier derived from calculated price. "Copied!" flash on success for 2s. Monthly button disabled until price is calculated.
+
+**Lesson:** `statusAddon` renders between the status dropdown and CALL NOTES textarea in `CallPrepModal` — use it (not `callSection`) for anything that must appear ABOVE CALL NOTES.
+
+---
+
 ### 2026-06-26 — Prompts 121+122 SHIPPED (`f40c753`, `3e6a735`)
 
 **Prompt 121 — SAY THIS Back/Start Over layout:** `CallPrepModal.jsx` bottom row changed to `justifyContent: 'space-between'` — Back hard-left, step counter + Start Over grouped hard-right.

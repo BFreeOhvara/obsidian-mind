@@ -20,6 +20,190 @@ tags:
 
 ---
 
+### ✅ Prompt 132 SHIPPED 2026-06-27 (`f4e890c`) — Floor/ceiling fix: $399/$1,999
+
+### ✅ Prompt 131 SHIPPED 2026-06-27 (`c5d99d1`) — Closer popup: stack display + price calc + Stripe links + setter notes
+
+### Prompt 129 — Closer sidebar reorder + add My Calls nav item
+
+**File:** `src/components/layout/Sidebar.jsx` (or wherever the closer sidebar nav items are defined).
+
+Two changes to the closer nav:
+
+1. **Reorder:** Current order is Appointments → My Leads → Pipeline → Script → … Change to: Appointments → My Leads → Script → Pipeline → … (Script moves above Pipeline, everything else stays).
+
+2. **Add My Calls:** Add a "My Calls" nav item after Pipeline (or at a logical position after Pipeline). Use the same icon the rep's My Calls uses (likely `Phone` or `Mic` — check the rep sidebar). Route: `/closer/calls`. Role: `closer`.
+
+**Do NOT change** any rep sidebar items or any other nav.
+
+**Verify:** Closer sidebar shows Appointments → My Leads → Script → Pipeline → My Calls (+ rest). Clicking My Calls navigates to `/closer/calls` (page doesn't exist yet — that's Prompt 130).
+
+---
+
+### Prompt 130 — Closer My Calls page (call recording + AI grade)
+
+**Depends on Prompt 129 (nav item) being in place.**
+
+The rep dashboard has a "My Calls" page showing recorded calls with AI grading — one thing done well, one thing to work on, overall letter grade (A–F), and a playback link. Build the exact same page for the closer at `/closer/calls`.
+
+**Step 1 — Find the rep's My Calls page.** Search for the rep's calls route/component (likely `src/pages/rep/MyCalls.jsx` or similar). Read it fully before writing anything.
+
+**Step 2 — Create `src/pages/closer/MyCalls.jsx`.** Copy the rep's My Calls component, then:
+- Change the profile/user query to use the closer's `profile.id`
+- The `grade-call` edge function already exists and grades by `profile_id` — confirm it works for any role, not just `rep`. If there's a role check, remove it or add `closer` to the allowed roles.
+- Keep all UI identical: call list, playback, grade badge, "Did well" and "Work on" feedback text.
+
+**Step 3 — Wire the route** in `App.jsx`: add `/closer/calls` route pointing to the new component, role: `closer`.
+
+**Verify:** `/closer/calls` loads and shows Nate's graded calls. Grade badge, feedback text, and playback all work. Page is visually identical to the rep's My Calls.
+
+---
+
+### Prompt 128 — Closer pipeline filter tabs: Pending = yellow, add All tab = blue
+
+**File:** `src/pages/closer/CloserPipeline.jsx` — the Closer tab's filter row.
+
+Two changes:
+
+1. **Pending tab color → yellow/warning.** In `CLOSER_TAB_COLORS`, change `pending` from its current color to `warning` (the same yellow token used by the "pending" status badge on the lead rows). It should match exactly — same color token, not a guess.
+
+2. **Add "All" tab at the end.** Append `'All'` to the closer tab array (after Needs Rescheduling). Map it to `accent` (blue) in `CLOSER_TAB_COLORS`. When "All" is selected, show all closer appointments regardless of status (no status filter applied). Empty state: "No appointments."
+
+Result: Pending (yellow) · Closed (green) · Lost (red) · No Show (slate) · Needs Rescheduling (info) · All (blue)
+
+**Do NOT change:** Appointment Setting tab, any other logic.
+
+**Verify:** Closer pipeline filter row shows Pending in yellow matching the status badge, and All tab in blue at the end showing all appointments when selected.
+
+---
+
+### Prompt 127 — Closer bank account: use rep's existing flow, remove stub
+
+**Context:** Prompt 88 stubbed the closer's "Add Bank Account" button with a modal saying Stripe Connect isn't set up. But the rep portal already has a working bank connection flow. The closer should use the exact same thing — no new infrastructure needed.
+
+Find where the rep's "Add Bank Account" button and its popup/modal live (search the rep Revenue or Settings page for "bank" or "Add Bank"). Then:
+1. Replace the stub modal in `src/pages/closer/Revenue.jsx` (or wherever the closer's bank button renders) with the exact same component/flow the rep uses — import and render it directly, passing the closer's `profile.id` as the user identifier.
+2. Delete the stub modal code entirely.
+
+Do NOT build anything new. If the rep's flow is a self-contained component, import it. If it's inline JSX, copy it verbatim and swap only the profile/user reference. The goal is zero behavioral difference between the rep's bank setup and the closer's.
+
+**Verify:** `/closer/revenue` — "Add Bank Account" button opens the same popup the rep sees, not the stub message.
+
+---
+
+### Prompt 126 — Rep Activity default to Day, Script tab order fix, Script canvas centering
+
+Three fixes. Read each file before touching it.
+
+---
+
+**Fix 1 — Rep Activity default view: "Day"**
+
+File: wherever the closer's Rep Activity page lives (search for `RepActivity` or the `/closer/rep-activity` route). The page currently loads on a view other than "Day" (likely "Week"). Change the default selected period/tab to `'day'` so "Day" is active on first render. One-line state change.
+
+---
+
+**Fix 2 — Script tab order: Closer first, Appointment Setting second**
+
+File: `src/pages/closer/CloserScript.jsx`. Currently the sub-tabs render as "Appointment Setting Script | Closer Script" (or similar wrong order). The closer script loads by default but sits on the second tab, which is confusing. Swap the tab array so "Closer Script" is index 0 (left) and "Appointment Setting Script" is index 1 (right). Default active tab stays Closer Script. Same fix as the pipeline tab order — just swap the array order.
+
+---
+
+**Fix 3 — Script canvas nodes off-center on load**
+
+File: `src/components/closer/ScriptCanvas.jsx` (or wherever the ReactFlow canvas is). When the script page loads, the nodes in the drag canvas are slightly off-center / not properly fitted to the viewport. Fix: call `fitView` on initial load. In ReactFlow this is typically done by passing `fitView` prop to the `<ReactFlow>` component, OR calling `reactFlowInstance.fitView()` inside an `onInit` callback. Check which approach is already in use and apply the correct one. If `fitView` is already set, the issue may be that the nodes are laid out after the first render — in that case call `fitView` inside a `useEffect` with a short timeout (e.g. `setTimeout(() => instance.fitView({ padding: 0.2 }), 50)`) to let the layout settle first.
+
+**Verify:** `/closer/rep-activity` loads on "Day" tab. `/closer/script` shows "Closer Script" as the first (left) tab and loads it by default. Clicking the script page — nodes should be centered/fitted in the canvas without manually panning.
+
+---
+
+### Prompt 124 — SMS appointment reminders: DB migration + outbound edge function + cron
+
+**Context:** Same Twilio number already used for calling. Env vars `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER` should already exist — confirm before writing new ones. Client gets SMS reminders at 24h, 1h, and 10min before their appointment.
+
+**Step 1 — Migration `057_appointment_sms_tracking.sql`:**
+Add three boolean columns to the `appointments` table to track which reminders have fired (prevents duplicate sends on each cron tick):
+```sql
+ALTER TABLE appointments
+  ADD COLUMN IF NOT EXISTS sms_24h_sent boolean DEFAULT false,
+  ADD COLUMN IF NOT EXISTS sms_1h_sent boolean DEFAULT false,
+  ADD COLUMN IF NOT EXISTS sms_10min_sent boolean DEFAULT false;
+```
+⚠️ Brayden applies this manually in Supabase SQL editor.
+
+**Step 2 — Edge function `send-appointment-reminders`:**
+Create `supabase/functions/send-appointment-reminders/index.ts`. Logic:
+1. Query appointments where `status IN ('pending', 'scheduled')` and `scheduled_at` is in the future (within 25 hours — only look ahead that far to keep the query tight).
+2. For each appointment, check the three windows against current time and fire the appropriate SMS if the flag is false:
+   - `sms_24h_sent`: fire when `scheduled_at` is between 23h 55min and 24h 5min from now
+   - `sms_1h_sent`: fire when `scheduled_at` is between 55min and 65min from now
+   - `sms_10min_sent`: fire when `scheduled_at` is between 5min and 15min from now
+3. For each SMS, look up the lead's phone number (join `leads` on `lead_id`). If no phone number, skip silently.
+4. Send via Twilio REST API (POST to `https://api.twilio.com/2010-04-01/Accounts/{SID}/Messages.json`). Message text:
+   - 24h: `"Hi! Just a reminder — your call with the Ohvara team is scheduled for tomorrow at {time}. Reply CANCEL to cancel or RESCHEDULE to have someone reach out."`
+   - 1h: `"Your Ohvara call is in 1 hour at {time}. Reply CANCEL to cancel or RESCHEDULE to reschedule."`
+   - 10min: `"Your Ohvara call starts in 10 minutes. Reply CANCEL if you can't make it."`
+5. On successful Twilio response, update the appointment row to set the corresponding `sms_Xh_sent = true`.
+
+**Step 3 — Cron job via `pg_cron`:**
+Add to the migration (or a separate migration `058_sms_cron.sql`):
+```sql
+SELECT cron.schedule(
+  'send-appointment-reminders',
+  '*/5 * * * *',
+  $$SELECT net.http_post(
+    url := current_setting('app.supabase_url') || '/functions/v1/send-appointment-reminders',
+    headers := jsonb_build_object('Authorization', 'Bearer ' || current_setting('app.service_role_key')),
+    body := '{}'::jsonb
+  )$$
+);
+```
+If `pg_cron` / `pg_net` aren't available, note it and Brayden will set up an external cron instead.
+
+**Verify:** Deploy edge function. Apply migration. Manually invoke the function and confirm it queries appointments and (with a test appointment set 10min out) fires an SMS to the lead's number.
+
+---
+
+### Prompt 125 — Inbound SMS: cancel/reschedule webhook + notifications to rep + closer
+
+**Depends on Prompt 124 being deployed first.**
+
+**Step 1 — Edge function `twilio-sms-webhook`:**
+Create `supabase/functions/twilio-sms-webhook/index.ts`. This receives Twilio's inbound SMS webhook (POST with `From`, `Body` fields URL-encoded).
+
+Logic:
+1. Parse `From` (client's phone number) and `Body` (their reply text, uppercased and trimmed).
+2. Look up the matching appointment: query `appointments` joined with `leads` where `leads.phone` matches `From` and `appointments.status IN ('pending', 'scheduled')`. If multiple, take the most recent `scheduled_at`. If none found, respond 200 with empty TwiML and exit.
+3. Based on `Body`:
+   - Contains "CANCEL": set `appointments.status = 'cancelled'`. Insert a notification for the assigned rep (`assigned_rep_id`) with type `appointment_cancelled`, message `"{business_name} cancelled their appointment"`. Also insert a notification for the closer (`closer_id`) with the same message if `closer_id` is set.
+   - Contains "RESCHEDULE": set `appointments.status = 'needs_rescheduling'`. Insert notifications for rep and closer with type `appointment_rescheduled`, message `"{business_name} wants to reschedule"`.
+   - Anything else: respond 200 with TwiML `<Response><Message>Got it — we'll be in touch.</Message></Response>` and exit.
+4. Respond with TwiML `<Response></Response>` (empty, no auto-reply needed beyond the keyword branch).
+
+**Step 2 — Expose the webhook:**
+The edge function URL will be `https://{project}.supabase.co/functions/v1/twilio-sms-webhook`. Note this URL in the Memories log — Brayden needs to paste it into Twilio Console under the Twilio number's "A MESSAGE COMES IN" webhook field.
+
+**Note on notification types:** `appointment_cancelled` and `appointment_rescheduled` may be new types not yet in the `notifications` table CHECK constraint. Check the schema — if there's a type enum or CHECK constraint, add these two values in a migration first.
+
+**Verify:** Use Twilio's test webhook tool (or `curl`) to POST a fake inbound SMS payload with `From` matching a test lead's phone and `Body=CANCEL`. Confirm appointment status updates and notifications are inserted for both rep and closer.
+
+---
+
+### Prompt 123 — Closer Appointments: replace Est. Earnings + Revenue Generated with Deals Closed
+
+**File:** `src/pages/closer/MyAppointments.jsx` (or wherever the 4 KPI cards at the top of the closer Appointments page render — find it).
+
+Remove the **Est. Earnings** and **Revenue Generated** KPI cards entirely. Replace with a single **Deals Closed** card — total all-time count of appointments this closer has marked as closed. Check the column name (likely `outcome = 'closed'` or `status = 'closed'` on the `appointments` table). Card should show:
+- Label: "DEALS CLOSED" (same caps style as the other cards)
+- Value: integer count
+- Subtitle: "all time" (muted, same style as other subtitles)
+
+Result: 3 KPI cards total — Today's Appointments · Weekly Close Rate · Deals Closed. Remove all queries/state for Est. Earnings and Revenue Generated that are no longer used.
+
+**Verify:** `/closer` Appointments page shows exactly 3 KPI cards. Deals Closed shows correct count.
+
+---
+
 ### ✅ Prompt 122 SHIPPED 2026-06-26 (`3e6a735`) — Tab order, no refresh, empty states, deals section
 
 ### ✅ Prompt 121 SHIPPED 2026-06-26 (`f40c753`) — Back hard-left, Start Over hard-right

@@ -80,7 +80,7 @@ _Adopted from ruvnet/ruflo CLAUDE.md (generic principles only — its swarm/tool
 
 ## Pricing (custom stack, no fixed packages — 2026-06-20)
 
-Setup fee: $297 flat. Monthly: formula-priced (value-based) — `callsMissedPerWeek × 4.33 × avgTicket × 0.15`, floor $397, ceiling $1,997, rounded to nearest $10. Target average: ~$1,200/mo. Automations are AI-generated per lead, structured as 1-2 front-runner agents (solve core problem) + 1-5 sub-agents (complement front-runners), no fixed catalog. Full detail + commission math: [[North Star]] "Custom Stack Pricing" + "Commission Structure".
+Setup fee: $297 flat. Monthly: formula-priced (value-based) — `callsMissedPerWeek × 4.33 × avgTicket × 0.15`, floor $399, ceiling $1,999, rounded to nearest value ending in 99. Target average: ~$1,200/mo. Automations are AI-generated per lead, structured as 1-2 front-runner agents (solve core problem) + 1-5 sub-agents (complement front-runners), no fixed catalog. Full detail + commission math: [[North Star]] "Custom Stack Pricing" + "Commission Structure".
 
 ROI anchor: always compare to cost of a human hire, not to competitors.
 
