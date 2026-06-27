@@ -16,7 +16,7 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–123 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–133 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
 ---
 
@@ -34,92 +34,11 @@ tags:
 
 ### ✅ Prompt 126 SHIPPED 2026-06-27 (`d60af74`) — Rep Activity default Day, Script tab order, canvas fitView
 
-### Prompt 124 — SMS appointment reminders: DB migration + outbound edge function + cron
+### ✅ Prompt 124 SHIPPED 2026-06-27 (`52876d9`) — SMS appointment reminders edge fn + migrations
 
-**Context:** Same Twilio number already used for calling. Env vars `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER` should already exist — confirm before writing new ones. Client gets SMS reminders at 24h, 1h, and 10min before their appointment.
+### ✅ Prompt 125 SHIPPED 2026-06-27 (`3611181`) — Inbound SMS webhook cancel/reschedule
 
-**Step 1 — Migration `057_appointment_sms_tracking.sql`:**
-Add three boolean columns to the `appointments` table to track which reminders have fired (prevents duplicate sends on each cron tick):
-```sql
-ALTER TABLE appointments
-  ADD COLUMN IF NOT EXISTS sms_24h_sent boolean DEFAULT false,
-  ADD COLUMN IF NOT EXISTS sms_1h_sent boolean DEFAULT false,
-  ADD COLUMN IF NOT EXISTS sms_10min_sent boolean DEFAULT false;
-```
-⚠️ Brayden applies this manually in Supabase SQL editor.
-
-**Step 2 — Edge function `send-appointment-reminders`:**
-Create `supabase/functions/send-appointment-reminders/index.ts`. Logic:
-1. Query appointments where `status IN ('pending', 'scheduled')` and `scheduled_at` is in the future (within 25 hours — only look ahead that far to keep the query tight).
-2. For each appointment, check the three windows against current time and fire the appropriate SMS if the flag is false:
-   - `sms_24h_sent`: fire when `scheduled_at` is between 23h 55min and 24h 5min from now
-   - `sms_1h_sent`: fire when `scheduled_at` is between 55min and 65min from now
-   - `sms_10min_sent`: fire when `scheduled_at` is between 5min and 15min from now
-3. For each SMS, look up the lead's phone number (join `leads` on `lead_id`). If no phone number, skip silently.
-4. Send via Twilio REST API (POST to `https://api.twilio.com/2010-04-01/Accounts/{SID}/Messages.json`). Message text:
-   - 24h: `"Hi! Just a reminder — your call with the Ohvara team is scheduled for tomorrow at {time}. Reply CANCEL to cancel or RESCHEDULE to have someone reach out."`
-   - 1h: `"Your Ohvara call is in 1 hour at {time}. Reply CANCEL to cancel or RESCHEDULE to reschedule."`
-   - 10min: `"Your Ohvara call starts in 10 minutes. Reply CANCEL if you can't make it."`
-5. On successful Twilio response, update the appointment row to set the corresponding `sms_Xh_sent = true`.
-
-**Step 3 — Cron job via `pg_cron`:**
-Add to the migration (or a separate migration `058_sms_cron.sql`):
-```sql
-SELECT cron.schedule(
-  'send-appointment-reminders',
-  '*/5 * * * *',
-  $$SELECT net.http_post(
-    url := current_setting('app.supabase_url') || '/functions/v1/send-appointment-reminders',
-    headers := jsonb_build_object('Authorization', 'Bearer ' || current_setting('app.service_role_key')),
-    body := '{}'::jsonb
-  )$$
-);
-```
-If `pg_cron` / `pg_net` aren't available, note it and Brayden will set up an external cron instead.
-
-**Verify:** Deploy edge function. Apply migration. Manually invoke the function and confirm it queries appointments and (with a test appointment set 10min out) fires an SMS to the lead's number.
-
----
-
-### Prompt 125 — Inbound SMS: cancel/reschedule webhook + notifications to rep + closer
-
-**Depends on Prompt 124 being deployed first.**
-
-**Step 1 — Edge function `twilio-sms-webhook`:**
-Create `supabase/functions/twilio-sms-webhook/index.ts`. This receives Twilio's inbound SMS webhook (POST with `From`, `Body` fields URL-encoded).
-
-Logic:
-1. Parse `From` (client's phone number) and `Body` (their reply text, uppercased and trimmed).
-2. Look up the matching appointment: query `appointments` joined with `leads` where `leads.phone` matches `From` and `appointments.status IN ('pending', 'scheduled')`. If multiple, take the most recent `scheduled_at`. If none found, respond 200 with empty TwiML and exit.
-3. Based on `Body`:
-   - Contains "CANCEL": set `appointments.status = 'cancelled'`. Insert a notification for the assigned rep (`assigned_rep_id`) with type `appointment_cancelled`, message `"{business_name} cancelled their appointment"`. Also insert a notification for the closer (`closer_id`) with the same message if `closer_id` is set.
-   - Contains "RESCHEDULE": set `appointments.status = 'needs_rescheduling'`. Insert notifications for rep and closer with type `appointment_rescheduled`, message `"{business_name} wants to reschedule"`.
-   - Anything else: respond 200 with TwiML `<Response><Message>Got it — we'll be in touch.</Message></Response>` and exit.
-4. Respond with TwiML `<Response></Response>` (empty, no auto-reply needed beyond the keyword branch).
-
-**Step 2 — Expose the webhook:**
-The edge function URL will be `https://{project}.supabase.co/functions/v1/twilio-sms-webhook`. Note this URL in the Memories log — Brayden needs to paste it into Twilio Console under the Twilio number's "A MESSAGE COMES IN" webhook field.
-
-**Note on notification types:** `appointment_cancelled` and `appointment_rescheduled` may be new types not yet in the `notifications` table CHECK constraint. Check the schema — if there's a type enum or CHECK constraint, add these two values in a migration first.
-
-**Verify:** Use Twilio's test webhook tool (or `curl`) to POST a fake inbound SMS payload with `From` matching a test lead's phone and `Body=CANCEL`. Confirm appointment status updates and notifications are inserted for both rep and closer.
-
----
-
-### Prompt 123 — Closer Appointments: replace Est. Earnings + Revenue Generated with Deals Closed
-
-**File:** `src/pages/closer/MyAppointments.jsx` (or wherever the 4 KPI cards at the top of the closer Appointments page render — find it).
-
-Remove the **Est. Earnings** and **Revenue Generated** KPI cards entirely. Replace with a single **Deals Closed** card — total all-time count of appointments this closer has marked as closed. Check the column name (likely `outcome = 'closed'` or `status = 'closed'` on the `appointments` table). Card should show:
-- Label: "DEALS CLOSED" (same caps style as the other cards)
-- Value: integer count
-- Subtitle: "all time" (muted, same style as other subtitles)
-
-Result: 3 KPI cards total — Today's Appointments · Weekly Close Rate · Deals Closed. Remove all queries/state for Est. Earnings and Revenue Generated that are no longer used.
-
-**Verify:** `/closer` Appointments page shows exactly 3 KPI cards. Deals Closed shows correct count.
-
----
+### ✅ Prompt 123 SHIPPED 2026-06-27 (`f012906`) — Deals Closed KPI, remove Est. Earnings + Revenue
 
 ### ✅ Prompt 122 SHIPPED 2026-06-26 (`3e6a735`) — Tab order, no refresh, empty states, deals section
 

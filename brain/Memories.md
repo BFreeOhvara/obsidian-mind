@@ -64,6 +64,23 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-27 — Prompts 123+124+125 SHIPPED
+
+**Prompt 124 (`52876d9`) — SMS appointment reminders:**
+- Migration `057_appointment_sms_tracking.sql`: three boolean columns on `appointments` (`sms_24h_sent`, `sms_1h_sent`, `sms_10min_sent`). ⚠️ Manual apply required.
+- Edge function `send-appointment-reminders`: queries appointments within 25h window, checks three time buckets (24h: 1435–1445min, 1h: 55–65min, 10min: 5–15min), sends Twilio SMS, marks flag on success. STUB_MODE when Twilio env vars absent.
+- Migration `058_sms_cron.sql`: pg_cron every 5 min via pg_net. ⚠️ Requires pg_cron + pg_net extensions enabled.
+
+**Prompt 125 (`3611181`) — Inbound SMS webhook:**
+- Edge function `twilio-sms-webhook`: parses Twilio inbound POST, looks up appointment by `leads.phone = From`, handles CANCEL → status `cancelled` + notifications, RESCHEDULE → status `needs_rescheduling` + notifications, else → "Got it" TwiML reply.
+- `notifications.type` is plain TEXT (no CHECK constraint) — no migration needed for new types.
+- ⚠️ **Action for Brayden:** paste `https://jjextitmbptoaolacocs.supabase.co/functions/v1/twilio-sms-webhook` into Twilio Console → phone number → "A MESSAGE COMES IN" webhook. Deploy both functions with `--no-verify-jwt`.
+
+**Prompt 123 (`f012906`) — Closer KPI cards:**
+- `MyAppointments.jsx`: removed Est. Earnings + Revenue Generated KPI cards + their query fields. Added Deals Closed (all-time count via separate `count: exact` query on `outcome = 'closed'`). 3 KPI cards now: Today's Appointments · Weekly Close Rate · Deals Closed.
+
+---
+
 ### 2026-06-27 — Session wrap (Prompts 126–133 complete)
 
 All work this session logged individually above. Atlas updated (LIVE_STATE + Memories committed `7f35c8f`). Next queue item: Prompt 124 (SMS reminders — requires manual DB migration). No blockers, all repos clean and pushed.
