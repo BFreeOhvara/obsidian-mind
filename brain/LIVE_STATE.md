@@ -24,40 +24,7 @@ tags:
 
 ### ✅ Prompt 131 SHIPPED 2026-06-27 (`c5d99d1`) — Closer popup: stack display + price calc + Stripe links + setter notes
 
-### Prompt 129 — Closer sidebar reorder + add My Calls nav item
-
-**File:** `src/components/layout/Sidebar.jsx` (or wherever the closer sidebar nav items are defined).
-
-Two changes to the closer nav:
-
-1. **Reorder:** Current order is Appointments → My Leads → Pipeline → Script → … Change to: Appointments → My Leads → Script → Pipeline → … (Script moves above Pipeline, everything else stays).
-
-2. **Add My Calls:** Add a "My Calls" nav item after Pipeline (or at a logical position after Pipeline). Use the same icon the rep's My Calls uses (likely `Phone` or `Mic` — check the rep sidebar). Route: `/closer/calls`. Role: `closer`.
-
-**Do NOT change** any rep sidebar items or any other nav.
-
-**Verify:** Closer sidebar shows Appointments → My Leads → Script → Pipeline → My Calls (+ rest). Clicking My Calls navigates to `/closer/calls` (page doesn't exist yet — that's Prompt 130).
-
----
-
-### Prompt 130 — Closer My Calls page (call recording + AI grade)
-
-**Depends on Prompt 129 (nav item) being in place.**
-
-The rep dashboard has a "My Calls" page showing recorded calls with AI grading — one thing done well, one thing to work on, overall letter grade (A–F), and a playback link. Build the exact same page for the closer at `/closer/calls`.
-
-**Step 1 — Find the rep's My Calls page.** Search for the rep's calls route/component (likely `src/pages/rep/MyCalls.jsx` or similar). Read it fully before writing anything.
-
-**Step 2 — Create `src/pages/closer/MyCalls.jsx`.** Copy the rep's My Calls component, then:
-- Change the profile/user query to use the closer's `profile.id`
-- The `grade-call` edge function already exists and grades by `profile_id` — confirm it works for any role, not just `rep`. If there's a role check, remove it or add `closer` to the allowed roles.
-- Keep all UI identical: call list, playback, grade badge, "Did well" and "Work on" feedback text.
-
-**Step 3 — Wire the route** in `App.jsx`: add `/closer/calls` route pointing to the new component, role: `closer`.
-
-**Verify:** `/closer/calls` loads and shows Nate's graded calls. Grade badge, feedback text, and playback all work. Page is visually identical to the rep's My Calls.
-
----
+### ✅ Prompts 129+130 SHIPPED 2026-06-27 (`2ca17a7`) — Closer sidebar reorder + My Calls nav + page
 
 ### Prompt 128 — Closer pipeline filter tabs: Pending = yellow, add All tab = blue
 

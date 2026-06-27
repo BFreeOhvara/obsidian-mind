@@ -64,6 +64,14 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-27 — Prompts 129+130 SHIPPED (`2ca17a7`) — Closer sidebar reorder + My Calls
+
+**Sidebar:** `Sidebar.jsx` closer nav reordered — Script moved above Pipeline. Added `My Calls` (`/closer/calls`, `PhoneCall` icon) after Pipeline. `PhoneCall` was already imported for the rep's My Calls — no new import needed.
+
+**Closer MyCalls page:** `src/pages/closer/MyCalls.jsx` — identical to `src/pages/rep/MyCalls.jsx` except query key is `['closer-calls', profile?.id]`. Queries `calls` table with `.eq('rep_id', profile.id)` — same column as rep (calls table uses `rep_id` for all roles, no separate closer field). `grade-call` edge function has no role check (webhook-triggered, no JWT). Route wired in `App.jsx` as `/closer/calls` with `allowedRoles: ['closer']`.
+
+---
+
 ### 2026-06-27 — Prompts 131+132 SHIPPED (`f4e890c`, `c5d99d1`)
 
 **Prompt 132 — Floor/ceiling fix:** `supabase/functions/recommend-stack/index.ts` `formulaPrice` clamp changed from `(397, 1997)` to `(399, 1999)`. Brayden confirmed 2026-06-27: monthly retainer always ends in 99, no exceptions. Also updated `CLAUDE.md` and `brain/LIVE_STATE.md` references from $397/$1,997 to $399/$1,999.
