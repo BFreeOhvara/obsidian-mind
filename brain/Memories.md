@@ -67,9 +67,9 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 ### 2026-06-27 — Prompts 123+124+125 SHIPPED
 
 **Prompt 124 (`52876d9`) — SMS appointment reminders:**
-- Migration `057_appointment_sms_tracking.sql`: three boolean columns on `appointments` (`sms_24h_sent`, `sms_1h_sent`, `sms_10min_sent`). ⚠️ Manual apply required.
+- Migration `057_appointment_sms_tracking.sql`: three boolean columns on `appointments` (`sms_24h_sent`, `sms_1h_sent`, `sms_10min_sent`). ✅ Applied 2026-06-27 (Brayden, Claude Chrome).
 - Edge function `send-appointment-reminders`: queries appointments within 25h window, checks three time buckets (24h: 1435–1445min, 1h: 55–65min, 10min: 5–15min), sends Twilio SMS, marks flag on success. STUB_MODE when Twilio env vars absent.
-- Migration `058_sms_cron.sql`: pg_cron every 5 min via pg_net. ⚠️ Requires pg_cron + pg_net extensions enabled.
+- Migration `058_sms_cron.sql`: pg_cron job ID 13, every 5 min via pg_net. ✅ Applied 2026-06-27 (Brayden, Claude Chrome). pg_cron + pg_net were already enabled. SMS reminder system fully live end-to-end.
 
 **Prompt 125 (`3611181`) — Inbound SMS webhook:**
 - Edge function `twilio-sms-webhook`: parses Twilio inbound POST, looks up appointment by `leads.phone = From`, handles CANCEL → status `cancelled` + notifications, RESCHEDULE → status `needs_rescheduling` + notifications, else → "Got it" TwiML reply.
@@ -2512,5 +2512,4 @@ Brayden reported: clicking the mic button in the Cowork tab records for ~1 secon
 **Recommended fixes (in order):**
 1. Settings → Privacy → Microphone — toggle Claude off/on.
 2. Settings → Apps → Claude → Advanced options → Reset (clears MSIX state, preserves VHD session data).
-3. `Restart-Service -Name Audiosrv -Force` to clear stale WASAPI sessions.
-4. If still broken: recurring KP41s (3 in 2 days) suggest RAM/PSU instability — run MemTest86.
+3. `Restart-Service -Name Audiosrv -Force` to clear stale WASAPI

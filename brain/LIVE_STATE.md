@@ -20,6 +20,12 @@ tags:
 
 ---
 
+### ✅ Migration 058 APPLIED 2026-06-27 (Brayden, via Claude Chrome) — pg_cron job `send-appointment-reminders` registered as job ID 13
+
+pg_cron and pg_net were already enabled. Cron fires every 5 min (`*/5 * * * *`), calls `send-appointment-reminders` Edge Function via `net.http_post` with service role Bearer token. SMS reminder system is fully live end-to-end (migration 057 + 058 both applied, Edge Function deployed).
+
+---
+
 ### ✅ Prompt 133 SHIPPED 2026-06-27 (`3d67b85`) — $297 setup fee + single "Generate Payment Link" button
 
 ### ✅ Prompt 132 SHIPPED 2026-06-27 (`f4e890c`) — Floor/ceiling fix: $399/$1,999
