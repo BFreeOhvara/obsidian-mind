@@ -18,6 +18,49 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–119 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
+---
+
+### Prompt 120 — Closer popup: Pending status selectable + SAY THIS parity with setter
+
+**File:** `src/components/shared/CallPrepModal.jsx` — read it first before touching anything.
+
+Three concrete issues, all visible by comparing the closer popup (`/closer`, NorthStar Heating screenshot) against the setter popup (`/closer/call-leads`, TowMaster Pro / Comfort Air screenshots):
+
+---
+
+**Fix 1 — "Pending" must be a selectable closer status with yellow color.**
+
+Right now the closer's STATUS block shows "Pending" as a plain disabled/default value with no color. Once Nate picks any other status (e.g. Lost) he cannot change back to Pending — it's gone from the options. Fix:
+
+- In wherever the closer's `statusOptions` prop is constructed (check `AppointmentCard.jsx` or whoever passes props to `CallPrepModal`), add `Pending` as the FIRST item in the array, with the warning/yellow color token (same color as the yellow "pending" badge in the modal header). It should have a yellow dot and yellow highlight when selected, exactly like how "New" has a blue dot + blue highlight in the setter.
+- It must be selectable: clicking it re-sets outcome to `pending`. Done button behavior for `pending` re-select: treat it the same as Missed/Needs Rescheduling (update status only, no commission flow) — or simply leave the status unchanged (no-op close if they re-select pending and hit Done). Decide by checking what `handleComplete` does for the other non-commission statuses; match that pattern.
+
+---
+
+**Fix 2 — SAY THIS box in closer must be pixel-identical to setter.**
+
+Compare screenshots: the closer's right-column SAY THIS box has visually different text size and button layout vs the setter's. The component has a multi-line branch (closer, `scriptLines.length > 1`) and single-line branch (setter, `scriptLines.length === 1`). The multi-line branch diverges from single-line in at least two ways:
+
+1. **Quote text font-size/line-height differs.** Both modes must use the EXACT same `<p>` or text element with the EXACT same `fontSize`, `lineHeight`, `fontStyle`, `fontWeight`. If multi-line and single-line each have their own copy of the text element, merge them into one — only the string content (`scriptLines[currentIndex]` vs `scriptLines[0]`) should differ.
+
+2. **Back / Start Over position.** In the setter screenshots, `← Back` is bottom-left and `⟳ Start over` is bottom-right of the SAY THIS column — they are on their OWN row, BELOW the Next button, with nothing sharing horizontal space with Next. In the closer screenshot, Back + Start Over appear to share the footer row with the step counter `1 / 25` squished to the right. Fix: Next must always be full-width on its own row. Back and Start Over go on a SEPARATE row below Next (just like setter). Step counter `N / total` can sit inline on that same Back/Start-Over row (e.g. right-aligned), but must NOT appear inside the quote box itself.
+
+**Do NOT change:** `handleComplete`, `STATUS_OPTIONS` values, `scriptLines` content, stepper advance/back logic.
+
+**Verify:** Open `/closer` → click appointment (NorthStar Heating) and `/closer/call-leads` → click a row (TowMaster Pro) side by side. Quote text must be same font size. Next button must be same width. Back + Start Over must be on the same row below Next in both. The only SAY THIS differences should be different text content and step counter presence.
+
+---
+
+**Fix 3 — Color coordination in SAY THIS box (closer must match setter's color-change behavior).**
+
+In the setter screenshots (TowMaster Pro, step 2), the SAY THIS box shows a GREEN left border, GREEN Next button, and green Back text — the color changes based on which script line/section is active. The closer's SAY THIS box stays static accent/purple regardless of step. Look at how the setter's `scriptLines` data drives this color (likely a `color` or `kind` field on each line object, or the setter script exports a color per line). Apply the same logic to the closer: whatever color field the setter uses, use it on the closer's lines too. Check `src/lib/closerScript.js` for the lines array structure. If lines already have a color/kind field, wire it into `CallPrepModal`'s accent color variable (left border color, Next button color, Back text color). If they don't, add the field to `closerScript.js` matching the setter's structure.
+
+---
+
+**Verify all three together:** `/closer` appointment popup — Pending appears as first yellow-highlighted status option; SAY THIS quote text same size as setter; Back/Start Over on own row below Next; Next button color changes as you step through lines.
+
+---
+
 ### ✅ Prompt 119 SHIPPED 2026-06-26 (`0ab78b0`) — SAY THIS label color + quote italic fix
 
 ### ✅ Prompt 118 SHIPPED 2026-06-26
