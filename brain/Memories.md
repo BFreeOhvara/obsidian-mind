@@ -64,6 +64,18 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-27 — Prompt 133 SHIPPED (`3d67b85`) — $297 setup fee + single payment link
+
+**Fix 1:** `generate-stripe-links/index.ts` — PACKAGES `setup` changed from `497` → `297` on all four tiers (basic/pro/premium/elite).
+
+**Fix 2:** Created `supabase/functions/create-payment-link/index.ts`. Takes `{ monthlyPrice, businessName }`. Creates a Stripe Checkout Session in `mode: subscription` with the recurring monthly price as `line_items[0]` and a one-time $297 setup fee via `subscription_data.add_invoice_items[0]`. Client pays $297 upfront on the first invoice + monthly subscription starts automatically. Returns `{ url }`.
+
+**AppointmentCardModal.jsx:** Removed `copySetupLink`, `copyMonthlyLink`, `setupCopied`, `monthlyCopied` state and functions. Removed `priceToTier` helper (no longer needed). Added `linkCopied` state and `generatePaymentLink()` async function. Replaced two buttons (Copy Setup Link + Copy Monthly Link) with a single "Generate Payment Link" button — disabled until `monthlyPrice` is calculated, shows "Generating…" while loading, "Copied!" on success.
+
+**Lesson:** Stripe Checkout `mode: subscription` supports one-time setup fees via `subscription_data.add_invoice_items` — no need for a separate payment link or two checkout sessions.
+
+---
+
 ### 2026-06-27 — Prompt 126 SHIPPED (`d60af74`) — Rep Activity Day, Script tabs, canvas fitView
 
 **Fix 1:** `RepAnalytics.jsx` — `useState('week')` → `useState('day')`. One-line change.
