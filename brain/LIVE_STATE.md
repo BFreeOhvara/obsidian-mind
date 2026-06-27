@@ -50,41 +50,7 @@ pg_cron and pg_net were already enabled. Cron fires every 5 min (`*/5 * * * *`),
 
 ### ✅ Prompt 121 SHIPPED 2026-06-26 (`f40c753`) — Back hard-left, Start Over hard-right
 
----
-
-**Fix 1 — Swap pipeline tab order in `CloserPipeline.jsx`.**
-
-Currently the top-level tabs render as: `Appointment Setting | Closer` (Appointment Setting is index 0, Closer is index 1). The active default is Closer, but it sits on the right which feels like "page 2." Swap them so the order is `Closer | Appointment Setting` — Closer is index 0 (left), Appointment Setting is index 1 (right). The default active tab stays Closer. No other logic changes.
-
----
-
-**Fix 2 — Remove refresh button from My Leads page.**
-
-File: `src/pages/closer/CallLeads.jsx` (or wherever the My Leads page header renders). There is a refresh button in the top-right corner of the page. Remove it entirely — the button, its onClick handler, and any imports used only by it. Do not remove any data-fetching logic, only the button UI element.
-
----
-
-**Fix 3 — Contextual empty states for Appointment Setting filter tabs in `CloserPipeline.jsx`.**
-
-In the Appointment Setting view, when a filter tab (New / No Answer / Follow-Up / Appointment Booked / Not Interested / All) has zero matching leads, the table should show a contextual empty message instead of a blank box. Map each tab to a message:
-- New → "No new leads"
-- No Answer → "No no-answer leads"
-- Follow-Up → "No follow-up leads"
-- Appointment Booked → "No booked appointments"
-- Not Interested → "No not-interested leads"
-- All → "No leads"
-
-The empty state should match the existing empty-state style (icon + text, same pattern already used elsewhere in the pipeline). Do not add empty states to the Closer view tabs — those already have them or are out of scope here.
-
----
-
-**Fix 4 — Add deals section to Closer Revenue page.**
-
-File: `src/pages/closer/Revenue.jsx` (or wherever the closer Revenue page lives — find it). Below the weekly chart, add a "Deals" section that lists the closer's closed deals. Each row should show: business name, and the commission payout amount (what Nate gets paid). Source this from `commission_payouts` table (or whatever table stores payout data for the closer — check existing Revenue page queries). Style it to match the appointment-setting dashboard's equivalent deals/activity list — same row layout, same font treatment, same dark card style. If there's a `business_name` join needed (via `leads` or `appointments`), add it.
-
-**Do NOT change:** commission calculation logic, handleComplete, any other page.
-
-**Verify:** `/closer/pipeline` — Closer tab is on the left, Appointment Setting on the right, Closer loads by default. `/closer/call-leads` (My Leads) — no refresh button visible. Appointment Setting pipeline → click a filter with no results → contextual empty message appears. `/closer/revenue` — deals list appears below the chart showing business name + payout per closed deal.
+### ✅ Fix 1–4 SHIPPED 2026-06-27 (CC) — pipeline tab swap, refresh button removal, empty states, closer revenue deals
 
 ---
 
@@ -1589,3 +1555,4 @@ Non-CC sessions (Manager chats, no filesystem) re-ground from the most recent pa
 - [[North Star]] — who we are, packages, pricing, goals, hard rules
 - [[session-flow]] — reload/handoff chain, context alarm, artifact + auto-log rules
 - [[ohvara-dashboard]] — dashboard architecture brain doc
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  

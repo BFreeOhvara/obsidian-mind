@@ -64,6 +64,10 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-27 — Fix 1–4 re-shipped by CC + migration 058 applied
+
+Migration 058 (pg_cron job ID 13, `send-appointment-reminders` every 5 min) applied via Claude Chrome — SMS reminder system fully live. Fix 1–4 (pipeline tab swap → Closer left, My Leads refresh button removed, Appointment Setting contextual empty states, Closer Revenue deals section) re-shipped by CC after obsidian-mind push. Queue is now empty.
+
 ### 2026-06-27 — Fixes 1–4 already shipped (Prompt 122)
 
 Eagle queued four fixes (pipeline tab order, remove refresh button, contextual empty states, Deals section on Revenue page) — verified all four are already live from Prompt 122 (`3e6a735`, 2026-06-26). No code changes made. Vault pushed to GitHub at session start.
@@ -2509,14 +2513,4 @@ Brayden reported: clicking the mic button in the Cowork tab records for ~1 secon
 - `CoworkVMService`: Running, Automatic — healthy.
 - `vmms`: Not installed — expected. Cowork uses `vmcompute` (HCS) directly, which is running.
 - Log location found: `C:\ProgramData\Claude\Logs\cowork-service.log` + `coworkd\user-*.log` (not under `%LOCALAPPDATA%\Claude`).
-- Searched 11,879 lines for audio keywords — **zero hits**. VM config has no virtual audio device (no virtio-snd). Audio capture is 100% host-side (Windows), sent to VM via RPC/HvSocket after capture.
-- Event Viewer KP41: 4 crashes — today 3:38 PM, yesterday twice, 6/11. Recurring instability pattern.
-- TDR (Event 4101): AMD GPU driver (`amduw23g`) stopped responding 6/20 and 6/15.
-
-**Conclusion:** VM stack is a red herring — the 1-second cutoff is a host-side Windows audio capture failure. Most likely: MSIX app mic permission corruption from dirty shutdown, or stale WASAPI session lock.
-
-**Recommended fixes (in order):**
-1. Settings → Privacy → Microphone — toggle Claude off/on.
-2. Settings → Apps → Claude → Advanced options → Reset (clears MSIX state, preserves VHD session data).
-3. `Restart-Service -Name Audiosrv -Force` to clear stale WASAPI sessions.
-4. If still broken: recurring KP41s (3 in 2 days) suggest RAM/PSU instability — run MemTest86.
+- Searched 11,879 lines for audio keywords — **zero hits**. VM config has no virtual audio device (no virtio-snd).
