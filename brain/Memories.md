@@ -64,6 +64,12 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-27 — Fixes 1–4 already shipped (Prompt 122)
+
+Eagle queued four fixes (pipeline tab order, remove refresh button, contextual empty states, Deals section on Revenue page) — verified all four are already live from Prompt 122 (`3e6a735`, 2026-06-26). No code changes made. Vault pushed to GitHub at session start.
+
+---
+
 ### 2026-06-27 — Prompts 123+124+125 SHIPPED
 
 **Prompt 124 (`52876d9`) — SMS appointment reminders:**
@@ -2512,4 +2518,5 @@ Brayden reported: clicking the mic button in the Cowork tab records for ~1 secon
 **Recommended fixes (in order):**
 1. Settings → Privacy → Microphone — toggle Claude off/on.
 2. Settings → Apps → Claude → Advanced options → Reset (clears MSIX state, preserves VHD session data).
-3. `Restart-Service -Name Audiosrv -Force` to clear stale WASAPI
+3. `Restart-Service -Name Audiosrv -Force` to clear stale WASAPI sessions.
+4. If still broken: recurring KP41s (3 in 2 days) suggest RAM/PSU instability — run MemTest86.
