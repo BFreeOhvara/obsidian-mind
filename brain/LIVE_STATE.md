@@ -16,11 +16,67 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–119 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–122 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
 ---
 
-### Prompt 120 — Closer popup: Pending status selectable + SAY THIS parity with setter
+### ✅ Prompt 122 SHIPPED 2026-06-26 (`3e6a735`) — Tab order, no refresh, empty states, deals section
+
+### ✅ Prompt 121 SHIPPED 2026-06-26 (`f40c753`) — Back hard-left, Start Over hard-right
+
+---
+
+**Fix 1 — Swap pipeline tab order in `CloserPipeline.jsx`.**
+
+Currently the top-level tabs render as: `Appointment Setting | Closer` (Appointment Setting is index 0, Closer is index 1). The active default is Closer, but it sits on the right which feels like "page 2." Swap them so the order is `Closer | Appointment Setting` — Closer is index 0 (left), Appointment Setting is index 1 (right). The default active tab stays Closer. No other logic changes.
+
+---
+
+**Fix 2 — Remove refresh button from My Leads page.**
+
+File: `src/pages/closer/CallLeads.jsx` (or wherever the My Leads page header renders). There is a refresh button in the top-right corner of the page. Remove it entirely — the button, its onClick handler, and any imports used only by it. Do not remove any data-fetching logic, only the button UI element.
+
+---
+
+**Fix 3 — Contextual empty states for Appointment Setting filter tabs in `CloserPipeline.jsx`.**
+
+In the Appointment Setting view, when a filter tab (New / No Answer / Follow-Up / Appointment Booked / Not Interested / All) has zero matching leads, the table should show a contextual empty message instead of a blank box. Map each tab to a message:
+- New → "No new leads"
+- No Answer → "No no-answer leads"
+- Follow-Up → "No follow-up leads"
+- Appointment Booked → "No booked appointments"
+- Not Interested → "No not-interested leads"
+- All → "No leads"
+
+The empty state should match the existing empty-state style (icon + text, same pattern already used elsewhere in the pipeline). Do not add empty states to the Closer view tabs — those already have them or are out of scope here.
+
+---
+
+**Fix 4 — Add deals section to Closer Revenue page.**
+
+File: `src/pages/closer/Revenue.jsx` (or wherever the closer Revenue page lives — find it). Below the weekly chart, add a "Deals" section that lists the closer's closed deals. Each row should show: business name, and the commission payout amount (what Nate gets paid). Source this from `commission_payouts` table (or whatever table stores payout data for the closer — check existing Revenue page queries). Style it to match the appointment-setting dashboard's equivalent deals/activity list — same row layout, same font treatment, same dark card style. If there's a `business_name` join needed (via `leads` or `appointments`), add it.
+
+**Do NOT change:** commission calculation logic, handleComplete, any other page.
+
+**Verify:** `/closer/pipeline` — Closer tab is on the left, Appointment Setting on the right, Closer loads by default. `/closer/call-leads` (My Leads) — no refresh button visible. Appointment Setting pipeline → click a filter with no results → contextual empty message appears. `/closer/revenue` — deals list appears below the chart showing business name + payout per closed deal.
+
+---
+
+### Prompt 121 — Closer SAY THIS: Back/Start Over positioning
+
+**File:** `src/components/shared/CallPrepModal.jsx` — one layout fix only.
+
+In the multi-line mode (closer, `scriptLines.length > 1`), the row containing `← Back`, `⟳ Start over`, and the step counter (`1 / 25`) does not match the setter's layout. In the setter, `← Back` is hard-left and `⟳ Start over` is hard-right with `justifyContent: 'space-between'`. In the closer, the three items sit together and the spacing is off.
+
+**Fix:** On that bottom row, keep `← Back` hard-left and `⟳ Start over` hard-right (`justifyContent: 'space-between'`). Put the step counter (`1 / 25`) either right-aligned next to Start Over (inline on the same row, as a small muted element between them or grouped with Start Over), or as a tiny muted label above the Back/Start Over row — whichever requires the least diff. The goal is that Back lands in the same x-position as it does in the setter, and Start Over lands in the same x-position as it does in the setter.
+
+**Do NOT change:** anything else — script content, colors, Pending status, quote box, Next button, or any other layout.
+
+**Verify:** Open `/closer` appointment popup and `/closer/call-leads` popup side by side. `← Back` should be in the same bottom-left position in both. `⟳ Start over` should be in the same bottom-right position in both.
+
+---
+
+### ✅ Prompt 120 SHIPPED 2026-06-26 (`e46f205`) — Pending status + SAY THIS parity + section color
 
 **File:** `src/components/shared/CallPrepModal.jsx` — read it first before touching anything.
 

@@ -64,6 +64,28 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-26 — Prompts 121+122 SHIPPED (`f40c753`, `3e6a735`)
+
+**Prompt 121 — SAY THIS Back/Start Over layout:** `CallPrepModal.jsx` bottom row changed to `justifyContent: 'space-between'` — Back hard-left, step counter + Start Over grouped hard-right.
+
+**Prompt 122 — Four pipeline fixes:**
+- `CloserPipeline.jsx`: `VIEW_TABS` order swapped — Closer (index 0, left) before Appointment Setting (index 1, right). Default active stays `closer`.
+- `CallLeads.jsx`: `RefreshCw` import removed, `refetch` removed from destructuring, `<Button>Refresh</Button>` removed from header.
+- `CloserPipeline.jsx`: Appointment Setting `QueueTable` `emptyText` now a lookup on `statusFilter` → per-tab message (New / No Answer / Follow-Up / Appointment Booked / Not Interested / All).
+- `RevenueTracker.jsx`: `DealsSection` component added below chart — queries `commission_payouts` via `rep_id = closerId`, joins `appointments.leads.business_name`, renders each row as business name (left) + payout amount in green mono (right).
+
+---
+
+### 2026-06-26 — Prompt 120 SHIPPED: Closer popup parity (`e46f205`)
+
+**Fix 1 — Pending status:** Added `pending` as first STATUS_OPTIONS entry (warning/yellow) in `AppointmentCardModal.jsx`. `handleComplete` handles it same as `needs_rescheduling` (status-only update, no commission flow).
+
+**Fix 2+3 — SAY THIS ScriptWalk parity + section color:** `SAY_LINES` changed from `flatMap(s => s.lines)` (plain strings) to `flatMap(s => s.lines.map(l => ({ text: l, color: s.color })))` — carries section color per line. `CallPrepModal.jsx` now derives `lineColor` from the current entry's `.color` field (falls back to `var(--accent)` for plain strings). Quote box: `borderLeft: 3px solid lineColor` + `borderRadius: 12` + `padding: 18px 20px`. Quote text: `fontSize: 17, lineHeight: 1.55, fontWeight: 500`. Next button: `height: 46, borderRadius: 11, fontSize: 14.5, fontWeight: 600, color: '#0E0E1A'`, background uses `lineColor`. Back/Start Over: styled matching ScriptWalk's Back button (accent-dim pill when enabled, transparent when not). Gap 16 on column. All matches ScriptWalk `SayCard` exactly.
+
+**Pattern:** Flat `string[]` loses metadata. Always carry `{ text, color }` objects when script sections have distinct visual identity.
+
+---
+
 ### 2026-06-26 — Prompt 119 SHIPPED: SAY THIS label color + quote italic fix (`0ab78b0`)
 
 **Root cause confirmed:** `CallPrepModal.jsx` had two style bugs visible only when `scriptLines` has >1 entry (closer's 25-line script): (1) "Say This" label used `color: 'var(--accent)'` (purple) instead of `var(--text-muted)` matching all other caps labels; (2) quote text had `fontStyle: 'italic'` which should be absent (normal weight). The setter used `children` mode (ScriptWalk), never `scriptLines`, so it never hit the buggy path — that's why Prompt 117's setter screenshot looked correct.
