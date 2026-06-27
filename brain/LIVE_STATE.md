@@ -26,63 +26,11 @@ tags:
 
 ### ✅ Prompts 129+130 SHIPPED 2026-06-27 (`2ca17a7`) — Closer sidebar reorder + My Calls nav + page
 
-### Prompt 128 — Closer pipeline filter tabs: Pending = yellow, add All tab = blue
+### ✅ Prompt 128 SHIPPED 2026-06-27 (`3871842`) — Closer pipeline: Pending yellow, All tab blue
 
-**File:** `src/pages/closer/CloserPipeline.jsx` — the Closer tab's filter row.
+### ✅ Prompt 127 SHIPPED 2026-06-27 (`37097f2`) — Closer bank connect: stub removed, real flow wired
 
-Two changes:
-
-1. **Pending tab color → yellow/warning.** In `CLOSER_TAB_COLORS`, change `pending` from its current color to `warning` (the same yellow token used by the "pending" status badge on the lead rows). It should match exactly — same color token, not a guess.
-
-2. **Add "All" tab at the end.** Append `'All'` to the closer tab array (after Needs Rescheduling). Map it to `accent` (blue) in `CLOSER_TAB_COLORS`. When "All" is selected, show all closer appointments regardless of status (no status filter applied). Empty state: "No appointments."
-
-Result: Pending (yellow) · Closed (green) · Lost (red) · No Show (slate) · Needs Rescheduling (info) · All (blue)
-
-**Do NOT change:** Appointment Setting tab, any other logic.
-
-**Verify:** Closer pipeline filter row shows Pending in yellow matching the status badge, and All tab in blue at the end showing all appointments when selected.
-
----
-
-### Prompt 127 — Closer bank account: use rep's existing flow, remove stub
-
-**Context:** Prompt 88 stubbed the closer's "Add Bank Account" button with a modal saying Stripe Connect isn't set up. But the rep portal already has a working bank connection flow. The closer should use the exact same thing — no new infrastructure needed.
-
-Find where the rep's "Add Bank Account" button and its popup/modal live (search the rep Revenue or Settings page for "bank" or "Add Bank"). Then:
-1. Replace the stub modal in `src/pages/closer/Revenue.jsx` (or wherever the closer's bank button renders) with the exact same component/flow the rep uses — import and render it directly, passing the closer's `profile.id` as the user identifier.
-2. Delete the stub modal code entirely.
-
-Do NOT build anything new. If the rep's flow is a self-contained component, import it. If it's inline JSX, copy it verbatim and swap only the profile/user reference. The goal is zero behavioral difference between the rep's bank setup and the closer's.
-
-**Verify:** `/closer/revenue` — "Add Bank Account" button opens the same popup the rep sees, not the stub message.
-
----
-
-### Prompt 126 — Rep Activity default to Day, Script tab order fix, Script canvas centering
-
-Three fixes. Read each file before touching it.
-
----
-
-**Fix 1 — Rep Activity default view: "Day"**
-
-File: wherever the closer's Rep Activity page lives (search for `RepActivity` or the `/closer/rep-activity` route). The page currently loads on a view other than "Day" (likely "Week"). Change the default selected period/tab to `'day'` so "Day" is active on first render. One-line state change.
-
----
-
-**Fix 2 — Script tab order: Closer first, Appointment Setting second**
-
-File: `src/pages/closer/CloserScript.jsx`. Currently the sub-tabs render as "Appointment Setting Script | Closer Script" (or similar wrong order). The closer script loads by default but sits on the second tab, which is confusing. Swap the tab array so "Closer Script" is index 0 (left) and "Appointment Setting Script" is index 1 (right). Default active tab stays Closer Script. Same fix as the pipeline tab order — just swap the array order.
-
----
-
-**Fix 3 — Script canvas nodes off-center on load**
-
-File: `src/components/closer/ScriptCanvas.jsx` (or wherever the ReactFlow canvas is). When the script page loads, the nodes in the drag canvas are slightly off-center / not properly fitted to the viewport. Fix: call `fitView` on initial load. In ReactFlow this is typically done by passing `fitView` prop to the `<ReactFlow>` component, OR calling `reactFlowInstance.fitView()` inside an `onInit` callback. Check which approach is already in use and apply the correct one. If `fitView` is already set, the issue may be that the nodes are laid out after the first render — in that case call `fitView` inside a `useEffect` with a short timeout (e.g. `setTimeout(() => instance.fitView({ padding: 0.2 }), 50)`) to let the layout settle first.
-
-**Verify:** `/closer/rep-activity` loads on "Day" tab. `/closer/script` shows "Closer Script" as the first (left) tab and loads it by default. Clicking the script page — nodes should be centered/fitted in the canvas without manually panning.
-
----
+### ✅ Prompt 126 SHIPPED 2026-06-27 (`d60af74`) — Rep Activity default Day, Script tab order, canvas fitView
 
 ### Prompt 124 — SMS appointment reminders: DB migration + outbound edge function + cron
 

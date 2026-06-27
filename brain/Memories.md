@@ -64,6 +64,22 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-27 — Prompt 126 SHIPPED (`d60af74`) — Rep Activity Day, Script tabs, canvas fitView
+
+**Fix 1:** `RepAnalytics.jsx` — `useState('week')` → `useState('day')`. One-line change.
+**Fix 2:** `CloserScript.jsx` — `TABS` array swapped: `closer` is now index 0 (left), `setter` is index 1. Default `tab` state is already `'closer'` — no change needed there.
+**Fix 3:** `ScriptCanvas.jsx` (`src/components/rep/`) — `fitView` prop already existed on `<ReactFlow>`. Added `onInit` callback that calls `instance.fitView({ padding: 0.15 })` inside `setTimeout(..., 50)` to let the layout settle post-mount. Added `useRef` import.
+
+---
+
+### 2026-06-27 — Prompts 127+128 SHIPPED (`3871842`, `37097f2`)
+
+**Prompt 128 — Closer pipeline filter tabs:** `CloserPipeline.jsx` — `CLOSER_TAB_COLORS.pending` changed from `var(--accent)` → `var(--warning)` (yellow). Added `{ key: 'all', label: 'All', icon: null }` to `CLOSER_TABS`; added `all: { color: 'var(--accent)', ... }` to `CLOSER_TAB_COLORS`. `filteredAppts.all` = unfiltered `appts`. New `AllTab` component (same columns as `PendingTab`). Tab render guard: `{Icon && <Icon size={13} />}` — needed since `all` tab has `icon: null`.
+
+**Prompt 127 — Closer bank connect:** `RevenueTracker.jsx` — deleted `AddBankModal` stub. Imported `useConnectOnboard`, `useCheckOnboardStatus` from `../../hooks/usePayouts`. Added `startOnboarding()` (opens Stripe popup), two `useEffect` hooks (popup URL detection + postMessage relay) — exact same pattern as `src/pages/rep/MyCommissions.jsx`. Button shows "Bank Connected" (green) when `profile.stripe_onboarding_complete`, else "Connect Bank" which calls `startOnboarding()` directly.
+
+---
+
 ### 2026-06-27 — Prompts 129+130 SHIPPED (`2ca17a7`) — Closer sidebar reorder + My Calls
 
 **Sidebar:** `Sidebar.jsx` closer nav reordered — Script moved above Pipeline. Added `My Calls` (`/closer/calls`, `PhoneCall` icon) after Pipeline. `PhoneCall` was already imported for the rep's My Calls — no new import needed.
