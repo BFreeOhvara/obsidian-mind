@@ -64,6 +64,44 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-28 — Prompt 135: Training lock + New tab color + leads_unlocked notifier [CC]
+
+**Prompt 135** (`e2418e0`): Three changes shipped.
+
+1. **"New" tab color** — `MyLeads.jsx` `TAB_COLORS['New']` changed from `var(--text-secondary)` to `var(--info)` (#38BDF8), matching `STATUS_TAB_COLORS['New']` in `CloserPipeline.jsx`.
+
+2. **Training flag on profiles** — `supabase/migrations/059_rep_training_completed.sql` adds `training_completed boolean NOT NULL DEFAULT false` to `profiles`. ⚠️ Needs Claude Chrome to apply in Supabase SQL editor.
+
+3. **FlashcardDeck completion trigger** — `TrainingCenter.jsx` `FlashcardDeck` receives `onAllMastered` prop. When `mastered.size >= FLASHCARDS.length`, updates `profiles.training_completed = true` via Supabase and shows inline green success message: "Training complete — your leads will come in on the next refresh."
+
+4. **Leads unlocked notification** — `useRepNotificationTriggers.js` exports `useLeadsUnlockedNotifier(repId, trainingCompleted)` — realtime INSERT listener on `leads` filtered by `assigned_rep_id`. Fires once per session (firedRef) only when `trainingCompleted = true`. Inserts `leads_unlocked` notification: "Your leads are ready — start calling."
+
+**Design note:** Existing `TrainingGate` in `MyLeads.jsx` gates on `isTrainingComplete()` (videos + quiz + roleplay) — unchanged. The new `training_completed` flag is set on flashcard mastery and drives the notification only, independent of the gate logic.
+
+**Pending:** Migration 059 needs Claude Chrome to apply.
+
+---
+
+### 2026-06-28 — Setter script UX fixes + Prompt 138 queued (Falcon session, context limit)
+
+**What happened:** Session continued from prior compaction. Confirmed CC shipped Prompts 136, 137, 138. Queued Prompt 138 for inline answer capture on setter question nodes.
+
+**Prompt 138** (`b4a7e7a`) — already shipped by CC before this session ended:
+Inline capture on vitals question nodes. `capturedValues` state in `ScriptWalk.jsx`, debounced Supabase save, `renderText()` substitutes `[their number]`/`[their estimate]` in later script lines. `SayCard`/`SayWithFork` render a labeled number input below the quote when `step.capture` is present. Input does not block Next.
+
+**Key UX principle established:** When a script node asks a data-capturing question ("How many calls do you get?"), the setter should be able to enter the prospect's answer RIGHT THERE on that same node. No tab switching. The entered value auto-fills into later script lines via token substitution.
+
+**Infrastructure fix — migrations and git push:** Corrected recurring mistake. Claude Chrome applies all Supabase migrations — never tell Brayden to do it manually. CC pushes `ohvara-dashboard` git. Vault (`obsidian-mind`) git push is blocked by Windows file locks (Obsidian holds `.git/HEAD.lock`) — needs a Claude Chrome solution, not a Brayden manual step. Feedback memory saved.
+
+**Pending after this session:**
+- Prompt 135 — Training lock on My Leads + "New" filter tab lighter blue + migration 059
+- Migration 059 — `ALTER TABLE profiles ADD COLUMN IF NOT EXISTS training_completed boolean DEFAULT false` — Claude Chrome to apply
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 135 (training lock) is next for CC. Migration 059 is in the LIVE_STATE queue for Claude Chrome.`
+
+---
+
 ### 2026-06-28 — Prompts 136, 138, 137: ScriptWalk auto-route + capture + opener rewrite
 
 **Prompt 136** (`142f1f9`): `ScriptWalk.jsx` — `followRouteIfNeeded()` helper auto-navigates route steps in `advance()` / `chooseOption()`. No "Go to X" button ever rendered. `atChooser` removed; `atTerminal = baseExhausted`. `routeTarget()` in `discoveryScript.js` now resolves vitals/pain/handoff/objections by name.

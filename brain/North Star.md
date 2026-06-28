@@ -162,7 +162,7 @@ Admin creates account → Rep logs in → 150 leads already loaded → Rep start
 
 Target: rep is calling within 60 seconds of first login.
 
-- Training is optional — available anytime, not required before calling
+- Training required before leads unlock. Reps complete flashcards at `/rep/training`, leads appear on next admin refresh.
 
 ### Dialer
 

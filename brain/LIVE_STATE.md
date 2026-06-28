@@ -38,7 +38,15 @@ tags:
 
 ---
 
-### Prompt 135 — Training lock on rep My Leads + "New" filter tab color
+### ✅ Prompt 135 SHIPPED 2026-06-28 (`e2418e0`) — Training lock + New tab color + leads_unlocked notifier
+
+`MyLeads.jsx`: TAB_COLORS `'New'` → `var(--info)` (matches CloserPipeline). `supabase/migrations/059_rep_training_completed.sql`: `ALTER TABLE profiles ADD COLUMN training_completed boolean NOT NULL DEFAULT false` — ⚠️ apply in Supabase SQL editor. `TrainingCenter.jsx`: `FlashcardDeck` gets `onAllMastered` prop; when `mastered.size >= FLASHCARDS.length`, calls `supabase.from('profiles').update({ training_completed: true })` and shows inline success message. `useRepNotificationTriggers.js`: `useLeadsUnlockedNotifier(repId, trainingCompleted)` — realtime INSERT on leads, fires once (firedRef) with `leads_unlocked` notification, only when `trainingCompleted = true`.
+
+**Note:** Existing MyLeads `TrainingGate` already gates on videos + quiz + roleplay via `isTrainingComplete()`. The new `training_completed` flag is set separately on flashcard completion. The gate and flag are independent — gate controls UI lock, flag drives the notification.
+
+---
+
+### ~~Prompt 135~~ — Training lock on rep My Leads + "New" filter tab color
 
 Two changes to the rep dashboard.
 
@@ -48,7 +56,7 @@ In the rep's My Leads page (`src/pages/rep/CallLeads.jsx` or wherever the status
 
 **Change 2 — Training lock on My Leads**
 
-**Schema:** Add `training_completed boolean DEFAULT false` to the `profiles` table via a new migration (`059_rep_training_completed.sql`). ⚠️ Brayden applies manually in Supabase SQL editor.
+**Schema:** Add `training_completed boolean DEFAULT false` to the `profiles` table via a new migration (`059_rep_training_completed.sql`). ⚠️ Claude Chrome applies this in the Supabase SQL editor — same process as migrations 055–058.
 
 **Lock state** (when `profile.training_completed === false`):
 
