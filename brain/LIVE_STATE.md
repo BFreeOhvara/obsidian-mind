@@ -16,7 +16,14 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–143 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–145 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+
+---
+
+### ✅ Prompts 144+145 SHIPPED 2026-06-28 (`b9b8ece`) — earnings filter + revenue calendar
+
+- **145** (`b9b8ece`): `CloserMyStats.jsx` — Earnings Summary "Total revenue closed" and "Deals closed" now use `windowData` instead of `raw` — rescopes with Day/Week/Month filter. Commission earned stays all-time (separate commissions query).
+- **144** (`b9b8ece`): `RevenueTracker.jsx` — Added "All Time" as first filter tab (default); All Time chart shows monthly buckets. Replaced `<input type="date">` fields with `MiniCalendar` popup (self-contained, no library): click start → hover shows prospective range → click end → calendar closes, chart scopes to day-by-day bars. ✕ on trigger button clears range.
 
 ---
 

@@ -64,6 +64,18 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-28 — Prompts 139–143 shipped [CC via Falcon queue]
+
+- **139**: Closer My Leads — "Rep Assigned" → "City" column
+- **140**: Pipeline Appointment Setting — default tab "All" → "New"
+- **141**: Closer call recording graded notification (`useCloserCallGradedNotifier`, watches `calls UPDATE` graded_at null→set)
+- **142**: My Stats — bar → AreaChart; Day/Week/Month filter on KPIs + chart
+- **143**: Revenue Tracker — line → BarChart; Day/Week/Month filter + From/To date range picker
+
+**Open question:** Does Earnings Summary on My Stats rescope with the filter, or stay all-time? Not yet decided.
+
+---
+
 ### 2026-06-28 — Prompt 135 + Migration 059 fully live [Falcon]
 
 CC shipped Prompt 135 (`e2418e0`). Claude Chrome applied migration 059 — `profiles.training_completed boolean DEFAULT false` live in Supabase (`jjextitmbptoaolacocs`). Training lock system fully end-to-end.
@@ -2641,3 +2653,23 @@ Brayden reported: clicking the mic button in the Cowork tab records for ~1 secon
 2. Settings → Apps → Claude → Advanced options → Reset (clears MSIX state, preserves VHD session data).
 3. `Restart-Service -Name Audiosrv -Force` to clear stale WASAPI sessions.
 4. If still broken: recurring KP41s (3 in 2 days) suggest RAM/PSU instability — run MemTest86.
+
+## Session Log — 2026-06-28 (Prompts 144+145)
+
+**Commit:** `b9b8ece` — `ohvara-dashboard` master
+
+### Prompt 145 — CloserMyStats: Earnings Summary rescopes with filter
+
+`CloserMyStats.jsx`: "Total revenue closed" and "Deals closed" in the Earnings Summary panel changed from `raw.filter(a => a.outcome === 'closed')` (all-time) to `windowData.filter(a => a.outcome === 'closed')` (filtered window). Commission earned stays all-time — it comes from `useCloserCommissions`, a separate query not tied to the appointments window.
+
+### Prompt 144 — RevenueTracker: All Time default + MiniCalendar
+
+`RevenueTracker.jsx` full rewrite:
+- `FILTER_TABS` now `['All Time', 'Day', 'Week', 'Month']`, default `'All Time'`
+- `buildChartData` All Time branch: groups `allDeals` by calendar month (`updated_at.slice(0,7)`), sorts keys, maps to `{ label: 'Jun 25', value, count }` — falls back to 6 empty months if no data
+- Removed `customFrom`/`customTo` string states + `<input type="date">` fields
+- Added `rangeStart`/`rangeEnd` (YYYY-MM-DD strings or null), `hoverDate`, `calOpen`, `calViewYear`/`calViewMonth`
+- `MiniCalendar` component (same file, no library): 42-cell grid (6 weeks), prev/next nav, today highlight via `var(--accent)`, edge days (start/end) filled accent, prospective range fades when hover active, future days non-clickable
+- Click 1 → sets rangeStart, clears rangeEnd; Click 2 → sorts [a,b], sets both, closes calendar
+- Trigger button shows "Jun 1 – Jun 5" when range set; inline ✕ clears range
+- Calendar closes on outside click (mousedown listener)
