@@ -64,6 +64,17 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-28 — Prompt 149 shipped [CC via Falcon queue]
+
+Phone number search + phone column in pipeline across all dashboards.
+- Closer/admin search bars: strip non-digits, OR on phone match; placeholders updated
+- `CloserPipeline.jsx`: phone OR added to setter + closer filters; PHONE column added to all 6 closer tab tables (140px, JetBrains Mono)
+- Rep `MyLeads.jsx` has no text search — no change needed
+
+**Still queued:** 146 (commission rescope), 147 (My Stats default Day), 148 (seed data for preview)
+
+---
+
 ### 2026-06-28 — Prompts 144–145 shipped [CC via Falcon queue]
 
 - **144**: Revenue Tracker — "All Time" tab added as default (monthly buckets); `MiniCalendar` popup replaces text inputs (click start → hover → click end → scopes chart to day-by-day bars; ✕ clears)
@@ -2680,6 +2691,20 @@ Brayden reported: clicking the mic button in the Cowork tab records for ~1 secon
 - Click 1 → sets rangeStart, clears rangeEnd; Click 2 → sorts [a,b], sets both, closes calendar
 - Trigger button shows "Jun 1 – Jun 5" when range set; inline ✕ clears range
 - Calendar closes on outside click (mousedown listener)
+
+## Session Log — 2026-06-28 (Prompt 148)
+
+**Commits:** `1dc0413` (initial seed) + `5a17caf` (fix) — `ohvara-dashboard` master
+
+### Prompt 148 — Seed sample data for Closer dashboard preview
+
+`supabase/seeds/closer_preview_seed.sql` — PL/pgSQL DO block seeding 12 closed appointments spread across 8 months (`days_ago` array), 12 `commission_payouts` (10% each), 3 notifications (appointment_booked, appointment_reminder_5min, call_graded). Ran clean in Supabase SQL editor.
+
+**Bug discovered and fixed during run:** Migration 049 defined `commission_payouts.rep_profile_id` but the live DB column is `rep_id` — likely altered after migration was written. Also `deal_value_cents` column doesn't exist in live schema (migration 051 may not have been applied or was reverted). Seed fixed: `rep_profile_id` → `rep_id`, `deal_value_cents` dropped from INSERT.
+
+**Lesson:** Always query `information_schema.columns` before seeding a table — migration files can diverge from live DB schema.
+
+---
 
 ## Session Log — 2026-06-28 (Prompt 149)
 

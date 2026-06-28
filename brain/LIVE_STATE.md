@@ -16,7 +16,7 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–145, 149 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–149 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
 ---
 
@@ -30,35 +30,12 @@ tags:
 
 ---
 
-### Prompt 148 — Seed sample data for Closer dashboard preview (Revenue Tracker + Notifications)
+### ✅ Prompt 148 SHIPPED 2026-06-28 (`5a17caf`) — Seed sample data for Closer dashboard preview
 
-Write a SQL file `supabase/seeds/closer_preview_seed.sql` and hand it to Claude Chrome to run in the Supabase SQL editor. The goal: Nate's closer dashboard shows realistic sample data so he can verify Revenue Tracker and notification bell look correct.
-
-**Step 1 — find Nate's closer profile ID:**
-```sql
-SELECT id FROM profiles WHERE role = 'closer' LIMIT 1;
-```
-Use the returned UUID as `[CLOSER_ID]` throughout the seed.
-
-**Step 2 — seed closed deals** (so Revenue Tracker KPI cards + bar chart + Deals table all populate):
-
-Insert ~12 sample appointments with `status = 'completed'`, `outcome = 'closed'`, spread across the last 8 months. Vary `deal_value` between $800 and $2,400 (realistic monthly pricing). Assign `closer_id = [CLOSER_ID]`. Use real-looking business names. Spread `closed_at` (or `updated_at`) across different months so the monthly bar chart shows varied bars — not all in one month. Check the `appointments` table schema first to confirm exact column names (`deal_value`, `closer_id`, `outcome`, `closed_at` — use whatever columns exist).
-
-Also insert matching `commission_payouts` rows if that table exists and the Revenue Tracker reads from it. Check first.
-
-**Step 3 — seed closer notifications** (so the bell dropdown shows one example of every notification type):
-
-Insert one row per notification type into `notifications` (or whatever table `CloserNotificationBell` reads from), all with `profile_id = [CLOSER_ID]` and `read = false`. Types to cover:
-- `appointment_booked` — message: "New appointment booked — NorthStar Heating & Air"
-- `appointment_reminder_5min` — message: "Your appointment with TowMaster Pro starts in 5 minutes"
-- `call_graded` — message: "Your call recording has been graded — review your score"
-- Any other type already handled by `useCloserNotificationTriggers.js`
-
-Check the notifications table schema for exact column names before inserting.
-
-**Output:** `supabase/seeds/closer_preview_seed.sql` — hand to Claude Chrome to run. Do NOT run `supabase db push`. Do NOT modify any app code.
-
-**Verify:** After Claude Chrome runs the seed — `/closer/revenue` shows populated KPI cards + bar chart with monthly bars + deals in the Deals table. `/closer` notification bell shows all notification types in the dropdown.
+- `supabase/seeds/closer_preview_seed.sql` created and run in Supabase SQL editor
+- 12 closed appointments spread across 8 months, commission_payouts (10% each), 3 notifications
+- Bug fixed during run: `rep_profile_id` → `rep_id`, `deal_value_cents` dropped (column absent in live schema)
+- Result: "Success. No rows returned" — seed ran clean
 
 ---
 
