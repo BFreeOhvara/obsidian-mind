@@ -33,72 +33,66 @@ the setter qualifies the problem, Nate builds the fix.
 ---
 
 ## 1. Opener
-*Goal: survive the first 10 seconds. Sound like a peer who noticed something specific, not a telemarketer.*
+*Goal: survive the first 10 seconds. Sound like a peer who noticed something specific, not a salesperson.*
 
-- "Hey, is this [Business Name]? [First Name]? Perfect — I'll be quick, I know you're mid-day."
-- "I saw your listing for the [receptionist/front desk/dispatcher] role — quick question about how you're handling calls right now while that search is going."
-- If no Indeed listing: "I work with [niche] owners in [city] — quick one, are you the one who picks up when the crew's out on jobs?"
+> **Tone first — this is the whole game.** Every real call recording from AI agency sellers says the same thing: it's not the words, it's how you sound. Be casual. Almost laid-back. Sound like a friend calling a friend, not a rep working a list. Drop your energy a half-notch from "professional" — warmer, unhurried. If you're monotone or stiff, no script saves you. Practice out loud until this sounds like you, not like a script.
 
-> Coach's note: the opener's only job is to earn the next 30 seconds. Don't explain who you are yet — that comes later, if at all.
+### Standard Opener (Indeed lead — use this 90% of the time)
 
-## 2. The Vitals Check (Discovery)
-*Goal: get the real numbers. Every answer here is something Nate and the AI will use to build the recommendation — dig for specifics, not "yeah it's busy."*
+> **Why this works:** you have a real, specific reason to call — they posted the job. That's better than any fake pattern interrupt. Don't waste it. Lead with it before you say who you are.
 
-**Current setup**
-- "Walk me through what happens right now when a call comes in — who picks it up?"
-- "With [X] techs/crew in the field, who's catching the phone while they're on a job?"
-- "Is that the same person doing scheduling too, or is it split up?"
+1. Confirm you have the right person first:
+   *"Hey, is this [Business Name]? Is [First Name] around?"* — pause, let them say yes.
 
-**Volume & leakage**
-- "On a normal day, about how many calls are you getting?"
-- "And on your busiest days — the ones you're hiring for — what does that number look like?"
-- "When [the person] can't get to it, where does that call go? Voicemail? Does it ever just... go to a competitor?"
-- "How often would you say that happens in a week?"
+2. Lead with context (the Indeed post = your reason):
+   *"Hey [First Name] — saw you guys have a listing up for a [receptionist/dispatcher/front desk]. Quick question about how you're handling calls while that search is going — you got a minute?"*
 
-**Cost**
-- "Do you have a sense of what one of those calls is worth if it turns into a job?"
-- "So if you're missing a handful of those a week, what's that actually costing you a month?" *(let them do the math out loud)*
+3. **Stop there. Do not explain anything else.** Let them respond.
 
-**Why now**
-- "What made you decide to post for this role now versus six months ago?"
-- "Is this seasonal, or has it been building for a while?"
-
-**Current tools**
-- "Are you using anything right now for after-hours calls, or does it just ring out?"
-- "Any other locations, or is it just the one?"
-
-> Coach's note: this should feel like a checkup, not an interrogation. Slow down, react to what they say ("oh wow," "that's more than I expected"), and let silence do some of the work after the cost question.
-
-## 3. Pain Amplification
-*Goal: let them say the number back to you. You're not telling them they have a problem — they just told you.*
-
-- "So just to make sure I've got this right — you're potentially losing [their number] jobs a week to voicemail or competitors, and that's been going on since [their answer]?"
-- "If that stayed exactly the same for the next year, what would that add up to?"
-- "What would it mean for [Business Name] if every one of those calls got picked up, even at 2pm on a Tuesday?"
-
-> Coach's note: reflect their own words back. If they downplay it, just move to the next question — don't argue.
-
-## 4. The Handoff (Booking with Nate)
-*Goal: position Nate as the specialist who reviews everything just gathered and builds the exact fix — not a generic sales call.*
-
-- "Here's what I'd like to do — I'm going to pass everything we just talked about to Nate, who specializes in exactly this for [niche] businesses."
-- "He'll look at your call volume, what you're missing, and build out what actually makes sense for [Business Name] specifically — not some generic package."
-- "Does [day/time] work, or would [alternate] be better?"
-
-> Coach's note: don't preview pricing, features, or "the AI." That lands better coming from Nate with the full picture in hand than from you guessing at it.
-
-## 5. Booking Objections
-*Goal: these are objections to scheduling the call, not objections to having a problem — that part's already settled.*
-
-- **"Just send me some info"** → "Totally get it, but honestly the stuff that matters is specific to what you just told me — Nate can build something around your actual numbers in 15 minutes. Easier to just grab the time."
-- **"I don't have time this week"** → "No problem, that's exactly why he keeps it to 15 minutes — what's better, [option A] or [option B]?"
-- **"Who's Nate / what company is this?"** → "Fair question — we work with [niche] businesses on exactly the call-coverage issue we just walked through. Nate can explain the whole thing on the call."
-- **"How much does this cost?"** → "Honestly depends on your call volume and setup, which is exactly what Nate's going to map out for you — that's why I didn't want to guess at a number before he's seen your numbers."
+> **What not to say:** don't say "I'm calling from [company]" yet. Don't say "we help businesses like yours." Don't use "how are you doing" — it flags you as a telemarketer. The job posting is already your credibility. Use it.
 
 ---
 
-## Related
+### Pattern Interrupt Opener (no Indeed listing, or lead went cold)
 
-- [[ohvara-pricing-packaging-strategy]] — the strategy this script executes (problem-first, two-axis model, warm-not-cold framing, universal-not-per-niche training)
-- [[LIVE_STATE]] — current build state (the dashboard's per-lead AI script + Training Center are where this model surfaces in product)
-- [[North Star]] — who we are, packages, hard rules
+> Use when you don't have an active Indeed post but you're calling into a warm niche. The "Google says closed" angle from real AI receptionist cold calls — gets two easy yeses before you say anything of substance.
+
+*"Hey, sorry — did you just say [Business Name]? You guys still open? It said closed on Google for some reason."*
+— [they confirm they're open]
+*"Oh weird, might be a glitch — anyway, quick question while I have you…"*
+— [transition to the vitals check opener question below]
+
+> Casual, almost unprofessional. You're not trying to sound polished. You're trying to sound like a customer who accidentally called.
+
+---
+
+### Permission Frame (use when they seem hesitant after the first line)
+
+> If they don't immediately engage, give them an explicit out. This sounds counterintuitive but it lowers their guard more than any other line — because it signals you're not desperate.
+
+*"Look, I know this is out of nowhere — you can totally tell me you're slammed and I'll let you go. Quick question first though: while you're looking for that person, who's catching the phones when your team's tied up?"*
+
+---
+
+### Bridge into Discovery
+
+Whichever opener you used, this is the transition line once they're talking:
+*"Quick question — while that search is going, what's actually happening right now when a call comes in and nobody's free to grab it?"*
+
+This is the first discovery question. It's also the last thing you say in the opener — after this you're in Section 2 (Vitals Check).
+
+> **Coach's note:** the opener's only job is to earn the next 30 seconds. The moment they answer any question, you've earned it — move to Vitals. Don't fill silence with explanation. Don't preview what you do. The second you say "we have an AI that..." you've lost the intake-nurse frame and they'll either shut down or ask about price before you've built any value.
+
+## 2. The Vitals Check (Discovery)
+*Goal: get the real numbers — call volume, leakage, cost, and why now. Every answer feeds Nate's pre-call brief and the AI's recommendation. Dig for specifics, not "yeah it's busy."*
+
+> **How to ask questions in this section:** always give them the reason you're asking before you ask it — "I only ask because..." or "the reason I'm wondering is..." This is what separates a diagnostic conversation from an interrogation. When people know why you want a number, they give you a real one instead of a deflection.
+
+> **Point of view opener (use to bridge from the opener):** Before launching in, drop one short credibility statement to get them thinking — it prompts them to open up without you having to extract it. *"Most [niche] owners I talk to, their crew is out on jobs and calls are the thing that slips through the cracks the most — even after they've tried to fix it. Is that kind of the situation, or is it something different for you?"* — then shut up and let them answer. Whatever they say is the thread you pull.
+
+---
+
+**Current setup**
+- *"Walk me through what happens right now when a call comes in — who picks it up?"*
+- *"With [X] techs out in the field, who's actually catching the phone when they're on a job?"*
+- *"Is that the same person handling scheduling too, or is it split?"* — I only ask because 
