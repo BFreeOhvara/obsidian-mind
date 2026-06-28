@@ -64,6 +64,15 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-28 — Prompts 146–147 shipped [CC via Falcon queue]
+
+- **146**: `CloserMyStats.jsx` — Commission earned now rescopes with filter (`windowCommission` memo, same `windowStart`/`windowEnd` bounds as revenue/deals)
+- **147**: `CloserMyStats.jsx` — default filter tab changed `'Month'` → `'Day'`
+
+**MRR decision (2026-06-28):** Monthly recurring income (month 2+) is 50/50 Brayden/Nate split. Needs separate tracking from close commissions. Prompts 150+151 queued: 150 fixes Revenue Tracker Deals display (total deal + 45% cut, fix month label "Nov '25"), 151 adds `subscriptions` table + admin recurring management + closer MRR section.
+
+---
+
 ### 2026-06-28 — Prompt 148 shipped [CC via Falcon queue]
 
 Seed SQL (`supabase/seeds/closer_preview_seed.sql`) run in Supabase. 12 closed appointments spread across 8 months + matching commission_payouts + 3 notifications (appointment_booked, appointment_reminder_5min, call_graded). Schema quirks corrected live: `rep_profile_id` → `rep_id`, `deal_value_cents` dropped (column absent). Revenue Tracker and notification bell should now show realistic sample data for Nate.
@@ -2750,3 +2759,15 @@ Session resumed after context compaction. Prompt 148 seed bug (rep_profile_id �
 - **147**: `CloserMyStats.jsx` — default filter tab changed from Month → Day (one line)
 - **146**: `useCloserCommissions` hook updated to fetch `created_at` + return raw rows; `windowCommission` memo filters by `windowStart`; Commission earned row now rescopes with Day/Week/Month like the other two Earnings Summary values
 - Both pushed to GitHub. Queue clear — next up is the Eagle setter script task (Section 5 rewrite + full-call calibration).
+
+---
+
+## Session Log — 2026-06-28 (Eagle setter script task)
+
+**CC | 2026-06-28 — Setter script Section 5 + full-call calibration complete**
+
+- Section 5 was already well-developed from Falcon's pass. Enriched with: "I'm on the job right now" mid-job handler + volume mindset note at hard stop.
+- Full-call transcripts pulled for both starred videos (GHL Wizard `4ZQr5IP5RpI` + SixFlow `v1piqxyWJvM`). Saved to `brain/setter-transcripts-full-calls.md`.
+- 4 surgical calibration edits to `strategy/ohvara-setter-discovery-script.md`: Section 1 decision-maker check, Section 4 show-rate system (3 touchpoints + Loom video), Section 5 mid-job objection handler, Section 5 volume mindset note.
+- Sections 2–3 confirmed solid against real call patterns — no changes needed.
+- Next: Prompt 151 (MRR tracker — subscriptions schema + admin UI + closer Revenue view).

@@ -20,6 +20,99 @@ tags:
 
 ---
 
+### ✅ Eagle Setter Script Task DONE 2026-06-28 — Section 5 rewrite + full-call calibration
+
+**Step 1 — Section 5:** `strategy/ohvara-setter-discovery-script.md` enriched from s5-objections transcripts: added "I'm on the job right now" handler (mid-job callback pattern, distinct from "not this week") + volume mindset note at hard stop.
+
+**Step 2 — Full-call transcripts:** `brain/setter-transcripts-full-calls.md` created — GHL Wizard live calls (`4ZQr5IP5RpI`) + SixFlow complete system (`v1piqxyWJvM`). Transcripts + key patterns extracted.
+
+**Step 3 — Calibration:** 4 surgical edits: Section 5 mid-job handler, Section 5 volume mindset, Section 4 show-rate note (3 follow-ups + Loom video), Section 1 decision-maker check. Sections 2–3 confirmed solid.
+
+---
+
+### Prompt 151 — MRR tracker: schema + admin management + closer Revenue view
+
+Two income streams need separate tracking:
+- **Close commission (one-time):** 45% of (setup $297 + first month). Already in `commission_payouts`.
+- **Monthly recurring (month 2+):** 50% of the monthly subscription, every month after the first. Not tracked yet.
+
+**Step 1 — Migration 060** (`supabase/migrations/060_subscriptions.sql`):
+
+```sql
+CREATE TABLE subscriptions (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  lead_id uuid REFERENCES leads(id) ON DELETE CASCADE,
+  closer_id uuid REFERENCES profiles(id),
+  monthly_amount integer NOT NULL,
+  started_at timestamptz DEFAULT now(),
+  is_active boolean DEFAULT true,
+  created_at timestamptz DEFAULT now()
+);
+ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Closer reads own subscriptions" ON subscriptions
+  FOR SELECT USING (closer_id = auth.uid());
+CREATE POLICY "Admin manages subscriptions" ON subscriptions
+  FOR ALL USING (
+    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
+  );
+```
+
+⚠️ Claude Chrome applies migration 060 in Supabase SQL editor.
+
+**Step 2 — Admin: activate recurring on a closed deal**
+
+In the admin closed deals view (check `src/pages/admin/`), add per-row:
+- "Set Recurring" button → opens inline form: monthly amount input (pre-fill with deal's monthly component if available) + Confirm
+- On confirm: INSERT into `subscriptions` (`lead_id`, `closer_id`, `monthly_amount`)
+- Button becomes "Active ✓" (muted, disabled) once subscription exists for that lead
+- "Deactivate" action sets `is_active = false`
+
+**Step 3 — Closer Revenue Tracker: Monthly Recurring section**
+
+In `RevenueTracker.jsx`, below the existing Deals table, add a "Monthly Recurring" section:
+
+Two KPI cards:
+- **Total MRR** — `SUM(monthly_amount)` where `closer_id = profile.id AND is_active = true`
+- **Your Monthly Cut** — Total MRR × 50%
+
+Below cards: table of active recurring clients:
+- Columns: BUSINESS | MONTHLY AMOUNT | YOUR CUT (50%) | ACTIVE SINCE
+- Join `lead_id` → `leads.business_name`
+- MONTHLY AMOUNT and YOUR CUT in JetBrains Mono, success color
+- ACTIVE SINCE formatted "Jun 2026"
+
+This section is always all-time (not scoped to the Day/Week/Month filter).
+
+**Do NOT change:** close commission logic, existing Deals table, filter tabs, calendar picker.
+
+**Verify:** Admin marks a closed deal recurring → subscription row created. Closer `/closer/revenue` → Monthly Recurring section shows MRR + 50% cut + active client list.
+
+---
+
+### Prompt 150 — Revenue Tracker: fix Deals table + month label format
+
+**File:** `src/pages/closer/RevenueTracker.jsx`
+
+**Fix 1 — Deals table columns**
+
+Replace current single-amount column with:
+
+| BUSINESS | TOTAL DEAL | YOUR CUT (45%) | DATE |
+
+- `TOTAL DEAL` = full amount client paid (check appointments schema for `deal_value` or equivalent — use the field storing the full deal amount, not commission)
+- `YOUR CUT (45%)` = `TOTAL DEAL × 0.45`, success color, JetBrains Mono
+- `DATE` = deal close date
+
+**Fix 2 — Month label format**
+
+X-axis labels change from `"Nov 25"` → `"Nov '25"` (apostrophe before year digits). Makes it unambiguous that it's a year, not a day.
+
+**Do NOT change:** bar chart type, filter tabs, calendar picker, KPI cards.
+
+**Verify:** Deals table shows full deal amount + 45% cut (green). Chart x-axis shows "Nov '25" format.
+
+---
+
 ### ✅ Prompt 149 SHIPPED 2026-06-28 (`a3f52db`) — Phone search + phone column in pipeline
 
 - `closer/CallLeads.jsx`: added `qDigits` phone OR to filter predicate; placeholder → "Search business, niche, city, phone…"

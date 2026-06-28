@@ -44,6 +44,8 @@ the setter qualifies the problem, Nate builds the fix.
 1. Confirm you have the right person first:
    *"Hey, is this [Business Name]? Is [First Name] around?"* — pause, let them say yes.
 
+   > **Decision-maker check:** if you don't get the owner on the line, don't pitch. Politely end it — *"No problem — is there a good time to catch [First Name] directly?"* — log the callback and move on. Pitching to non-decision-makers is a time sink. The owner is the only person who can book the Nate call.
+
 2. Lead with context (the Indeed post = your reason):
    *"Hey [First Name] — saw you guys have a listing up for a [receptionist/dispatcher/front desk]. Quick question about how you're handling calls while that search is going — you got a minute?"*
 
@@ -227,13 +229,111 @@ Send the text immediately while they're still on the line. This closes the loop 
 
 > **Coach's note:** don't preview pricing, features, or mention "the AI" by name. Don't say "we have a product that..." or "what we do is..." That entire conversation belongs to Nate — with the full picture in hand, he builds the frame around their specific pain. If you preview it here you give them something to object to before Nate has a chance to anchor the value. Your job ends the moment the time slot is locked and the confirmation text is sent.
 
-## 5. Booking Objections
-*Goal: these are objections to scheduling the call, not objections to having a problem — that part's already settled.*
+> **Show rate — follow up 3 times before Nate's call.** Booking is only half the job. Three touchpoints: 24 hours before ("confirming we're still on for [time] tomorrow"), 1 hour before ("heads up, Nate's call is in an hour"), 15 minutes before if no response. Optional but high-leverage: send a personalized 60-second Loom video right after booking — say Nate's name, reference one thing they mentioned, name one concrete thing they'll learn. Takes 3 minutes and is the single highest-ROI no-show prevention move in the system.
 
-- **"Just send me some info"** → "Totally get it, but honestly the stuff that matters is specific to what you just told me — Nate can build something around your actual numbers in 15 minutes. Easier to just grab the time."
-- **"I don't have time this week"** → "No problem, that's exactly why he keeps it to 15 minutes — what's better, [option A] or [option B]?"
-- **"Who's Nate / what company is this?"** → "Fair question — we work with [niche] businesses on exactly the call-coverage issue we just walked through. Nate can explain the whole thing on the call."
-- **"How much does this cost?"** → "Honestly depends on your call volume and setup, which is exactly what Nate's going to map out for you — that's why I didn't want to guess at a number before he's seen your numbers."
+## 5. Booking Objections
+*Goal: get past the calendar friction. The problem is already confirmed — everything here is a polite brush-off, not a real objection.*
+
+> **Read this first:** by Section 5, the prospect has already confirmed the problem, said a number out loud, and felt the gap. They're not objecting to the problem. They're objecting to putting time on a calendar — which is low-stakes resistance, not conviction. Treat it like that. Don't go defensive, don't start explaining the product, don't add new information. The job is to make the Nate call feel like the path of least resistance.
+>
+> **Buyer psychology:** when someone says "send me some info" or "not this week," they're usually not saying no — they're saying "I don't want to deal with this right now." They're being polite. They've got 25 unread emails, a job to run, and something else on their mind. Acknowledge that. Don't fight it. Use it to lock the call.
+
+---
+
+### "Just send me some info first"
+
+This is the most common brush-off and the one that burns the most time if you handle it wrong. Sending an email and waiting is almost never how these calls get booked.
+
+**Step 1 — validate, don't argue:**
+*"Yeah, totally — I can do that."*
+
+Don't fight the email request. Agreeing immediately drops their guard.
+
+**Step 2 — redirect toward the call:**
+*"The thing is, anything I send you is going to be pretty generic — the stuff that actually matters is specific to what you just told me about [their situation]. That's exactly what Nate would be working from. Easier to just grab 15 minutes and have him walk through it with you directly — then you'll actually get something useful out of it."*
+
+Most of the time this closes it. Move straight to the time ask.
+
+**If they push back on the email again:**
+Get direct — warmly, not confrontationally:
+*"Can I ask — are you actually going to read it? Because I know how packed your inbox is, and I don't want to put together something that just disappears in there. That's why I'd rather get you 15 minutes with Nate who can actually answer your questions."*
+
+This works because it's honest. It mirrors what they're thinking. Most prospects respond well to someone who doesn't pretend the email is actually going to get read.
+
+**Last resort — placeholder + email:**
+If they absolutely insist on info first:
+*"Okay — I'll send it over today. And I'm going to drop a 15-minute placeholder on your calendar for [day]. If you read it and it's not worth your time, just decline — no hard feelings. But if it's interesting, we're already set."*
+
+This keeps the call alive without forcing the issue. You're not asking for permission — you're making it easy to say yes later.
+
+---
+
+### "I'm actually in the middle of something right now"
+
+This is different from "not this week" — they're literally on a job, in a meeting, mid-task. Don't try to continue the call. Make the re-contact frictionless:
+
+*"No problem at all — you're working. What time later today works? I'll call you back at exactly [time]."*
+
+The key is giving a specific time, not "I'll try you later." Get a commitment before you hang up. If they won't give you a specific time:
+
+*"Got it — when's a better day this week when you're not mid-job? I'll put you on my list for [day]."*
+
+Don't try to squeeze discovery questions into a rushed call. Log it and call back. Someone who answers mid-job is not checked out on you — they're just busy. A clean callback has a better conversion rate than a pressured 60-second pitch.
+
+---
+
+### "I don't have time this week"
+
+*"No problem — that's exactly why Nate keeps it to 15 minutes. What works better, [next week option A] or [option B]?"*
+
+Don't accept vague timing. "Let me know when you're less busy" means never. Always give two specific options and go to the next week. If they're genuinely slammed:
+
+*"Got it — let's find a time when you can actually expect the call. What's a better week for you?"*
+
+Lock a specific date, even if it's two weeks out. A real date beats a vague maybe.
+
+---
+
+### "Who's Nate? / What company is this?"
+
+Fair question — answer it in one sentence and pivot immediately:
+
+*"We work with [niche] businesses specifically on the call-coverage issue we just walked through — Nate's the one who actually maps out what that looks like for your setup. That's the whole point of the call."*
+
+Don't over-explain. Don't pitch the company. The more you explain here, the more they have to object to. One sentence, then go straight back to the time ask.
+
+---
+
+### "How much does this cost?"
+
+*"Honestly depends on your call volume and setup — which is exactly what Nate's going to figure out on the call. That's why I didn't want to guess at a number before he's seen your actual numbers. It wouldn't mean anything without that."*
+
+Don't give a range. Don't say "starting at X." Any number you name becomes an anchor they'll argue with before Nate has had a chance to build the value. Hold the line — the pricing conversation belongs to Nate.
+
+---
+
+### General fallback — the AAA framework
+
+For any objection you didn't prep for: **Acknowledge, Affirm, Ask.**
+
+1. **Acknowledge** — *"I get that."* / *"That makes sense."* / *"Fair."* — one line, no filler.
+2. **Affirm** — name what they said back to them in their words, not yours.
+3. **Ask** — one question that re-opens the conversation or moves toward a time slot.
+
+Example: if they say "we're already looking at other options" —
+*"Got it — makes sense you'd be doing your homework. [Affirm] Can I ask what you're comparing it against? [Ask]"* — then listen, and pivot back to the Nate call from there.
+
+---
+
+### Hard stop — two asks, then get a callback
+
+If you've asked for the time twice and they've deflected both times, don't push a third time. That's the line between persistence and pressure, and pressure poisons the lead for Nate.
+
+*"No problem — sounds like the timing just isn't right. When would be a better time to circle back — is [month] more realistic, or closer to [season]?"*
+
+Get a real callback date, log it, and move on. A future lead who feels respected is better than a booked call with someone who felt cornered.
+
+> **Volume mindset:** when a call goes sideways, don't debrief it for five minutes. Log the callback date and dial the next number. The only lever you control is volume. Cold calling is a numbers game — dwelling on a lost call costs you the next two conversations.
 
 ---
 
