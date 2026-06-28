@@ -64,6 +64,18 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-28 — Prompts 136, 138, 137: ScriptWalk auto-route + capture + opener rewrite
+
+**Prompt 136** (`142f1f9`): `ScriptWalk.jsx` — `followRouteIfNeeded()` helper auto-navigates route steps in `advance()` / `chooseOption()`. No "Go to X" button ever rendered. `atChooser` removed; `atTerminal = baseExhausted`. `routeTarget()` in `discoveryScript.js` now resolves vitals/pain/handoff/objections by name.
+
+**Prompt 138** (`b4a7e7a`): Inline answer capture on setter script question nodes. `discoveryScript.js`: vitals section gets `captures` array + `attachCaptures()` in `buildScriptFlow`. `ScriptWalk.jsx`: `capturedValues` state + 600ms debounced Supabase save + `renderText()` for `[their number]`/`[their estimate]`. `SayCard`/`SayWithFork` render inline number input.
+
+**Prompt 137** (`b5d164f`): Opener section rewritten — no `[First Name]`, uses Indeed listing hook. Two-node opener: confirm business → ask "who should I speak to?" → transfer or owner. `[First Name]` removed from `fillTokens` and `FIXED_OPENER`.
+
+**Key lesson on token design:** `[First Name]` was a bad token because the lead database doesn't reliably have it. The new opener doesn't rely on it — uses Indeed listing as the hook instead. `[Name]` in the transferred node is a verbal placeholder (not a data token), left as literal text for the setter to fill mid-call.
+
+---
+
 ### 2026-06-28 — Prompt 134: DISCOVERY_SCRIPT rewritten to setter v2 branching flow
 
 **What happened:** Replaced the entire `DISCOVERY_SCRIPT` constant in `src/lib/discoveryScript.js` with the new 6-section branching setter script from `brain/setter-script-v2-flow.md`. Committed `85bca0c`, pushed to GitHub.

@@ -16,7 +16,63 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–134 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–134, 136–138 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+
+---
+
+### ✅ Prompt 138 SHIPPED 2026-06-28 (`b4a7e7a`) — Inline answer capture on question nodes
+
+`discoveryScript.js`: `captures` array on vitals section → `attachCaptures()` in `buildScriptFlow` attaches `capture: { field, label, placeholder }` to matching say steps. `ScriptWalk.jsx`: `capturedValues` state + `captureField()` debounced (600ms) Supabase save + `renderText()` for `[their number]`/`[their estimate]` substitution. `SayCard` and `SayWithFork` render inline number input below quote box when `step.capture` is present. Input does not block Next.
+
+---
+
+### ✅ Prompt 137 SHIPPED 2026-06-28 (`b5d164f`) — Rewrite opener: Indeed listing hook, no first name
+
+`discoveryScript.js`: opener section rewritten — "Hey, is this [Business Name]?" → "Hey — I saw y'all had an Indeed listing up. I was wondering who I should speak to about that?" → branches: That's me → bridge | Transferred → transferred node ("Hey [Name]...") | What's this about? → permission frame. `[First Name]` removed from `fillTokens` and `FIXED_OPENER`. No other sections changed.
+
+---
+
+### ✅ Prompt 136 SHIPPED 2026-06-28 (`142f1f9`) — Auto-advance route steps, fix routeTarget
+
+`ScriptWalk.jsx`: `followRouteIfNeeded()` helper auto-navigates on route steps inside `advance()` / `chooseOption()`. `atChooser` removed; `atTerminal = baseExhausted`. `discoveryScript.js`: `routeTarget()` now resolves vitals/pain/handoff/objections by name.
+
+---
+
+### Prompt 135 — Training lock on rep My Leads + "New" filter tab color
+
+Two changes to the rep dashboard.
+
+**Change 1 — "New" status filter tab color**
+
+In the rep's My Leads page (`src/pages/rep/CallLeads.jsx` or wherever the status filter tabs render), the "New" filter tab should use the same lighter blue color as the Closer dashboard's filter tabs. Check what color token the Closer pipeline uses for its tabs (`src/pages/closer/CloserPipeline.jsx` → `CLOSER_TAB_COLORS` or similar) and apply that same token to the "New" tab in the rep's filter. Do not change any other tab colors.
+
+**Change 2 — Training lock on My Leads**
+
+**Schema:** Add `training_completed boolean DEFAULT false` to the `profiles` table via a new migration (`059_rep_training_completed.sql`). ⚠️ Brayden applies manually in Supabase SQL editor.
+
+**Lock state** (when `profile.training_completed === false`):
+
+In the My Leads leads list container, overlay a locked state instead of showing leads:
+- Keep the box/container visible at its normal size — do not hide it
+- No leads rendered inside
+- Centered inside the box: a lock icon (`Lock` from lucide-react, ~32px, muted color), then below it:
+  - Line 1: `"Complete training to unlock your leads."` (text-primary, 15px)
+  - Line 2: a styled link → `"Go to Training →"` that navigates to `/rep/training`
+- Do not show any lead count or Request Leads button while locked
+
+**Completion trigger** (in `TrainingCenter.jsx`):
+
+Find where flashcard completion is tracked (currently localStorage). When all flashcards are completed, also `UPDATE profiles SET training_completed = true WHERE id = [profile.id]` via Supabase. After update, show a one-time inline message inside TrainingCenter: `"Training complete — your leads will come in on the next refresh."` (success color, not a toast).
+
+**Post-completion, no leads yet** — show normal empty state (no lock, no lock message). Lock UI only shows when `training_completed === false`.
+
+**Notification:** When a rep with `training_completed = true` receives their first lead (INSERT on `leads` where `assigned_rep_id = profile.id`), fire a `leads_unlocked` notification: `"Your leads are ready — start calling."` Add to `useRepNotificationTriggers.js`. Only fire if `profile.training_completed` is true to avoid firing on subsequent batches.
+
+**North Star update:** Change "Training is optional — available anytime, not required before calling" → "Training required before leads unlock. Reps complete flashcards at `/rep/training`, leads appear on next admin refresh."
+
+**Do NOT change:** flashcard logic, video rendering, roleplay section, any closer files, admin lead assignment.
+
+**Verify:** Rep with training_completed false → My Leads shows lock + "Go to Training" link. Complete flashcards → profile updates → TrainingCenter shows success message. My Leads now shows empty state (no lock). Admin assigns leads → notification fires → leads appear.
 
 ---
 
