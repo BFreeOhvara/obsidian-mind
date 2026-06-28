@@ -30,86 +30,19 @@ tags:
 
 ---
 
-### Prompt 151 — MRR tracker: schema + admin management + closer Revenue view
+### ✅ Prompt 151 SHIPPED 2026-06-28 (`9ef7e13`) — MRR tracker
 
-Two income streams need separate tracking:
-- **Close commission (one-time):** 45% of (setup $297 + first month). Already in `commission_payouts`.
-- **Monthly recurring (month 2+):** 50% of the monthly subscription, every month after the first. Not tracked yet.
-
-**Step 1 — Migration 060** (`supabase/migrations/060_subscriptions.sql`):
-
-```sql
-CREATE TABLE subscriptions (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  lead_id uuid REFERENCES leads(id) ON DELETE CASCADE,
-  closer_id uuid REFERENCES profiles(id),
-  monthly_amount integer NOT NULL,
-  started_at timestamptz DEFAULT now(),
-  is_active boolean DEFAULT true,
-  created_at timestamptz DEFAULT now()
-);
-ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Closer reads own subscriptions" ON subscriptions
-  FOR SELECT USING (closer_id = auth.uid());
-CREATE POLICY "Admin manages subscriptions" ON subscriptions
-  FOR ALL USING (
-    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
-  );
-```
-
-⚠️ Claude Chrome applies migration 060 in Supabase SQL editor.
-
-**Step 2 — Admin: activate recurring on a closed deal**
-
-In the admin closed deals view (check `src/pages/admin/`), add per-row:
-- "Set Recurring" button → opens inline form: monthly amount input (pre-fill with deal's monthly component if available) + Confirm
-- On confirm: INSERT into `subscriptions` (`lead_id`, `closer_id`, `monthly_amount`)
-- Button becomes "Active ✓" (muted, disabled) once subscription exists for that lead
-- "Deactivate" action sets `is_active = false`
-
-**Step 3 — Closer Revenue Tracker: Monthly Recurring section**
-
-In `RevenueTracker.jsx`, below the existing Deals table, add a "Monthly Recurring" section:
-
-Two KPI cards:
-- **Total MRR** — `SUM(monthly_amount)` where `closer_id = profile.id AND is_active = true`
-- **Your Monthly Cut** — Total MRR × 50%
-
-Below cards: table of active recurring clients:
-- Columns: BUSINESS | MONTHLY AMOUNT | YOUR CUT (50%) | ACTIVE SINCE
-- Join `lead_id` → `leads.business_name`
-- MONTHLY AMOUNT and YOUR CUT in JetBrains Mono, success color
-- ACTIVE SINCE formatted "Jun 2026"
-
-This section is always all-time (not scoped to the Day/Week/Month filter).
-
-**Do NOT change:** close commission logic, existing Deals table, filter tabs, calendar picker.
-
-**Verify:** Admin marks a closed deal recurring → subscription row created. Closer `/closer/revenue` → Monthly Recurring section shows MRR + 50% cut + active client list.
+- `supabase/migrations/060_subscriptions.sql` created — subscriptions table (lead_id, closer_id, monthly_amount, is_active, started_at); RLS: closer reads own, admin manages all
+- `Commissions.jsx` — Closed Deals table section with per-row Set Recurring inline form; Active ✓ once set; Deactivate sets is_active=false
+- `RevenueTracker.jsx` — RecurringSection: Total MRR + Your Monthly Cut KPIs + client table always all-time
+⚠️ Apply migration 060 in Supabase SQL editor (`supabase/migrations/060_subscriptions.sql`)
 
 ---
 
-### Prompt 150 — Revenue Tracker: fix Deals table + month label format
+### ✅ Prompt 150 SHIPPED 2026-06-28 (`57351a4`) — Revenue Tracker: Deals table + month label
 
-**File:** `src/pages/closer/RevenueTracker.jsx`
-
-**Fix 1 — Deals table columns**
-
-Replace current single-amount column with:
-
-| BUSINESS | TOTAL DEAL | YOUR CUT (45%) | DATE |
-
-- `TOTAL DEAL` = full amount client paid (check appointments schema for `deal_value` or equivalent — use the field storing the full deal amount, not commission)
-- `YOUR CUT (45%)` = `TOTAL DEAL × 0.45`, success color, JetBrains Mono
-- `DATE` = deal close date
-
-**Fix 2 — Month label format**
-
-X-axis labels change from `"Nov 25"` → `"Nov '25"` (apostrophe before year digits). Makes it unambiguous that it's a year, not a day.
-
-**Do NOT change:** bar chart type, filter tabs, calendar picker, KPI cards.
-
-**Verify:** Deals table shows full deal amount + 45% cut (green). Chart x-axis shows "Nov '25" format.
+- Deals table: BUSINESS | TOTAL DEAL | YOUR CUT (45%) | DATE — joins deal_value from appointments
+- Month label: "Nov '25" with apostrophe (was "Nov 25")
 
 ---
 

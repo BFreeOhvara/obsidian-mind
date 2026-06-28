@@ -64,6 +64,14 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-28 — Eagle setter script task complete [CC]
+
+Section 5 (booking objections) rewritten from transcripts — added "I'm on the job right now" mid-job callback pattern + volume mindset note. Full-call transcripts extracted (`brain/setter-transcripts-full-calls.md` from videos `4ZQr5IP5RpI` + `v1piqxyWJvM`). Calibration pass: 4 surgical edits (S5 mid-job handler, S5 volume mindset, S4 show-rate note with 3 follow-ups + Loom, S1 decision-maker check). Sections 2–3 confirmed solid.
+
+**Still queued:** 150 (Revenue Tracker Deals display + month label), 151 (MRR tracker + migration 060)
+
+---
+
 ### 2026-06-28 — Prompts 146–147 shipped [CC via Falcon queue]
 
 - **146**: `CloserMyStats.jsx` — Commission earned now rescopes with filter (`windowCommission` memo, same `windowStart`/`windowEnd` bounds as revenue/deals)
@@ -89,6 +97,19 @@ Phone number search + phone column in pipeline across all dashboards.
 - Rep `MyLeads.jsx` has no text search — no change needed
 
 **Still queued:** 146 (commission rescope), 147 (My Stats default Day), 148 (seed data for preview)
+
+---
+
+### 2026-06-28 — Prompts 150+151 shipped [CC via Eagle queue]
+
+**150** (`57351a4`): `RevenueTracker.jsx` — Deals table columns replaced: BUSINESS | TOTAL DEAL | YOUR CUT (45%) | DATE (grid layout; deal_value joined from appointments; cut = deal_value × 0.45, success color, mono). Month label format: `"Nov '25"` with apostrophe (was `"Nov 25"`).
+
+**151** (`9ef7e13`): MRR tracker — 3 changes:
+- `supabase/migrations/060_subscriptions.sql` created (table: id, lead_id, closer_id, monthly_amount, started_at, is_active; RLS: closer reads own, admin manages all)
+- `Commissions.jsx` — new "Closed Deals" table section showing all closed appointments with per-row "Set Recurring" inline form → INSERT into subscriptions; button becomes "Active ✓ $X/mo" once set; "Deactivate" sets is_active=false
+- `RevenueTracker.jsx` — new `RecurringSection` component below Deals: Total MRR + Your Monthly Cut (50%) KPI cards + active clients table (BUSINESS | MONTHLY AMOUNT | YOUR CUT (50%) | ACTIVE SINCE); always all-time, not filtered
+
+⚠️ Migration 060 (`subscriptions` table) needs Claude Chrome to apply in Supabase SQL editor before Set Recurring or MRR section work.
 
 ---
 
