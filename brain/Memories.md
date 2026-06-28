@@ -64,6 +64,47 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-28 — Prompt 134: DISCOVERY_SCRIPT rewritten to setter v2 branching flow
+
+**What happened:** Replaced the entire `DISCOVERY_SCRIPT` constant in `src/lib/discoveryScript.js` with the new 6-section branching setter script from `brain/setter-script-v2-flow.md`. Committed `85bca0c`, pushed to GitHub.
+
+**What changed:**
+- 6 sections: opener, vitals, pain, handoff, objections, close (replaces old 7-section branchA–E structure)
+- All spoken lines from v2-flow.md, no meta text, no closer name
+- `[First Name]` token added to `fillTokens` → `lead.first_name || lead.contact_name`
+- `FIXED_OPENER` updated to `"Hey, is this [Business Name]? Is [First Name] around?"`
+- Node graph translated to existing `BRANCH —` / `↳ IF` marker format with 3-space indentation for nested forks
+- Colors: `var(--accent)`, `var(--warning)`, `var(--success)`, `var(--danger)` only (design tokens available in DESIGN.md are limited to those four + accent-hover)
+- All exports, function signatures, `buildScriptFlow`, `buildCallScript`, `parseSteps` unchanged
+
+**Lesson:** DESIGN.md only has 4 color tokens beyond neutrals — `--accent`, `--success`, `--warning`, `--danger`. The v2 flow doc used aspirational tokens (`--accent-blue`, `--accent-teal`, `--accent-purple`) that don't exist in the CSS. Always check DESIGN.md before picking color tokens for new sections.
+
+---
+
+### 2026-06-28 — Setter script Sections 4 + 5 (Falcon session, context limit)
+
+**What happened:** Rebuilt setter discovery script Sections 4 and 5 from real AI cold call transcripts. Section 5 transcripts collected; rewrite pending (Eagle picks up from here).
+
+**Section 4 (Handoff / Booking with Nate) — COMPLETE.**
+- Transcribed 3 new videos into `brain/setter-transcripts-s4-handoff.md` (72KB): wuWRH-lIYds (AI agency day-2 cold calling), CfMJ01KP_ns (Paul's live calls — book 5-7/day), mQ68FJYL8Lg (2nd-ask booking framework).
+- Key patterns extracted: two-option time ask (never open-ended), "I'm with you" soft-no recovery + 4-step second-ask framework, send confirmation text while still on the line, "I'll leave you better than I found you" value framing, 2-ask max then get callback date.
+- Script rewrite committed `e4db208` — `strategy/ohvara-setter-discovery-script.md` Section 4 expanded from 4 bullets to full framework with bridge/time-ask/soft-no-recovery/hard-no-boundary/after-booking sections.
+
+**Section 5 (Booking Objections) — transcripts collected, rewrite queued for Eagle.**
+- 4 transcripts collected into `brain/setter-transcripts-s5-objections.md` via Claude Chrome: fxzyvptMmOw ("send me an email"), gaCfPXsHAU4 ("send me an email" pt 2), shRMsLX48eE (every cold call objection), D2mjP-FTqlI (how to handle every objection).
+- File saved to vault. Rewrite not yet done — Eagle to complete.
+
+**Full-call recordings — 2 still unprocessed:**
+- `4ZQr5IP5RpI` — Watch Me Book AI Receptionist Clients LIVE
+- `v1piqxyWJvM` — How I Sell AI Receptionists (COMPLETE SYSTEM)
+- CEWCMEfOm-w ✅ S1, wuWRH-lIYds ✅ S4, CfMJ01KP_ns ✅ S4 — already in vault
+- Plan: pull these 2 after Section 5 is done, use for final calibration pass across all sections.
+
+**Resume prompt for Eagle:**
+`Read brain/Memories.md, brain/LIVE_STATE.md, strategy/ohvara-setter-discovery-script.md — continuing Ohvara setter script work. Section 5 transcripts are in brain/setter-transcripts-s5-objections.md. Rewrite Section 5 of the setter script from those transcripts, same approach as Sections 1-4. Then pull the 2 remaining full-call recordings (brain/setter-script-video-sources.md "Starred Full-Call Recordings" section, the 2 not yet transcribed) and do a final calibration pass across all 5 sections.`
+
+---
+
 ### 2026-06-27 — Vault push only
 
 obsidian-mind pushed to GitHub (`git push`). No code changes. Queue empty.

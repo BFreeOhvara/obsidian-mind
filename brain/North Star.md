@@ -51,8 +51,8 @@ Bundled into the Elite package or standalone.
 **No fixed packages.** Every client gets a custom-named automation stack and a custom price, generated from their specific discovery answers — not picked off a menu.
 
 - **Setup fee: `$297` flat, one-time** (was `$497` — lowered with the pivot to formula pricing).
-- **Monthly: formula-priced, value-based.** `callsMissedPerWeek × 4.33 × avgTicket × 0.15` = estimated monthly value lost to missed calls; that becomes the price. Floor `$397/mo`, ceiling `$1,997/mo` (raised from `$297`/`$1,797` — Prompt 10, 2026-06-20).
-- **🔒 CORRECTION 2026-06-25 (Brayden) — every monthly price must end in `99`.** Rounding changed from "nearest `$10`" to "nearest value ending in `99`" — e.g. `$599`, `$899`, `$1,299`. Setup fee is unchanged (`$297` flat, does NOT need to end in 99). **Open question flagged for CC:** the current floor/ceiling (`$397`/`$1,997`) themselves end in `97`, not `99` — under the new convention these probably need to become `$399`/`$1,999` for consistency, but Brayden hasn't explicitly confirmed that — ask before changing the floor/ceiling values themselves, only the rounding logic for everything in between is confirmed.
+- **Monthly: formula-priced, value-based.** `callsMissedPerWeek × 4.33 × avgTicket × 0.15` = estimated monthly value lost to missed calls; that becomes the price. Floor `$399/mo`, ceiling `$1,999/mo`.
+- **🔒 Monthly always ends in 99** — $399, $599, $899, $1,299, $1,999, etc. Setup fee is $297 flat and does NOT follow this convention — it stays $297 forever.
 - **Target average deal: ~`$1,200/mo`.**
 - ~~**Automations are AI-generated per lead as a tiered stack** (Prompt 10, 2026-06-20)...~~ **Superseded — see correction directly below.**
 

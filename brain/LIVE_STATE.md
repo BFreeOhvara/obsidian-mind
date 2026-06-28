@@ -16,7 +16,33 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–133 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–134 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+
+---
+
+### ✅ Prompt 134 SHIPPED 2026-06-28 (`85bca0c`) — Rewrite DISCOVERY_SCRIPT to setter script v2 branching flow
+
+`src/lib/discoveryScript.js` — `DISCOVERY_SCRIPT` fully replaced with 6 sections (opener, vitals, pain, handoff, objections, close) from `brain/setter-script-v2-flow.md`. Node graph translated to existing marker-line format (`BRANCH —` / `↳ IF` with 3-space indentation for nesting). `[First Name]` token added to `fillTokens` (maps to `lead.first_name || lead.contact_name`). `FIXED_OPENER` updated to new opener. All exports and function signatures unchanged.
+
+---
+
+### 🦅 EAGLE TASK — Setter Script Section 5 + Full-Call Calibration (2026-06-28)
+
+Falcon ran out of context. Sections 1–4 of `strategy/ohvara-setter-discovery-script.md` are fully rewritten. Section 5 transcripts are collected. Pick up here:
+
+**Step 1 — Rewrite Section 5 (Booking Objections).**
+Transcripts in `brain/setter-transcripts-s5-objections.md` (4 videos: "send me an email" ×2, every cold call objection, how to handle every objection). Current Section 5 is thin — 4 bullets. Rewrite same way as Sections 1–4: read transcripts, extract real patterns, rewrite with tone guidance + specific word tracks + coaching notes. Goal: handle objections to booking the Nate call (not objections to having the problem — that's settled). Key objections: "just send me info," "no time this week," "who's Nate / what's this company," "how much does it cost."
+
+**Step 2 — Pull the 2 remaining full-call recordings.**
+See `brain/setter-script-video-sources.md` → "Starred Full-Call Recordings" — pull 2 not yet transcribed:
+- `4ZQr5IP5RpI` — Watch Me Book AI Receptionist Clients LIVE
+- `v1piqxyWJvM` — How I Sell AI Receptionists (COMPLETE SYSTEM)
+Use Claude Chrome artifact (same format as Sections 1–5) → save to `brain/setter-transcripts-full-calls.md`.
+
+**Step 3 — Final calibration pass.**
+Read full-call transcripts. Compare against finished script. Look for anything per-section rewrites got wrong — especially transitions (Vitals → Pain → Handoff flow). Surgical edits only. Log what changed.
+
+**Commit when done.** Delete this Eagle task from LIVE_STATE, append session log to Memories.
 
 ---
 
@@ -1555,4 +1581,3 @@ Non-CC sessions (Manager chats, no filesystem) re-ground from the most recent pa
 - [[North Star]] — who we are, packages, pricing, goals, hard rules
 - [[session-flow]] — reload/handoff chain, context alarm, artifact + auto-log rules
 - [[ohvara-dashboard]] — dashboard architecture brain doc
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
