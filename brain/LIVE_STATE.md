@@ -16,7 +16,81 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–149 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–151 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+
+---
+
+### ✅ Prompt 153 SHIPPED 2026-06-28 (`2a6fa15`) — Pipeline KPI box fixes
+
+- `CloserPipeline.jsx`: PENDING + SCHEDULED KPI cards moved outside the conditional — always visible on all closer sub-tabs
+- `CloserPipeline.jsx`: ACTIVE KPI card removed from Appointment Setting tab; only TOTAL + BOOKED remain
+
+---
+
+### ✅ Prompt 153 — Pipeline KPI box fixes
+
+**File:** `src/pages/closer/CloserPipeline.jsx`
+
+**Fix 1 — Closer tab: PENDING + SCHEDULED boxes always visible**
+
+The PENDING and SCHEDULED KPI cards currently only render on the Pending sub-tab. When switching to All (or any other tab), they disappear. Make them always visible regardless of which closer sub-tab is active — same two cards, same data, always shown above the filter tabs.
+
+**Fix 2 — Appointment Setting tab: remove ACTIVE box**
+
+The Appointment Setting tab shows three KPI cards: TOTAL / BOOKED / ACTIVE. Remove the ACTIVE card entirely. Only TOTAL and BOOKED remain.
+
+**Do NOT change:** anything else — tab logic, filter behavior, table columns, colors.
+
+**Verify:** Closer tab → switch between Pending/Closed/Lost/All — PENDING and SCHEDULED cards always visible. Appointment Setting tab → only two cards (TOTAL + BOOKED).
+
+---
+
+### ✅ Prompt 152 SHIPPED 2026-06-28 (`2a6fa15`) — Closer popup: read-only setter data + price display
+
+- `AppointmentCardModal.jsx`: `callsMissed`/`avgTicket` converted from editable state to read-only constants from `lead.calls_missed_per_week`/`lead.avg_ticket`
+- CLOSE section inputs replaced with read-only labeled displays (Calls Missed/Wk, Avg Ticket)
+- Price display restructured: SETUP FEE ($297 always) + MONTHLY (calculated, accent color, mono) as labeled field rows
+- Generate Payment Link unchanged — already used `monthlyPrice` which derives from the same values
+- `Input` import removed (no longer needed)
+
+---
+
+### ✅ Prompt 152 — Closer popup: pre-fill setter data, show calculated price, fix Generate Payment Link
+
+**File:** `src/components/shared/CallPrepModal.jsx` (closer mode) + wherever the closer popup reads its appointment/lead data
+
+**Context:** The setter captures `callsMissedPerWeek` and `avgTicket` during the discovery call (Prompt 138 — `capturedValues` state, debounced save to Supabase). By the time an appointment reaches the closer, that data already exists. The closer popup currently shows blank inputs for these — wrong. The closer never enters this data.
+
+**Step 1 — Find where setter captures are stored**
+
+Check what Prompt 138 actually saved to. Look in `ScriptWalk.jsx` for the debounced Supabase save — find the table and column names (`calls_missed_per_week`, `avg_ticket`, or similar). They're likely on the `appointments` or `leads` row. Confirm the field names before proceeding.
+
+**Step 2 — Remove the blank inputs from closer popup**
+
+In `CallPrepModal.jsx` (closer mode), the CLOSE section currently has editable inputs for "Calls missed/we" and "Avg ticket $". Remove both inputs entirely. Replace with read-only display of the values pulled from the appointment/lead record (the setter's captured data). Style as plain labeled values, not inputs — same style as the PHONE and SET BY fields on the left.
+
+If the values are null/missing (setter didn't capture), show "—" for each.
+
+**Step 3 — Calculate and display the price**
+
+Formula: `Math.round((Math.min(Math.max(callsMissedPerWeek * 4.33 * avgTicket * 0.15, 399), 1999) + 1) / 100) * 100 - 1`
+(floor $399, ceiling $1,999, rounds to nearest value ending in 99)
+
+Display the result prominently in the CLOSE section as **the price** — not "recommended price", just the number. Label it "MONTHLY" in the same caps-label style as other fields. JetBrains Mono, accent color. Setup fee is always $297 (display it too, labeled "SETUP FEE"). If captured values are missing, show "—" for the price too.
+
+**Step 4 — Fix Generate Payment Link**
+
+The Generate Payment Link button should use the calculated monthly price and $297 setup fee to build the two Stripe links (setup fee link + monthly subscription link). Check how it currently works — if it's reading from the blank inputs it was using before, rewire it to use the calculated values instead. If Stripe link generation is broken for another reason, surface the error.
+
+**Do NOT change:** SAY THIS stepper, status picker, call notes, Done button logic, any rep/setter files.
+
+**Verify:** Open closer popup for an appointment where the setter captured data → Calls missed/week and avg ticket show pre-filled values (read-only) → Monthly price auto-calculated and displayed → Generate Payment Link produces two links using those values.
+
+---
+
+### ✅ Migration 060 APPLIED 2026-06-28 — subscriptions table live
+
+`subscriptions` table created with RLS. Closer reads own, admin manages all. Project `jjextitmbptoaolacocs`. No errors.
 
 ---
 

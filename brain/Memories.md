@@ -64,11 +64,34 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-28 — Migration 060 applied [Claude Chrome]
+
+`subscriptions` table live in Supabase (`jjextitmbptoaolacocs`). RLS enabled. MRR tracker fully operational end-to-end.
+
+---
+
+### 2026-06-28 — Prompts 150–151 shipped [CC]
+
+- **150**: Revenue Tracker Deals table → BUSINESS / TOTAL DEAL / YOUR CUT (45%) / DATE; month labels → "Nov '25" format
+- **151**: `subscriptions` table created (`060_subscriptions.sql`); admin `Commissions.jsx` gains Set Recurring inline form per closed deal; `RevenueTracker.jsx` gains Monthly Recurring section (Total MRR + Your Monthly Cut 50% + active client table)
+
+⚠️ Migration 060 still needs Claude Chrome to apply.
+
+---
+
 ### 2026-06-28 — Eagle setter script task complete [CC]
 
 Section 5 (booking objections) rewritten from transcripts — added "I'm on the job right now" mid-job callback pattern + volume mindset note. Full-call transcripts extracted (`brain/setter-transcripts-full-calls.md` from videos `4ZQr5IP5RpI` + `v1piqxyWJvM`). Calibration pass: 4 surgical edits (S5 mid-job handler, S5 volume mindset, S4 show-rate note with 3 follow-ups + Loom, S1 decision-maker check). Sections 2–3 confirmed solid.
 
 **Still queued:** 150 (Revenue Tracker Deals display + month label), 151 (MRR tracker + migration 060)
+
+---
+
+### 2026-06-28 — Prompts 152+153 shipped [CC via Eagle queue]
+
+**152** (`2a6fa15`): Closer popup CLOSE section — editable inputs replaced with read-only labeled displays pulling from `lead.calls_missed_per_week` + `lead.avg_ticket`. Price shown as SETUP FEE $297 + MONTHLY (formula result, accent/mono). Generate Payment Link already used `monthlyPrice` — no change needed.
+
+**153** (`2a6fa15`): CloserPipeline — PENDING + SCHEDULED KPI cards now always visible on all closer sub-tabs. ACTIVE card removed from Appointment Setting tab (only TOTAL + BOOKED remain).
 
 ---
 
