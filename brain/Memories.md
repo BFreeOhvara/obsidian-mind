@@ -2724,3 +2724,11 @@ Brayden reported: clicking the mic button in the Cowork tab records for ~1 secon
 **`admin/LeadPipeline.jsx`:** `applyFilters` now computes `sDigits`, checks `biz.includes(s) || (sDigits && phone.includes(sDigits))` — phone sourced from `r.lead?.phone ?? r.phone`. Placeholder → "Search business, niche, city, phone…", width 240.
 
 **Rep `MyLeads.jsx`:** No text search bar (status filter tabs only) — no change.
+
+---
+
+## Session Log — 2026-06-28 (session close)
+
+**CC | 2026-06-28 — Prompts 148+149 shipped, both repos pushed**
+
+Session resumed after context compaction. Prompt 148 seed bug (rep_profile_id → rep_id, deal_value_cents absent) discovered and fixed; seed ran clean in Supabase SQL editor. Prompt 149 (phone search + pipeline phone column) was already logged. Both ohvara-dashboard (`5a17caf`) and obsidian-mind (`f728b5f`) pushed to GitHub. Queue: Prompt 147 (CloserMyStats default tab Day) and Prompt 146 (commission filter rescope) remain next.
