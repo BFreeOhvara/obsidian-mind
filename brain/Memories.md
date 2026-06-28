@@ -64,6 +64,26 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-28 — Prompt 135 + Migration 059 fully live [Falcon]
+
+CC shipped Prompt 135 (`e2418e0`). Claude Chrome applied migration 059 — `profiles.training_completed boolean DEFAULT false` live in Supabase (`jjextitmbptoaolacocs`). Training lock system fully end-to-end.
+
+---
+
+### 2026-06-28 — Prompts 139–143: Closer table/pipeline/stats/revenue [CC]
+
+**139** (`0fb7749`): `CallLeads.jsx` — replaced Rep Assigned header+cell with City (`lead.city`). Removed unused `repName` variable.
+
+**140** (`0fb7749`): `CloserPipeline.jsx` `SetterView` — `useState('All')` → `useState('New')`.
+
+**141** (`0fb7749`): `useCloserNotificationTriggers.js` — added `useCloserCallGradedNotifier(closerId)`: realtime UPDATE on `calls` filtered by `rep_id` (closers use `rep_id` column — confirmed from `MyCalls.jsx`), fires cache invalidation when `graded_at` transitions null → set. Wired into `CloserNotificationBell`.
+
+**142** (`659d3ba`): `CloserMyStats.jsx` full rewrite — imports recharts AreaChart. Fetches raw data once, windows by Day/Week/Month in component. Chart shows 4h blocks (Day), daily (Week), 8-week (Month). KPIs computed from windowed data.
+
+**143** (`659d3ba`): `RevenueTracker.jsx` rewrite — AreaChart → BarChart. Day/Week/Month preset tabs. Custom From/To date inputs (native `input[type=date]`); when set, overrides preset and builds day-by-day buckets for x-axis. Clear button resets to preset. Deals table and bank connect unchanged.
+
+---
+
 ### 2026-06-28 — Prompt 135: Training lock + New tab color + leads_unlocked notifier [CC]
 
 **Prompt 135** (`e2418e0`): Three changes shipped.

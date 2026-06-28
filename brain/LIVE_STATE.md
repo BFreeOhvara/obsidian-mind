@@ -16,7 +16,23 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–134, 136–138 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–143 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+
+---
+
+### ✅ Prompts 139–143 SHIPPED 2026-06-28 (`0fb7749`, `659d3ba`) — Closer table/pipeline/stats/revenue fixes
+
+- **139** (`0fb7749`): `CallLeads.jsx` — Rep Assigned column → City column (`lead.city`)
+- **140** (`0fb7749`): `CloserPipeline.jsx` — SetterView `statusFilter` default `'All'` → `'New'`
+- **141** (`0fb7749`): `useCloserNotificationTriggers.js` — `useCloserCallGradedNotifier` watches `calls UPDATE` where `rep_id = closerId` and `graded_at` transitions null → set; wired into `CloserNotificationBell`
+- **142** (`659d3ba`): `CloserMyStats.jsx` — bar chart → area/line chart (recharts AreaChart); Day/Week/Month filter rescopes KPIs + chart (Day = 4h blocks, Week = daily, Month = 8-week)
+- **143** (`659d3ba`): `RevenueTracker.jsx` — AreaChart → BarChart; Day/Week/Month filter + custom From/To date range; custom range shows day-by-day bars; Clear resets to preset
+
+---
+
+### ✅ Migration 059 APPLIED 2026-06-28 — profiles.training_completed column live
+
+`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS training_completed boolean DEFAULT false` — applied in Supabase SQL editor, project `jjextitmbptoaolacocs`. No errors.
 
 ---
 
@@ -38,49 +54,17 @@ tags:
 
 ---
 
+### ✅ Migration 059 APPLIED 2026-06-28 — profiles.training_completed column live
+
+`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS training_completed boolean DEFAULT false` — applied in Supabase SQL editor, project `jjextitmbptoaolacocs`. No errors.
+
+---
+
 ### ✅ Prompt 135 SHIPPED 2026-06-28 (`e2418e0`) — Training lock + New tab color + leads_unlocked notifier
 
 `MyLeads.jsx`: TAB_COLORS `'New'` → `var(--info)` (matches CloserPipeline). `supabase/migrations/059_rep_training_completed.sql`: `ALTER TABLE profiles ADD COLUMN training_completed boolean NOT NULL DEFAULT false` — ⚠️ apply in Supabase SQL editor. `TrainingCenter.jsx`: `FlashcardDeck` gets `onAllMastered` prop; when `mastered.size >= FLASHCARDS.length`, calls `supabase.from('profiles').update({ training_completed: true })` and shows inline success message. `useRepNotificationTriggers.js`: `useLeadsUnlockedNotifier(repId, trainingCompleted)` — realtime INSERT on leads, fires once (firedRef) with `leads_unlocked` notification, only when `trainingCompleted = true`.
 
 **Note:** Existing MyLeads `TrainingGate` already gates on videos + quiz + roleplay via `isTrainingComplete()`. The new `training_completed` flag is set separately on flashcard completion. The gate and flag are independent — gate controls UI lock, flag drives the notification.
-
----
-
-### ~~Prompt 135~~ — Training lock on rep My Leads + "New" filter tab color
-
-Two changes to the rep dashboard.
-
-**Change 1 — "New" status filter tab color**
-
-In the rep's My Leads page (`src/pages/rep/CallLeads.jsx` or wherever the status filter tabs render), the "New" filter tab should use the same lighter blue color as the Closer dashboard's filter tabs. Check what color token the Closer pipeline uses for its tabs (`src/pages/closer/CloserPipeline.jsx` → `CLOSER_TAB_COLORS` or similar) and apply that same token to the "New" tab in the rep's filter. Do not change any other tab colors.
-
-**Change 2 — Training lock on My Leads**
-
-**Schema:** Add `training_completed boolean DEFAULT false` to the `profiles` table via a new migration (`059_rep_training_completed.sql`). ⚠️ Claude Chrome applies this in the Supabase SQL editor — same process as migrations 055–058.
-
-**Lock state** (when `profile.training_completed === false`):
-
-In the My Leads leads list container, overlay a locked state instead of showing leads:
-- Keep the box/container visible at its normal size — do not hide it
-- No leads rendered inside
-- Centered inside the box: a lock icon (`Lock` from lucide-react, ~32px, muted color), then below it:
-  - Line 1: `"Complete training to unlock your leads."` (text-primary, 15px)
-  - Line 2: a styled link → `"Go to Training →"` that navigates to `/rep/training`
-- Do not show any lead count or Request Leads button while locked
-
-**Completion trigger** (in `TrainingCenter.jsx`):
-
-Find where flashcard completion is tracked (currently localStorage). When all flashcards are completed, also `UPDATE profiles SET training_completed = true WHERE id = [profile.id]` via Supabase. After update, show a one-time inline message inside TrainingCenter: `"Training complete — your leads will come in on the next refresh."` (success color, not a toast).
-
-**Post-completion, no leads yet** — show normal empty state (no lock, no lock message). Lock UI only shows when `training_completed === false`.
-
-**Notification:** When a rep with `training_completed = true` receives their first lead (INSERT on `leads` where `assigned_rep_id = profile.id`), fire a `leads_unlocked` notification: `"Your leads are ready — start calling."` Add to `useRepNotificationTriggers.js`. Only fire if `profile.training_completed` is true to avoid firing on subsequent batches.
-
-**North Star update:** Change "Training is optional — available anytime, not required before calling" → "Training required before leads unlock. Reps complete flashcards at `/rep/training`, leads appear on next admin refresh."
-
-**Do NOT change:** flashcard logic, video rendering, roleplay section, any closer files, admin lead assignment.
-
-**Verify:** Rep with training_completed false → My Leads shows lock + "Go to Training" link. Complete flashcards → profile updates → TrainingCenter shows success message. My Leads now shows empty state (no lock). Admin assigns leads → notification fires → leads appear.
 
 ---
 
