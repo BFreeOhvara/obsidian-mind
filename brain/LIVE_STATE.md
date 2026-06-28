@@ -39,29 +39,10 @@ tags:
 
 ---
 
-### Prompt 147 — My Stats: default filter tab Day (not Month)
+### ✅ Prompts 146+147 SHIPPED 2026-06-28 (`1409490`) — commission filter by window + Day default
 
-**File:** `src/pages/closer/CloserMyStats.jsx`
-
-Change the initial `useState` for the filter tab from `'Month'` to `'Day'`.
-
-One line change. **Do NOT change anything else.**
-
-**Verify:** `/closer/stats` loads — Day tab is active by default.
-
----
-
-### Prompt 146 — My Stats: Commission earned rescopes with filter
-
-**File:** `src/pages/closer/CloserMyStats.jsx`
-
-In Prompt 145, "Total revenue closed" and "Deals closed" were wired to the Day/Week/Month filter, but "Commission earned" was left as all-time because it uses a separate query. Fix it — filter that query by the same active window so all three Earnings Summary values are consistent.
-
-Find the commissions query (likely a separate `supabase.from('commission_payouts')` or similar fetch). Apply the same date range filter already used for revenue/deals — whatever `startDate`/`endDate` bounds Prompt 145 set up, pass those same bounds to the commissions query.
-
-**Do NOT change:** anything else.
-
-**Verify:** Switch to Day → Commission earned shows today's commission. Month → this month's. All three Earnings Summary values always reflect the same window.
+- **147**: `CloserMyStats.jsx` — `useState('Month')` → `useState('Day')` — Day tab active by default on `/closer/stats`
+- **146**: `CloserMyStats.jsx` — `useCloserCommissions` now fetches `amount, created_at`; `windowCommission` memo filters by `windowStart`; "Commission earned" row uses `windowCommission` instead of all-time total — all 3 Earnings Summary values now rescope with Day/Week/Month filter
 
 ---
 

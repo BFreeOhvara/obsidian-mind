@@ -64,6 +64,14 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-28 — Prompt 148 shipped [CC via Falcon queue]
+
+Seed SQL (`supabase/seeds/closer_preview_seed.sql`) run in Supabase. 12 closed appointments spread across 8 months + matching commission_payouts + 3 notifications (appointment_booked, appointment_reminder_5min, call_graded). Schema quirks corrected live: `rep_profile_id` → `rep_id`, `deal_value_cents` dropped (column absent). Revenue Tracker and notification bell should now show realistic sample data for Nate.
+
+**Still queued:** 146 (commission earned rescopes), 147 (My Stats default → Day)
+
+---
+
 ### 2026-06-28 — Prompt 149 shipped [CC via Falcon queue]
 
 Phone number search + phone column in pipeline across all dashboards.
@@ -2732,3 +2740,13 @@ Brayden reported: clicking the mic button in the Cowork tab records for ~1 secon
 **CC | 2026-06-28 — Prompts 148+149 shipped, both repos pushed**
 
 Session resumed after context compaction. Prompt 148 seed bug (rep_profile_id → rep_id, deal_value_cents absent) discovered and fixed; seed ran clean in Supabase SQL editor. Prompt 149 (phone search + pipeline phone column) was already logged. Both ohvara-dashboard (`5a17caf`) and obsidian-mind (`f728b5f`) pushed to GitHub. Queue: Prompt 147 (CloserMyStats default tab Day) and Prompt 146 (commission filter rescope) remain next.
+
+---
+
+## Session Log — 2026-06-28 (Prompts 146+147)
+
+**CC | 2026-06-28 — Prompts 146+147 shipped (`1409490`)**
+
+- **147**: `CloserMyStats.jsx` — default filter tab changed from Month → Day (one line)
+- **146**: `useCloserCommissions` hook updated to fetch `created_at` + return raw rows; `windowCommission` memo filters by `windowStart`; Commission earned row now rescopes with Day/Week/Month like the other two Earnings Summary values
+- Both pushed to GitHub. Queue clear — next up is the Eagle setter script task (Section 5 rewrite + full-call calibration).
