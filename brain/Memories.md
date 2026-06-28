@@ -64,6 +64,13 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-28 — Prompts 144–145 shipped [CC via Falcon queue]
+
+- **144**: Revenue Tracker — "All Time" tab added as default (monthly buckets); `MiniCalendar` popup replaces text inputs (click start → hover → click end → scopes chart to day-by-day bars; ✕ clears)
+- **145**: My Stats Earnings Summary — Total revenue closed + Deals closed rescope with Day/Week/Month filter; Commission earned stays all-time (separate query)
+
+---
+
 ### 2026-06-28 — Prompts 139–143 shipped [CC via Falcon queue]
 
 - **139**: Closer My Leads — "Rep Assigned" → "City" column
@@ -2673,3 +2680,22 @@ Brayden reported: clicking the mic button in the Cowork tab records for ~1 secon
 - Click 1 → sets rangeStart, clears rangeEnd; Click 2 → sorts [a,b], sets both, closes calendar
 - Trigger button shows "Jun 1 – Jun 5" when range set; inline ✕ clears range
 - Calendar closes on outside click (mousedown listener)
+
+## Session Log — 2026-06-28 (Prompt 149)
+
+**Commit:** `a3f52db` — `ohvara-dashboard` master
+
+### Prompt 149 — Phone search + phone column in pipeline
+
+**`closer/CallLeads.jsx`:** Added `qDigits = q.replace(/\D/g, '')` and phone OR: `(qDigits && (l.phone || '').replace(/\D/g, '').includes(qDigits))`. Placeholder updated. Strips non-digits from both sides so "512-978", "512 978", "5129" all match the same number.
+
+**`closer/CloserPipeline.jsx`:**
+- SetterView `filtered` useMemo: added phone OR with same digit-strip pattern.
+- CloserView `filteredAppts` useMemo: added phone OR on `a.lead?.phone`.
+- All 6 closer tab components (PendingTab, ClosedTab, LostTab, NoShowTab, NeedsReschedulingTab, AllTab): added `['Phone', '0 0 140px']` column header and `<div style={cell('0 0 140px', { fontFamily: 'var(--font-mono)' })}>{a.lead?.phone || '—'}</div>` cell after City. `a.lead?.phone` available because `useMyAppointments` already selects `lead:leads(..., phone, ...)`.
+- Setter tab already had Phone column (line 340) — no change needed there.
+- Placeholder → "Search business, niche, phone…", input width 220.
+
+**`admin/LeadPipeline.jsx`:** `applyFilters` now computes `sDigits`, checks `biz.includes(s) || (sDigits && phone.includes(sDigits))` — phone sourced from `r.lead?.phone ?? r.phone`. Placeholder → "Search business, niche, city, phone…", width 240.
+
+**Rep `MyLeads.jsx`:** No text search bar (status filter tabs only) — no change.
