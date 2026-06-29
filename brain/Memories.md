@@ -64,6 +64,13 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-28 — Prompts 152–153 shipped [CC]
+
+- **153**: `CloserPipeline.jsx` — PENDING + SCHEDULED KPI cards always visible on all closer sub-tabs; ACTIVE card removed from Appointment Setting tab
+- **152**: `AppointmentCardModal.jsx` — calls missed/week + avg ticket read-only from `lead.calls_missed_per_week`/`lead.avg_ticket`; SETUP FEE ($297) + MONTHLY (calculated) displayed as labeled fields; Generate Payment Link was already wired to `monthlyPrice`
+
+---
+
 ### 2026-06-28 — Migration 060 applied [Claude Chrome]
 
 `subscriptions` table live in Supabase (`jjextitmbptoaolacocs`). RLS enabled. MRR tracker fully operational end-to-end.
@@ -84,6 +91,18 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 Section 5 (booking objections) rewritten from transcripts — added "I'm on the job right now" mid-job callback pattern + volume mindset note. Full-call transcripts extracted (`brain/setter-transcripts-full-calls.md` from videos `4ZQr5IP5RpI` + `v1piqxyWJvM`). Calibration pass: 4 surgical edits (S5 mid-job handler, S5 volume mindset, S4 show-rate note with 3 follow-ups + Loom, S1 decision-maker check). Sections 2–3 confirmed solid.
 
 **Still queued:** 150 (Revenue Tracker Deals display + month label), 151 (MRR tracker + migration 060)
+
+---
+
+### 2026-06-28 — Prompts 154–157 shipped [CC via Eagle queue]
+
+**154** (`9452677`): `CloserMyStats.jsx` — Commission Earned now `SUM(windowData.deal_value) × 0.45` instead of reading from `commission_payouts`. `useCloserCommissions` hook removed.
+
+**155** (`9452677`): `RevenueTracker.jsx` — Deals table grid `1fr 140px 160px 130px` (was `1fr auto auto auto`). Reseed SQL queued for Claude Chrome: `UPDATE appointments SET deal_value = deal_value - (deal_value % 100) + 96 WHERE closer_id = (SELECT id FROM profiles WHERE role = 'closer' LIMIT 1) AND outcome = 'closed'`.
+
+**156** (`9452677`): `RevenueTracker.jsx` — 4 KPI cards now filter-scoped: REVENUE / YOUR CUT (×0.45) / DEALS CLOSED / AVG DEAL. All update with filter tab or custom date range.
+
+**157** (`9452677`): `RevenueTracker.jsx` — Chart decoupled from filter. Always shows last 8 calendar months as bars, title "New Revenue — Last 8 Months", always rendered (no empty-state swap).
 
 ---
 

@@ -16,7 +16,136 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–151 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–153 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+
+---
+
+### ✅ Prompt 157 SHIPPED 2026-06-28 (`9452677`) — Revenue Tracker: chart fixed to last 8 months
+
+- `RevenueTracker.jsx`: `chartData` memo replaced — always builds last 8 calendar months from `allDeals`, key-matched on `updated_at.slice(0,7)`. Completely independent of filter/date range state.
+- Chart title hardcoded to "New Revenue — Last 8 Months"
+- `{!chartData.some(d => d.value > 0) ? <empty state> : <chart>}` conditional removed — chart always renders
+- `buildChartData` function left in place (unused, harmless)
+
+---
+
+### ✅ Prompt 157 — Revenue Tracker: chart fixed to last 8 months of new closes, decoupled from filter
+
+**File:** `src/pages/closer/RevenueTracker.jsx`
+
+**The chart is now completely independent of the filter tabs.** Filter tabs (Day/Week/Month/All Time/Custom) only affect the 4 KPI cards and the Deals table — never the chart.
+
+**Chart behavior:**
+- Always shows the last 8 calendar months as bars
+- Each bar = new revenue closed (deal_value SUM) in that specific month only — NOT cumulative, NOT stacked
+- A month where nothing was closed shows a $0 bar (bar is absent/minimal) but the x-axis label still renders
+- Chart title: `"New Revenue — Last 8 Months"`
+- X-axis labels: `"Nov '25"`, `"Dec '25"` … format (apostrophe before year — already implemented in Prompt 150)
+- The chart never disappears, never shows a "No closed deals" replacement message — always visible
+
+**Remove:** any existing logic that changes the chart based on the active filter tab or date range.
+
+**Do NOT change:** KPI cards, Deals table, filter tabs, custom range calendar, Monthly Recurring section.
+
+**Verify:** Switch between All Time / Day / Week / Month / Custom — chart stays identical, always showing last 8 months of new closes. Months with no deals still show x-axis label.
+
+---
+
+### ✅ Prompt 156 SHIPPED 2026-06-28 (`9452677`) — Revenue Tracker: KPI cards respond to active filter
+
+- `RevenueTracker.jsx`: `kpis` memo now computes a single `scoped` dataset based on active filter/custom range. 4 new cards: REVENUE / YOUR CUT (×0.45) / DEALS CLOSED / AVG DEAL — all scope with filter. Static allTime/thisMonth/thisWeek removed.
+
+---
+
+### ✅ Prompt 156 — Revenue Tracker: KPI cards respond to active filter
+
+**File:** `src/pages/closer/RevenueTracker.jsx`
+
+**Problem:** The four KPI cards (ALL TIME / THIS MONTH / THIS WEEK / AVG DEAL) are static — each shows a fixed time window regardless of the filter selected. This makes the Day/Week/Month/All Time filter tabs meaningless for the cards.
+
+**Fix:** Replace all four cards with four metrics that all scope to the active filter window (same `startDate`/`endDate` bounds used by the chart and Deals table):
+
+| Card | Label | Value |
+|------|-------|-------|
+| 1 | REVENUE | `SUM(deal_value)` for active period |
+| 2 | YOUR CUT | REVENUE × 0.45, success color |
+| 3 | DEALS CLOSED | `COUNT(*)` of closed deals in period |
+| 4 | AVG DEAL | REVENUE ÷ DEALS CLOSED (or `—` if 0) |
+
+All four update together when the filter tab or custom date range changes.
+
+Remove the old static cards entirely — no "ALL TIME", "THIS MONTH", "THIS WEEK" fixed labels.
+
+**Do NOT change:** chart, Deals table, filter tabs, custom range calendar, Monthly Recurring section.
+
+**Verify:** All Time → cards show all-time totals. Switch to Month → all four cards show this month's numbers. Switch to Day → today's numbers. Custom range → that range's numbers. AVG DEAL shows `—` when no deals in period.
+
+---
+
+### ✅ Prompt 155 SHIPPED 2026-06-28 (`9452677`) — Deals table layout + reseed SQL
+
+- `RevenueTracker.jsx`: Deals table grid changed from `1fr auto auto auto` to `1fr 140px 160px 130px` — fixed column widths, headers align with data cells
+- Reseed SQL for Claude Chrome (shift deal_values to end in 96):
+```sql
+UPDATE appointments
+SET deal_value = deal_value - (deal_value % 100) + 96
+WHERE closer_id = (SELECT id FROM profiles WHERE role = 'closer' LIMIT 1)
+  AND outcome = 'closed';
+```
+
+---
+
+### ✅ Prompt 155 — Deals table layout + correct seed deal amounts
+
+**Part 1 — Table layout fix (`src/pages/closer/RevenueTracker.jsx`)**
+
+The Deals table has BUSINESS / TOTAL DEAL / YOUR CUT (45%) / DATE cramped on the right. Fix column widths so each column is clearly separated:
+
+- BUSINESS: `flex: 1` (takes remaining space, left-aligned)
+- TOTAL DEAL: fixed `140px`, right-aligned
+- YOUR CUT (45%): fixed `160px`, right-aligned, success color
+- DATE: fixed `130px`, right-aligned, muted color
+
+Headers must align exactly with data cells. Add consistent padding between columns so nothing looks crowded.
+
+**Part 2 — Reseed deal amounts (CC writes SQL, Claude Chrome runs it)**
+
+Every Ohvara deal = setup fee $297 + monthly subscription (always ends in 99). So total deal always ends in 96 (e.g. $297 + $999 = $1,296). The current seeded deal_values end in wrong digits.
+
+Write and output this SQL for Claude Chrome to run:
+
+```sql
+UPDATE appointments
+SET deal_value = deal_value - (deal_value % 100) + 96
+WHERE closer_id = (SELECT id FROM profiles WHERE role = 'closer' LIMIT 1)
+  AND outcome = 'closed';
+```
+
+This shifts every seeded amount to end in 96 (e.g. $1,199 → $1,196, $899 → $896) matching real deal math. Also update the matching commission_payouts amounts if that table has its own stored amounts.
+
+**Do NOT change:** chart data source, filter logic, any other table.
+
+**Verify:** Deals table columns are evenly spaced, no crowding. Every TOTAL DEAL value ends in 96. YOUR CUT = TOTAL DEAL × 0.45.
+
+---
+
+### ✅ Prompt 154 SHIPPED 2026-06-28 (`9452677`) — Fix Commission Earned
+
+- `CloserMyStats.jsx`: `windowCommission` now computes as `SUM(deal_value) × 0.45` from `windowData` filtered to `outcome === 'closed'`. `useCloserCommissions` hook call removed (no longer needed).
+
+---
+
+### ✅ Prompt 154 — Fix Commission Earned: compute dynamically as deal_value × 0.45
+
+**File:** `src/pages/closer/CloserMyStats.jsx`
+
+"Commission earned" in Earnings Summary is reading from `commission_payouts.amount` which has wrong values. Replace it: compute commission dynamically as `SUM(deal_value) × 0.45` from the closer's completed appointments within the active filter window — same source and same date bounds already used for "Total revenue closed".
+
+One change: wherever `windowCommission` is computed (added in Prompt 146), replace the `commission_payouts` query with `appointments` deal_value sum × 0.45. This makes the number definitionally correct and self-consistent: Commission Earned will always equal Total Revenue Closed × 0.45.
+
+**Do NOT change:** the commission_payouts table, any other calculation, any other file.
+
+**Verify:** My Stats → Month → Commission Earned = Total Revenue Closed × 0.45 (e.g. $3,598 → ~$1,619).
 
 ---
 
@@ -27,24 +156,6 @@ tags:
 
 ---
 
-### ✅ Prompt 153 — Pipeline KPI box fixes
-
-**File:** `src/pages/closer/CloserPipeline.jsx`
-
-**Fix 1 — Closer tab: PENDING + SCHEDULED boxes always visible**
-
-The PENDING and SCHEDULED KPI cards currently only render on the Pending sub-tab. When switching to All (or any other tab), they disappear. Make them always visible regardless of which closer sub-tab is active — same two cards, same data, always shown above the filter tabs.
-
-**Fix 2 — Appointment Setting tab: remove ACTIVE box**
-
-The Appointment Setting tab shows three KPI cards: TOTAL / BOOKED / ACTIVE. Remove the ACTIVE card entirely. Only TOTAL and BOOKED remain.
-
-**Do NOT change:** anything else — tab logic, filter behavior, table columns, colors.
-
-**Verify:** Closer tab → switch between Pending/Closed/Lost/All — PENDING and SCHEDULED cards always visible. Appointment Setting tab → only two cards (TOTAL + BOOKED).
-
----
-
 ### ✅ Prompt 152 SHIPPED 2026-06-28 (`2a6fa15`) — Closer popup: read-only setter data + price display
 
 - `AppointmentCardModal.jsx`: `callsMissed`/`avgTicket` converted from editable state to read-only constants from `lead.calls_missed_per_week`/`lead.avg_ticket`
@@ -52,39 +163,6 @@ The Appointment Setting tab shows three KPI cards: TOTAL / BOOKED / ACTIVE. Remo
 - Price display restructured: SETUP FEE ($297 always) + MONTHLY (calculated, accent color, mono) as labeled field rows
 - Generate Payment Link unchanged — already used `monthlyPrice` which derives from the same values
 - `Input` import removed (no longer needed)
-
----
-
-### ✅ Prompt 152 — Closer popup: pre-fill setter data, show calculated price, fix Generate Payment Link
-
-**File:** `src/components/shared/CallPrepModal.jsx` (closer mode) + wherever the closer popup reads its appointment/lead data
-
-**Context:** The setter captures `callsMissedPerWeek` and `avgTicket` during the discovery call (Prompt 138 — `capturedValues` state, debounced save to Supabase). By the time an appointment reaches the closer, that data already exists. The closer popup currently shows blank inputs for these — wrong. The closer never enters this data.
-
-**Step 1 — Find where setter captures are stored**
-
-Check what Prompt 138 actually saved to. Look in `ScriptWalk.jsx` for the debounced Supabase save — find the table and column names (`calls_missed_per_week`, `avg_ticket`, or similar). They're likely on the `appointments` or `leads` row. Confirm the field names before proceeding.
-
-**Step 2 — Remove the blank inputs from closer popup**
-
-In `CallPrepModal.jsx` (closer mode), the CLOSE section currently has editable inputs for "Calls missed/we" and "Avg ticket $". Remove both inputs entirely. Replace with read-only display of the values pulled from the appointment/lead record (the setter's captured data). Style as plain labeled values, not inputs — same style as the PHONE and SET BY fields on the left.
-
-If the values are null/missing (setter didn't capture), show "—" for each.
-
-**Step 3 — Calculate and display the price**
-
-Formula: `Math.round((Math.min(Math.max(callsMissedPerWeek * 4.33 * avgTicket * 0.15, 399), 1999) + 1) / 100) * 100 - 1`
-(floor $399, ceiling $1,999, rounds to nearest value ending in 99)
-
-Display the result prominently in the CLOSE section as **the price** — not "recommended price", just the number. Label it "MONTHLY" in the same caps-label style as other fields. JetBrains Mono, accent color. Setup fee is always $297 (display it too, labeled "SETUP FEE"). If captured values are missing, show "—" for the price too.
-
-**Step 4 — Fix Generate Payment Link**
-
-The Generate Payment Link button should use the calculated monthly price and $297 setup fee to build the two Stripe links (setup fee link + monthly subscription link). Check how it currently works — if it's reading from the blank inputs it was using before, rewire it to use the calculated values instead. If Stripe link generation is broken for another reason, surface the error.
-
-**Do NOT change:** SAY THIS stepper, status picker, call notes, Done button logic, any rep/setter files.
-
-**Verify:** Open closer popup for an appointment where the setter captured data → Calls missed/week and avg ticket show pre-filled values (read-only) → Monthly price auto-calculated and displayed → Generate Payment Link produces two links using those values.
 
 ---
 
