@@ -16,7 +16,16 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–172 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–173 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+
+---
+
+### ✅ Prompt 173 SHIPPED 2026-06-30 (`3767b5b`) — 4 small fixes
+
+- Fix 1: `SetterStatusBadge` New color `var(--accent)` → `var(--info)` (matches New filter tab token).
+- Fix 2: "Redistributed This Week" KPI removed from `NoAnswerTab` (kept: In Queue + Redistributing Today).
+- Fix 3: "Overdue" KPI removed from `FollowUpTab` (kept: Pending Follow-Ups + Due Today).
+- Fix 4: `RepPerformance.jsx` default period `'week'` → `'day'`.
 
 ---
 

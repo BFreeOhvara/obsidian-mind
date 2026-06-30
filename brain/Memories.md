@@ -90,10 +90,23 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ---
 
+### [CC | 2026-06-30 — Prompt 173 shipped]
+
+- Fix 1: `SetterStatusBadge` New → `var(--info)`. Fix 2: "Redistributed This Week" KPI removed from NoAnswerTab. Fix 3: "Overdue" KPI removed from FollowUpTab. Fix 4: RepPerformance default `'week'`→`'day'`. `3767b5b` pushed.
+
+---
+
 ### [CC | 2026-06-30 — Prompts 171+172 shipped]
 
 - **172**: `AdminCloserView` verified — STATUS hidden on filtered tabs, `AdminCloserStatusBadge` on All, "completed"→"closed". No changes needed.
 - **171**: `SetterStatusBadge` added (New=blue/accent, No Answer=slate, Follow-Up=yellow/warning, Not Interested=red/danger). All tab in `AppointmentSettingView` uses badge instead of plain text. `22dc6a0` pushed.
+
+---
+
+### [CC | 2026-06-30 — Prompts 171+172 shipped]
+
+- **172**: `AdminCloserView` verified correct from P164 — no changes needed. `22dc6a0` pushed.
+- **171**: `SetterStatusBadge` (New=blue, No Answer=slate, Follow-Up=yellow, Not Interested=red) added to All tab in `AppointmentSettingView`.
 
 ---
 
