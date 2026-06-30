@@ -90,10 +90,24 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ---
 
+### [CC | 2026-06-30 — Prompts 171+172 shipped]
+
+- **172**: `AdminCloserView` verified — STATUS hidden on filtered tabs, `AdminCloserStatusBadge` on All, "completed"→"closed". No changes needed.
+- **171**: `SetterStatusBadge` added (New=blue/accent, No Answer=slate, Follow-Up=yellow/warning, Not Interested=red/danger). All tab in `AppointmentSettingView` uses badge instead of plain text. `22dc6a0` pushed.
+
+---
+
 ### [CC | 2026-06-30 — Prompts 169+170 shipped]
 
 - **169**: `useNoAnswerQueue` → `.is('distributed_at', null)` (active holds only). `useFollowUpQueue` → `.is('reminded_at', null).is('completed_at', null)` (pending only). Badge counts accurate.
 - **170**: `assign_daily_batches()` rewritten — promotes due follow-ups per rep before filling new slots. Migration `063_follow_up_at.sql` applied. `de7f3fd` pushed.
+
+---
+
+### [CC | 2026-06-30 — Prompts 169+170 shipped]
+
+- **169**: No Answer tab filtered to `.is('distributed_at', null)` — distributed rows hidden. Follow-Up tab filtered to hide completed rows. Both tabs now show active-only entries. `de7f3fd` pushed.
+- **170**: `assign_daily_batches()` rewritten — Step 1 promotes due follow-ups per rep (`follow_up_at <= today` → `status='New'`); remaining slots fill to 150 cap. `follow_up_at` column already existed, no migration needed.
 
 ---
 
@@ -109,9 +123,9 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ---
 
-### [CC | 2026-06-30 — Prompt 167 shipped]
+### [CC | 2026-06-30 — Prompt 167 shipped (Falcon log)]
 
-- **167**: No Answer 24h hold → Unassigned pool return.
+- **167**: No Answer 24h hold → Unassigned pool return. Migration 062 applied via Supabase MCP (Falcon). `fa26526` pushed.
   - `no_answer_at` already existed on leads (migration 019 trigger). No new column needed.
   - `process_lead_queues()` No Answer block removed — was redistributing to random rep. Follow-up logic unchanged.
   - New edge function `redistribute-no-answers` deployed: queries `leads WHERE status='No Answer' AND no_answer_at <= now()-24h`, sets `assigned_rep_id=NULL, status='New', no_answer_at=NULL`, closes `no_answer_queue` rows with `distributed_at`.
