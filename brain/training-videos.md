@@ -68,6 +68,9 @@ metadata:
 - [x] Brayden transcribed all 8 videos via free YouTube transcript sites, sent transcripts 2026-06-30
 - [x] Falcon generated real mini-quiz (32 Q) + final exam (28 Q) content — see [[training-quiz-content]]
 - [x] Prompt 176 queued in [[LIVE_STATE]] — CC swaps placeholder quiz content for real content
-- [ ] CC runs Prompts 175 + 176
+- [x] CC ran Prompts 175 + 176
+- [x] Diagnosed Brayden's "flashcards/quiz didn't change" report 2026-06-30: Final Exam is correct (28 real Qs); separate old "Flashcards" (48 generic cards) + "Quiz" (20 Q drawn from that deck) tabs were never in scope
+- [x] Falcon generated real video-specific flashcard content (48 cards, 6/video) — see [[training-flashcard-content]]
+- [ ] Prompt 177 queued in [[LIVE_STATE]] — CC swaps in real flashcards + retires old Quiz tab
 
 **Why not voicemail strategy:** no-answer leads stay in the pipeline and get called back automatically — voicemail is low priority.
