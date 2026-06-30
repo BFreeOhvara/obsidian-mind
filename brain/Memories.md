@@ -90,6 +90,15 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ---
 
+### [CC | 2026-06-30 — Prompt 177 shipped · `dc6de73`]
+
+- **Flashcards**: `src/data/flashcards.js` replaced — 8 video-tied categories (AI Receptionist / Tonality / Discovery / Gatekeeper / Objections / Qualifying / Booking / Time Management), 6 cards each = 48 total. Old 6-category generic deck (Pipeline/Discovery/Objections/Booking/Niches/Mindset) retired.
+- **Quiz tab**: removed from TABS array, render block, and progress checklist. `QuizTab` component + `generateQuiz()` remain in the file (not deleted — no check done for other imports), only the tab entry and render line removed.
+- **Final Exam**: untouched — still shows 28 video-specific questions, 85% gate, gated by all 8 watched.
+- Build clean. Commit `dc6de73` pushed.
+
+---
+
 ### [CC | 2026-06-30 — Prompts 175+176 shipped · `d092883`]
 
 - **175**: TRAINING_VIDEOS[5].youtubeId swapped `dj3J75I0GYQ` → `wDgnnCRufOI` (Qualifying Customers, 5:05).

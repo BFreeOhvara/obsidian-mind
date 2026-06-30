@@ -16,23 +16,15 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–176 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–177 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
 ---
 
-### Prompt 177 — Replace generic Flashcards deck with video-specific cards, retire old Quiz tab
+### ✅ Prompt 177 SHIPPED 2026-06-30 (`dc6de73`) — video-tied flashcards + Quiz tab retired
 
-**Context:** Brayden reported "flashcards didn't change" and "quiz still says 20 questions" after Prompt 174-176. Root cause confirmed live on production (`/rep/training`, logged in as `apex11`): the Training Center has 6 tabs — Script | Videos | **Flashcards (48 cards)** | **Quiz** | Final Exam | AI Roleplay. Prompt 174-176 only ever touched **Final Exam** (now correctly showing 25-30 real questions from the 8 videos). **Flashcards** (48 cards, categories Pipeline/Discovery/Objections/Booking/Niches/Mindset) and **Quiz** (20 questions, drawn at random from that same flashcard deck) are a separate, older system that was never in scope and still has zero connection to the 8 training videos.
-
-**Change 1 — Replace flashcard deck content.**
-Find wherever the 48-card flashcard deck data lives (likely a `FLASHCARDS` array/object in the same file as `TRAINING_VIDEOS`/`MINI_QUIZ_CONTENT`/`FINAL_EXAM_QUESTIONS`, or a sibling data file). Replace all 48 cards with the 48 cards in [[training-flashcard-content]] — 6 cards per video, one category per video (AI Receptionist / Tonality / Discovery / Gatekeeper / Objections / Qualifying / Booking / Time Management). Keep the existing `FlashcardDeck` component, category-filter pills, "Mark Mastered" mechanic, and the `training_completed` flashcard-mastery gate exactly as-is — content swap only, same shape (front/back pairs, category tag per card).
-
-**Change 2 — Retire the old "Quiz" tab.**
-Remove the "Quiz" tab (the one labeled "Flashcard Quiz," 20 random questions pulled from the flashcard deck, 85% pass threshold) from the Training Center tab bar entirely. "Final Exam" is now the sole quiz that matters — it already covers all 8 videos with real content and already gates `training_completed` per Prompt 174. Do not touch any pass/fail state this old Quiz tab may have written anywhere (e.g. if it set a `localStorage` or Supabase flag, leave that flag alone — just remove the tab and its route/component from the UI). If the old Quiz component is also imported elsewhere, only remove the Training Center tab/nav entry, not the component file itself (avoid breaking an import elsewhere without checking first).
-
-**Do NOT change:** Videos tab, Script tab, AI Roleplay tab, Final Exam content/gating (already correct from Prompt 176), the flashcard mastery → `training_completed` flag logic.
-
-**Verify:** Flashcards tab shows 8 categories (one per video) with 6 cards each, real content not generic. Old "Quiz" tab no longer appears in the tab bar. Final Exam untouched and still shows 25-30 video-specific questions.
+- **Flashcards**: `src/data/flashcards.js` replaced with 8 video categories × 6 cards = 48 total (AI Receptionist / Tonality / Discovery / Gatekeeper / Objections / Qualifying / Booking / Time Management). Old generic 6-category deck gone.
+- **Quiz tab**: removed from tab bar, render block, and progress checklist. Component left in file (not deleted).
+- **Final Exam**: untouched — 28 real questions, 85% gate, gated by all 8 watched.
 
 ---
 
