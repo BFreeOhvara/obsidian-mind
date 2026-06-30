@@ -20,6 +20,18 @@ tags:
 
 ---
 
+### Prompt 178 — Flashcards: short-form recall cards (content-only swap)
+
+**Context:** Brayden reviewed Prompt 177's video-tied flashcards (full Q&A sentences) and found them too hard to memorize. Ask: make flashcards short — a term/cue on the front, a short phrase on the back, not full sentences. Final Exam stays as full-sentence general-knowledge questions (Brayden confirmed that's fine as-is) — this prompt only touches flashcard content.
+
+**Change:** In `src/data/flashcards.js` (the file Prompt 177 just populated), replace all 48 card `front`/`back` text with the short-form versions in [[training-flashcard-content]] (updated 2026-06-30). Same 8 categories, same 6-per-category count, same data shape/keys — only the front/back strings get shorter. Example: old front "How do you put a dollar value on one missed call a day?" / back "Multiply missed calls/day × average ticket price × days per year..." becomes front "Missed call math" / back "Calls missed/day × ticket price × days/yr".
+
+**Do NOT change:** category names, card count, FlashcardDeck component, Mark Mastered mechanic, Final Exam (leave its full-sentence questions alone), any other tab.
+
+**Verify:** Flashcards tab still shows 48 cards across the same 8 categories, but each card now reads as a short cue/phrase pair instead of a full question and full-sentence answer.
+
+---
+
 ### ✅ Prompt 177 SHIPPED 2026-06-30 (`dc6de73`) — video-tied flashcards + Quiz tab retired
 
 - **Flashcards**: `src/data/flashcards.js` replaced with 8 video categories × 6 cards = 48 total (AI Receptionist / Tonality / Discovery / Gatekeeper / Objections / Qualifying / Booking / Time Management). Old generic 6-category deck gone.
