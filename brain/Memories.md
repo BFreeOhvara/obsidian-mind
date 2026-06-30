@@ -96,6 +96,24 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ---
 
+### [CC | 2026-06-30 — Prompt 166 shipped]
+
+- **166**: `AppointmentSettingView` sub-tab 3-way color swap — No Answer → slate (`#94A3B8`), Follow-Up → yellow (`var(--warning)`), All → blue (`var(--accent)`). `f225bb7` pushed.
+
+---
+
+### [CC | 2026-06-30 — Prompt 167 shipped]
+
+- **167**: No Answer 24h hold → Unassigned pool return.
+  - `no_answer_at` already existed on leads (migration 019 trigger). No new column needed.
+  - `process_lead_queues()` No Answer block removed — was redistributing to random rep. Follow-up logic unchanged.
+  - New edge function `redistribute-no-answers` deployed: queries `leads WHERE status='No Answer' AND no_answer_at <= now()-24h`, sets `assigned_rep_id=NULL, status='New', no_answer_at=NULL`, closes `no_answer_queue` rows with `distributed_at`.
+  - Migration `062_no_answer_at.sql` applied: column guard + modified `process_lead_queues` + pg_cron every 5 min.
+  - `NoAnswerTab` status badge: "distributed" → "pool" (since no dist_rep assigned).
+  - `fa26526` pushed.
+
+---
+
 ### [CC | 2026-06-30 — Prompt 168 shipped]
 
 - **168**: CSV upload on Unassigned > Review tab. `parseCSV()` helper (case-insensitive header aliasing). Dedup by phone OR business+city before insert. Rows inserted with `verified=false`, `assigned_rep_id=null`. Inline success/error message, refetch after upload. Lead Sources + Lead Scraper removed from admin sidebar NAV (page files kept). `1844b74` pushed.

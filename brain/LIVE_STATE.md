@@ -16,7 +16,7 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–165, 168 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–168 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
 ---
 
@@ -33,7 +33,7 @@ tags:
 
 ---
 
-### Prompt 167 — No Answer 24-hour hold → return to Unassigned pool
+### ✅ Prompt 167 SHIPPED 2026-06-30 (`fa26526`) — No Answer 24h hold → Unassigned pool return
 
 **Files:** `supabase/migrations/062_no_answer_at.sql`, `supabase/functions/redistribute-no-answers/index.ts` (new edge function), existing pg_cron setup
 
