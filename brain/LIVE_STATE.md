@@ -16,36 +16,83 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–161 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–165, 168 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+
+---
+
+### ✅ Prompt 168 SHIPPED 2026-06-30 (`1844b74`) — CSV upload on Review tab + sidebar cleanup
+
+- `UnassignedTab`: `parseCSV()` helper (case-insensitive header match), Upload Leads button top-right of Review sub-tab, dedup by phone OR business+city, inserts with `verified=false`, inline success/error message, refetches after upload.
+- `Sidebar.jsx`: Lead Sources + Lead Scraper nav items removed from admin NAV array. Page files untouched.
+
+---
+
+### Prompt 166 — Appointment Setting tab: fix sub-tab colors
+
+**File:** `src/pages/admin/LeadPipeline.jsx` (or wherever `AppointmentSettingView` tab colors are defined)
+
+Two color swaps on the Appointment Setting sub-tabs:
+- **No Answer** tab: change to gray/slate (use `var(--text-muted)` or equivalent neutral — same visual weight as the All tab's default styling)
+- **Follow-Up** tab: change to yellow (use `var(--warning)` — same yellow No Answer currently has)
+
+Everything else (New = blue, Not Interested = red, All = neutral) stays unchanged.
+
+**Do NOT change:** any logic, data, or other tabs.
+
+---
+
+### Prompt 167 — No Answer 24-hour hold → return to Unassigned pool
+
+**Files:** `supabase/migrations/062_no_answer_at.sql`, `supabase/functions/redistribute-no-answers/index.ts` (new edge function), existing pg_cron setup
+
+**Business logic:** When a rep marks a lead as no_answer, it sits in the No Answer queue for exactly 24 hours from the moment it was marked. After 24 hours, it automatically returns to the Unassigned pool — `assigned_rep_id` set to NULL, `call_status` reset to `'new'` — so it can be picked up again in the next batch. It does NOT get redistributed to a specific rep; it just goes back to the pool.
+
+**Part 1 — Migration (`062_no_answer_at.sql`):**
+Check if a `no_answer_at timestamptz` column already exists on leads. If not:
+```sql
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS no_answer_at timestamptz;
+```
+Also check what currently sets the no_answer state — if there's a `called_at` or similar timestamp already being used for this, note it and use the existing column instead of adding a new one.
+
+**Part 2 — Edge function (`redistribute-no-answers`):**
+Runs on a schedule. Logic:
+```sql
+UPDATE leads
+SET assigned_rep_id = NULL,
+    call_status = 'new',
+    no_answer_at = NULL
+WHERE call_status = 'no_answer'
+  AND no_answer_at IS NOT NULL
+  AND no_answer_at <= NOW() - INTERVAL '24 hours';
+```
+Returns count of leads returned to pool.
+
+**Part 3 — pg_cron job:**
+Register the edge function in pg_cron (same pattern as migration 058's `send-appointment-reminders` cron). Run every 5 minutes: `*/5 * * * *`.
+
+**Part 4 — When rep marks no_answer:**
+Wherever the rep's call outcome saves `call_status = 'no_answer'` to the database, also set `no_answer_at = NOW()` at the same time. Find that save path (likely in a Supabase update call in the rep's call flow or `MyLeads.jsx`) and add the timestamp.
+
+**Remove:** The existing "redistribution to specific rep" logic in the No Answer tab if it exists — leads return to pool only, never pushed to a named rep.
+
+**KPI cards on No Answer tab:** Keep IN QUEUE (count where `call_status = 'no_answer'`), update REDISTRIBUTING TODAY and REDISTRIBUTED THIS WEEK to count leads that returned to pool today/this week (query leads where `call_status = 'new' AND assigned_rep_id IS NULL AND no_answer_at IS NULL` filtered by date — or add a `redistributed_at` timestamp if needed).
+
+⚠️ Apply migration 062 via Supabase MCP before deploying edge function.
+
+---
+
+### ✅ Prompts 163+164+165 SHIPPED 2026-06-30 (`fd947e5`) — Admin pipeline overhaul
+
+- **163**: `AppointmentSettingView` — CloserPipeline-style filter tabs (New/No Answer/Follow-Up/Not Interested/All) with count badges.
+- **164**: `AdminCloserView` — filter tabs (Pending/Closed/Lost/No Show/Needs Rescheduling/All) + table (BUSINESS/NICHE/CITY/PHONE/SET BY/CLOSER/SCHEDULED). Color-coded status badge on All tab. 2 KPI cards: PENDING TOTAL + CLOSED TOTAL.
+- **165**: `UnassignedTab` rebuilt with Review/Confirmed sub-tabs. Review: `verified=false` leads + Google search link + Confirm button. Confirmed: `verified=true` pool. Migration `061_lead_verified.sql` created + applied via Supabase MCP (Falcon).
+- ⚠️ Scraper insert still needs `verified: false` on new leads — queue separately.
 
 ---
 
 ### ✅ Prompt 162 SHIPPED 2026-06-30 (`7f3e7e5`) — Admin LeadPipeline: 3 top-level tabs
 
 - `LeadPipeline.jsx`: 6-tab flat list → 3 top-level VIEW_TABS (Unassigned / Appointment Setting / Closer). Unassigned renders existing `UnassignedTab`. Appointment Setting gets inner SETTER_SUB_TABS (New / No Answer Queue / Follow-Up Queue / Not Interested). Closer renders existing `BookedTab`. Default view: Unassigned. All table content components unchanged.
-
----
-
-### ~~Prompt 162 — Admin LeadPipeline: 3 top-level tabs (Unassigned / Appointment Setting / Closer)~~
-
-**File:** `src/pages/admin/LeadPipeline.jsx` (and any sub-components it renders)
-
-Restructure the admin pipeline to mirror the Closer pipeline's tab layout, but with 3 top-level tabs instead of 2:
-
-**Tab 1 — Unassigned**
-Leads where `assigned_rep_id IS NULL AND assigned_closer_id IS NULL`. This is the admin's pool to distribute. Show the existing unassigned leads table/view here. Default active tab.
-
-**Tab 2 — Appointment Setting**
-Leads assigned to reps (`assigned_rep_id IS NOT NULL`). This is the setter pipeline — what reps are working. Show the existing rep-assigned leads view here.
-
-**Tab 3 — Closer**
-Appointments in the closer pipeline (`assigned_closer_id IS NOT NULL`, or pull from the `appointments` table scoped to all closers). Show the existing closer-assigned appointments view here.
-
-**Implementation:** Use the same tab component/pattern already used in `CloserPipeline.jsx` (the Closer / Appointment Setting switcher) — extend it to 3 tabs and wire each to the correct data filter. Whatever sub-filters/columns currently exist within each view stay intact — this is a top-level reorganization only, not a rebuild of the table contents.
-
-**Do NOT change:** individual table columns, search, existing filters within each section, RLS, or any other admin page.
-
-**Verify:** Admin pipeline loads on Unassigned by default. Appointment Setting shows rep-assigned leads. Closer shows closer pipeline appointments.
 
 ---
 

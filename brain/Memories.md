@@ -90,23 +90,23 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ---
 
+### [CC | 2026-06-30 — Prompt 168 shipped]
+
+- **168**: CSV upload on Unassigned > Review tab. `parseCSV()` helper (case-insensitive header aliasing). Dedup by phone OR business+city before insert. Rows inserted with `verified=false`, `assigned_rep_id=null`. Inline success/error message, refetch after upload. Lead Sources + Lead Scraper removed from admin sidebar NAV (page files kept). `1844b74` pushed.
+
+---
+
 ### [CC | 2026-06-30 — Prompts 163+164+165 shipped]
 
 - **163**: `AppointmentSettingView` — CloserPipeline-style colored filter tabs (New/No Answer/Follow-Up/Not Interested/All) with count badges.
 - **164**: `AdminCloserView` — filter tabs + table; All tab color badge; 2 KPI cards. Replaces BookedTab.
-- **165**: `UnassignedTab` — Review/Confirmed sub-tabs. Confirm button sets `verified=true`. Migration `061_lead_verified.sql` created. ⚠️ Apply manually: `ALTER TABLE leads ADD COLUMN IF NOT EXISTS verified boolean NOT NULL DEFAULT true;`. `fd947e5` pushed.
+- **165**: `UnassignedTab` — Review/Confirmed sub-tabs. Confirm button sets `verified=true`. Migration `061_lead_verified.sql` created + applied via Supabase MCP (Falcon). ⚠️ Scraper still needs `verified: false` on new lead inserts. `fd947e5` pushed.
 
 ---
 
 ### [CC | 2026-06-30 — Prompt 162 shipped]
 
 - **162**: `admin/LeadPipeline.jsx` — 6 flat tabs → 3 top-level VIEW_TABS (Unassigned default, Appointment Setting with inner sub-tabs, Closer). All table content unchanged. `7f3e7e5` pushed.
-
----
-
-### [CC | 2026-06-30 — Prompt 162 shipped]
-
-- **162**: `LeadPipeline.jsx` — 6-tab flat list → 3 top-level tabs: Unassigned (default), Appointment Setting (inner sub-tabs: New/No Answer Queue/Follow-Up Queue/Not Interested), Closer (BookedTab). Table contents unchanged. `7f3e7e5` pushed.
 
 ---
 
