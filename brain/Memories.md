@@ -90,6 +90,20 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ---
 
+### [CC | 2026-06-30 — Prompt 174 shipped · `56cbf13`]
+
+- **TRAINING_VIDEOS** replaced with 8 real videos matching Brayden's final locked picks (`brain/training-videos.md`). All PLACEHOLDER IDs gone.
+- **LockedVideoPlayer** — YouTube IFrame API loaded dynamically; blocks scrubbing ahead via 1-second poll (snaps back to `maxTimeRef`); keyboard shortcuts disabled (`disablekb:1`); fullscreen allowed (`fs:1`); X button and backdrop-click disabled while video is playing.
+- **MiniQuiz** — per-video 4-question formative quiz (placeholder content, clearly labeled). Appears after video ends inside the same modal. Wrong answer shows correct highlight and advances. Never gates next video.
+- **FinalQuizTab** — 28-question exam (3-4 placeholder questions per video, all labeled for transcript-swap). Gated by `watchedCount >= 8` (all videos must be watched first). Pass threshold `FINAL_QUIZ_PASS_PCT = 85%`.
+- **Combined training_completed gate** — `profiles.training_completed` now only writes true when BOTH flashcards mastered AND final exam passed. State tracked client-side via localStorage key `ohvara_final_quiz_passed` (no migration exists for server-side final-quiz state — flagged for Falcon to add if needed).
+- **New "Final Exam" tab** added after Quiz in tab bar.
+- Build clean. Commit `56cbf13` pushed.
+
+**Content placeholder status:** quiz questions across all 3 quiz surfaces (mini-quiz × 8 + final quiz × 28 = 60 placeholders total) are stub text labeled "Placeholder Q# for [video title] — replace once transcript-derived questions are ready." Follow-up prompt will swap real content once Brayden's transcripts come in.
+
+---
+
 ### [CC | 2026-06-30 — Prompt 173 shipped]
 
 - Fix 1: `SetterStatusBadge` New → `var(--info)`. Fix 2: "Redistributed This Week" KPI removed from NoAnswerTab. Fix 3: "Overdue" KPI removed from FollowUpTab. Fix 4: RepPerformance default `'week'`→`'day'`. `3767b5b` pushed.
