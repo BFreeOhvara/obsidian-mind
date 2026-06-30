@@ -47,7 +47,7 @@ metadata:
 3. **Discovery script** — "What Questions To Ask Prospects During The Sales Discovery Process" — Jeremy Miner — **4:34** — https://www.youtube.com/watch?v=dDGX95UkV10 — ⚠️ swapped, original (`SThDd_7Y5Fw`) was 34:36, way over
 4. **Gatekeeper** — "How To Get Past The Gatekeeper? (Sales Training)" — **7:40** — https://www.youtube.com/watch?v=krveop9O-ik — kept, verified under 10 min
 5. **Objections** — "9 Minute Training To Destroy Any Sales Objection" — Jeremy Miner — **8:59** — https://www.youtube.com/watch?v=mDWUpuumAuo — ⚠️ swapped, original (`fAnEnXBtOjU`) was 18:24, over
-6. **Qualifying** — "Genius Sales Qualifying Questions: Stop Wasting Time on Bad Leads" — **9:16** — https://www.youtube.com/watch?v=dj3J75I0GYQ — kept, verified under 10 min
+6. **Qualifying** — "Qualifying Customers" — Sales School / The Wolf of Wall Street — **5:05** — https://www.youtube.com/watch?v=wDgnnCRufOI — ⚠️ swapped 2026-06-30, original (`dj3J75I0GYQ`) wasn't playing/loading for Brayden — kept same topic, picked a different video
 7. **Booking & handoff** — "Appointment Setter Training — 11 More Tips to Book Appointments" — **8:23** — https://www.youtube.com/watch?v=4mrM8GO6SS0 — kept, verified under 10 min
 8. **Time management** — "Sales Training: The Exact Daily Schedule Top Reps Use" — **7:08** — https://www.youtube.com/watch?v=ga5_EizLwdw — kept, verified under 10 min
 
