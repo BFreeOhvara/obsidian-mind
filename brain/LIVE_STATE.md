@@ -16,7 +16,13 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–153 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–158 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+
+---
+
+### ✅ Prompt 158 SHIPPED 2026-06-30 (`523a741`) — RevenueTracker: switch date field updated_at → created_at
+
+- `RevenueTracker.jsx`: all 12 `updated_at` references replaced with `created_at` — chartData memo, scoped KPI filter, custom range filter, Deals table DATE column, Supabase select field, DealsSection appointment date. Chart now buckets by real close date (INSERT timestamp), not trigger-overwritten updated_at.
 
 ---
 
@@ -29,56 +35,9 @@ tags:
 
 ---
 
-### ✅ Prompt 157 — Revenue Tracker: chart fixed to last 8 months of new closes, decoupled from filter
-
-**File:** `src/pages/closer/RevenueTracker.jsx`
-
-**The chart is now completely independent of the filter tabs.** Filter tabs (Day/Week/Month/All Time/Custom) only affect the 4 KPI cards and the Deals table — never the chart.
-
-**Chart behavior:**
-- Always shows the last 8 calendar months as bars
-- Each bar = new revenue closed (deal_value SUM) in that specific month only — NOT cumulative, NOT stacked
-- A month where nothing was closed shows a $0 bar (bar is absent/minimal) but the x-axis label still renders
-- Chart title: `"New Revenue — Last 8 Months"`
-- X-axis labels: `"Nov '25"`, `"Dec '25"` … format (apostrophe before year — already implemented in Prompt 150)
-- The chart never disappears, never shows a "No closed deals" replacement message — always visible
-
-**Remove:** any existing logic that changes the chart based on the active filter tab or date range.
-
-**Do NOT change:** KPI cards, Deals table, filter tabs, custom range calendar, Monthly Recurring section.
-
-**Verify:** Switch between All Time / Day / Week / Month / Custom — chart stays identical, always showing last 8 months of new closes. Months with no deals still show x-axis label.
-
----
-
 ### ✅ Prompt 156 SHIPPED 2026-06-28 (`9452677`) — Revenue Tracker: KPI cards respond to active filter
 
 - `RevenueTracker.jsx`: `kpis` memo now computes a single `scoped` dataset based on active filter/custom range. 4 new cards: REVENUE / YOUR CUT (×0.45) / DEALS CLOSED / AVG DEAL — all scope with filter. Static allTime/thisMonth/thisWeek removed.
-
----
-
-### ✅ Prompt 156 — Revenue Tracker: KPI cards respond to active filter
-
-**File:** `src/pages/closer/RevenueTracker.jsx`
-
-**Problem:** The four KPI cards (ALL TIME / THIS MONTH / THIS WEEK / AVG DEAL) are static — each shows a fixed time window regardless of the filter selected. This makes the Day/Week/Month/All Time filter tabs meaningless for the cards.
-
-**Fix:** Replace all four cards with four metrics that all scope to the active filter window (same `startDate`/`endDate` bounds used by the chart and Deals table):
-
-| Card | Label | Value |
-|------|-------|-------|
-| 1 | REVENUE | `SUM(deal_value)` for active period |
-| 2 | YOUR CUT | REVENUE × 0.45, success color |
-| 3 | DEALS CLOSED | `COUNT(*)` of closed deals in period |
-| 4 | AVG DEAL | REVENUE ÷ DEALS CLOSED (or `—` if 0) |
-
-All four update together when the filter tab or custom date range changes.
-
-Remove the old static cards entirely — no "ALL TIME", "THIS MONTH", "THIS WEEK" fixed labels.
-
-**Do NOT change:** chart, Deals table, filter tabs, custom range calendar, Monthly Recurring section.
-
-**Verify:** All Time → cards show all-time totals. Switch to Month → all four cards show this month's numbers. Switch to Day → today's numbers. Custom range → that range's numbers. AVG DEAL shows `—` when no deals in period.
 
 ---
 
@@ -95,57 +54,9 @@ WHERE closer_id = (SELECT id FROM profiles WHERE role = 'closer' LIMIT 1)
 
 ---
 
-### ✅ Prompt 155 — Deals table layout + correct seed deal amounts
-
-**Part 1 — Table layout fix (`src/pages/closer/RevenueTracker.jsx`)**
-
-The Deals table has BUSINESS / TOTAL DEAL / YOUR CUT (45%) / DATE cramped on the right. Fix column widths so each column is clearly separated:
-
-- BUSINESS: `flex: 1` (takes remaining space, left-aligned)
-- TOTAL DEAL: fixed `140px`, right-aligned
-- YOUR CUT (45%): fixed `160px`, right-aligned, success color
-- DATE: fixed `130px`, right-aligned, muted color
-
-Headers must align exactly with data cells. Add consistent padding between columns so nothing looks crowded.
-
-**Part 2 — Reseed deal amounts (CC writes SQL, Claude Chrome runs it)**
-
-Every Ohvara deal = setup fee $297 + monthly subscription (always ends in 99). So total deal always ends in 96 (e.g. $297 + $999 = $1,296). The current seeded deal_values end in wrong digits.
-
-Write and output this SQL for Claude Chrome to run:
-
-```sql
-UPDATE appointments
-SET deal_value = deal_value - (deal_value % 100) + 96
-WHERE closer_id = (SELECT id FROM profiles WHERE role = 'closer' LIMIT 1)
-  AND outcome = 'closed';
-```
-
-This shifts every seeded amount to end in 96 (e.g. $1,199 → $1,196, $899 → $896) matching real deal math. Also update the matching commission_payouts amounts if that table has its own stored amounts.
-
-**Do NOT change:** chart data source, filter logic, any other table.
-
-**Verify:** Deals table columns are evenly spaced, no crowding. Every TOTAL DEAL value ends in 96. YOUR CUT = TOTAL DEAL × 0.45.
-
----
-
 ### ✅ Prompt 154 SHIPPED 2026-06-28 (`9452677`) — Fix Commission Earned
 
 - `CloserMyStats.jsx`: `windowCommission` now computes as `SUM(deal_value) × 0.45` from `windowData` filtered to `outcome === 'closed'`. `useCloserCommissions` hook call removed (no longer needed).
-
----
-
-### ✅ Prompt 154 — Fix Commission Earned: compute dynamically as deal_value × 0.45
-
-**File:** `src/pages/closer/CloserMyStats.jsx`
-
-"Commission earned" in Earnings Summary is reading from `commission_payouts.amount` which has wrong values. Replace it: compute commission dynamically as `SUM(deal_value) × 0.45` from the closer's completed appointments within the active filter window — same source and same date bounds already used for "Total revenue closed".
-
-One change: wherever `windowCommission` is computed (added in Prompt 146), replace the `commission_payouts` query with `appointments` deal_value sum × 0.45. This makes the number definitionally correct and self-consistent: Commission Earned will always equal Total Revenue Closed × 0.45.
-
-**Do NOT change:** the commission_payouts table, any other calculation, any other file.
-
-**Verify:** My Stats → Month → Commission Earned = Total Revenue Closed × 0.45 (e.g. $3,598 → ~$1,619).
 
 ---
 

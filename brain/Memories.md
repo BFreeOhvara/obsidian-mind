@@ -64,6 +64,53 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-06-30 — Seed data fixed + Prompt 158 queued [Falcon]
+
+**Context:** Continuing from previous session. Revenue Tracker was showing all-zero data because deal_value was NULL on all seeded appointments and created_at/updated_at were all today.
+
+**Deal values fixed (via Falcon + Claude Chrome):**
+- Diagnostic revealed seed closer_id is `3f2b2df7-40b1-4921-80e2-09981c819642` (NOT `2d7e4b45...` which was Nate's profile — only 1 row)
+- SET deal_value on 14 closed appointments to values ending in 96: $796–$2,296. Confirmed 14 rows updated.
+
+**Dates spread across 8 months (via Falcon + Claude Chrome):**
+- All 14 seed appointments had created_at = today (Jun 28). Updated created_at to span Nov 2025 – Jun 2026 (1–3 deals/month).
+- ⚠️ Supabase trigger overwrites `updated_at` to NOW() on every row UPDATE — cannot set `updated_at` via SQL update. `created_at` was correctly set (confirmed by Chrome).
+
+**Prompt 158 queued for CC:**
+- `RevenueTracker.jsx` — replace all `updated_at` references with `created_at` (chart `chartData` memo, KPI `scoped` filter, Deals table DATE column). `updated_at` is trigger-controlled; `created_at` holds the real close date.
+- After this ships: chart bars spread Nov–Jun; Day filter shows 1 deal, Month shows 3, All Time shows 14.
+
+**Key learnings this session:**
+- Falcon can run Supabase SQL directly via Claude in Chrome MCP (navigate → clipboard → paste → run). No need to produce file artifacts for Claude Chrome.
+- The `updated_at` trigger is a hard constraint — always use `created_at` for business-logic date fields in RevenueTracker.
+- Seed closer_id: `3f2b2df7-40b1-4921-80e2-09981c819642` (14 closed deals)
+
+**Resume prompt for next session:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. CC is running Prompt 158 (RevenueTracker updated_at → created_at). Check if it shipped, verify Revenue Tracker filters work, then check North Star for what's next.`
+
+---
+
+### 2026-06-30 — Prompt 158 shipped [CC]
+
+- **158**: `RevenueTracker.jsx` — all 12 `updated_at` refs replaced with `created_at` (chartData memo, KPI scoped filter, custom range filter, Deals table DATE column, Supabase select, DealsSection date). Chart now buckets by real close date. `523a741` pushed.
+
+---
+
+### 2026-06-28 — Prompts 154–157 shipped [CC]
+
+- **157**: Revenue Tracker chart decoupled from filter — always shows last 8 months of new closes, never hides
+- **156**: Revenue Tracker KPI cards → REVENUE / YOUR CUT (×0.45) / DEALS CLOSED / AVG DEAL, all scoped to active filter
+- **155**: Deals table fixed column widths (1fr / 140px / 160px / 130px); reseed SQL produced for Claude Chrome
+- **154**: `CloserMyStats.jsx` Commission Earned now computed as `deal_value × 0.45` from appointments — `useCloserCommissions` hook removed
+
+⚠️ Reseed SQL from Prompt 155 still needs Claude Chrome:
+```sql
+UPDATE appointments SET deal_value = deal_value - (deal_value % 100) + 96
+WHERE closer_id = (SELECT id FROM profiles WHERE role = 'closer' LIMIT 1) AND outcome = 'closed';
+```
+
+---
+
 ### 2026-06-28 — Prompts 152–153 shipped [CC]
 
 - **153**: `CloserPipeline.jsx` — PENDING + SCHEDULED KPI cards always visible on all closer sub-tabs; ACTIVE card removed from Appointment Setting tab
