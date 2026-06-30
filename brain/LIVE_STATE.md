@@ -20,6 +20,32 @@ tags:
 
 ---
 
+### Prompt 174 — Wire 8 setter training videos + per-video mini quiz + final quiz into Training Center
+
+**File:** `src/pages/rep/TrainingCenter.jsx` (and wherever `TRAINING_VIDEOS` / flashcard-gate logic lives). Read it first — this replaces the 7 `PLACEHOLDER_*` YouTube IDs noted in the dashboard brain doc.
+
+**Source of truth:** [[training-videos]] — 8 topics + YouTube picks locked 2026-06-30.
+
+**1. Real video IDs (replace all PLACEHOLDER_* in `TRAINING_VIDEOS`):**
+1. What an AI receptionist does — `eqbEvpUBCSk`
+2. Tonality & delivery — `MmvtvsZDKmw`
+3. The discovery script — `SThDd_7Y5Fw`
+4. Getting past the gatekeeper — `krveop9O-ik`
+5. Handling objections — `fAnEnXBtOjU`
+6. Qualifying the prospect — `dj3J75I0GYQ`
+7. Booking & handoff — `4mrM8GO6SS0`
+8. Time management & call discipline — `ga5_EizLwdw`
+
+**2. Per-video mini quiz (new component).** After each video finishes (or on a "Take Quiz" action under it — match existing video-card UX), show a short 3–5 question quiz tied to that specific video. **Purely formative, non-gating:** wrong answer → show "incorrect," highlight the correct choice, then advance to the next question regardless of right/wrong. Never blocks moving to the next video, never blocks finishing training, score isn't stored anywhere that matters.
+
+**3. Final quiz (new component).** One combined 25–30 question quiz covering all 8 videos — this is the one that actually gates completion. Wire it into the same completion mechanism the flashcard deck already uses (`training_completed` flag / `onAllMastered` pattern, migration 059) rather than inventing a second gate. If the existing gate only has one boolean and can't cleanly support "flashcards done AND final quiz passed," use best judgment on how to combine them and flag the decision in your commit/log for Falcon to review — don't block the whole prompt on it.
+
+**4. Content isn't ready yet — ship the structure with placeholders.** Brayden is hand-transcribing the 8 videos; real quiz questions don't exist yet. Build both quiz components fully wired and functional with clearly-labeled placeholder questions (e.g. "Placeholder Q1 for [video topic] — replace once transcript-derived questions are ready"). A follow-up prompt will swap in real content once transcripts come in. Do not wait on content to ship the structure.
+
+**Verify:** each of the 8 video cards plays the correct real video. Mini quiz appears after each video, wrong answers show correct-answer highlight and advance, never blocks progress. Final 25–30 question quiz is reachable, gates completion consistent with the existing flashcard gate. Commit, log to [[Memories]], delete this prompt from LIVE_STATE.
+
+---
+
 ### ✅ Prompt 173 SHIPPED 2026-06-30 (`3767b5b`) — 4 small fixes
 
 - Fix 1: `SetterStatusBadge` New color `var(--accent)` → `var(--info)` (matches New filter tab token).
