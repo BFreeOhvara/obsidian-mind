@@ -27,17 +27,9 @@ tags:
 
 ---
 
-### Prompt 166 — Appointment Setting tab: fix sub-tab colors
+### ✅ Prompt 166 SHIPPED 2026-06-30 (`f225bb7`) — Appointment Setting sub-tab 3-way color swap
 
-**File:** `src/pages/admin/LeadPipeline.jsx` (or wherever `AppointmentSettingView` tab colors are defined)
-
-Two color swaps on the Appointment Setting sub-tabs:
-- **No Answer** tab: change to gray/slate (use `var(--text-muted)` or equivalent neutral — same visual weight as the All tab's default styling)
-- **Follow-Up** tab: change to yellow (use `var(--warning)` — same yellow No Answer currently has)
-
-Everything else (New = blue, Not Interested = red, All = neutral) stays unchanged.
-
-**Do NOT change:** any logic, data, or other tabs.
+- No Answer → slate (`#94A3B8`). Follow-Up → yellow (`var(--warning)`). All → blue (`var(--accent)`). Two commits (4c63afc + f225bb7).
 
 ---
 

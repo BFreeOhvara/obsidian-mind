@@ -90,6 +90,12 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ---
 
+### [CC | 2026-06-30 — Prompt 166 shipped]
+
+- **166**: Appointment Setting sub-tab 3-way color swap in `SETTER_FILTER_TABS`: No Answer → slate (`#94A3B8`), Follow-Up → `var(--warning)` yellow, All → `var(--accent)` blue. `f225bb7` pushed.
+
+---
+
 ### [CC | 2026-06-30 — Prompt 168 shipped]
 
 - **168**: CSV upload on Unassigned > Review tab. `parseCSV()` helper (case-insensitive header aliasing). Dedup by phone OR business+city before insert. Rows inserted with `verified=false`, `assigned_rep_id=null`. Inline success/error message, refetch after upload. Lead Sources + Lead Scraper removed from admin sidebar NAV (page files kept). `1844b74` pushed.
