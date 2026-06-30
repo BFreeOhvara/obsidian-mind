@@ -20,6 +20,29 @@ tags:
 
 ---
 
+### Prompt 176 — Swap in real mini-quiz + final exam content (Prompt 174 follow-up)
+
+**Source:** [[training-quiz-content]] — full 8×4 mini-quiz set + 28-question final exam, written from Brayden's transcripts of all 8 final videos (already reflects the swapped video 6 from Prompt 175 — no conflict).
+
+Replace all 60 placeholder questions from Prompt 174 (`MiniQuiz` per video + `FinalQuizTab`) with the real questions/options/correct-answers in that file. Same components, same gating/scoring behavior (mini-quiz non-gating/formative, final exam 85% threshold gates `training_completed` alongside flashcards) — this prompt only swaps question content, no structural changes.
+
+**Verify:** each of the 8 videos' mini-quiz shows its real 4 questions in order, correct answers highlight properly on a wrong guess. Final Exam tab shows all 28 real questions, scores correctly, 85%+ marks it passed. Commit, log to [[Memories]], delete this prompt from LIVE_STATE.
+
+---
+
+### Prompt 175 — Swap qualifying-topic video (Prompt 174 follow-up, one-line fix)
+
+**File:** wherever `TRAINING_VIDEOS` lives (same array Prompt 174 just populated).
+
+Video 6 (Qualifying the prospect) isn't playing/loading for Brayden. Swap the YouTube ID only — same topic, same slot, nothing else about Prompt 174's build changes (mini quiz placeholder, lock behavior, etc. all stay as-is):
+
+- Old: `dj3J75I0GYQ`
+- New: `wDgnnCRufOI` ("Qualifying Customers" — Sales School / The Wolf of Wall Street, 5:05)
+
+**Verify:** video 6 card now plays `wDgnnCRufOI` and actually loads. Commit, log to [[Memories]], delete this prompt from LIVE_STATE.
+
+---
+
 ### ✅ Prompt 174 SHIPPED 2026-06-30 (`56cbf13`) — 8 real videos + lock + mini quiz + final exam
 
 - TRAINING_VIDEOS replaced with 8 Brayden-locked picks (all <10 min). `LockedVideoPlayer` uses YouTube IFrame API — blocks scrub-ahead via 1s poll, disables keyboard shortcuts, X/backdrop locked while playing, fullscreen allowed. Mini quiz (4 placeholder Qs per video, formative/non-gating) appears in-modal after video ends. `FinalQuizTab` (28 placeholder Qs, 85% threshold, gated behind all 8 watched) added as new "Final Exam" tab. Combined training_completed gate: requires BOTH flashcards mastered AND final exam passed — final quiz state tracked client-side via `localStorage('ohvara_final_quiz_passed')` (⚠️ Falcon add server-side column if needed). 60 placeholder questions total — swap in real content once Brayden's transcripts arrive.

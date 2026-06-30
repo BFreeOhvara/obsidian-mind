@@ -47,7 +47,7 @@ metadata:
 3. **Discovery script** — "What Questions To Ask Prospects During The Sales Discovery Process" — Jeremy Miner — **4:34** — https://www.youtube.com/watch?v=dDGX95UkV10 — ⚠️ swapped, original (`SThDd_7Y5Fw`) was 34:36, way over
 4. **Gatekeeper** — "How To Get Past The Gatekeeper? (Sales Training)" — **7:40** — https://www.youtube.com/watch?v=krveop9O-ik — kept, verified under 10 min
 5. **Objections** — "9 Minute Training To Destroy Any Sales Objection" — Jeremy Miner — **8:59** — https://www.youtube.com/watch?v=mDWUpuumAuo — ⚠️ swapped, original (`fAnEnXBtOjU`) was 18:24, over
-6. **Qualifying** — "Genius Sales Qualifying Questions: Stop Wasting Time on Bad Leads" — **9:16** — https://www.youtube.com/watch?v=dj3J75I0GYQ — kept, verified under 10 min
+6. **Qualifying** — "Qualifying Customers" — Sales School / The Wolf of Wall Street — **5:05** — https://www.youtube.com/watch?v=wDgnnCRufOI — ⚠️ swapped 2026-06-30, original (`dj3J75I0GYQ`) wasn't playing/loading for Brayden — kept same topic, picked a different video
 7. **Booking & handoff** — "Appointment Setter Training — 11 More Tips to Book Appointments" — **8:23** — https://www.youtube.com/watch?v=4mrM8GO6SS0 — kept, verified under 10 min
 8. **Time management** — "Sales Training: The Exact Daily Schedule Top Reps Use" — **7:08** — https://www.youtube.com/watch?v=ga5_EizLwdw — kept, verified under 10 min
 
@@ -63,8 +63,11 @@ metadata:
 - [x] Brayden + Falcon pick all 8 videos (2026-06-30)
 - [x] Durations verified, 3 swapped for being over 10 min (2026-06-30)
 - [x] Prompt 174 queued in [[LIVE_STATE]] — CC wires videos + lock + mini quiz + final quiz structure (placeholder questions, since transcripts aren't ready yet)
-- [ ] Brayden transcribes all 8 videos, sends transcripts back
-- [ ] Falcon/Eagle generates real flashcards + quiz questions per video from transcripts
-- [ ] CC swaps placeholder quiz content for real content
+- [x] Prompt 174 SHIPPED 2026-06-30 (`56cbf13`)
+- [x] Video 6 swap queued as Prompt 175 (player wasn't loading the original pick)
+- [x] Brayden transcribed all 8 videos via free YouTube transcript sites, sent transcripts 2026-06-30
+- [x] Falcon generated real mini-quiz (32 Q) + final exam (28 Q) content — see [[training-quiz-content]]
+- [x] Prompt 176 queued in [[LIVE_STATE]] — CC swaps placeholder quiz content for real content
+- [ ] CC runs Prompts 175 + 176
 
 **Why not voicemail strategy:** no-answer leads stay in the pipeline and get called back automatically — voicemail is low priority.
