@@ -90,6 +90,12 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ---
 
+### [CC | 2026-06-30 — Prompt 159 shipped]
+
+- **159**: `CloserMyStats.jsx` — select/windowData switched `updated_at` → `created_at` (same trigger fix as P158); KPIs/Earnings scope to Day/Week/Month correctly. Chart hardcoded to last 7 days from `raw`, no filter dependency. `buildChartData` removed. `47951fa` pushed.
+
+---
+
 ### [CC | 2026-06-30 — queue check, no tasks]
 
 Queue empty after Prompt 158. `git pull` confirmed vault up to date. No new prompts from Eagle/Falcon — nothing to build.
