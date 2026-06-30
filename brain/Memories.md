@@ -90,6 +90,13 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ---
 
+### [CC | 2026-06-30 — Prompts 175+176 shipped · `d092883`]
+
+- **175**: TRAINING_VIDEOS[5].youtubeId swapped `dj3J75I0GYQ` → `wDgnnCRufOI` (Qualifying Customers, 5:05).
+- **176**: All 60 placeholder questions replaced with real content from [[training-quiz-content]]. `MINI_QUIZ_CONTENT` lookup (8×4 Qs) and `FINAL_EXAM_QUESTIONS` static array (28 Qs) replace the placeholder generators. `buildMiniQuiz` / `buildFinalQuizPool` are now thin wrappers that just return the real data. Build clean, pushed.
+
+---
+
 ### [CC | 2026-06-30 — Prompt 174 shipped · `56cbf13`]
 
 - **TRAINING_VIDEOS** replaced with 8 real videos matching Brayden's final locked picks (`brain/training-videos.md`). All PLACEHOLDER IDs gone.

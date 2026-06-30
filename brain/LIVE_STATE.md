@@ -16,30 +16,14 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–174 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–176 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
 ---
 
-### Prompt 176 — Swap in real mini-quiz + final exam content (Prompt 174 follow-up)
+### ✅ Prompts 175+176 SHIPPED 2026-06-30 (`d092883`) — video 6 swap + real quiz content
 
-**Source:** [[training-quiz-content]] — full 8×4 mini-quiz set + 28-question final exam, written from Brayden's transcripts of all 8 final videos (already reflects the swapped video 6 from Prompt 175 — no conflict).
-
-Replace all 60 placeholder questions from Prompt 174 (`MiniQuiz` per video + `FinalQuizTab`) with the real questions/options/correct-answers in that file. Same components, same gating/scoring behavior (mini-quiz non-gating/formative, final exam 85% threshold gates `training_completed` alongside flashcards) — this prompt only swaps question content, no structural changes.
-
-**Verify:** each of the 8 videos' mini-quiz shows its real 4 questions in order, correct answers highlight properly on a wrong guess. Final Exam tab shows all 28 real questions, scores correctly, 85%+ marks it passed. Commit, log to [[Memories]], delete this prompt from LIVE_STATE.
-
----
-
-### Prompt 175 — Swap qualifying-topic video (Prompt 174 follow-up, one-line fix)
-
-**File:** wherever `TRAINING_VIDEOS` lives (same array Prompt 174 just populated).
-
-Video 6 (Qualifying the prospect) isn't playing/loading for Brayden. Swap the YouTube ID only — same topic, same slot, nothing else about Prompt 174's build changes (mini quiz placeholder, lock behavior, etc. all stay as-is):
-
-- Old: `dj3J75I0GYQ`
-- New: `wDgnnCRufOI` ("Qualifying Customers" — Sales School / The Wolf of Wall Street, 5:05)
-
-**Verify:** video 6 card now plays `wDgnnCRufOI` and actually loads. Commit, log to [[Memories]], delete this prompt from LIVE_STATE.
+- **175**: Video 6 (Qualifying) YouTube ID swapped `dj3J75I0GYQ` → `wDgnnCRufOI` ("Qualifying Customers", 5:05). Duration updated to 5:05.
+- **176**: All 60 placeholder questions replaced with real transcript-derived content from [[training-quiz-content]]. `MINI_QUIZ_CONTENT` lookup object (8 videos × 4 Qs each) replaces `buildMiniQuiz` placeholder generator. `FINAL_EXAM_QUESTIONS` static array (28 Qs) replaces `buildFinalQuizPool` placeholder. Same components/gating/scoring — content only.
 
 ---
 
