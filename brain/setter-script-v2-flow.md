@@ -21,21 +21,22 @@ tags:
 ## SECTION 1 — Opener
 *id: opener | color: var(--accent-blue) | kind: opener*
 
-**Node: confirm**
-SAY: "Hey, is this [Business Name]? Is [First Name] around?"
-→ "Yes / speaking" → **node: indeed-open**
-→ "They're not in / who's calling?" → **node: gatekeeper**
+**Node: confirm-business**
+SAY: "Hey, is this [Business Name]?"
+→ "Yes / speaking" → **node: indeed-ask**
+→ Wrong number / not them → END
 
-**Node: gatekeeper**
-SAY: "No worries — do you know when they'd be back? I'll give them a call then."
-→ Gets time → END (log callback)
-→ "They don't take calls" → END
+**Node: indeed-ask**
+SAY: "Hey — I saw y'all had an Indeed listing up. I was wondering who I should speak to about that?"
+→ "That's me / you got them" → **node: bridge**
+→ "Let me transfer you / that's [Name]" → **node: transferred**
+→ "What's this about?" → **node: permission-frame**
 
-**Node: indeed-open**
-SAY: "Hey [First Name] — saw you guys have a listing up for a [receptionist / dispatcher / front desk]. Quick question about how you're handling calls while that search is going — you got a minute?"
-→ "Sure / yeah / go ahead" → **node: bridge**
-→ "What's this about? / Who is this?" → **node: permission-frame**
-→ "I'm busy / not a good time" → **node: permission-frame**
+**Node: transferred**
+SAY: "Hey [Name] — yeah, I was just asking about your listing for a [receptionist / dispatcher / front desk]. Quick question about how you're handling calls while that search is going — you got a minute?"
+→ "Sure / yeah" → **node: bridge**
+→ "What is this?" → **node: permission-frame**
+→ "I'm busy" → **node: permission-frame**
 
 **Node: permission-frame**
 SAY: "I know this is out of nowhere — you can totally tell me you're slammed and I'll let you go. Quick question first though: while you're looking for that person, who's catching the phones when your team's tied up?"

@@ -40,25 +40,29 @@ metadata:
 
 **Second revision:** also avoid "cold calling" in the title itself — general sales-skill videos preferred, even if cold calling comes up inside the video. Picks below all have clean titles.
 
-1. **What an AI receptionist does** — "AI Receptionist Demo: 24/7 Clinic Booking in Real-Time: Never Miss Another Call" — https://www.youtube.com/watch?v=eqbEvpUBCSk — pure functional demo (AI agent handling real call scenarios, missed-call pain), no business model/pricing/sales talk
-2. **Tonality & delivery** — "How To Master Your Tonality" — Sales School with Jordan Belfort — https://www.youtube.com/watch?v=MmvtvsZDKmw
-3. **Discovery script** — "How To Ask Discovery Questions To Uncover Business Problems" (Sell Playbook) — https://www.youtube.com/watch?v=SThDd_7Y5Fw
-4. **Gatekeeper** — "How To Get Past The Gatekeeper? (Sales Training)" — https://www.youtube.com/watch?v=krveop9O-ik
-5. **Objections** — "How To Overcome Any Sales Objection | Best Objection Handling Techniques, Scripts & Psychology" — https://www.youtube.com/watch?v=fAnEnXBtOjU
-6. **Qualifying** — "Genius Sales Qualifying Questions: Stop Wasting Time on Bad Leads" — https://www.youtube.com/watch?v=dj3J75I0GYQ
-7. **Booking & handoff** — "Appointment Setter Training — 11 More Tips to Book Appointments" — https://www.youtube.com/watch?v=4mrM8GO6SS0
-8. **Time management** — "Sales Training: The Exact Daily Schedule Top Reps Use" — https://www.youtube.com/watch?v=ga5_EizLwdw
+**FINAL — durations verified via Chrome 2026-06-30, all under 10 min, 3 swapped out for being too long:**
 
-**Status:** all 8 picked 2026-06-30. Next: Brayden watches/swaps as needed, transcribes, sends transcripts back for flashcard/quiz generation.
+1. **What an AI receptionist does** — "AI Receptionists for Small Businesses Explained (Full Breakdown)" — SixFlow Automations — **7:40** — https://www.youtube.com/watch?v=0_TQV5tfFds — ⚠️ swapped from original pick (`eqbEvpUBCSk` turned out to be a 17-second Short, not a real video)
+2. **Tonality & delivery** — "Tonality & Body Language" — Jordan Belfort — **9:35** — https://www.youtube.com/watch?v=vjj9qOxGCgk — ⚠️ swapped, original (`MmvtvsZDKmw`) was 11:12, over the 10-min cap
+3. **Discovery script** — "What Questions To Ask Prospects During The Sales Discovery Process" — Jeremy Miner — **4:34** — https://www.youtube.com/watch?v=dDGX95UkV10 — ⚠️ swapped, original (`SThDd_7Y5Fw`) was 34:36, way over
+4. **Gatekeeper** — "How To Get Past The Gatekeeper? (Sales Training)" — **7:40** — https://www.youtube.com/watch?v=krveop9O-ik — kept, verified under 10 min
+5. **Objections** — "9 Minute Training To Destroy Any Sales Objection" — Jeremy Miner — **8:59** — https://www.youtube.com/watch?v=mDWUpuumAuo — ⚠️ swapped, original (`fAnEnXBtOjU`) was 18:24, over
+6. **Qualifying** — "Genius Sales Qualifying Questions: Stop Wasting Time on Bad Leads" — **9:16** — https://www.youtube.com/watch?v=dj3J75I0GYQ — kept, verified under 10 min
+7. **Booking & handoff** — "Appointment Setter Training — 11 More Tips to Book Appointments" — **8:23** — https://www.youtube.com/watch?v=4mrM8GO6SS0 — kept, verified under 10 min
+8. **Time management** — "Sales Training: The Exact Daily Schedule Top Reps Use" — **7:08** — https://www.youtube.com/watch?v=ga5_EizLwdw — kept, verified under 10 min
+
+**Status:** all 8 final, durations verified 2026-06-30. **Transcription attempted via Chrome and abandoned** — YouTube's transcript panel opened but never rendered segment text across 2 different videos tried (likely a session/extraction limitation, not a per-video issue). Falling back to Brayden transcribing by hand as originally planned.
 
 ## Quiz Spec (locked 2026-06-30)
 
 - **Per-video mini quiz:** 3–5 questions, appears after each video. Purely formative/non-gating — wrong answer shows "incorrect," highlights the correct choice, advances to next question regardless. Never blocks moving on.
 - **Final quiz:** one combined 25–30 question quiz covering all 8 videos — this is the one that actually gates training completion (wired into the existing `training_completed` flag mechanism).
+- **Video lock (added 2026-06-30):** player can't be clicked off or skipped — fullscreen is allowed, but no scrubbing ahead, no navigating away mid-video. Mini quiz unlocks only after the video finishes.
 
 ## Status
 - [x] Brayden + Falcon pick all 8 videos (2026-06-30)
-- [x] Prompt 174 queued in [[LIVE_STATE]] — CC wires videos + mini quiz + final quiz structure (placeholder questions, since transcripts aren't ready yet)
+- [x] Durations verified, 3 swapped for being over 10 min (2026-06-30)
+- [x] Prompt 174 queued in [[LIVE_STATE]] — CC wires videos + lock + mini quiz + final quiz structure (placeholder questions, since transcripts aren't ready yet)
 - [ ] Brayden transcribes all 8 videos, sends transcripts back
 - [ ] Falcon/Eagle generates real flashcards + quiz questions per video from transcripts
 - [ ] CC swaps placeholder quiz content for real content

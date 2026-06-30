@@ -96,6 +96,12 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ---
 
+### [CC | 2026-06-30 — Prompt 173 shipped]
+
+- **173**: `SetterStatusBadge` New → `var(--info)`. "Redistributed This Week" KPI removed from NoAnswerTab. "Overdue" KPI removed from FollowUpTab. `RepPerformance.jsx` default `'week'` → `'day'`. `3767b5b` pushed.
+
+---
+
 ### [CC | 2026-06-30 — Prompts 171+172 shipped]
 
 - **172**: `AdminCloserView` verified — STATUS hidden on filtered tabs, `AdminCloserStatusBadge` on All, "completed"→"closed". No changes needed.
