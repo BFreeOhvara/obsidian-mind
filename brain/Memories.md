@@ -90,15 +90,22 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ---
 
-### [CC | 2026-06-30 — Prompt 166 shipped]
+### [CC | 2026-06-30 — Prompts 169+170 shipped]
 
-- **166**: Appointment Setting sub-tab 3-way color swap in `SETTER_FILTER_TABS`: No Answer → slate (`#94A3B8`), Follow-Up → `var(--warning)` yellow, All → `var(--accent)` blue. `f225bb7` pushed.
+- **169**: `useNoAnswerQueue` → `.is('distributed_at', null)` (active holds only). `useFollowUpQueue` → `.is('reminded_at', null).is('completed_at', null)` (pending only). Badge counts accurate.
+- **170**: `assign_daily_batches()` rewritten — promotes due follow-ups per rep before filling new slots. Migration `063_follow_up_at.sql` applied. `de7f3fd` pushed.
+
+---
+
+### [CC | 2026-06-30 — Prompt 167 shipped]
+
+- **167**: `062_no_answer_at.sql` applied. `redistribute-no-answers` edge function: leads return to pool after 24h (`assigned_rep_id=NULL, status='New', no_answer_at=NULL`). pg_cron `*/5 * * * *`. `process_lead_queues()` No Answer block removed. `fa26526` pushed.
 
 ---
 
 ### [CC | 2026-06-30 — Prompt 166 shipped]
 
-- **166**: `AppointmentSettingView` sub-tab 3-way color swap — No Answer → slate (`#94A3B8`), Follow-Up → yellow (`var(--warning)`), All → blue (`var(--accent)`). `f225bb7` pushed.
+- **166**: Appointment Setting sub-tab 3-way color swap in `SETTER_FILTER_TABS`: No Answer → slate (`#94A3B8`), Follow-Up → `var(--warning)` yellow, All → `var(--accent)` blue. `f225bb7` pushed.
 
 ---
 

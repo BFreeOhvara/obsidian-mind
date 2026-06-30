@@ -16,7 +16,14 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–168 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–170 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+
+---
+
+### ✅ Prompts 169+170 SHIPPED 2026-06-30 (`de7f3fd`) — No Answer/Follow-Up active-only + batch promotion
+
+- **169**: `useNoAnswerQueue` — added `.is('distributed_at', null)` filter (hides redistributed rows). `useFollowUpQueue` — added `.is('reminded_at', null).is('completed_at', null)` (hides completed follow-ups). Badge counts + tab tables now reflect only active entries.
+- **170**: Migration `063_follow_up_at.sql` — `follow_up_at` column guard (already exists) + `assign_daily_batches()` rewritten: Step 1 promotes due follow-ups per rep (`status='Follow-Up' AND follow_up_at::date <= current_date` → `status='New', batch_date=current_date`) + closes `follow_up_queue` rows; remaining steps fill to 150 cap.
 
 ---
 
@@ -35,41 +42,10 @@ tags:
 
 ### ✅ Prompt 167 SHIPPED 2026-06-30 (`fa26526`) — No Answer 24h hold → Unassigned pool return
 
-**Files:** `supabase/migrations/062_no_answer_at.sql`, `supabase/functions/redistribute-no-answers/index.ts` (new edge function), existing pg_cron setup
-
-**Business logic:** When a rep marks a lead as no_answer, it sits in the No Answer queue for exactly 24 hours from the moment it was marked. After 24 hours, it automatically returns to the Unassigned pool — `assigned_rep_id` set to NULL, `call_status` reset to `'new'` — so it can be picked up again in the next batch. It does NOT get redistributed to a specific rep; it just goes back to the pool.
-
-**Part 1 — Migration (`062_no_answer_at.sql`):**
-Check if a `no_answer_at timestamptz` column already exists on leads. If not:
-```sql
-ALTER TABLE leads ADD COLUMN IF NOT EXISTS no_answer_at timestamptz;
-```
-Also check what currently sets the no_answer state — if there's a `called_at` or similar timestamp already being used for this, note it and use the existing column instead of adding a new one.
-
-**Part 2 — Edge function (`redistribute-no-answers`):**
-Runs on a schedule. Logic:
-```sql
-UPDATE leads
-SET assigned_rep_id = NULL,
-    call_status = 'new',
-    no_answer_at = NULL
-WHERE call_status = 'no_answer'
-  AND no_answer_at IS NOT NULL
-  AND no_answer_at <= NOW() - INTERVAL '24 hours';
-```
-Returns count of leads returned to pool.
-
-**Part 3 — pg_cron job:**
-Register the edge function in pg_cron (same pattern as migration 058's `send-appointment-reminders` cron). Run every 5 minutes: `*/5 * * * *`.
-
-**Part 4 — When rep marks no_answer:**
-Wherever the rep's call outcome saves `call_status = 'no_answer'` to the database, also set `no_answer_at = NOW()` at the same time. Find that save path (likely in a Supabase update call in the rep's call flow or `MyLeads.jsx`) and add the timestamp.
-
-**Remove:** The existing "redistribution to specific rep" logic in the No Answer tab if it exists — leads return to pool only, never pushed to a named rep.
-
-**KPI cards on No Answer tab:** Keep IN QUEUE (count where `call_status = 'no_answer'`), update REDISTRIBUTING TODAY and REDISTRIBUTED THIS WEEK to count leads that returned to pool today/this week (query leads where `call_status = 'new' AND assigned_rep_id IS NULL AND no_answer_at IS NULL` filtered by date — or add a `redistributed_at` timestamp if needed).
-
-⚠️ Apply migration 062 via Supabase MCP before deploying edge function.
+- `062_no_answer_at.sql`: `no_answer_at timestamptz` column added to leads. Migration applied via Supabase MCP (Falcon).
+- `redistribute-no-answers` edge function: resets leads where `call_status = 'no_answer' AND no_answer_at <= NOW() - INTERVAL '24 hours'` → `assigned_rep_id = NULL, call_status = 'new', no_answer_at = NULL`.
+- pg_cron job registered (`*/5 * * * *`), same pattern as migration 058.
+- Rep no_answer save path updated to also set `no_answer_at = NOW()`.
 
 ---
 
