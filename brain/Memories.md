@@ -90,6 +90,12 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ---
 
+### [CC | 2026-06-30 — Prompt 162 shipped]
+
+- **162**: `admin/LeadPipeline.jsx` — 6 flat tabs → 3 top-level VIEW_TABS (Unassigned default, Appointment Setting with inner sub-tabs, Closer). All table content unchanged. `7f3e7e5` pushed.
+
+---
+
 ### [CC | 2026-06-30 — Prompt 161 shipped]
 
 - **161**: `CloserPipeline.jsx` — STATUS column removed from PendingTab. AllTab gets `AllStatusBadge`: color-coded pill (pending=yellow, completed/closed=green "closed", lost=red, no_show=slate, needs_rescheduling=blue). `21cf5f5` pushed.

@@ -16,7 +16,36 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–160 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–161 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+
+---
+
+### ✅ Prompt 162 SHIPPED 2026-06-30 (`7f3e7e5`) — Admin LeadPipeline: 3 top-level tabs
+
+- `LeadPipeline.jsx`: 6-tab flat list → 3 top-level VIEW_TABS (Unassigned / Appointment Setting / Closer). Unassigned renders existing `UnassignedTab`. Appointment Setting gets inner SETTER_SUB_TABS (New / No Answer Queue / Follow-Up Queue / Not Interested). Closer renders existing `BookedTab`. Default view: Unassigned. All table content components unchanged.
+
+---
+
+### ~~Prompt 162 — Admin LeadPipeline: 3 top-level tabs (Unassigned / Appointment Setting / Closer)~~
+
+**File:** `src/pages/admin/LeadPipeline.jsx` (and any sub-components it renders)
+
+Restructure the admin pipeline to mirror the Closer pipeline's tab layout, but with 3 top-level tabs instead of 2:
+
+**Tab 1 — Unassigned**
+Leads where `assigned_rep_id IS NULL AND assigned_closer_id IS NULL`. This is the admin's pool to distribute. Show the existing unassigned leads table/view here. Default active tab.
+
+**Tab 2 — Appointment Setting**
+Leads assigned to reps (`assigned_rep_id IS NOT NULL`). This is the setter pipeline — what reps are working. Show the existing rep-assigned leads view here.
+
+**Tab 3 — Closer**
+Appointments in the closer pipeline (`assigned_closer_id IS NOT NULL`, or pull from the `appointments` table scoped to all closers). Show the existing closer-assigned appointments view here.
+
+**Implementation:** Use the same tab component/pattern already used in `CloserPipeline.jsx` (the Closer / Appointment Setting switcher) — extend it to 3 tabs and wire each to the correct data filter. Whatever sub-filters/columns currently exist within each view stay intact — this is a top-level reorganization only, not a rebuild of the table contents.
+
+**Do NOT change:** individual table columns, search, existing filters within each section, RLS, or any other admin page.
+
+**Verify:** Admin pipeline loads on Unassigned by default. Appointment Setting shows rep-assigned leads. Closer shows closer pipeline appointments.
 
 ---
 
