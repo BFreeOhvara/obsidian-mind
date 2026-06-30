@@ -20,6 +20,41 @@ tags:
 
 ---
 
+### Prompt 159 — CloserMyStats: fix chart to last-7-days + make KPIs/Earnings scope to filter
+
+**File:** `src/pages/closer/CloserMyStats.jsx`
+
+**Problem (confirmed via screenshots):** Two bugs coexist:
+1. The chart changes with the Day/Week/Month filter — it shouldn't. It should always show close rate over the last 7 calendar days regardless of filter.
+2. The KPI cards (Close Rate, Show Rate, Deals Closed, Avg Deal) and Earnings Summary do NOT change with the filter — they show all-time numbers (14 deals) on both Day and Month. They should scope to the active window.
+
+**Fix 1 — Chart: hardcode to last 7 days, remove filter dependency.**
+
+Replace whatever chart memo/data currently drives the chart with a new standalone memo that:
+- Builds exactly 7 entries, one per calendar day — today and the 6 days before (Mon–Sun style, or just D-6 through today)
+- For each day: count appointments where `outcome = 'closed'` divided by total appointments that day → close rate %
+- Label each bar/point by short weekday or date (e.g. "Mon", "Tue" or "6/24", "6/25")
+- This memo reads from `raw` (all appointments, unfiltered) — NOT from `windowData`
+- Chart title: "Close Rate — Last 7 Days"
+- This memo must have zero dependency on `filter` state or `windowStart` — it must be identical regardless of which tab is active
+
+**Fix 2 — KPIs + Earnings: ensure they scope to active filter.**
+
+`windowData` should already be filtered by `windowStart` (Day = today, Week = last 7 days, Month = last 30 days). If the KPI cards and Earnings Summary are reading from `raw` instead of `windowData`, switch them to `windowData`. Specifically:
+- Close Rate: closed / total from `windowData`
+- Show Rate: showed / total from `windowData` (exclude no-shows)
+- Deals Closed: count closed from `windowData`
+- Avg Deal: average `deal_value` of closed in `windowData`
+- Earnings Summary — Total revenue closed: sum `deal_value` from `windowData` where closed
+- Earnings Summary — Deals closed: count from `windowData` where closed
+- Earnings Summary — Commission earned: stays as-is (separate commissions query — do NOT change)
+
+**Do NOT change:** filter tab UI, `windowStart` logic, commission query, anything outside `CloserMyStats.jsx`.
+
+**Verify:** On Day filter — Deals Closed should show 0 or 1 (not 14). On Month — deals from last 30 days only. Chart shows same 7-day bars on all filter tabs.
+
+---
+
 ### ✅ Prompt 158 SHIPPED 2026-06-30 (`523a741`) — RevenueTracker: switch date field updated_at → created_at
 
 - `RevenueTracker.jsx`: all 12 `updated_at` references replaced with `created_at` — chartData memo, scoped KPI filter, custom range filter, Deals table DATE column, Supabase select field, DealsSection appointment date. Chart now buckets by real close date (INSERT timestamp), not trigger-overwritten updated_at.
