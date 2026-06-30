@@ -90,6 +90,12 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ---
 
+### [CC | 2026-06-30 — Prompt 160 shipped]
+
+- **160**: `CloserPipeline.jsx` — KPI row reduced to exactly 2 cards per tab. PENDING always left (global from allAppts). Second card varies: TODAY on Pending/All, CLOSED DEALS on Closed, LOST on Lost, NO SHOW on No Show, NEEDS RESCHEDULING on Needs Rescheduling. SCHEDULED card removed. `filteredAppts.lost` fixed to outcome=lost only. `eb1a218` pushed.
+
+---
+
 ### [CC | 2026-06-30 — Prompt 159 shipped]
 
 - **159**: `CloserMyStats.jsx` — select/windowData switched `updated_at` → `created_at` (same trigger fix as P158); KPIs/Earnings scope to Day/Week/Month correctly. Chart hardcoded to last 7 days from `raw`, no filter dependency. `buildChartData` removed. `47951fa` pushed.
@@ -99,6 +105,12 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 ### [CC | 2026-06-30 — queue check, no tasks]
 
 Queue empty after Prompt 158. `git pull` confirmed vault up to date. No new prompts from Eagle/Falcon — nothing to build.
+
+---
+
+### [CC | 2026-06-30 — Prompt 159 shipped]
+
+- **159**: `CloserMyStats.jsx` — Supabase select switched to `created_at`; `windowData` filter now uses `created_at` so KPIs + Earnings scope correctly to Day/Week/Month. New `chartData` memo hardcoded to last 7 calendar days from `raw`, no filter dependency. Chart title: "Close Rate — Last 7 Days". `47951fa` pushed.
 
 ---
 

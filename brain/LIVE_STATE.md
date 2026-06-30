@@ -16,7 +16,41 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–158 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–159 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+
+---
+
+### ✅ Prompt 160 SHIPPED 2026-06-30 (`eb1a218`) — CloserPipeline: 2 KPI cards per tab
+
+- SCHEDULED card removed. PENDING always left (global count from allAppts). Second card: TODAY (pending+today) on Pending/All, CLOSED DEALS on Closed, LOST (lost-only, not no_show) on Lost, NO SHOW on No Show, NEEDS RESCHEDULING on Needs Rescheduling.
+- `filteredAppts.lost` fixed to `outcome === 'lost'` only (was including no_show).
+
+---
+
+### ~~Prompt 160 — CloserPipeline: 2 KPI cards per tab, PENDING always first, second varies~~
+
+**File:** `src/pages/closer/CloserPipeline.jsx`
+
+Every filter tab on the Closer sub-tab currently shows too many KPI cards (up to 4 on Closed), and "Scheduled" is redundant since every pending appointment already has a time. Replace with exactly 2 cards per tab — PENDING always on the left, second card depends on active tab:
+
+| Active tab | Card 1 | Card 2 |
+|---|---|---|
+| Pending | PENDING (count where status pending) | TODAY (pending appointments scheduled for today) |
+| Closed | PENDING | CLOSED DEALS (count where outcome closed) |
+| Lost | PENDING | LOST (count where outcome lost — NOT "Lost/No Show", just lost) |
+| No Show | PENDING | NO SHOW (count where outcome no_show) |
+| Needs Rescheduling | PENDING | NEEDS RESCHEDULING (count where status needs_rescheduling) |
+| All | PENDING | TODAY (same as Pending tab) |
+
+**Remove entirely:** the SCHEDULED KPI card (and any "Lost/No Show" combined card). These are gone from all tabs.
+
+**TODAY definition:** appointments where `status = 'pending'` AND `scheduled_at` falls on today's calendar date (compare date portion only, ignore time).
+
+**PENDING definition:** count of all appointments where `status = 'pending'` — same value on every tab (it's a global count, not scoped to the active tab filter).
+
+**Do NOT change:** the tab filter logic, the appointments table below, search bar, Appointment Setting sub-tab, or anything outside the KPI card section of the Closer sub-tab.
+
+**Verify:** Click through all 6 tabs — each shows exactly 2 cards. No "Scheduled" card anywhere. Lost tab shows "LOST" not "LOST / NO SHOW". Closed tab shows "CLOSED DEALS" count.
 
 ---
 
