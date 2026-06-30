@@ -20,6 +20,16 @@ tags:
 
 ---
 
+### Prompt 176 — Swap in real mini-quiz + final exam content (Prompt 174 follow-up)
+
+**Source:** [[training-quiz-content]] — full 8×4 mini-quiz set + 28-question final exam, written from Brayden's transcripts of all 8 final videos (already reflects the swapped video 6 from Prompt 175 — no conflict).
+
+Replace all 60 placeholder questions from Prompt 174 (`MiniQuiz` per video + `FinalQuizTab`) with the real questions/options/correct-answers in that file. Same components, same gating/scoring behavior (mini-quiz non-gating/formative, final exam 85% threshold gates `training_completed` alongside flashcards) — this prompt only swaps question content, no structural changes.
+
+**Verify:** each of the 8 videos' mini-quiz shows its real 4 questions in order, correct answers highlight properly on a wrong guess. Final Exam tab shows all 28 real questions, scores correctly, 85%+ marks it passed. Commit, log to [[Memories]], delete this prompt from LIVE_STATE.
+
+---
+
 ### Prompt 175 — Swap qualifying-topic video (Prompt 174 follow-up, one-line fix)
 
 **File:** wherever `TRAINING_VIDEOS` lives (same array Prompt 174 just populated).

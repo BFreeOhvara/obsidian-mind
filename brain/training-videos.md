@@ -63,8 +63,11 @@ metadata:
 - [x] Brayden + Falcon pick all 8 videos (2026-06-30)
 - [x] Durations verified, 3 swapped for being over 10 min (2026-06-30)
 - [x] Prompt 174 queued in [[LIVE_STATE]] — CC wires videos + lock + mini quiz + final quiz structure (placeholder questions, since transcripts aren't ready yet)
-- [ ] Brayden transcribes all 8 videos, sends transcripts back
-- [ ] Falcon/Eagle generates real flashcards + quiz questions per video from transcripts
-- [ ] CC swaps placeholder quiz content for real content
+- [x] Prompt 174 SHIPPED 2026-06-30 (`56cbf13`)
+- [x] Video 6 swap queued as Prompt 175 (player wasn't loading the original pick)
+- [x] Brayden transcribed all 8 videos via free YouTube transcript sites, sent transcripts 2026-06-30
+- [x] Falcon generated real mini-quiz (32 Q) + final exam (28 Q) content — see [[training-quiz-content]]
+- [x] Prompt 176 queued in [[LIVE_STATE]] — CC swaps placeholder quiz content for real content
+- [ ] CC runs Prompts 175 + 176
 
 **Why not voicemail strategy:** no-answer leads stay in the pipeline and get called back automatically — voicemail is low priority.
