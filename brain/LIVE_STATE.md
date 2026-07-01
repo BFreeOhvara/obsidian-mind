@@ -20,6 +20,18 @@ tags:
 
 ---
 
+### Prompt 185 — Fix: Final Exam question card renders above the viewport (Prompt 183 regression)
+
+**Context (Falcon, verified live 2026-07-01 via Chrome + DOM inspection):** Prompt 183 shipped and most of it works — no live score counter confirmed (searched page text for "correct", not found), locked modal confirmed (backdrop-dimmed, can't click through to background). But the "make the question card bigger" change broke layout: the modal/card is now taller than the viewport, doesn't scroll, and isn't vertically constrained — so the top of the card (the "Question X of 30" counter and the actual question text) renders **above** the visible viewport (confirmed via `getBoundingClientRect()`: the "Question" text node's `top` was `-164px` — literally off-screen above the fold). Only the 4 answer options are visible on a normal screen; the rep can't see what question they're even answering without scrolling the whole page up somehow (and the modal itself has no visible scroll).
+
+**Fix:** Constrain the exam modal/card so its full content (question counter, question text, all 4 answers) fits within the viewport height, OR make the modal internally scrollable (`max-height: 90vh` + `overflow-y: auto` on the card, or similar) so nothing renders off-screen regardless of screen size. "Bigger" should mean it fills more of the available space attractively — not that it exceeds the viewport and clips content above the fold. Test at a normal laptop viewport height (roughly 750-800px tall content area, same as what's been used in every other Chrome verification pass this project) to make sure the full card — header, question, and 4 options — is visible without any scrolling needed.
+
+**Do NOT change:** anything else from Prompt 183 (locked modal behavior, no live score, no answer-flash — all confirmed working), Prompt 184's Video 6 content, any other tab.
+
+**Verify:** Click "Start Final Exam," and without scrolling, confirm "Question 1 of 30," the full question text, and all 4 answer options are all visible on screen at once at a normal viewport height.
+
+---
+
 ### ✅ Prompt 183 SHIPPED 2026-07-01 (`9b75c67`) — final exam UX overhaul
 
 - `FinalQuizTab`: in-progress/finished states now render as a full-screen locked modal (`position: fixed`, same pattern as `LockedVideoPlayer`/Prompt 174) — no backdrop-click-to-close and no X while `!finished`; X + backdrop-click both work once `finished`. Start screen (stat cards/chips from Prompt 182) untouched, still inline.
