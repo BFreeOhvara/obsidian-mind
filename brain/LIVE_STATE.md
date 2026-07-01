@@ -20,6 +20,20 @@ tags:
 
 ---
 
+### Prompt 179 — Flashcards: true vocab-term format (content-only swap, v2)
+
+**Context:** Brayden reviewed Prompt 178's short-phrase flashcards and they still read as too long/sentence-like. What he actually wants: vocab-word style — front is a short term/label (2-4 words), back is a one-line definition, like a glossary entry, not a Q&A pair at all. He confirmed the Final Exam (multiple-choice, full questions covering everything) is fine as-is and should stay that way — this prompt only touches flashcard content, again.
+
+**Change:** In `src/data/flashcards.js` (same file Prompts 177/178 touched), replace all 48 card `front`/`back` strings with the vocab-term versions in [[training-flashcard-content]] (v2, updated 2026-06-30). Same 8 categories, same 6-per-category count, same data shape/keys. Example: front "Missed call math" / back "Calls missed/day × ticket price × days/yr" (Prompt 178) becomes front "Missed Call Math" / back "Missed calls/day × ticket price × days/year = lost revenue" — i.e. front reads like a glossary term, back reads like a definition, not an abbreviated sentence fragment.
+
+**Do NOT change:** category names, card count, FlashcardDeck component, Mark Mastered mechanic, Final Exam (leave alone — Brayden confirmed it's fine as full-sentence multiple choice), any other tab.
+
+**⚠️ Deploy check needed:** Prompt 178's commit (`1832fa7`) was verified correct in the GitHub repo but did NOT show up on the live production site (`ohvara-dashboard.vercel.app`) after 6+ minutes of waiting — confirmed by fetching the live JS bundle directly and finding it still contained the old pre-178 text. Prompt 177 had deployed live within ~1-2 min normally. If Prompt 179's commit also fails to go live within a few minutes of pushing, flag it — something may be wrong with the Vercel auto-deploy pipeline (stuck build, build error, or webhook issue) and Brayden will need to check the Vercel dashboard directly (Falcon doesn't have Vercel login access in this environment).
+
+**Verify:** Flashcards tab still shows 48 cards across the same 8 categories, each card now reads as a short vocab term with a one-line definition underneath — no question marks, no full sentences on the front.
+
+---
+
 ### ✅ Prompt 178 SHIPPED 2026-06-30 (`1832fa7`) — flashcards short-form cue/phrase
 
 - `src/data/flashcards.js`: all 48 card front/back replaced with short cue/term → short phrase format. Same 8 categories × 6 cards, same keys. Final Exam untouched.
