@@ -90,6 +90,13 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ---
 
+### [CC | 2026-06-30 — Prompts 179-FIX + 180 shipped · `acf438a`, `557ef8f`]
+
+- **179-FIX**: git identity in ohvara-dashboard was `Brayden` / `youremail@gmail.com` — blocked Vercel auto-deploy on Prompts 178+179. Fixed to `BFreeOhvara` / `freemanbrayden04@gmail.com`. Empty commit `acf438a` triggered clean Vercel build.
+- **180**: `TrainingCenter.jsx` — `onEnded` no longer marks video watched (just transitions to quiz). `MiniQuiz.onDone` now calls `markWatched` + `closeVideo`. Watched credit requires completing all 4 mini-quiz questions, not just finishing the video.
+
+---
+
 ### [CC | 2026-06-30 — Prompt 179 shipped · `5489e28`]
 
 - `src/data/flashcards.js`: all 48 card front/back replaced with vocab-term → one-line definition format (glossary style). Same 8 categories × 6 cards. Final Exam untouched.
