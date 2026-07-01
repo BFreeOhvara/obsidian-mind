@@ -36,6 +36,23 @@ tags:
 
 ---
 
+### Prompt 184 — Video 6 revert: swap ID back + swap in BANT content (flashcards + mini-quiz + final exam)
+
+**Context (Brayden, 2026-07-01):** Video 6 (Qualifying) is being reverted. The current video ("Qualifying Customers," Sales School/Wolf of Wall Street, `wDgnnCRufOI`, 5:05, from Prompt 175) has bad audio — sounds like a phone recording in a noisy room, no mic. Brayden wants to go back to the very first pick, which turns out to have been fine all along — the original 2026-06-30 swap reason ("wasn't playing/loading") was actually just a YouTube pre-roll ad loading first, not a real bug. Brayden has now transcribed the original video and Falcon has rewritten all of Video 6's training content around it.
+
+**Change 1 — swap the video ID back.** In `TRAINING_VIDEOS`, Video 6 (Qualifying) changes from `wDgnnCRufOI` (5:05) to `dj3J75I0GYQ` (9:16) — "Genius Sales Qualifying Questions: Stop Wasting Time on Bad Leads," Brad Lea TV. Update the stored duration to 9:16.
+
+**Change 2 — swap in new Video 6 content, 3 places:**
+- `src/data/flashcards.js` — Category 6/Qualifying's 6 cards replaced with the BANT-based cards in [[training-flashcard-content]] (updated 2026-07-01). Same question-front/answer-back format as every other category, same category key/label, still 6 cards.
+- `MINI_QUIZ_CONTENT` — Mini-Quiz 6's 4 questions replaced with the BANT-based questions in [[training-quiz-content]] (updated 2026-07-01).
+- `FINAL_EXAM_QUESTIONS` — Topic 6's 3 questions (currently numbered 20-22) replaced with the BANT-based questions in [[training-quiz-content]]. Still exactly 3 questions for this topic, exam stays at 30 total.
+
+**Do NOT change:** any other video, any other category/topic's flashcards or quiz content, the 85% pass threshold, video count (still 8), Prompt 183's UX changes to the exam experience (bigger card/no live score/no flash/lock modal — build on top of that, don't revert it).
+
+**Verify:** Videos tab shows Video 6 as the Brad Lea "Genius Sales Qualifying Questions" video at 9:16. Flashcards → Qualifying category shows 6 new BANT-based cards (e.g. "What does BANT stand for?" → "Budget, Authority, Need, Timeline"). Final Exam and Mini-Quiz 6 no longer reference household income/coaching tone — they test BANT instead.
+
+---
+
 ### ✅ Prompt 182 SHIPPED 2026-07-01 (`c6e9c21`) — 30-question final exam + redesigned start screen
 
 - `FINAL_EXAM_QUESTIONS`: added `f29` (Video 3/Discovery — "how long has this been going on for?") and `f30` (Video 8/Time Management — "key way to build tomorrow's pipeline today") — 28 → 30, confirmed by count. Updated the stale "28 questions" code comment.

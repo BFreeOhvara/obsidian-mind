@@ -145,31 +145,31 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
    C) Ask for a referral
    D) Confirm the appointment time
 
-## Mini-Quiz 6 — Qualifying the prospect
+## Mini-Quiz 6 — Qualifying the prospect (REVISED 2026-07-01, new video: "Genius Sales Qualifying Questions: Stop Wasting Time on Bad Leads," Brad Lea TV)
 
-1. When qualifying a prospect financially, what matters most?
-   A) Just their job title
-   B) Their zip code
-   C) Combined household income relative to the payment ✅
-   D) Their age
+1. What does BANT stand for?
+   A) Budget, Authority, Need, Timeline ✅
+   B) Best, Aggressive, New, Targeted
+   C) Buyer, Attitude, Numbers, Trust
+   D) Budget, Ability, Need, Trust
 
-2. What tone works best when asking about someone's financial background?
-   A) A skeptical, interrogating tone
-   B) A non-judgmental, coaching-style tone ✅
-   C) A purely formal/legal tone
-   D) A sarcastic tone
+2. Why should you gather BANT information during the conversation rather than as a separate step afterward?
+   A) It's required by law
+   B) It lets you qualify while you're already building value and rapport ✅
+   C) It's not actually recommended — better to ask after the pitch
+   D) Prospects prefer written questionnaires
 
-3. What should you do if a prospect clearly can't afford any version of the offer?
-   A) Offer a steep discount immediately
-   B) Keep pushing the highest tier anyway
-   C) Don't waste further time — move to the next lead ✅
-   D) Report it to your manager
+3. What's the point of asking about a prospect's decision-making process?
+   A) To make small talk
+   B) To find out if you're talking to someone who can actually say yes ✅
+   C) To fill time on the call
+   D) It's not important
 
-4. What's the broader mindset for qualifying efficiently?
-   A) Spend equal time on every prospect regardless of their answers
-   B) Never ask about money directly
-   C) Ask, listen, and quickly decide whether to move forward or move on ✅
-   D) Qualify everyone the exact same way
+4. What's the risk of skipping qualifying questions and just pitching?
+   A) None — pitching first always works better
+   B) You waste time building a full pitch for someone who was never a fit ✅
+   C) It makes you sound more confident
+   D) It's actually faster overall
 
 ## Mini-Quiz 7 — Booking & handoff
 
@@ -351,25 +351,25 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
     C) Talking about their job
     D) Identifying with other people who keep delaying and never solve their problem ✅
 
-**Topic 6 — Qualifying the prospect**
+**Topic 6 — Qualifying the prospect (REVISED 2026-07-01, new video: "Genius Sales Qualifying Questions: Stop Wasting Time on Bad Leads," Brad Lea TV)**
 
-20. When qualifying a prospect financially, what combined factor matters most?
-    A) Just their job title
-    B) Their zip code
-    C) Combined household income relative to the payment ✅
-    D) Their age
+20. What does the BANT framework stand for?
+    A) Budget, Authority, Need, Timeline ✅
+    B) Best, Aggressive, New, Targeted
+    C) Buyer, Attitude, Numbers, Trust
+    D) Budget, Ability, Need, Trust
 
-21. What should you do if a prospect clearly can't afford any version of the offer?
-    A) Offer a steep discount immediately
-    B) Keep pushing the highest tier anyway
-    C) Don't waste further time — move to the next lead ✅
-    D) Report them
+21. Why gather budget, authority, need, and timeline information during the conversation instead of after?
+    A) It's required by policy
+    B) It lets you qualify while you're already building value, without a separate step ✅
+    C) It only works in writing
+    D) It doesn't matter when you ask
 
-22. What kind of tone works best when asking about someone's financial background?
-    A) A skeptical, interrogating tone
-    B) A non-judgmental, coaching-style tone ✅
-    C) A purely formal/legal tone
-    D) Sarcastic
+22. What's the risk of not confirming you're speaking with the actual decision-maker?
+    A) None — everyone can approve a purchase
+    B) You could spend a lot of time and follow-up on someone who ultimately can't say yes ✅
+    C) It speeds up the sale
+    D) It guarantees a close
 
 **Topic 7 — Booking & handoff**
 

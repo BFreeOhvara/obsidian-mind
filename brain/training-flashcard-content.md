@@ -58,14 +58,14 @@ Source: Brayden's transcripts of the 8 locked videos (see [[training-videos]]). 
 5. Front: What tone seeds doubt in a prospect's mind and lowers their guard? → Back: A concerned tone
 6. Front: What's the mistake most reps make when handling objections? → Back: Arguing their frame instead of reframing it
 
-## Category 6 — QUALIFYING (Video 6)
+## Category 6 — QUALIFYING (Video 6) — REVISED 2026-07-01, new video ("Genius Sales Qualifying Questions: Stop Wasting Time on Bad Leads," Brad Lea TV)
 
-1. Front: What should a prospect's combined household income comfortably cover? → Back: The payment
-2. Front: When does a payment actually strain a prospect's budget? → Back: Only if the product doesn't pay for itself
-3. Front: How should you ask a prospect about their money history? → Back: Like a coach, not an interrogator
-4. Front: What should you do when someone clearly can't afford the offer? → Back: Disqualify them fast and move on
-5. Front: Why does moving fast through unqualified leads matter? → Back: It keeps your overall call efficiency high
-6. Front: What should you ask about to understand how a prospect thinks about investing in solutions? → Back: Their past relationship with money/success
+1. Front: What does BANT stand for? → Back: Budget, Authority, Need, Timeline
+2. Front: What does the "Budget" question in BANT actually determine? → Back: Whether the prospect can afford your product or service
+3. Front: What does the "Authority" question in BANT actually determine? → Back: Whether you're talking to the real decision-maker
+4. Front: What does the "Need" question in BANT actually determine? → Back: The prospect's real pain point or challenge
+5. Front: What does the "Timeline" question in BANT actually determine? → Back: How urgent the prospect is and when they'd actually decide
+6. Front: Is thoroughly qualifying a prospect considered rude? → Back: No — it's intelligent, as long as your tone is right
 
 ## Category 7 — BOOKING (Video 7)
 
