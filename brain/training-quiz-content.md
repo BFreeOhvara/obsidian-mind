@@ -223,7 +223,7 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
 
 ---
 
-## Final Exam — 28 questions, combined across all 8 videos
+## Final Exam — 30 questions, combined across all 8 videos (expanded from 28 on 2026-06-30, +1 each to Videos 3 and 8)
 
 **Video 1 — What an AI receptionist does**
 
@@ -297,21 +297,27 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
     C) The root cause behind their stated problem ✅
     D) Their job title
 
+12. What does asking "how long has this been going on for?" accomplish, per the video?
+    A) Confirms a callback time
+    B) Qualifies their budget
+    C) Gets the prospect to relive the pain of the problem ✅
+    D) Ends the conversation politely
+
 **Video 4 — Getting past the gatekeeper**
 
-12. Who is generally the best person to reach when cold calling a business, per the video?
+13. Who is generally the best person to reach when cold calling a business, per the video?
     A) The receptionist
     B) Any available employee
     C) The owner or a decision-maker ✅
     D) The IT department
 
-13. What kind of tone does the video recommend using with a gatekeeper?
+14. What kind of tone does the video recommend using with a gatekeeper?
     A) Very formal and scripted
     B) Apologetic
     C) Loud and aggressive
     D) Casual and confident, like you already have a relationship with the person you're calling for ✅
 
-14. What's a risk of over-explaining yourself to a gatekeeper, per the video?
+15. What's a risk of over-explaining yourself to a gatekeeper, per the video?
     A) Nothing — more detail always helps
     B) You lose control of the conversation and give them a reason to screen you out ✅
     C) It's required for compliance
@@ -319,25 +325,25 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
 
 **Video 5 — Handling objections**
 
-15. What two emotions drive a person to actually want to change, per the video?
+16. What two emotions drive a person to actually want to change, per the video?
     A) Excitement and hope
     B) Pain and fear of future pain ✅
     C) Trust and logic
     D) Guilt and obligation
 
-16. What is a "consequence question" used for?
+17. What is a "consequence question" used for?
     A) To confirm a meeting time
     B) To ask for payment info
     C) To deframe a brush-off objection and get the prospect thinking about what happens if they don't act ✅
     D) To end the call
 
-17. Why might a salesperson intentionally use a "concerned" tone when challenging an objection?
+18. Why might a salesperson intentionally use a "concerned" tone when challenging an objection?
     A) To sound less confident on purpose
     B) To seed doubt that the prospect may be missing something, lowering their guard ✅
     C) It has no real effect
     D) To rush the prospect along
 
-18. What does the "identity frame" technique push a prospect to avoid?
+19. What does the "identity frame" technique push a prospect to avoid?
     A) Identifying with their own family
     B) Comparing prices
     C) Talking about their job
@@ -345,19 +351,19 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
 
 **Video 6 — Qualifying the prospect**
 
-19. When qualifying a prospect financially, what combined factor does the video focus on?
+20. When qualifying a prospect financially, what combined factor does the video focus on?
     A) Just their job title
     B) Their zip code
     C) Combined household income relative to the payment ✅
     D) Their age
 
-20. What should you do if a prospect clearly can't afford any version of the offer?
+21. What should you do if a prospect clearly can't afford any version of the offer?
     A) Offer a steep discount immediately
     B) Keep pushing the highest tier anyway
     C) Don't waste further time — move to the next lead ✅
     D) Report them
 
-21. What kind of tone does the video suggest using when asking about someone's financial background?
+22. What kind of tone does the video suggest using when asking about someone's financial background?
     A) A skeptical, interrogating tone
     B) A non-judgmental, coaching-style tone ✅
     C) A purely formal/legal tone
@@ -365,25 +371,25 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
 
 **Video 7 — Booking & handoff**
 
-22. What should an appointment setter do before being more assertive about booking?
+23. What should an appointment setter do before being more assertive about booking?
     A) Send a contract immediately
     B) Ask for payment
     C) Build rapport, provide value, and qualify the prospect first ✅
     D) Nothing — assertiveness should come first
 
-23. What's the recommended phrasing style for confirming a prospect has time?
+24. What's the recommended phrasing style for confirming a prospect has time?
     A) An open-ended "you got a sec?"
     B) No need to ask at all
     C) A small, specific ask like "do you have two minutes?" ✅
     D) A 30-minute time block request
 
-24. What does "assume the appointment" mean in practice?
+25. What does "assume the appointment" mean in practice?
     A) Always double-confirm before booking
     B) Let the prospect suggest the time
     C) Skip qualifying entirely
     D) Move forward with booking rather than asking permission to proceed ✅
 
-25. When is the ideal moment to ask for a referral, per the video?
+26. When is the ideal moment to ask for a referral, per the video?
     A) Before you've provided any value
     B) During an objection
     C) When the prospect is expressing thanks or gratitude ✅
@@ -391,24 +397,30 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
 
 **Video 8 — Time management & call discipline**
 
-26. What's one of the biggest mistakes that causes reps to underperform, per the video?
+27. What's one of the biggest mistakes that causes reps to underperform, per the video?
     A) Making too many calls
     B) Taking detailed notes
     C) Reacting to the day instead of planning it ✅
     D) Following up too quickly
 
-27. Why are morning dial blocks especially effective, per the video?
+28. Why are morning dial blocks especially effective, per the video?
     A) It's mandatory company policy
     B) Prospects prefer being called early no matter what
     C) It avoids using a CRM
     D) Connect rates are better and it builds early momentum ✅
 
-28. What's the recommended way to close out the work day, per the video?
+29. What's the recommended way to close out the work day, per the video?
     A) Immediately log off without review
     B) Schedule more calls for the night
     C) A few minutes of reflection on what worked and what to carry into tomorrow ✅
     D) Clear all browser tabs
 
+30. What's described as a key way to build tomorrow's pipeline today, per the video?
+    A) Randomly cold calling with no list
+    B) A dedicated sourcing block to find new target contacts ✅
+    C) Waiting until tomorrow morning to find leads
+    D) Skipping prep entirely and improvising
+
 ---
 
-**Status:** content complete 2026-06-30, ready for CC to swap in for the 60 placeholders from Prompt 174. See Prompt 176 in [[LIVE_STATE]].
+**Status:** expanded to 30 questions 2026-06-30 (Prompt 182) — was 28. Ready for CC to swap into `FINAL_EXAM_QUESTIONS`.
