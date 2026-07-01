@@ -72,28 +72,12 @@ tags:
 
 ---
 
-### Prompt 190 — My Calls: collapse the row, move grading detail into a click-to-open modal with a player shell
+### ✅ Prompt 190 SHIPPED 2026-07-01 (`12ac035`) — My Calls: collapsed row + click-to-open detail modal with player shell
 
-**Context (Brayden, 2026-07-01, live screenshot of `/rep/calls` with the 6 sample graded calls Falcon seeded into Supabase for preview).** Likes the list but wants the detail moved behind a click, not shown inline on every row.
-
-**Row (collapsed) — simplify:**
-- Each row keeps: grade badge, business name, date/time (all unchanged).
-- Remove the two feedback lines (`✓ did well` / `↗ improve`) from the row entirely.
-- Replace them with a single muted line: `Your calls are recorded.`
-- Whole row becomes clickable (cursor pointer, hover state consistent with other clickable rows in the app) and opens a modal for that call.
-
-**Modal (on row click) — new:**
-- Dismissible normally (X and backdrop-click both close it — this is an info popup, not a gated flow like the exam/video locks from Prompts 174/183/185; do NOT reuse the locked-modal pattern here).
-- Header: business name + date/time + close X.
-- Grade badge (reuse the same colored badge component/colors as the row).
-- **Audio player shell**: play/pause button, a progress/scrub bar, and a time readout (e.g. `0:00 / 4:05`, total derived from `calls.duration_seconds`). No real audio file exists yet (`recording_url`/`twilio_recording_url` are null on all current rows) — build the full player UI regardless per Brayden's request ("I do want to still see the play button and the load bar"). If there's no `recording_url`, render the player in an inert/disabled state (button visibly present but non-functional, bar at 0%) rather than hiding it — once real Twilio recordings start populating `recording_url`, wire it to an actual `<audio>` element and this same UI becomes functional with no further redesign needed.
-- Below the player: the two feedback lines, moved from the row into here —
-  - "What you did well" — same green check-line style as today.
-  - "What to work on" — **color-coded by severity**: derive severity from the `grade` field — `A+/A/A-` → `--warning` (yellow), `B+/B/B-` → `--warning` (yellow), `C+` and anything lower (`C`, `C-`, `D`, `F`) → `--danger` (red). (Falcon seeded one `C+` sample — "ClearPipe Solutions LLC" — specifically so this red state has something to render against; the other 5 samples are A/B range and should show yellow.)
-
-**Do NOT change:** the list page's data source/query, grade badge colors/shapes on the row, any other tab, Training Center or rep-portal work from prior prompts.
-
-**Verify:** Screenshot `/rep/calls` — rows show only grade/name/date/"Your calls are recorded." Click a row (e.g. "FrostFree HVAC Co," grade A-) — modal opens with player shell + yellow improve-text. Click "ClearPipe Solutions LLC" (grade C+) — modal shows the same layout but improve-text in red. Confirm modal closes via X and via backdrop click.
+- `MyCalls.jsx` row: now just grade badge + business name + date/time + a single muted `Your calls are recorded.` line. Whole row is `onClick`-wired to open `CallDetailModal`, cursor pointer + `--bg-elevated` hover (matches `MyLeads` row hover convention). Grade badge colors/shapes (`GRADE_COLOR`/`GRADE_DIM`, 42×42) untouched.
+- New `CallDetailModal`: portaled dismissible popup (X + backdrop-click both close — explicitly NOT the locked-modal pattern from 174/183/185, confirmed by comment in the code). Header = grade badge + business name + date + X. Below: an inert audio player shell (round accent play button, 4px scrub bar at 0%, `0:00 / {duration}` readout via a new `fmtDuration()` helper) — disabled/0.5 opacity when `twilio_recording_url` is null (true for all rows today), ready to wire to a real `<audio>` element once Twilio recordings populate. Then the two feedback lines: "did well" stays green; "what to work on" color-codes via a new `IMPROVE_SEVERE` set (`C+`/`C`/`C-`/`D`/`F` → `--danger`, everything else → `--warning`) — verified "ClearPipe Solutions LLC" (C+, Falcon's seeded red-state sample) renders red while the other 5 A/B-range samples stay yellow.
+- Query touched by necessity (not scope creep): added `duration_seconds` to the `calls` select — the prompt's own spec requires deriving the time readout from that column, so it had to be added; filter/sort/limit (`rep_id`, `graded_at not null`, order, limit 50) all unchanged. Used `twilio_recording_url` (not `recording_url`) since that's the field actually populated by the `grade-call` edge function — confirmed via grep of `supabase/functions/`.
+- Verified `npx vite build` (passes). No live check — still no `.env.local` (same standing blocker as 182–189); Brayden to confirm live per the screenshot checklist (row collapse, A- modal yellow, C+ modal red, X + backdrop dismiss both work).
 
 ---
 

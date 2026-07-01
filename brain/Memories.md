@@ -3132,3 +3132,15 @@ Session resumed after context compaction. Prompt 148 seed bug (rep_profile_id �
 - Lesson: **training content sourced from real YouTube videos can leak business-sensitive info (pricing, margin, build stack) if the source video happens to mention it** — worth a content sanity pass (not just accuracy) before wiring any future video into setter-facing material. See also [[training-videos]] for the full video-swap history (Videos 1 and 6 have now each been swapped twice for content reasons).
 - Verified `npx vite build` only — standing blocker persists: no `.env.local`, no live check (same as 182–188).
 - Status: SHIPPED + pushed to `master`; Prompt 189 cleared from [[LIVE_STATE]] queue; [[training-videos]] checklist updated to reflect 184 + 189 shipped.
+
+---
+
+## Session Log — 2026-07-01 (Prompt 190)
+
+**CC | 2026-07-01 — My Calls: collapsed row + click-to-open detail modal with player shell (shipped `12ac035`)**
+
+- `MyCalls.jsx` in [[ohvara-dashboard]]: rows simplified to grade badge/business name/date + a single "Your calls are recorded." line; whole row clickable, opens a new dismissible `CallDetailModal` (X + backdrop-click, explicitly NOT the locked-modal pattern from Prompts 174/183/185).
+- Modal: header (badge/name/date/X), an inert audio player shell (play button, 0%-progress scrub bar, `0:00 / duration` via new `fmtDuration()`) disabled until `twilio_recording_url` populates, then the two feedback lines — "did well" green, "what to work on" color-coded red/yellow by grade severity (`IMPROVE_SEVERE` set: C+/C/C-/D/F → red, else yellow). Verified against Falcon's seeded samples (ClearPipe Solutions LLC = C+ = red; other 5 = A/B = yellow).
+- Deliberately added `duration_seconds` to the `calls` select (prompt's own spec required it for the time readout) — filter/sort/limit untouched. Confirmed `twilio_recording_url` (not `recording_url`) is the field the `grade-call` edge function actually writes, via grep of `supabase/functions/`.
+- Verified `npx vite build` only — standing blocker persists: no `.env.local`, no live check (same as 182–189).
+- Status: SHIPPED + pushed to `master`; Prompt 190 cleared from [[LIVE_STATE]] queue.
