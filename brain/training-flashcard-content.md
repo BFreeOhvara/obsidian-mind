@@ -1,86 +1,86 @@
 ---
 name: training-flashcard-content
-description: Real flashcard content (48 cards, 6 per video) tied to the 8 appointment-setter training videos — vocab/term format (rewritten 2026-06-30 v2 per Brayden — short phrase Q&A was still too long, wants true vocab-word/definition style)
+description: Real flashcard content (48 cards, 6 per video) tied to the 8 appointment-setter training videos — question-front/answer-back format (v3, 2026-06-30 per Brayden — flip the vocab-term cards so front is a natural question and back is the short answer/term)
 metadata:
   type: project
 ---
 
-# Training Flashcard Content (vocab/term format, video-specific)
+# Training Flashcard Content (question-front format, video-specific)
 
 Source: Brayden's transcripts of the 8 locked videos (see [[training-videos]]). All content is original paraphrase, not verbatim transcript text. 6 cards per video × 8 videos = 48 cards.
 
-**Format rule (2026-06-30, v2):** front = a single term or short vocab-style label (2-4 words max), back = a one-line definition (not a full sentence with subject/verb padding — just the definition itself). Think glossary entry, not Q&A. Recall/memorization is the job here; the Final Exam (multiple-choice, full-sentence questions covering everything) is where deeper understanding gets tested — that stays as-is.
+**Format rule (2026-06-30, v3):** front = a natural question whose answer is the term/concept (e.g. "How long do you have to prove you're sharp, enthusiastic, and an expert?"), back = the short answer/term (e.g. "The first 4 seconds"). This is the reverse of v2 (Prompt 179), which had front = term, back = definition. Same underlying term/definition pairs, just flipped and reworded as Q&A so the front reads as a real question and the back is what you'd say out loud as the answer.
 
-**History:** v1 (Prompt 177) was full-sentence Q&A — too hard to memorize. v2a (Prompt 178) shortened to short-phrase Q&A — still read as too long/sentence-like. This v2 (Prompt 179) is real vocab-term → definition format.
+**History:** v1 (Prompt 177) full-sentence Q&A. v2a (Prompt 178) short-phrase Q&A. v2 (Prompt 179) vocab-term → definition (glossary style). v3 (this version, Prompt 181) flips v2: front = question, back = short answer.
 
 ## Category 1 — AI RECEPTIONIST (Video 1)
 
-1. Term: AI Receptionist → Def: AI voice agent that answers calls like a human, 24/7 or as overflow
-2. Term: Missed Call Math → Def: Missed calls/day × ticket price × days/year = lost revenue
-3. Term: Templated AI → Def: Plug-and-play, generic (RingCentral, GoHighLevel)
-4. Term: Custom AI → Def: Agency-built, tailored to the business
-5. Term: Overflow Mode → Def: AI only answers when a human can't
-6. Term: Per-Minute Pricing → Def: ~$0.12/min raw cost; agencies mark it up
+1. Front: What do you call an AI voice agent that answers calls like a human, 24/7 or as overflow? → Back: An AI Receptionist
+2. Front: How do you calculate how much a missed call is costing you per year? → Back: Missed calls/day × ticket price × days/year
+3. Front: What kind of AI receptionist is plug-and-play and generic, like RingCentral or GoHighLevel? → Back: Templated AI
+4. Front: What kind of AI receptionist is agency-built and tailored to the business? → Back: Custom AI
+5. Front: What's it called when the AI only answers calls a human can't get to? → Back: Overflow mode
+6. Front: Roughly how is AI receptionist usage priced before an agency's markup? → Back: ~$0.12/min raw cost
 
 ## Category 2 — TONALITY (Video 2)
 
-1. Term: First 4 Seconds → Def: Window to prove you're sharp, enthusiastic, an expert
-2. Term: 90/10 Rule → Def: Tonality + body language = 90% of impact, words = 10%
-3. Term: Charisma → Def: A learnable skill, not a trait
-4. Term: Rapport → Def: Feeling cared for + feeling similarity
-5. Term: Deliberate Tonality → Def: Vocal emphasis that pulls the listener in
-6. Term: Flat Tone → Def: Causes the listener to check out
+1. Front: How long do you have to prove you're sharp, enthusiastic, and an expert? → Back: The first 4 seconds
+2. Front: What percentage of communication impact comes from tonality and body language combined? → Back: 90% (words are only 10%)
+3. Front: Is charisma something you're born with or something you can learn? → Back: A learnable skill, not a trait
+4. Front: What two feelings does a prospect need to have for rapport to form? → Back: That you care about them, and that you're similar to them
+5. Front: What does using deliberate vocal emphasis do to a listener? → Back: Pulls them in, keeps them engaged
+6. Front: What happens to a listener when you speak in a flat tone? → Back: They mentally check out
 
 ## Category 3 — DISCOVERY (Video 3)
 
-1. Term: Clarifying Question → Def: "How do you mean by that?" — digs past the surface
-2. Term: Word Echo → Def: Repeating their emotion word back to open them up
-3. Term: Pain Timeline → Def: "How long has this been going on?"
-4. Term: The Pause → Def: Silence after a question forces a deeper answer
-5. Term: Root Cause Question → Def: "What's causing this?"
-6. Term: Discovery First → Def: Surface pain before pitching, to build urgency
+1. Front: What question digs past a surface-level answer to find out what's really going on? → Back: "How do you mean by that?"
+2. Front: What's it called when you repeat a prospect's own emotion word back to them? → Back: A word echo
+3. Front: What question gets a prospect to relive how long a problem has been affecting them? → Back: "How long has this been going on?"
+4. Front: What forces a prospect to give a deeper, more considered answer after you ask a question? → Back: The pause (staying silent)
+5. Front: What question gets straight at the root cause of a prospect's problem? → Back: "What's causing this?"
+6. Front: Why surface a prospect's pain before pitching anything? → Back: It builds urgency
 
 ## Category 4 — GATEKEEPER (Video 4)
 
-1. Term: Decision-Maker → Def: Owner or exec — the only one who can act on your offer
-2. Term: Casual Open → Def: Skip formal intros, sound like you already know them
-3. Term: The Pause (Gatekeeper) → Def: Stop talking after your question, let them answer
-4. Term: Over-Explaining → Def: Reads as nervous or salesy
-5. Term: Screening → Def: What gatekeepers do to filter out sales calls
-6. Term: Casual > Professional → Def: Polished reads as guarded; casual reads as safe
+1. Front: Who's the only person who can actually act on your offer? → Back: The decision-maker (owner or exec)
+2. Front: What kind of opener skips the formal intro and sounds like you already know them? → Back: A casual open
+3. Front: What should you do right after asking the gatekeeper your question? → Back: Stop talking and let them answer
+4. Front: What does over-explaining yourself to a gatekeeper make you sound like? → Back: Nervous or salesy
+5. Front: What's a gatekeeper's job when it comes to sales calls? → Back: Screening them out
+6. Front: Why does sounding casual work better than sounding polished on a cold open? → Back: Polished reads as guarded, casual reads as safe
 
 ## Category 5 — OBJECTIONS (Video 5)
 
-1. Term: Frame → Def: The mental stance keeping a prospect stuck with no urgency
-2. Term: Pain & Fear → Def: The 2 emotional drivers of change
-3. Term: Consequence Question → Def: "Then what happens?" — chained deeper each time
-4. Term: Identity Frame → Def: Contrasting them vs. people who stayed stuck
-5. Term: Concerned Tone → Def: Seeds doubt, lowers their guard
-6. Term: Rebuttal Mistake → Def: Arguing their frame instead of reframing it
+1. Front: What's the mental stance that keeps a prospect stuck with no urgency to change? → Back: Their frame
+2. Front: What are the two emotional drivers that actually cause someone to change? → Back: Pain, and fear of future pain
+3. Front: What question keeps chaining deeper into what happens if a prospect does nothing? → Back: "Then what happens?"
+4. Front: What's it called when you contrast a prospect against people who never fixed the problem? → Back: An identity frame
+5. Front: What tone seeds doubt in a prospect's mind and lowers their guard? → Back: A concerned tone
+6. Front: What's the mistake most reps make when handling objections? → Back: Arguing their frame instead of reframing it
 
 ## Category 6 — QUALIFYING (Video 6)
 
-1. Term: Household Income Test → Def: Combined income should comfortably cover the payment
-2. Term: Cash-Flow Negative → Def: When a payment strains the budget — not the case if the product pays for itself
-3. Term: Coach Approach → Def: Asking about money history like a coach, not an interrogator
-4. Term: Disqualify Fast → Def: Moving on quickly when someone clearly can't afford it
-5. Term: Call Efficiency → Def: Why moving fast through unqualified leads matters
-6. Term: Money History → Def: Their past relationship with money/success
+1. Front: What should a prospect's combined household income comfortably cover? → Back: The payment
+2. Front: When does a payment actually strain a prospect's budget? → Back: Only if the product doesn't pay for itself
+3. Front: How should you ask a prospect about their money history? → Back: Like a coach, not an interrogator
+4. Front: What should you do when someone clearly can't afford the offer? → Back: Disqualify them fast and move on
+5. Front: Why does moving fast through unqualified leads matter? → Back: It keeps your overall call efficiency high
+6. Front: What should you ask about to understand how a prospect thinks about investing in solutions? → Back: Their past relationship with money/success
 
 ## Category 7 — BOOKING (Video 7)
 
-1. Term: Pre-Call Prep → Def: Having their info ready before you call — don't re-ask
-2. Term: Pushy Gap → Def: Prospects see pushiness more than setters realize
-3. Term: Earned Assertiveness → Def: Getting direct only after rapport + value + qualifying
-4. Term: Small Ask → Def: "Got 2 minutes?" — easy yes
-5. Term: Assumptive Close → Def: Booking instead of asking "want to move forward?"
-6. Term: Referral Window → Def: Asking right when they're thanking you
+1. Front: What should you have ready before calling a prospect back? → Back: Their info, so you don't re-ask what they already gave you
+2. Front: Who notices pushiness more — setters or prospects? → Back: Prospects
+3. Front: When is it okay to get more direct/assertive with a prospect? → Back: Only after rapport, value, and qualifying
+4. Front: What kind of ask makes it easy for a prospect to say yes? → Back: A small one, like "Got 2 minutes?"
+5. Front: What should you do instead of asking "want to move forward?"? → Back: Just book it (assume the appointment)
+6. Front: When's the best moment to ask for a referral? → Back: Right when they're thanking you
 
 ## Category 8 — TIME MANAGEMENT (Video 8)
 
-1. Term: Reactive Day → Def: Working off whatever pops up, no plan
-2. Term: Morning Dial Block → Def: Best call window, highest connect rates
-3. Term: Sourcing Block → Def: Dedicated time to build tomorrow's pipeline
-4. Term: Passive Learning → Def: Light, low-effort learning (e.g. lunch call reviews)
-5. Term: End-of-Day Reflection → Def: Turns activity into improvement
-6. Term: Work Intentional → Def: The core mindset — structure over hours
+1. Front: What's it called when you work off whatever pops up with no plan? → Back: A reactive day
+2. Front: What's the best call window for the highest connect rates? → Back: The morning dial block
+3. Front: What's dedicated time to build tomorrow's pipeline called? → Back: A sourcing block
+4. Front: What's light, low-effort learning, like listening to call reviews at lunch, called? → Back: Passive learning
+5. Front: What turns activity into actual improvement? → Back: End-of-day reflection
+6. Front: What's the core mindset behind a structured day — work longer or work smarter? → Back: Work intentional (structure over hours)
