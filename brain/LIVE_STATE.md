@@ -30,6 +30,27 @@ tags:
 
 ---
 
+### Prompt 186 — Final Exam: fix answer-letter styling + switch to select-then-Next flow with Back support
+
+**Context (Brayden, 2026-07-01, after seeing Prompt 185 live):** two separate requests.
+
+1. **Letter badges look washed out.** The A/B/C/D badges on each answer option are grey/hollow-looking. Brayden wants them "more filling" — i.e. a solid filled badge, not a muted one. He does NOT want them color-coded (no red/green correct-answer signaling — that stays removed per Prompt 183). All 4 badges should be the same color. Use `--accent` (`#6C63FF`) as a solid fill with `--text-primary` text — the only non-semantic accent color in [[DESIGN]] (success/warning/danger are reserved for right/wrong signaling, which this quiz intentionally never shows).
+
+2. **Interaction model change.** Currently clicking an answer immediately records it and auto-advances (Prompt 183 behavior). New behavior: clicking an answer only *selects* it (highlight the chosen option using `--accent`, no right/wrong reveal) — advancing requires a separate **"Next"** button click. Add a **"Back"** button so the rep can return to a previous question; if they go back to an already-answered question, their prior selection must still show as selected. This means answers need to persist per-question-index (array/map), not just accumulate into a running score as they're picked.
+
+**Implementation notes:**
+- Keep everything else from Prompts 183/185 unchanged: locked full-screen portal modal (no backdrop/X close until finished), no live score counter, no green/red flash, current card sizing.
+- "Next" disabled until an option is selected for the current question.
+- On question 30, the advance button becomes "Finish"/"Submit" and reveals the existing score screen (score-reveal behavior unchanged).
+- "Back" available from question 2 onward; hidden/disabled on question 1.
+- Store selected answers keyed by question index so Back/Next can move freely between answered and unanswered questions without losing prior picks.
+
+**Do NOT change:** question content/wording (183/184), start screen (182), the portal/locked-modal fix (185), score-reveal-only-at-finish behavior.
+
+**Verify:** Start the exam, select an answer (confirm accent-color highlight, no right/wrong reveal), confirm Next is disabled until a selection is made, click Next, click Back on question 2+ and confirm the prior selection still shows highlighted, reach question 30 and confirm the final button finishes the exam and shows the score screen. Confirm all 4 letter badges render as solid filled accent color, not grey.
+
+---
+
 ### ✅ Prompt 183 SHIPPED 2026-07-01 (`9b75c67`) — final exam UX overhaul
 
 - `FinalQuizTab`: in-progress/finished states now render as a full-screen locked modal (`position: fixed`, same pattern as `LockedVideoPlayer`/Prompt 174) — no backdrop-click-to-close and no X while `!finished`; X + backdrop-click both work once `finished`. Start screen (stat cards/chips from Prompt 182) untouched, still inline.
