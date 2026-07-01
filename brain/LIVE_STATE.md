@@ -16,19 +16,13 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–180 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
 ---
 
-### Prompt 181 — Flashcards: flip front/back (question front, short answer back)
+### ✅ Prompt 181 SHIPPED 2026-06-30 (`71aa785`) — flashcards question-front/answer-back (v3)
 
-**Context (Brayden, 2026-06-30):** Prompt 179's vocab-term format is close but backwards. Example: current front "First 4 Seconds" / back "Window to prove you're sharp, enthusiastic, and an expert" — Brayden wants it flipped to front "How long do you have to prove you're sharp, enthusiastic, and an expert?" / back "The first 4 seconds." So: front = a natural question whose answer is the term/concept, back = the short answer (the term itself, phrased naturally as an answer, not a definition).
-
-**Change:** In `src/data/flashcards.js`, replace all 48 card `front`/`back` strings with the v3 content in [[training-flashcard-content]] (updated 2026-06-30). Same 8 categories, same 6-per-category count, same data shape/keys — this is the v2 content flipped and reworded as question→answer instead of term→definition.
-
-**Do NOT change:** category names, card count, FlashcardDeck component, Mark Mastered mechanic, Final Exam, Prompt 180's watched-on-quiz-completion logic, any other tab.
-
-**Verify:** Flashcards tab still shows 48 cards across the same 8 categories. Each card front now reads as a real question (ends in "?"), and tapping/flipping reveals a short answer on the back — e.g. front "How long do you have to prove you're sharp, enthusiastic, and an expert?" → back "The first 4 seconds."
+- `src/data/flashcards.js`: all 48 card front/back replaced with question-front → short-answer-back format. Each front is a natural question ending in "?", back is the term/concept phrased as an answer. Same 8 categories × 6 cards, same keys.
 
 ---
 

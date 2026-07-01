@@ -90,6 +90,12 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ---
 
+### [CC | 2026-06-30 — Prompt 181 shipped · `71aa785`]
+
+- `src/data/flashcards.js`: all 48 cards flipped to question-front → short-answer-back (v3). Front ends in "?", back is the term/concept phrased as an answer. Same 8 categories × 6 cards.
+
+---
+
 ### [CC | 2026-06-30 — Prompts 179-FIX + 180 shipped · `acf438a`, `557ef8f`]
 
 - **179-FIX**: git identity in ohvara-dashboard was `Brayden` / `youremail@gmail.com` — blocked Vercel auto-deploy on Prompts 178+179. Fixed to `BFreeOhvara` / `freemanbrayden04@gmail.com`. Empty commit `acf438a` triggered clean Vercel build.
