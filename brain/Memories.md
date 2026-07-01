@@ -3119,3 +3119,16 @@ Session resumed after context compaction. Prompt 148 seed bug (rep_profile_id �
   - **B** `MyStats.jsx`: the run-on `·`-joined caption became two stacked `<p>` lines under the title ("Completed Day = 150 dials" / "Perfect Day = 150 dials + 2 bookings"); "Last 21 days" stays alone top-right. Header → `alignItems:flex-start` + `marginBottom:10`.
 - Verified `npx vite build` — **standing blocker persists: no `.env.local`, no live check**.
 - Status: SHIPPED + pushed to `master`; Prompt 188 cleared from [[LIVE_STATE]] queue.
+
+---
+
+## Session Log — 2026-07-01 (Prompt 189)
+
+**CC | 2026-07-01 — Video 1 swap: removed internal cost/margin leak from setter training (shipped `162eb1d`)**
+
+- Old Video 1 pick (SixFlow "Full Breakdown") taught raw ~$0.12/min wholesale AI cost + templated-vs-custom-build info, which leaked verbatim into a flashcard and Final Exam Topic 1 Q3 — exposing Ohvara's approximate markup/margin to appointment setters. Swapped to "AI Answering Service for Small Businesses | Overview of Upfirst" (`AUEr1jPJsi8`, 6:30) — confirmed via Brayden's transcript to have zero pricing/cost mentions.
+- Rewrote all Video 1 content in [[ohvara-dashboard]] `TrainingCenter.jsx` + `flashcards.js`: `TRAINING_VIDEOS[0]`, `flashcards.js` Category 1 (6 cards), `MINI_QUIZ_CONTENT[1]` (4 Qs), `FINAL_EXAM_QUESTIONS` f1–f4 — all pulled from [[training-flashcard-content]]/[[training-quiz-content]] (already updated by Falcon before this session).
+- Verified via grep across `src/` for the leaked strings (0.12, 12 cents, raw cost, Retell AI, Vapi, SixFlow, old video ID) — zero real hits (only unrelated CSS alpha values matched `0.12`). `npx vite build` passes.
+- Lesson: **training content sourced from real YouTube videos can leak business-sensitive info (pricing, margin, build stack) if the source video happens to mention it** — worth a content sanity pass (not just accuracy) before wiring any future video into setter-facing material. See also [[training-videos]] for the full video-swap history (Videos 1 and 6 have now each been swapped twice for content reasons).
+- Verified `npx vite build` only — standing blocker persists: no `.env.local`, no live check (same as 182–188).
+- Status: SHIPPED + pushed to `master`; Prompt 189 cleared from [[LIVE_STATE]] queue; [[training-videos]] checklist updated to reflect 184 + 189 shipped.

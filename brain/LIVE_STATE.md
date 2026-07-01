@@ -61,19 +61,14 @@ tags:
 
 ---
 
-### Prompt 189 — Video 1 swapped again: new pick + new flashcards/quiz (removes internal cost/margin info from setter training)
+### ✅ Prompt 189 SHIPPED 2026-07-01 (`162eb1d`) — Video 1 swap: removed internal cost/margin info from setter training
 
-**Context (Brayden, 2026-07-01):** Video 1's old pick ("AI Receptionists for Small Businesses Explained (Full Breakdown)," SixFlow Automations) taught the raw ~$0.12/min wholesale AI cost and templated-vs-custom-AI build info — that leaked into a flashcard AND into Final Exam Topic 1 Q3, meaning appointment setters could see Ohvara's approximate markup/margin and internal build approach. Brayden doesn't want setters to know that. Replaced the video entirely (not just the affected question) with "AI Answering Service for Small Businesses | Overview of Upfirst" (6:30, pure feature-tour + one demo call, confirmed via transcript to have zero pricing/cost mentions). Falcon rewrote all of Video 1's content around the new transcript — see [[training-flashcard-content]] Category 1 and [[training-quiz-content]] Mini-Quiz 1 + Final Exam Topic 1.
-
-**Fix:**
-1. `TRAINING_VIDEOS[0]`: `youtubeId` → `AUEr1jPJsi8`, duration → `6:30`, update title/description to match the new video (feature overview: talks to callers, collects info, books appointments, transfers calls, sends call summaries/transcripts/recordings) — remove any "missed-call math"/pricing framing carried over from the old pick.
-2. `flashcards.js` Category 1/AI Receptionist: replace all 6 cards with the new set from [[training-flashcard-content]] (warm transfer, call summary/transcript/recording, plain-English setup, calendar booking, spam detection — no cost figures, no build-platform names).
-3. `MINI_QUIZ_CONTENT` Mini-Quiz 1: replace all 4 questions with the new set from [[training-quiz-content]] (same 4 topics as the flashcards, MC format).
-4. `FINAL_EXAM_QUESTIONS` Topic 1 (currently questions 1-4 of 30): replace all 4 with the new set from [[training-quiz-content]] — **this is the one that actually mattered**, since the old Q3 was the literal "what's the raw per-minute rate" question. Confirm the old cost/templated-vs-custom questions are fully gone from the built bundle (grep for "12 cents" / "per-minute" / "Retell AI" / "Vapi" in `src/` — should be zero hits after this change).
-
-**Do NOT change:** any other video/topic (2-8), Final Exam question count (stays 30) or numbering, Training Center UX from Prompts 183/185/186, rep-portal work from 187/188.
-
-**Verify:** grep `src/` for "0.12" / "12 cents" / "raw cost" / "Retell AI" / "Vapi" and confirm zero matches. `npx vite build` passes. Screenshot/spot-check Video 1's flashcards and Final Exam Topic 1 (questions 1-4) show the new warm-transfer/call-summary/spam-detection content, not the old cost content.
+- `TRAINING_VIDEOS[0]`: `youtubeId` → `AUEr1jPJsi8`, duration → `6:30`, description now describes the feature overview (warm transfer, call summaries/transcripts/recordings) — no missed-call math/pricing framing.
+- `flashcards.js` Category 1: all 6 cards replaced with the new set from [[training-flashcard-content]] (call summary/transcript/recording, plain-English setup, warm transfer, calendar booking, spam detection) — old card 6 ("~$0.12/min raw cost") and card 3/4 (templated vs. custom AI) are gone.
+- `MINI_QUIZ_CONTENT[1]`: all 4 questions replaced — dropped the old "$300k/year missed revenue" math question and the "Retell AI or Vapi" custom-build question.
+- `FINAL_EXAM_QUESTIONS` f1–f4 (Topic 1): all 4 replaced — old f2 ("Retell AI or Vapi") and f3 ("about 12 cents per minute," the literal raw-cost leak) are gone.
+- Verified: `grep -rniE "0\.12|12 cents|raw cost|Retell AI|Vapi|SixFlow|0_TQV5tfFds" src/` → zero content hits (only unrelated CSS `0.12` alpha values matched, confirmed not the same string). `npx vite build` passes.
+- No live check — still no `.env.local` in the repo (same standing blocker as 182–188). Brayden to confirm live: Video 1 flashcards/mini-quiz/Final Exam Topic 1 show the new warm-transfer/call-summary/spam-detection content.
 
 ---
 

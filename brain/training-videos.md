@@ -1,6 +1,10 @@
 ---
 name: training-videos
+date: 2026-06-22
 description: The 8 approved training video topics for Ohvara appointment setters — Brayden picks the actual videos, transcribes them, sends transcripts to Eagle/Falcon to generate flashcards + quiz questions per video
+tags:
+  - brain
+  - project
 metadata:
   type: project
 ---
@@ -77,6 +81,7 @@ metadata:
 - [x] Prompt 182 SHIPPED — final exam expanded to 30 real questions + redesigned start screen
 - [x] Prompt 183 queued — final exam UX (bigger card, no live score, no answer flash, lock modal, de-video-referenced question wording)
 - [x] Video 6 revert content ready 2026-07-01: transcript received, flashcards/mini-quiz/final-exam rewritten around BANT
-- [ ] Prompt 184 queued in [[LIVE_STATE]] — CC swaps video 6 ID back to `dj3J75I0GYQ` (9:16) + swaps in new Video 6 content across flashcards.js, MINI_QUIZ_CONTENT, FINAL_EXAM_QUESTIONS
+- [x] Prompt 184 SHIPPED — video 6 swapped back to `dj3J75I0GYQ` (9:16) + new Video 6 content across flashcards.js, MINI_QUIZ_CONTENT, FINAL_EXAM_QUESTIONS
+- [x] Prompt 189 SHIPPED 2026-07-01 (`162eb1d`) — Video 1 swapped to `AUEr1jPJsi8` (6:30, Upfirst), removes internal cost/margin leak from flashcards + mini-quiz + Final Exam Topic 1
 
 **Why not voicemail strategy:** no-answer leads stay in the pipeline and get called back automatically — voicemail is low priority.
