@@ -20,6 +20,20 @@ tags:
 
 ---
 
+### Prompt 180 — Video "watched" flag should be set on mini-quiz completion, not video end
+
+**Context (Brayden, 2026-06-30):** Right now (per Prompt 174), a video's mini-quiz appears in-modal once the video finishes playing, and — as far as Brayden can tell from using it — the video's "watched" state (the thing that increments the X/8 counter gating Final Exam eligibility) gets set at that same video-end moment. Brayden's ask: decouple these two. The video should only be marked "watched" once the rep has also finished the mini-quiz that pops up after it (clicked through all the mini-quiz questions — right or wrong doesn't matter, mini-quiz stays non-gating/formative exactly as-is). If they close the tab, refresh, or navigate away right as the video ends but before finishing the mini-quiz, the video should NOT count as watched yet — they'd need to re-watch and complete the mini-quiz to get credit.
+
+**Why:** This closes a soft loophole. The video itself already can't be skipped or scrubbed (Prompt 174 lock is fine, don't touch it), but someone could currently get "watched" credit the instant the video ends without ever engaging with the recap questions, just by closing out at that exact moment. Tying the watched-flag to mini-quiz completion means the only way to get credit is to actually sit through the full video AND click through the mini-quiz — since the mini-quiz is only reachable after real playback completes (not skippable/scrubbable), this is a clean way to foolproof it without touching any of the existing lock mechanics.
+
+**Change:** Find wherever the per-video "watched" state gets persisted (likely a `watched_videos`/`watchedVideos` array or count, probably written to Supabase `training_progress` or similar, that drives the "X/8 videos watched" gate for Final Exam). Move that write from the video's `onEnded`/completion event to the mini-quiz's completion event (i.e., after the rep has answered or clicked through the last mini-quiz question for that video). The mini-quiz UI/questions/non-gating behavior stays exactly as-is — this is purely about *when* the watched-flag gets written, not what the quiz does.
+
+**Do NOT change:** `LockedVideoPlayer` scrub/skip/keyboard/backdrop lock behavior, mini-quiz content or non-gating scoring, Final Exam, Flashcards, any other tab.
+
+**Verify:** Watch a video fully, close the mini-quiz modal or navigate away before answering any mini-quiz questions (if possible), come back to Videos tab — that video should NOT show as watched yet. Watch it again, this time click through all mini-quiz questions to the end — video should now show as watched, and the X/8 counter should increment only at that point.
+
+---
+
 ### ✅ Prompt 179 SHIPPED 2026-06-30 (`5489e28`) — flashcards vocab/term + definition format
 
 - `src/data/flashcards.js`: all 48 card front/back replaced with vocab-term → one-line definition format (glossary style, no Q&A). Same 8 categories × 6 cards, same keys. Final Exam untouched.
