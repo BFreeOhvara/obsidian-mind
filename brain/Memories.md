@@ -64,6 +64,17 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### [CC | 2026-07-01 — Prompt 185 shipped · `808b47e`] — root-caused the exam modal off-screen bug
+
+- Falcon's Prompt 185 report described the Final Exam question card rendering above the viewport (`top: -164px`) after Prompt 183. Diagnosed properly instead of guessing: reproduced in an isolated static HTML harness mirroring `DashboardLayout.jsx`'s structure (scratchpad, not committed) rather than reasoning blind, since the app itself still can't run locally (no `.env.local`).
+- **Root cause:** `DashboardLayout.jsx`'s `.page-enter` wrapper has `animation: fadeSlideUp 0.35s ease both` (`index.css`) — `fill-mode: both` keeps `transform: translateY(0)` applied permanently after the animation ends. Any ancestor with a non-`none` transform becomes the containing block for `position: fixed` descendants (CSS spec), so the exam modal was fixed relative to that scrollable page wrapper, not the true viewport — scrolling the page before opening the modal pushed it off-screen by the scroll amount. Confirmed in the repro: nesting a fixed div inside a transformed, scrolled ancestor reproduced `card.top` going negative; moving the same node to `document.body` fixed it at any scroll position.
+- **Fix:** `FinalQuizTab`'s modal now renders via `createPortal(..., document.body)`. No sizing/CSS changes needed — Prompt 183's `maxHeight`/`overflow` were already correct; this was purely a containing-block bug, not an overflow bug.
+- Full writeup + the "why this matters for future modals" note saved to [[Gotchas]]. Flagged the video-lock modal (`LockedVideoPlayer` in `VideoLibrary`) as having the same latent bug via `spawn_task` (`task_dfc08055`) rather than fixing it here — out of scope per Prompt 185's "any other tab" restriction.
+- Same `.env.local` blocker as every session this week — verified via `npx vite build` + the isolated repro, not a live logged-in browser session.
+- LIVE_STATE queue is empty again.
+
+---
+
 ### [CC | 2026-07-01 — Prompts 183+184 shipped · `9b75c67`, `f6f4d2f`]
 
 - **183 (final exam UX):** `FinalQuizTab` in-progress/finished states now render as a full-screen locked modal — same `position: fixed` lock pattern as `LockedVideoPlayer` (Prompt 174), no backdrop-click/X-dismiss until `finished`. Bigger card (maxWidth 900, 21px question text). Removed the `picked`/live-feedback state — answers silently advance, no green/red flash, no live "X correct" counter; score only shows at the end. Swapped `MINI_QUIZ_CONTENT` (32 Qs) + `FINAL_EXAM_QUESTIONS` (30 Qs) to the v2 "no video references" wording from [[training-quiz-content]].
