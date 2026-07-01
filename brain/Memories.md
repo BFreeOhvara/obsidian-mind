@@ -3078,3 +3078,16 @@ Session resumed after context compaction. Prompt 148 seed bug (rep_profile_id �
 - 4 surgical calibration edits to `strategy/ohvara-setter-discovery-script.md`: Section 1 decision-maker check, Section 4 show-rate system (3 touchpoints + Loom video), Section 5 mid-job objection handler, Section 5 volume mindset note.
 - Sections 2–3 confirmed solid against real call patterns — no changes needed.
 - Next: Prompt 151 (MRR tracker — subscriptions schema + admin UI + closer Revenue view).
+
+---
+
+## Session Log — 2026-07-01 (Prompt 186)
+
+**CC | 2026-07-01 — Final exam: select-then-Next flow + solid accent letter badges (shipped `3e8563e`)**
+
+- `FinalQuizTab` in [[ohvara-dashboard]] `src/pages/rep/TrainingCenter.jsx` reworked per Prompt 186 (two Brayden requests after seeing 185 live).
+- Interaction change: dropped the running `correct` counter state for an `answers` array keyed by question index. `pick(i)` now only records the selection (no auto-advance, no reveal). Added Back (hidden on Q1) + Next/Finish buttons; Next disabled until a pick exists; last question shows "Finish" → existing score screen. Prior picks persist across Back/Next since answers are index-keyed. Score computed from `answers` at finish.
+- Styling: selected option → `--accent-dim` bg + `--accent` border + `--text-primary` text (no right/wrong color). Letter badges A–D → solid `--accent` fill + `--text-primary` text, all 4 identical (was muted `--bg-surface`/`--text-muted`).
+- Unchanged: portal/locked modal (185), start screen (182), question content (183/184), score-reveal-only-at-finish.
+- Root cause / lesson: n/a — pure feature change. Verified `npx vite build` only; **standing blocker persists — no `.env.local` in the repo, so live logged-in browser check still impossible** (same as 182–185). Brayden to confirm live.
+- Status: SHIPPED + pushed to `master`; Prompt 186 cleared from [[LIVE_STATE]] queue.
