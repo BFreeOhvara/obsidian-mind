@@ -20,6 +20,32 @@ tags:
 
 ---
 
+### ⚠️ RUN THIS FIRST — Prompt 179-FIX: git identity is blocking Vercel auto-deploy
+
+**Do this before Prompt 180 below, even though it's numbered lower in the queue.**
+
+**Context (Falcon, via Vercel MCP, 2026-06-30):** Prompts 178 (`1832fa7`) and 179 (`5489e28`) both show up in the Vercel dashboard as deployments with `readyState: "BLOCKED"` and zero build logs — meaning they never even started building and never went live, despite CC logging them as shipped. Root cause found via the Vercel API: those two commits are attributed to GitHub identity `goldshtofsara` with email `youremail@gmail.com` (a placeholder). Every deployment that has ever actually gone live (Prompt 177 and everything before it) was committed as `BFreeOhvara` (Brayden's real GitHub account). Vercel is blocking auto-deploys from a git author it doesn't recognize as authorized on this team, as a security measure.
+
+**Fix — two steps:**
+
+1. **Check and fix git identity in the `ohvara-dashboard` repo's local config:**
+   ```
+   git config user.name
+   git config user.email
+   ```
+   These should be Brayden's real name/email matching the `BFreeOhvara` GitHub account (check what prior successful commits used — `githubCommitAuthorEmail: "freemanbrayden04@gmail.com"`, `githubCommitAuthorName: "BFreeOhvara"` per the Vercel deployment metadata). If they're set to anything else (e.g. a placeholder or a different account), fix with:
+   ```
+   git config user.name "BFreeOhvara"
+   git config user.email "freemanbrayden04@gmail.com"
+   ```
+   Also check whatever GitHub credential/token CC is using to push (`git remote -v`, credential helper, or gh CLI auth) — if it's authenticating as a different GitHub account than `BFreeOhvara`, that needs fixing too, since the git config name/email alone doesn't determine the actual authenticated pusher GitHub resolves the commit to.
+
+2. **Trigger one new commit to supersede the stuck deployments.** Once identity is fixed, make a small no-op commit (e.g. a comment bump in `src/data/flashcards.js`, or just re-commit with `--amend --reset-author` if the content is already correct and just needs re-attribution) and push to `master`. This should show up in Vercel as a normal deployment (not BLOCKED) and — since Prompt 179's flashcard content is already correct in the file — this should make the vocab-term flashcards go live without needing any further content changes.
+
+**Verify:** After pushing, check that the new commit shows `readyState: "READY"` (not BLOCKED) — either via `vercel ls` / Vercel dashboard, or just confirm live at `ohvara-dashboard.vercel.app/rep/training` → Flashcards tab shows vocab-term cards (e.g. front "Missed Call Math", not a full sentence).
+
+---
+
 ### Prompt 180 — Video "watched" flag should be set on mini-quiz completion, not video end
 
 **Context (Brayden, 2026-06-30):** Right now (per Prompt 174), a video's mini-quiz appears in-modal once the video finishes playing, and — as far as Brayden can tell from using it — the video's "watched" state (the thing that increments the X/8 counter gating Final Exam eligibility) gets set at that same video-end moment. Brayden's ask: decouple these two. The video should only be marked "watched" once the rep has also finished the mini-quiz that pops up after it (clicked through all the mini-quiz questions — right or wrong doesn't matter, mini-quiz stays non-gating/formative exactly as-is). If they close the tab, refresh, or navigate away right as the video ends but before finishing the mini-quiz, the video should NOT count as watched yet — they'd need to re-watch and complete the mini-quiz to get credit.
