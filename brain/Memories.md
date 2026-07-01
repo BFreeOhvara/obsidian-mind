@@ -64,6 +64,16 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### [CC | 2026-07-01 — Prompt 182 shipped · `c6e9c21`]
+
+- `FINAL_EXAM_QUESTIONS` in `TrainingCenter.jsx`: 28 → 30 questions, added `f29` (Video 3/Discovery) and `f30` (Video 8/Time Management) per [[training-quiz-content]]. Stale "28 questions" comment and "25-30 questions" copy fixed to say 30.
+- `FinalQuizTab` start screen redesigned: 3 stat cards (Questions/To Pass/Videos Covered), 8 topic chips (reused `CATEGORY_LABELS`/`CATEGORY_COLORS` from `flashcards.js`), pass badge (boolean only — no persisted score % exists to show). All on real DESIGN.md/`index.css` tokens, no shadows/gradients/hex/heavy weights.
+- **Gotcha hit:** `ohvara-dashboard` has no `.env.local` — `src/lib/supabase.js` throws synchronously on missing `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY`, so the whole app renders a blank root before any route/auth logic runs. Didn't fabricate credentials to work around it. Verified instead via `npx vite build` (compiles clean) + a node count check (30 questions) + an isolated static mockup built from the real color tokens to sanity-check the layout. Full logged-in browser verification of this page still needs a real `.env.local` — Brayden should confirm live on Vercel.
+- Added `.claude/launch.json` to obsidian-mind (`cmd /c cd /d C:\Users\freem\ohvara-dashboard && npm run dev`, port 5173) so future sessions can preview the dashboard directly from this vault. Also ran `npm install` in `ohvara-dashboard` — `node_modules` wasn't present.
+- LIVE_STATE "Next Up for CC" queue is now empty.
+
+---
+
 ### 2026-06-30 — Seed data fixed + Prompt 158 queued [Falcon]
 
 **Context:** Continuing from previous session. Revenue Tracker was showing all-zero data because deal_value was NULL on all seeded appointments and created_at/updated_at were all today.
