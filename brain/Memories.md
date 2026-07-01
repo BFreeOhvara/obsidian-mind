@@ -3107,3 +3107,15 @@ Session resumed after context compaction. Prompt 148 seed bug (rep_profile_id �
 - Lesson: code already had the `perfect_day` detail as "…in one day" — Brayden's screenshot showed none, i.e. live was stale vs master. Confirms the live site can lag the repo; trust the code, not the screenshot, for current state. Trimmed to the exact requested phrasing anyway.
 - Verified `npx vite build` only — **standing blocker persists: no `.env.local`, no live logged-in check** (same as 182–186).
 - Status: SHIPPED + pushed to `master`; Prompt 187 cleared from [[LIVE_STATE]] queue.
+
+---
+
+## Session Log — 2026-07-01 (Prompt 188)
+
+**CC | 2026-07-01 — Fixed 187's search placement + Completed Days copy (shipped `caa7652`)**
+
+- Rework of 187 A & B after Brayden's live screenshots; C/D/E left alone.
+  - **A** `MyLeads.jsx`: pulled the search input out of the `X/150` progress-bar row (now back to pre-187 state) and onto the status-tabs row as a right-floated sibling — wrapped tabs (`flex:1`, keeps underline) + search (`flexShrink:0`) in an outer flex row, so search sits outside both the tabs box and the table box. Same filter logic.
+  - **B** `MyStats.jsx`: the run-on `·`-joined caption became two stacked `<p>` lines under the title ("Completed Day = 150 dials" / "Perfect Day = 150 dials + 2 bookings"); "Last 21 days" stays alone top-right. Header → `alignItems:flex-start` + `marginBottom:10`.
+- Verified `npx vite build` — **standing blocker persists: no `.env.local`, no live check**.
+- Status: SHIPPED + pushed to `master`; Prompt 188 cleared from [[LIVE_STATE]] queue.

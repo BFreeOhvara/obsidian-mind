@@ -52,31 +52,12 @@ tags:
 
 ---
 
-### Prompt 188 — Fix Prompt 187: search bar placement (A) + Completed Days text layout (B)
+### ✅ Prompt 188 SHIPPED 2026-07-01 (`caa7652`) — fixed 187's search placement (A) + Completed Days copy layout (B)
 
-**Context (Brayden, 2026-07-01, live screenshots of `/rep` and `/rep/stats` after Prompt 187 shipped).** Two of the five Prompt 187 changes need rework. C/D/E (Goals reorder + badge copy) are confirmed fine and must NOT be touched.
-
-**A) `/rep` — search bar is in the wrong spot, move it**
-
-Prompt 187 put the search input inside the same row/box as the `X / 150` progress bar (to its right, same container). Brayden does not want that. Required layout:
-
-1. The progress-bar row (`X / 150`) goes back to **exactly** how it looked before Prompt 187 — full-width bar, no search box in it, nothing added to that row or its container.
-2. The search input moves to the **status-tabs row** (the row with New / Appointment Booked / Follow-Up / No Answer / Not Interested / All) — same horizontal line as those tabs, right-aligned. It must be its own separate element, NOT nested inside the tabs' container/box and NOT inside the leads-table container — visually it sits on that row but outside both of those boxes (its own small bordered input floating on the right end of that row, tabs remain left-aligned as-is).
-3. Keep the same search behavior from 187 (filters business_name/contact_name/phone/city/niche, case-insensitive, applied after the active tab filter) — only the placement changes.
-
-**B) `/rep/stats` — Completed Days caption is illegible, needs real line breaks not a run-on string**
-
-Prompt 187 made the top-right caption one long string: `Completed Day = 150 dials · Perfect Day = 150 dials + 2 bookings · Last 21 days` — Brayden says it reads as mushed together, hard to tell where one clause ends and the next begins. Rework to:
-
-- Keep **"Last 21 days"** where it already is, top-right of the "Completed Days" panel header, same gray/muted style as before.
-- Under the **"Completed Days"** title (left side of that same header row), add a two-line gray subtitle, one definition per line:
-  - Line 1: `Completed Day = 150 dials`
-  - Line 2: `Perfect Day = 150 dials + 2 bookings`
-- These two lines should read as clearly separate rows (real line break / block element, not joined by a `·` separator), same muted text color/size as the existing caption. "Last 21 days" stays a single line on the right, unrelated to these two new lines.
-
-**Do NOT change:** Goals page reorder/badge copy (187 C/D/E — confirmed good), search filter logic itself (only its position), any Training Center work (183–186).
-
-**Verify:** Screenshot `/rep` — confirm the `X/150` bar row looks identical to pre-187 (no search box in it), and the search input now sits on the tabs row, right-aligned, visually outside both the tabs box and the table box. Screenshot `/rep/stats` — confirm "Last 21 days" still top-right, and "Completed Day = 150 dials" / "Perfect Day = 150 dials + 2 bookings" appear as two distinct lines under the "Completed Days" title, not run together.
+- **A** `MyLeads.jsx`: removed the search input from the `X / 150` progress-bar row (that row/container is back to its exact pre-187 state). Wrapped the status-tabs `<div>` and a new search `<div>` in an outer `flex`/`alignItems:center`/`gap:12`/`marginBottom:16` row — tabs keep their full-width underline via `flex:1`, search is a `flexShrink:0` sibling floated right, outside both the tabs box and the table box. Filter logic unchanged (same 187 substring match, after the active tab).
+- **B** `MyStats.jsx`: split the run-on caption. "Last 21 days" stays top-right alone; under the "Completed Days" title (left) there are now two separate `<p>` lines — `Completed Day = {DAILY_BATCH_TARGET} dials` and `Perfect Day = {DAILY_BATCH_TARGET} dials + 2 bookings` — same `--text-muted` 11px, real block line breaks (no `·`). Header switched to `alignItems:flex-start` + `marginBottom:10` to preserve pre-heatmap spacing.
+- Untouched per spec: Goals 187 C/D/E, search filter logic, Training Center (183–186).
+- Verified `npx vite build` (passes, confirms the MyLeads re-nesting is valid JSX). No live check — still no `.env.local` (same standing blocker). Brayden to confirm live per the screenshot checklist.
 
 ---
 
