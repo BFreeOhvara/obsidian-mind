@@ -20,22 +20,12 @@ tags:
 
 ---
 
-### Prompt 182 — Final Exam: 30 real questions (was 28) + redesign the bland start screen
+### ✅ Prompt 182 SHIPPED 2026-07-01 (`c6e9c21`) — 30-question final exam + redesigned start screen
 
-**Context (Brayden, 2026-06-30, from a screenshot of `/rep/training` → Final Exam tab):** Two asks. (1) The start screen copy says "25-30 questions" but the bank only has 28 — Brayden wants it to just say 30, and actually be 30 questions. (2) The start screen itself "looks super bland" — right now it's just a centered icon, "Final Exam" title, one paragraph of copy, and a button, with a lot of empty dead space around it. He wants it visually spiced up.
-
-**Change 1 — expand to 30 questions.** `FINAL_EXAM_QUESTIONS` currently has 28 (added in Prompt 176). Add the 2 new questions below to bring it to exactly 30 — full content in [[training-quiz-content]] under "Final Exam — 30 questions" (already renumbered 1-30 there, safe to copy directly): one new Video 3/Discovery question ("What does asking 'how long has this been going on for?' accomplish?") and one new Video 8/Time Management question ("What's described as a key way to build tomorrow's pipeline today?"). Update any hardcoded "28" question-count references and the exam description copy to say "30 questions" (not "25-30").
-
-**Change 2 — redesign the Final Exam start screen.** Keep the same page/tab structure, same "Start Final Exam" button and its behavior, same gating logic — this is visual only. Read [[DESIGN]] first (color tokens, anti-rules: no box-shadow, no gradients, no border-radius over 10px, no hardcoded hex, no font-weight 600/700, no zebra striping). Within those constraints, replace the single plain paragraph with something more substantial, for example:
-- A row of 3 small stat cards (bg-elevated background, JetBrains Mono for the numbers) showing: **30** Questions / **85%** to Pass / **8** Videos Covered — instead of burying these in a sentence.
-- A row of 8 small topic chips below that, one per training video topic (AI Receptionist, Tonality, Discovery, Gatekeeper, Objections, Qualifying, Booking, Time Management — same 8 categories as the Flashcards tab), so the page previews what's actually covered instead of just a generic paragraph.
-- If there's existing attempt/score data available (e.g. a previous exam score or pass/fail state), surface it near the top (using `--success`/`--danger` tokens for pass/fail) instead of only showing it after clicking in.
-
-Use judgment on exact layout — the goal is "less bare, more informative," not a specific pixel layout. Stay strictly within the existing color tokens and anti-rules; do not introduce new colors, shadows, or gradients.
-
-**Do NOT change:** Script, Videos, Flashcards, AI Roleplay tabs, exam question content beyond the 2 additions above, pass threshold (85%), gating logic (all 8 videos watched required), Start Final Exam button behavior once clicked.
-
-**Verify:** Final Exam start screen shows "30" not "25-30" anywhere, taking the exam presents exactly 30 questions, and the start screen has more visual structure than a single centered paragraph — while still following every DESIGN.md anti-rule (no shadows/gradients/hex/heavy weights/rounded-over-10px corners).
+- `FINAL_EXAM_QUESTIONS`: added `f29` (Video 3/Discovery — "how long has this been going on for?") and `f30` (Video 8/Time Management — "key way to build tomorrow's pipeline today") — 28 → 30, confirmed by count. Updated the stale "28 questions" code comment.
+- `FinalQuizTab` start screen (no-questions-yet state): replaced the single paragraph with 3 stat cards (Questions/To Pass/Videos Covered, `--bg-elevated` + JetBrains Mono numbers), a row of 8 topic chips (reusing `CATEGORY_LABELS`/`CATEGORY_COLORS` from `flashcards.js`), and — when `passed` is true — a pass badge using `--success` moved above the stat cards (no persisted score % exists, only the boolean flag, so that's what surfaces). "25-30 questions" copy → "30 questions". Same button/behavior/gating untouched.
+- Verified: 30-item count via a node script against the built file, `npx vite build` succeeds. Could not do a full logged-in browser check — repo has no `.env.local` (Supabase env vars), so the app throws before rendering (confirmed empty DOM root, no network calls fired) and I didn't fabricate credentials. Design was instead sanity-checked against real DESIGN.md/index.css tokens in an isolated mockup — no hex/shadows/gradients/heavy weights in the actual JSX, all `var()`-based.
+- Added `.claude/launch.json` to obsidian-mind pointing at the dashboard repo (`cmd /c cd /d ... && npm run dev`) so future prompts can preview the dashboard directly from vault sessions; also ran `npm install` in `ohvara-dashboard` (node_modules wasn't present).
 
 ---
 
