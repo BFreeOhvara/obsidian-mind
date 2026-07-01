@@ -61,6 +61,22 @@ tags:
 
 ---
 
+### Prompt 189 — Video 1 swapped again: new pick + new flashcards/quiz (removes internal cost/margin info from setter training)
+
+**Context (Brayden, 2026-07-01):** Video 1's old pick ("AI Receptionists for Small Businesses Explained (Full Breakdown)," SixFlow Automations) taught the raw ~$0.12/min wholesale AI cost and templated-vs-custom-AI build info — that leaked into a flashcard AND into Final Exam Topic 1 Q3, meaning appointment setters could see Ohvara's approximate markup/margin and internal build approach. Brayden doesn't want setters to know that. Replaced the video entirely (not just the affected question) with "AI Answering Service for Small Businesses | Overview of Upfirst" (6:30, pure feature-tour + one demo call, confirmed via transcript to have zero pricing/cost mentions). Falcon rewrote all of Video 1's content around the new transcript — see [[training-flashcard-content]] Category 1 and [[training-quiz-content]] Mini-Quiz 1 + Final Exam Topic 1.
+
+**Fix:**
+1. `TRAINING_VIDEOS[0]`: `youtubeId` → `AUEr1jPJsi8`, duration → `6:30`, update title/description to match the new video (feature overview: talks to callers, collects info, books appointments, transfers calls, sends call summaries/transcripts/recordings) — remove any "missed-call math"/pricing framing carried over from the old pick.
+2. `flashcards.js` Category 1/AI Receptionist: replace all 6 cards with the new set from [[training-flashcard-content]] (warm transfer, call summary/transcript/recording, plain-English setup, calendar booking, spam detection — no cost figures, no build-platform names).
+3. `MINI_QUIZ_CONTENT` Mini-Quiz 1: replace all 4 questions with the new set from [[training-quiz-content]] (same 4 topics as the flashcards, MC format).
+4. `FINAL_EXAM_QUESTIONS` Topic 1 (currently questions 1-4 of 30): replace all 4 with the new set from [[training-quiz-content]] — **this is the one that actually mattered**, since the old Q3 was the literal "what's the raw per-minute rate" question. Confirm the old cost/templated-vs-custom questions are fully gone from the built bundle (grep for "12 cents" / "per-minute" / "Retell AI" / "Vapi" in `src/` — should be zero hits after this change).
+
+**Do NOT change:** any other video/topic (2-8), Final Exam question count (stays 30) or numbering, Training Center UX from Prompts 183/185/186, rep-portal work from 187/188.
+
+**Verify:** grep `src/` for "0.12" / "12 cents" / "raw cost" / "Retell AI" / "Vapi" and confirm zero matches. `npx vite build` passes. Screenshot/spot-check Video 1's flashcards and Final Exam Topic 1 (questions 1-4) show the new warm-transfer/call-summary/spam-detection content, not the old cost content.
+
+---
+
 ### ✅ Prompt 183 SHIPPED 2026-07-01 (`9b75c67`) — final exam UX overhaul
 
 - `FinalQuizTab`: in-progress/finished states now render as a full-screen locked modal (`position: fixed`, same pattern as `LockedVideoPlayer`/Prompt 174) — no backdrop-click-to-close and no X while `!finished`; X + backdrop-click both work once `finished`. Start screen (stat cards/chips from Prompt 182) untouched, still inline.

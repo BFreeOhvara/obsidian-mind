@@ -13,14 +13,14 @@ Source: Brayden's transcripts of the 8 locked videos (see [[training-videos]]). 
 
 **History:** v1 (Prompt 177) full-sentence Q&A. v2a (Prompt 178) short-phrase Q&A. v2 (Prompt 179) vocab-term → definition (glossary style). v3 (this version, Prompt 181) flips v2: front = question, back = short answer.
 
-## Category 1 — AI RECEPTIONIST (Video 1)
+## Category 1 — AI RECEPTIONIST (Video 1) — REVISED 2026-07-01, new video ("AI Answering Service for Small Businesses | Overview of Upfirst")
 
-1. Front: What do you call an AI voice agent that answers calls like a human, 24/7 or as overflow? → Back: An AI Receptionist
-2. Front: How do you calculate how much a missed call is costing you per year? → Back: Missed calls/day × ticket price × days/year
-3. Front: What kind of AI receptionist is plug-and-play and generic, like RingCentral or GoHighLevel? → Back: Templated AI
-4. Front: What kind of AI receptionist is agency-built and tailored to the business? → Back: Custom AI
-5. Front: What's it called when the AI only answers calls a human can't get to? → Back: Overflow mode
-6. Front: Roughly how is AI receptionist usage priced before an agency's markup? → Back: ~$0.12/min raw cost
+1. Front: What three things does a business get after an AI receptionist finishes a call? → Back: A summary, a transcript, and a recording
+2. Front: How do you teach an AI receptionist about a specific business? → Back: Give it plain-English information and instructions — no AI expertise needed
+3. Front: What's it called when an AI receptionist briefs a human on the caller before connecting a transferred call? → Back: A warm transfer
+4. Front: What happens if a human declines a warm-transferred call? → Back: The AI receptionist politely takes a message
+5. Front: How can an AI receptionist book an appointment without texting the caller a link? → Back: By connecting to your calendar and checking real-time availability directly on the call
+6. Front: What can an AI receptionist automatically detect and filter out of your call log? → Back: Spam calls
 
 ## Category 2 — TONALITY (Video 2)
 

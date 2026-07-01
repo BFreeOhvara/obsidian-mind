@@ -15,31 +15,31 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
 
 ---
 
-## Mini-Quiz 1 — What an AI receptionist does
+## Mini-Quiz 1 — What an AI receptionist does (REVISED 2026-07-01, new video: "AI Answering Service for Small Businesses | Overview of Upfirst")
 
-1. What does missing just one call a day for a $300 product translate to per year?
-   A) About $10,000 in missed revenue
-   B) About $100,000 in missed revenue ✅
-   C) About $300,000 in missed revenue
-   D) It doesn't really add up to anything significant
+1. What can an AI receptionist do beyond just answering the phone?
+   A) Only play a recorded greeting
+   B) Collect caller info, schedule appointments, and transfer calls when needed ✅
+   C) Nothing else — it just answers and hangs up
+   D) Only work during business hours
 
-2. What typically happens when a caller's call goes to voicemail?
-   A) They always leave a detailed message
-   B) They wait a day and call back
-   C) They usually don't leave a voicemail and just call the next business ✅
-   D) They text the business instead
+2. What does a business typically receive after an AI receptionist finishes a call?
+   A) Nothing — calls aren't logged anywhere
+   B) A summary, transcript, and recording of the call ✅
+   C) Only a missed-call notification
+   D) A single-line note with no detail
 
-3. Which is the better-quality type of AI receptionist setup?
-   A) A basic voicemail system
-   B) A templated plug-and-play tool like RingCentral or GoHighLevel
-   C) A custom solution built on a platform like Retell AI or Vapi ✅
-   D) A simple chatbot widget
+3. How do you teach an AI receptionist about a specific business?
+   A) It requires hiring a developer to write custom code
+   B) Give it plain-English information and instructions — no AI expertise needed ✅
+   C) It learns everything automatically with zero setup
+   D) You can't customize what it knows
 
-4. What's the best way to figure out if an AI receptionist is worth it for a business?
-   A) Multiply missed calls per month by average ticket price and compare it to the monthly cost ✅
-   B) Just guess based on gut feeling
-   C) Copy whatever a competitor is paying
-   D) Ask the AI vendor what's fair
+4. What is a "warm transfer"?
+   A) Sending the caller straight to voicemail
+   B) The AI briefing a human on who's calling and why before connecting them ✅
+   C) A transfer that happens with no context at all
+   D) A transfer that only works after hours
 
 ## Mini-Quiz 2 — Tonality & delivery
 
@@ -227,31 +227,31 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
 
 ## Final Exam — 30 questions, combined across all 8 topics
 
-**Topic 1 — What an AI receptionist does**
+**Topic 1 — What an AI receptionist does (REVISED 2026-07-01, new video: "AI Answering Service for Small Businesses | Overview of Upfirst")**
 
-1. What's a simple way to describe what an AI receptionist is?
-   A) A basic answering machine
-   B) "Siri on steroids" — a human-sounding AI voice agent ✅
-   C) A human temp worker
-   D) A simple chatbot
+1. What's a simple way to describe what an AI receptionist does?
+   A) It only plays a recorded greeting on a loop
+   B) It talks with callers, answers questions, and can schedule appointments or transfer calls ✅
+   C) It's just a basic voicemail box
+   D) It replaces a business's phone number entirely
 
-2. Which type of AI receptionist requires more technical expertise to build well?
-   A) Templated solutions
-   B) Custom solutions built on platforms like Retell AI or Vapi ✅
-   C) Neither — they're equally simple
-   D) Both require the same effort
+2. What does a business get after an AI receptionist handles a call?
+   A) A summary, transcript, and recording ✅
+   B) Nothing — calls aren't logged
+   C) Only a busy-signal report
+   D) A handwritten note from the AI
 
-3. Roughly what's the raw per-minute rate for AI receptionist usage, before an agency's markup?
-   A) About 12 cents per minute ✅
-   B) About $1 per minute
-   C) About 50 cents per minute
-   D) It's always free
+3. What's required to teach an AI receptionist about a specific business's details?
+   A) Hiring a developer to write custom code
+   B) Plain-English information and instructions — no technical expertise needed ✅
+   C) Nothing — it can't be customized
+   D) A month of manual training calls
 
-4. Does an AI receptionist have to fully replace human staff?
-   A) Yes, always
-   B) No — it can be set to handle only overflow/after-hours calls, or run full-time, depending on preference ✅
-   C) It can never take calls when a human is available
-   D) It only works after hours
+4. What happens when a call is flagged as an emergency and set to transfer to a human?
+   A) It's always ignored
+   B) The AI briefs the human on the caller and reason before connecting (a warm transfer) ✅
+   C) It goes straight to voicemail regardless of settings
+   D) It automatically hangs up
 
 **Topic 2 — Tonality & delivery**
 
