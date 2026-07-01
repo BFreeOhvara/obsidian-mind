@@ -3091,3 +3091,19 @@ Session resumed after context compaction. Prompt 148 seed bug (rep_profile_id �
 - Unchanged: portal/locked modal (185), start screen (182), question content (183/184), score-reveal-only-at-finish.
 - Root cause / lesson: n/a — pure feature change. Verified `npx vite build` only; **standing blocker persists — no `.env.local` in the repo, so live logged-in browser check still impossible** (same as 182–185). Brayden to confirm live.
 - Status: SHIPPED + pushed to `master`; Prompt 186 cleared from [[LIVE_STATE]] queue.
+
+---
+
+## Session Log — 2026-07-01 (Prompt 187)
+
+**CC | 2026-07-01 — Rep portal: lead search + Stats/Goals copy + Goals reorder (shipped `0aa453f`)**
+
+- Five small rep-portal changes in [[ohvara-dashboard]], none touching Training Center:
+  - **A** `MyLeads.jsx`: added a "Search leads" input (Search icon, admin-`LeadPipeline` pattern) on the progress-bar row; `filtered` now substring-matches business/contact/phone/city/niche after the status-tab filter.
+  - **B** `MyStats.jsx`: Completed Days caption now spells out `Completed Day = 150 dials · Perfect Day = 150 dials + 2 bookings · Last 21 days` (uses `DAILY_BATCH_TARGET`).
+  - **C** `MyGoals.jsx`: swapped `Streak` ↔ `Days Completed` groups in `BADGE_GROUPS` → order now Days Completed, Perfect Days, Streak (Commission still last of the four).
+  - **D** `MyGoals.jsx`: moved "a completed day = 150 dials" off the `streak_3` badge onto a new first-tier `days_1` "1 Day Completed" badge; `TOTAL_BADGES`/`earnedCount` derive so they auto-absorb it.
+  - **E** `MyGoals.jsx`: `perfect_day` detail → "150 dials + 2 bookings".
+- Lesson: code already had the `perfect_day` detail as "…in one day" — Brayden's screenshot showed none, i.e. live was stale vs master. Confirms the live site can lag the repo; trust the code, not the screenshot, for current state. Trimmed to the exact requested phrasing anyway.
+- Verified `npx vite build` only — **standing blocker persists: no `.env.local`, no live logged-in check** (same as 182–186).
+- Status: SHIPPED + pushed to `master`; Prompt 187 cleared from [[LIVE_STATE]] queue.

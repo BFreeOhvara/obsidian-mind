@@ -41,28 +41,14 @@ tags:
 
 ---
 
-### Prompt 187 — Rep portal: lead search bar + Stats/Goals copy fixes + Goals section reorder
+### ✅ Prompt 187 SHIPPED 2026-07-01 (`0aa453f`) — rep portal: lead search + Stats/Goals copy fixes + Goals reorder
 
-**Context (Brayden, 2026-07-01, live screenshots of the Setter Portal at `/rep`, `/rep/stats`, `/rep/goals`).** Five separate small changes, all rep-portal, none touch the Training Center (unrelated to Prompts 183-186 above).
-
-**A) `/rep` (My Leads) — add a lead search bar**
-Currently the layout top-to-bottom is: 4 stat cards (Calls Today / Booked Today / Booking Rate / Follow-Ups Due Today) → a progress-bar row showing `X / 150` right-aligned → the status tabs row (New / Appointment Booked / Follow-Up / No Answer / Not Interested / All) → the leads table (columns: BUSINESS, NICHE, CITY, PHONE, STATUS, ACTION). Add a "Search leads" input on the progress-bar row, right-aligned so it sits roughly above the table's ACTION column (i.e. same line as the `X / 150` counter, to its right or replacing that empty space on the right side of that row). Should filter the visible leads table by business name, contact name, phone, city, or niche (client-side, case-insensitive substring match), respecting whichever status tab is currently active. Style per [[DESIGN]] tokens (bg-surface/border/text-secondary placeholder, no box-shadow, no border-radius >10px).
-
-**B) `/rep/stats` — label what "Completed Day" and "Perfect Day" mean**
-The "Completed Days" panel (the 21-day calendar grid) has "Last 21 days" in small gray text at its top right. Add adjacent small gray text (same style/weight as "Last 21 days") stating the definitions, e.g. `Completed Day = 150 dials · Perfect Day = 150 dials + 2 bookings`. Keep it terse, one line, same text-secondary color token.
-
-**C) `/rep/goals` — reorder the three milestone sections**
-Current order top to bottom: STREAK, PERFECT DAYS, DAYS COMPLETED, COMMISSION. Change to: **DAYS COMPLETED, PERFECT DAYS, STREAK, COMMISSION** — i.e. swap the Streak and Days Completed section positions; Perfect Days stays in the middle; Commission stays last, unchanged.
-
-**D) `/rep/goals` — move the "completed day" definition off the Streak badge onto a new Days Completed badge**
-The "3-Day Streak" badge (Streak section) currently states the definition "a completed day = 150 dials" as part of its description. Remove that definition text from the 3-Day Streak badge — it should just describe the streak itself, e.g. "Complete 3 days in a row" or "Achieve 3 completed days in a row" (no dials definition). Add a **new first-tier badge to the Days Completed section** (before the existing 10 Days badge) titled something like "1 Day Completed" whose description carries the definition instead: "A completed day = 150 dials." This is purely moving the definition text from one badge to a new one, not changing any unlock logic/thresholds elsewhere.
-
-**E) `/rep/goals` — add a description to the "Perfect Day" badge**
-The first badge in the Perfect Days section (singular "Perfect Day", the one with the checkmark icon) currently has no description text under its title. Add: "150 dials + 2 bookings" (matching the phrasing already used elsewhere on this page, e.g. the "5 Perfect Days" badge's "5 completed days with 150 dials + 2 bookings").
-
-**Do NOT change:** Training Center/exam work from Prompts 183-186, unlock thresholds/logic for any badge, the Commission section, any other rep-portal page not listed above.
-
-**Verify:** Screenshot `/rep` and confirm a working search box filters the table live. Screenshot `/rep/stats` and confirm the Completed/Perfect Day definitions appear near "Last 21 days". Screenshot `/rep/goals` and confirm section order is Days Completed → Perfect Days → Streak → Commission, the new "1 Day Completed" badge exists with the dials definition, the 3-Day Streak badge no longer has that definition, and the singular "Perfect Day" badge now shows "150 dials + 2 bookings".
+- **A) `/rep` search bar** — added `search` state + `Search` icon input on the progress-bar row (right of the `X / 150` counter), mirroring the admin `LeadPipeline` search pattern (28px left pad for the icon, `--bg-elevated`/`--border`, radius 8). `filtered` now applies a case-insensitive substring match over business_name/contact_name/phone/city/niche *after* the active status-tab filter.
+- **B) `/rep/stats`** — the "Completed Days" panel's top-right caption now reads `Completed Day = {DAILY_BATCH_TARGET} dials · Perfect Day = {DAILY_BATCH_TARGET} dials + 2 bookings · Last 21 days` (same `--text-muted` 11px style, uses the constant so it can't drift from 150).
+- **C) `/rep/goals` reorder** — swapped the `Streak` and `Days Completed` group objects in `BADGE_GROUPS`; new visible order is Dialer, Booking, **Days Completed, Perfect Days, Streak**, Commission, Special (Commission still last of the listed four; Dialer/Booking/Special untouched).
+- **D)** — `streak_3` detail trimmed to just `'Complete 3 days in a row'`; added new first-tier `days_1` badge ("1 Day Completed", 📆, `totalCompletedDays >= 1`, detail "A completed day = 150 dials") ahead of `days_10`. `TOTAL_BADGES`/`earnedCount` are derived so they absorb the new badge automatically.
+- **E)** — `perfect_day` detail set to `'150 dials + 2 bookings'` (was "…in one day"; now matches the requested/sibling phrasing).
+- Verified via `npx vite build` (passes). No live browser check — still no `.env.local` in the repo (app throws pre-render, same standing blocker as 182–186). Brayden to confirm live per the prompt's screenshot checklist.
 
 ---
 
