@@ -72,6 +72,31 @@ tags:
 
 ---
 
+### Prompt 190 — My Calls: collapse the row, move grading detail into a click-to-open modal with a player shell
+
+**Context (Brayden, 2026-07-01, live screenshot of `/rep/calls` with the 6 sample graded calls Falcon seeded into Supabase for preview).** Likes the list but wants the detail moved behind a click, not shown inline on every row.
+
+**Row (collapsed) — simplify:**
+- Each row keeps: grade badge, business name, date/time (all unchanged).
+- Remove the two feedback lines (`✓ did well` / `↗ improve`) from the row entirely.
+- Replace them with a single muted line: `Your calls are recorded.`
+- Whole row becomes clickable (cursor pointer, hover state consistent with other clickable rows in the app) and opens a modal for that call.
+
+**Modal (on row click) — new:**
+- Dismissible normally (X and backdrop-click both close it — this is an info popup, not a gated flow like the exam/video locks from Prompts 174/183/185; do NOT reuse the locked-modal pattern here).
+- Header: business name + date/time + close X.
+- Grade badge (reuse the same colored badge component/colors as the row).
+- **Audio player shell**: play/pause button, a progress/scrub bar, and a time readout (e.g. `0:00 / 4:05`, total derived from `calls.duration_seconds`). No real audio file exists yet (`recording_url`/`twilio_recording_url` are null on all current rows) — build the full player UI regardless per Brayden's request ("I do want to still see the play button and the load bar"). If there's no `recording_url`, render the player in an inert/disabled state (button visibly present but non-functional, bar at 0%) rather than hiding it — once real Twilio recordings start populating `recording_url`, wire it to an actual `<audio>` element and this same UI becomes functional with no further redesign needed.
+- Below the player: the two feedback lines, moved from the row into here —
+  - "What you did well" — same green check-line style as today.
+  - "What to work on" — **color-coded by severity**: derive severity from the `grade` field — `A+/A/A-` → `--warning` (yellow), `B+/B/B-` → `--warning` (yellow), `C+` and anything lower (`C`, `C-`, `D`, `F`) → `--danger` (red). (Falcon seeded one `C+` sample — "ClearPipe Solutions LLC" — specifically so this red state has something to render against; the other 5 samples are A/B range and should show yellow.)
+
+**Do NOT change:** the list page's data source/query, grade badge colors/shapes on the row, any other tab, Training Center or rep-portal work from prior prompts.
+
+**Verify:** Screenshot `/rep/calls` — rows show only grade/name/date/"Your calls are recorded." Click a row (e.g. "FrostFree HVAC Co," grade A-) — modal opens with player shell + yellow improve-text. Click "ClearPipe Solutions LLC" (grade C+) — modal shows the same layout but improve-text in red. Confirm modal closes via X and via backdrop click.
+
+---
+
 ### ✅ Prompt 183 SHIPPED 2026-07-01 (`9b75c67`) — final exam UX overhaul
 
 - `FinalQuizTab`: in-progress/finished states now render as a full-screen locked modal (`position: fixed`, same pattern as `LockedVideoPlayer`/Prompt 174) — no backdrop-click-to-close and no X while `!finished`; X + backdrop-click both work once `finished`. Start screen (stat cards/chips from Prompt 182) untouched, still inline.
