@@ -1,39 +1,41 @@
 ---
 name: training-quiz-content
-description: Real content for the 8 setter training videos' mini-quizzes + the combined final exam, generated from Brayden's transcripts (2026-06-30). Replaces the 60 placeholder questions CC shipped in Prompt 174.
+description: Real content for the 8 setter training videos' mini-quizzes + the combined final exam, generated from Brayden's transcripts (2026-06-30). v2 (2026-07-01) strips all "per the video"/"the video says" phrasing so every question reads as standalone knowledge, not video recall.
 metadata:
   type: project
 ---
 
-# Setter Training — Real Quiz Content
+# Setter Training — Real Quiz Content (v2 — no video references)
 
 Source: transcripts Brayden sent 2026-06-30 for the 8 locked videos in [[training-videos]] (video 6 reflects the swapped pick, "Qualifying Customers" — consistent with Prompt 175). All questions are original, written from the concepts taught — not copied from the videos.
 
-Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-gating, shown after that video. Final exam = the 28-question combined gate (85% to pass, per [[training-videos]] Quiz Spec).
+**v2 change (2026-07-01, Prompt 183):** Brayden flagged that questions referencing "the video" (e.g. "per the video," "does the video say," "described in the video") feel wrong — the setter being tested doesn't need to know this is video-derived, they just need to know the concept. Every question below is rewritten to stand alone as a direct knowledge question.
+
+Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-gating, shown after that video. Final exam = the 30-question combined gate (85% to pass, per [[training-videos]] Quiz Spec).
 
 ---
 
 ## Mini-Quiz 1 — What an AI receptionist does
 
-1. According to the video, what does missing just one call a day for a $300 product translate to per year?
+1. What does missing just one call a day for a $300 product translate to per year?
    A) About $10,000 in missed revenue
    B) About $100,000 in missed revenue ✅
    C) About $300,000 in missed revenue
    D) It doesn't really add up to anything significant
 
-2. What typically happens when a caller's call goes to voicemail, per the video?
+2. What typically happens when a caller's call goes to voicemail?
    A) They always leave a detailed message
    B) They wait a day and call back
    C) They usually don't leave a voicemail and just call the next business ✅
    D) They text the business instead
 
-3. Which is described as the better-quality type of AI receptionist setup?
+3. Which is the better-quality type of AI receptionist setup?
    A) A basic voicemail system
    B) A templated plug-and-play tool like RingCentral or GoHighLevel
    C) A custom solution built on a platform like Retell AI or Vapi ✅
    D) A simple chatbot widget
 
-4. How does the video say you should figure out if an AI receptionist is worth it for a business?
+4. What's the best way to figure out if an AI receptionist is worth it for a business?
    A) Multiply missed calls per month by average ticket price and compare it to the monthly cost ✅
    B) Just guess based on gut feeling
    C) Copy whatever a competitor is paying
@@ -41,7 +43,7 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
 
 ## Mini-Quiz 2 — Tonality & delivery
 
-1. Roughly how much of total communication impact comes from tonality and body language combined, per the video?
+1. Roughly how much of total communication impact comes from tonality and body language combined?
    A) About 10%
    B) About 50%
    C) About 90% ✅
@@ -53,13 +55,13 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
    C) Greeting, pitch, and close
    D) Problem, solution, and price
 
-3. What are the two core elements of rapport described in the video?
+3. What are the two core elements of rapport?
    A) Talking a lot and smiling often
    B) Matching the other person's volume and speed
    C) The prospect feeling you care about them, and feeling you're similar to them ✅
    D) Agreeing with everything they say
 
-4. What three things make up charisma, per the video?
+4. What three things make up charisma?
    A) Natural talent, confidence, and luck
    B) Being loud, being persistent, and memorizing a script
    C) Effective tonality, appropriate body language, and not saying foolish things ✅
@@ -79,13 +81,13 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
    C) Gets the prospect to relive the pain of the problem ✅
    D) Ends the conversation politely
 
-3. Why is the word "trying" (as in "we've been trying to...") called out as important?
+3. Why is the word "trying" (as in "we've been trying to...") worth calling out?
    A) It means they're not a real lead
    B) It signals frustration and is a good opening to probe deeper ✅
    C) It means they already solved the problem
    D) It's a signal to end the call
 
-4. What's the overall goal of these clarifying and probing questions?
+4. What's the overall goal of clarifying and probing questions?
    A) Fill time before pitching
    B) Make small talk to build comfort
    C) Confirm contact information
@@ -93,13 +95,13 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
 
 ## Mini-Quiz 4 — Getting past the gatekeeper
 
-1. What's the stated goal when a gatekeeper answers the phone?
+1. What's the goal when a gatekeeper answers the phone?
    A) Convince the gatekeeper to buy
    B) Get past them to reach an actual decision-maker ✅
    C) End the call immediately
    D) Leave a detailed voicemail
 
-2. What tone does the video recommend when greeting the gatekeeper?
+2. What tone works best when greeting a gatekeeper?
    A) Very formal and corporate
    B) Apologetic and unsure
    C) Casual and confident, as if you already know the person you're calling for ✅
@@ -119,7 +121,7 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
 
 ## Mini-Quiz 5 — Handling objections
 
-1. What are the two biggest emotional drivers that cause someone to want to change, per the video?
+1. What are the two biggest emotional drivers that cause someone to want to change?
    A) Greed and excitement
    B) Pain and the fear of future pain ✅
    C) Trust and logic
@@ -145,13 +147,13 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
 
 ## Mini-Quiz 6 — Qualifying the prospect
 
-1. When qualifying a prospect financially, what does the video focus on?
+1. When qualifying a prospect financially, what matters most?
    A) Just their job title
    B) Their zip code
    C) Combined household income relative to the payment ✅
    D) Their age
 
-2. What tone does the video recommend when asking about someone's financial background?
+2. What tone works best when asking about someone's financial background?
    A) A skeptical, interrogating tone
    B) A non-judgmental, coaching-style tone ✅
    C) A purely formal/legal tone
@@ -163,7 +165,7 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
    C) Don't waste further time — move to the next lead ✅
    D) Report it to your manager
 
-4. What's the broader mindset described for qualifying efficiently?
+4. What's the broader mindset for qualifying efficiently?
    A) Spend equal time on every prospect regardless of their answers
    B) Never ask about money directly
    C) Ask, listen, and quickly decide whether to move forward or move on ✅
@@ -171,7 +173,7 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
 
 ## Mini-Quiz 7 — Booking & handoff
 
-1. Per the video, when is it okay to be more assertive about booking the appointment?
+1. When is it okay to be more assertive about booking the appointment?
    A) Right at the start of the call
    B) Only with hesitant prospects
    C) After you've built rapport, provided value, and qualified them ✅
@@ -183,13 +185,13 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
    C) Move forward with booking instead of asking "would you like to?" ✅
    D) Wait for the prospect to bring it up
 
-3. When does the video say is the best time to ask for a referral?
+3. When's the best time to ask for a referral?
    A) At the very start of the call
    B) Right after handling an objection
    C) When the prospect is expressing thanks or gratitude ✅
    D) Setters shouldn't ask for referrals
 
-4. Why does the video recommend asking for a small, specific amount of time, like "two minutes"?
+4. Why ask for a small, specific amount of time, like "two minutes"?
    A) It sounds more official
    B) It avoids legal issues
    C) It's required by every script
@@ -197,25 +199,25 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
 
 ## Mini-Quiz 8 — Time management & call discipline
 
-1. Per the video, why are morning dial blocks especially effective?
+1. Why are morning dial blocks especially effective?
    A) It's required by company policy
    B) Prospects are more likely to be asleep
    C) Connect rates are better and it builds early momentum ✅
    D) It avoids using a CRM
 
-2. What's one of the main mistakes that causes reps to underperform, per the video?
+2. What's one of the main mistakes that causes reps to underperform?
    A) Making too many calls
    B) Reacting to whatever comes up instead of planning the day ✅
    C) Following up too quickly
    D) Taking too many breaks
 
-3. What should you do in the last few minutes of the day, per the video?
+3. What should you do in the last few minutes of the day?
    A) Schedule personal appointments
    B) Clear your entire email inbox
    C) Reflect on what worked and what to carry into tomorrow ✅
    D) Call your manager for a debrief
 
-4. Which of these is listed as one of the video's core takeaways?
+4. Which of these is a core takeaway for structuring your day well?
    A) Always answer Slack messages immediately
    B) Multitask calls and emails together
    C) Protect your call blocks like they're meetings ✅
@@ -223,13 +225,13 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
 
 ---
 
-## Final Exam — 30 questions, combined across all 8 videos (expanded from 28 on 2026-06-30, +1 each to Videos 3 and 8)
+## Final Exam — 30 questions, combined across all 8 topics
 
-**Video 1 — What an AI receptionist does**
+**Topic 1 — What an AI receptionist does**
 
-1. What does the video compare an AI receptionist to, in simple terms?
+1. What's a simple way to describe what an AI receptionist is?
    A) A basic answering machine
-   B) "Siri on steroids" ✅
+   B) "Siri on steroids" — a human-sounding AI voice agent ✅
    C) A human temp worker
    D) A simple chatbot
 
@@ -239,21 +241,21 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
    C) Neither — they're equally simple
    D) Both require the same effort
 
-3. Roughly what per-minute rate does the video mention for raw AI receptionist usage?
+3. Roughly what's the raw per-minute rate for AI receptionist usage, before an agency's markup?
    A) About 12 cents per minute ✅
    B) About $1 per minute
    C) About 50 cents per minute
    D) It's always free
 
-4. Does an AI receptionist have to fully replace human staff, per the video?
+4. Does an AI receptionist have to fully replace human staff?
    A) Yes, always
    B) No — it can be set to handle only overflow/after-hours calls, or run full-time, depending on preference ✅
    C) It can never take calls when a human is available
    D) It only works after hours
 
-**Video 2 — Tonality & delivery**
+**Topic 2 — Tonality & delivery**
 
-5. What does effective tonality give you in a conversation, per the video?
+5. What does effective tonality give you in a conversation?
    A) Control over how your message is perceived ✅
    B) A bigger paycheck automatically
    C) Nothing — words matter more
@@ -265,27 +267,27 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
    C) An expert in your field
    D) Your exact pricing ✅
 
-7. What two things make up the bulk of communication impact described in the video?
+7. What two things make up the bulk of communication impact?
    A) Words and tone
    B) Body language and price
    C) Tonality and body language ✅
    D) Confidence and price
 
-8. What must a prospect unconsciously feel for rapport to exist, per the video?
+8. What must a prospect unconsciously feel for rapport to exist?
    A) That you're the cheapest option
    B) That you're more educated than them
    C) That you care about them and that you're similar to them ✅
    D) That you'll never ask them for anything
 
-**Video 3 — The discovery script**
+**Topic 3 — The discovery script**
 
-9. What's the purpose of "clarifying and probing" questions, per the video?
+9. What's the purpose of "clarifying and probing" questions?
    A) To confirm contact information
    B) To get the prospect to reveal the real problem beneath the surface ✅
    C) To end the call faster
    D) To upsell immediately
 
-10. If a prospect says they're "frustrated," what's the simplest follow-up shown in the video?
+10. If a prospect says they're "frustrated," what's the simplest follow-up?
     A) Change the subject
     B) Repeat the word back as a question: "frustrated?" ✅
     C) Apologize
@@ -297,35 +299,35 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
     C) The root cause behind their stated problem ✅
     D) Their job title
 
-12. What does asking "how long has this been going on for?" accomplish, per the video?
+12. What does asking "how long has this been going on for?" accomplish?
     A) Confirms a callback time
     B) Qualifies their budget
     C) Gets the prospect to relive the pain of the problem ✅
     D) Ends the conversation politely
 
-**Video 4 — Getting past the gatekeeper**
+**Topic 4 — Getting past the gatekeeper**
 
-13. Who is generally the best person to reach when cold calling a business, per the video?
+13. Who is generally the best person to reach when cold calling a business?
     A) The receptionist
     B) Any available employee
     C) The owner or a decision-maker ✅
     D) The IT department
 
-14. What kind of tone does the video recommend using with a gatekeeper?
+14. What kind of tone works best with a gatekeeper?
     A) Very formal and scripted
     B) Apologetic
     C) Loud and aggressive
     D) Casual and confident, like you already have a relationship with the person you're calling for ✅
 
-15. What's a risk of over-explaining yourself to a gatekeeper, per the video?
+15. What's a risk of over-explaining yourself to a gatekeeper?
     A) Nothing — more detail always helps
     B) You lose control of the conversation and give them a reason to screen you out ✅
     C) It's required for compliance
     D) It speeds up the call
 
-**Video 5 — Handling objections**
+**Topic 5 — Handling objections**
 
-16. What two emotions drive a person to actually want to change, per the video?
+16. What two emotions drive a person to actually want to change?
     A) Excitement and hope
     B) Pain and fear of future pain ✅
     C) Trust and logic
@@ -349,9 +351,9 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
     C) Talking about their job
     D) Identifying with other people who keep delaying and never solve their problem ✅
 
-**Video 6 — Qualifying the prospect**
+**Topic 6 — Qualifying the prospect**
 
-20. When qualifying a prospect financially, what combined factor does the video focus on?
+20. When qualifying a prospect financially, what combined factor matters most?
     A) Just their job title
     B) Their zip code
     C) Combined household income relative to the payment ✅
@@ -363,13 +365,13 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
     C) Don't waste further time — move to the next lead ✅
     D) Report them
 
-22. What kind of tone does the video suggest using when asking about someone's financial background?
+22. What kind of tone works best when asking about someone's financial background?
     A) A skeptical, interrogating tone
     B) A non-judgmental, coaching-style tone ✅
     C) A purely formal/legal tone
     D) Sarcastic
 
-**Video 7 — Booking & handoff**
+**Topic 7 — Booking & handoff**
 
 23. What should an appointment setter do before being more assertive about booking?
     A) Send a contract immediately
@@ -389,33 +391,33 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
     C) Skip qualifying entirely
     D) Move forward with booking rather than asking permission to proceed ✅
 
-26. When is the ideal moment to ask for a referral, per the video?
+26. When is the ideal moment to ask for a referral?
     A) Before you've provided any value
     B) During an objection
     C) When the prospect is expressing thanks or gratitude ✅
     D) Never — setters shouldn't ask
 
-**Video 8 — Time management & call discipline**
+**Topic 8 — Time management & call discipline**
 
-27. What's one of the biggest mistakes that causes reps to underperform, per the video?
+27. What's one of the biggest mistakes that causes reps to underperform?
     A) Making too many calls
     B) Taking detailed notes
     C) Reacting to the day instead of planning it ✅
     D) Following up too quickly
 
-28. Why are morning dial blocks especially effective, per the video?
+28. Why are morning dial blocks especially effective?
     A) It's mandatory company policy
     B) Prospects prefer being called early no matter what
     C) It avoids using a CRM
     D) Connect rates are better and it builds early momentum ✅
 
-29. What's the recommended way to close out the work day, per the video?
+29. What's the recommended way to close out the work day?
     A) Immediately log off without review
     B) Schedule more calls for the night
     C) A few minutes of reflection on what worked and what to carry into tomorrow ✅
     D) Clear all browser tabs
 
-30. What's described as a key way to build tomorrow's pipeline today, per the video?
+30. What's a key way to build tomorrow's pipeline today?
     A) Randomly cold calling with no list
     B) A dedicated sourcing block to find new target contacts ✅
     C) Waiting until tomorrow morning to find leads
@@ -423,4 +425,4 @@ Format per question: prompt, 4 options (A–D), correct letter. Mini-quiz = non-
 
 ---
 
-**Status:** expanded to 30 questions 2026-06-30 (Prompt 182) — was 28. Ready for CC to swap into `FINAL_EXAM_QUESTIONS`.
+**Status:** v2 (2026-07-01, Prompt 183) — all "per the video"/"the video says" phrasing stripped from both mini-quizzes (32 Qs) and final exam (30 Qs). Same correct answers, same structure, just reworded as standalone questions. Ready for CC to swap into `MINI_QUIZ_CONTENT` and `FINAL_EXAM_QUESTIONS`.

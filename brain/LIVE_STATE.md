@@ -20,6 +20,22 @@ tags:
 
 ---
 
+### Prompt 183 — Final Exam UX overhaul: bigger card, no live score, no right/wrong flash, lock modal, de-video content
+
+**Context (Brayden, 2026-07-01, from a screenshot mid-exam):** Several issues with how taking the Final Exam actually feels, now that the content itself is right:
+
+1. **Too small.** The question card only uses a fraction of the screen — lots of dead space around it. Make the question/answer card noticeably larger, closer to filling the available content area (similar scale to how the Videos/Flashcards tabs use the space).
+2. **Remove the running score.** Top-right currently shows "4 correct" while taking the exam. Remove this entirely — the score should only be revealed at the end (pass/fail + final %), never mid-exam. Keep "Question X of 30" — that's fine as-is.
+3. **Remove the right/wrong flash on each answer.** Currently selecting an answer highlights it green or red before moving on. Cut this — selecting an answer should silently record it and immediately advance to the next question, no color feedback, no "correct"/"incorrect" indication until the whole exam is submitted at the end.
+4. **Lock it like the video player.** Right now you can click off / navigate away mid-exam. Brayden wants the same lock behavior as `LockedVideoPlayer` (Prompt 174) applied here — once "Start Final Exam" is clicked, it should behave like a locked modal: no backdrop-click-to-close, no dismissing until the exam is submitted/completed. Reuse the same lock pattern/approach as the video modal if practical.
+5. **Strip all "per the video" phrasing from the actual questions.** Brayden's reasoning: the setter being tested doesn't need to know an answer came from a video — it should just read as a direct knowledge question. All 30 Final Exam questions AND all 32 Mini-Quiz questions have been rewritten in [[training-quiz-content]] (v2, 2026-07-01) to remove every instance of "per the video," "does the video say/mention/recommend/focus on/suggest," "described in the video," etc. Same correct answers and structure — just reworded. Swap this content into both `FINAL_EXAM_QUESTIONS` and `MINI_QUIZ_CONTENT`.
+
+**Do NOT change:** the 85% pass threshold, the "all 8 videos watched" gate to unlock the Final Exam tab, Prompt 180's watched-on-mini-quiz-completion logic, Flashcards tab, Prompt 182's stat-card/topic-chip start screen (keep that — just make the in-progress question card bigger once the exam starts), Script/AI Roleplay tabs. Follow [[DESIGN]] tokens/anti-rules for any sizing/layout changes (no shadows, no gradients, no hardcoded hex, no border-radius over 10px, no font-weight 600/700).
+
+**Verify:** Taking the exam shows a visibly larger question card, no live "X correct" counter, no green/red flash on answer selection (just silently advances), can't click off/dismiss the exam modal mid-attempt, and no question anywhere says "per the video" or similar — e.g. Q3 should read "Roughly what's the raw per-minute rate for AI receptionist usage, before an agency's markup?" not "...does the video mention...".
+
+---
+
 ### ✅ Prompt 182 SHIPPED 2026-07-01 (`c6e9c21`) — 30-question final exam + redesigned start screen
 
 - `FINAL_EXAM_QUESTIONS`: added `f29` (Video 3/Discovery — "how long has this been going on for?") and `f30` (Video 8/Time Management — "key way to build tomorrow's pipeline today") — 28 → 30, confirmed by count. Updated the stale "28 questions" code comment.
