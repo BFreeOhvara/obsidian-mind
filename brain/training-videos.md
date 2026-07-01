@@ -47,7 +47,7 @@ metadata:
 3. **Discovery script** — "What Questions To Ask Prospects During The Sales Discovery Process" — Jeremy Miner — **4:34** — https://www.youtube.com/watch?v=dDGX95UkV10 — ⚠️ swapped, original (`SThDd_7Y5Fw`) was 34:36, way over
 4. **Gatekeeper** — "How To Get Past The Gatekeeper? (Sales Training)" — **7:40** — https://www.youtube.com/watch?v=krveop9O-ik — kept, verified under 10 min
 5. **Objections** — "9 Minute Training To Destroy Any Sales Objection" — Jeremy Miner — **8:59** — https://www.youtube.com/watch?v=mDWUpuumAuo — ⚠️ swapped, original (`fAnEnXBtOjU`) was 18:24, over
-6. **Qualifying** — "Qualifying Customers" — Sales School / The Wolf of Wall Street — **5:05** — https://www.youtube.com/watch?v=wDgnnCRufOI — ⚠️ swapped 2026-06-30, original (`dj3J75I0GYQ`) wasn't playing/loading for Brayden — kept same topic, picked a different video
+6. **Qualifying** — ⚠️ REVERTING 2026-07-01: current pick "Qualifying Customers" (Sales School / Wolf of Wall Street, `wDgnnCRufOI`, 5:05) has bad audio — sounds like a phone recording in a noisy room, no mic, not the clean talking-head style of the other 7 videos. Brayden wants to revert to the ORIGINAL first pick: **"Genius Sales Qualifying Questions: Stop Wasting Time on Bad Leads"** — Brad Lea TV — **9:16** — https://www.youtube.com/watch?v=dj3J75I0GYQ — clean studio audio, talking-head style, under 10 min. Correction: the original swap reason logged 2026-06-30 ("wasn't playing/loading for Brayden") was actually a YouTube pre-roll ad loading first, not a real playback issue with the video itself — confirmed 2026-07-01 by reloading the link and waiting past the ad. Brayden is transcribing this video now; once the transcript arrives, Falcon rewrites Video 6's 6 flashcards + 4 mini-quiz questions + final exam Q20-22 (topic 6) content, and queues one CC prompt to (a) swap the YouTube ID back to `dj3J75I0GYQ`/9:16 and (b) swap in the new Video 6 content across flashcards.js, MINI_QUIZ_CONTENT, and FINAL_EXAM_QUESTIONS.
 7. **Booking & handoff** — "Appointment Setter Training — 11 More Tips to Book Appointments" — **8:23** — https://www.youtube.com/watch?v=4mrM8GO6SS0 — kept, verified under 10 min
 8. **Time management** — "Sales Training: The Exact Daily Schedule Top Reps Use" — **7:08** — https://www.youtube.com/watch?v=ga5_EizLwdw — kept, verified under 10 min
 
@@ -71,6 +71,11 @@ metadata:
 - [x] CC ran Prompts 175 + 176
 - [x] Diagnosed Brayden's "flashcards/quiz didn't change" report 2026-06-30: Final Exam is correct (28 real Qs); separate old "Flashcards" (48 generic cards) + "Quiz" (20 Q drawn from that deck) tabs were never in scope
 - [x] Falcon generated real video-specific flashcard content (48 cards, 6/video) — see [[training-flashcard-content]]
-- [ ] Prompt 177 queued in [[LIVE_STATE]] — CC swaps in real flashcards + retires old Quiz tab
+- [x] Prompt 177 SHIPPED — CC swapped in real flashcards + retired old Quiz tab
+- [x] Prompts 178/179/181 SHIPPED — flashcard format iterated to vocab-term then question-front (final format)
+- [x] Prompt 180 SHIPPED — video "watched" flag moved to mini-quiz completion
+- [x] Prompt 182 SHIPPED — final exam expanded to 30 real questions + redesigned start screen
+- [x] Prompt 183 queued — final exam UX (bigger card, no live score, no answer flash, lock modal, de-video-referenced question wording)
+- [ ] Video 6 revert (2026-07-01): waiting on Brayden's transcript of the original pick (`dj3J75I0GYQ`, Brad Lea TV, 9:16) — swap reason was a false alarm (pre-roll ad, not a real playback bug). Once transcript arrives: Falcon rewrites Video 6 flashcards/mini-quiz/final-exam content, queues one CC prompt for the ID swap + content swap.
 
 **Why not voicemail strategy:** no-answer leads stay in the pipeline and get called back automatically — voicemail is low priority.
