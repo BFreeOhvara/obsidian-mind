@@ -16,19 +16,13 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–177 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–178 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
 ---
 
-### Prompt 178 — Flashcards: short-form recall cards (content-only swap)
+### ✅ Prompt 178 SHIPPED 2026-06-30 (`1832fa7`) — flashcards short-form cue/phrase
 
-**Context:** Brayden reviewed Prompt 177's video-tied flashcards (full Q&A sentences) and found them too hard to memorize. Ask: make flashcards short — a term/cue on the front, a short phrase on the back, not full sentences. Final Exam stays as full-sentence general-knowledge questions (Brayden confirmed that's fine as-is) — this prompt only touches flashcard content.
-
-**Change:** In `src/data/flashcards.js` (the file Prompt 177 just populated), replace all 48 card `front`/`back` text with the short-form versions in [[training-flashcard-content]] (updated 2026-06-30). Same 8 categories, same 6-per-category count, same data shape/keys — only the front/back strings get shorter. Example: old front "How do you put a dollar value on one missed call a day?" / back "Multiply missed calls/day × average ticket price × days per year..." becomes front "Missed call math" / back "Calls missed/day × ticket price × days/yr".
-
-**Do NOT change:** category names, card count, FlashcardDeck component, Mark Mastered mechanic, Final Exam (leave its full-sentence questions alone), any other tab.
-
-**Verify:** Flashcards tab still shows 48 cards across the same 8 categories, but each card now reads as a short cue/phrase pair instead of a full question and full-sentence answer.
+- `src/data/flashcards.js`: all 48 card front/back replaced with short cue/term → short phrase format. Same 8 categories × 6 cards, same keys. Final Exam untouched.
 
 ---
 

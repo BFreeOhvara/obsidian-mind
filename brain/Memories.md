@@ -90,6 +90,12 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ---
 
+### [CC | 2026-06-30 — Prompt 178 shipped · `1832fa7`]
+
+- `src/data/flashcards.js`: all 48 card front/back replaced with short cue/term → short phrase format per Brayden (full Q&A sentences were too hard to memorize). Same 8 categories × 6 cards, same keys/ids/category names. Final Exam and all other tabs untouched.
+
+---
+
 ### [CC | 2026-06-30 — Prompt 177 shipped · `dc6de73`]
 
 - **Flashcards**: `src/data/flashcards.js` replaced — 8 video-tied categories (AI Receptionist / Tonality / Discovery / Gatekeeper / Objections / Qualifying / Booking / Time Management), 6 cards each = 48 total. Old 6-category generic deck (Pipeline/Discovery/Objections/Booking/Niches/Mindset) retired.
