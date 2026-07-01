@@ -20,36 +20,22 @@ tags:
 
 ---
 
-### Prompt 183 — Final Exam UX overhaul: bigger card, no live score, no right/wrong flash, lock modal, de-video content
+### ✅ Prompt 183 SHIPPED 2026-07-01 (`9b75c67`) — final exam UX overhaul
 
-**Context (Brayden, 2026-07-01, from a screenshot mid-exam):** Several issues with how taking the Final Exam actually feels, now that the content itself is right:
-
-1. **Too small.** The question card only uses a fraction of the screen — lots of dead space around it. Make the question/answer card noticeably larger, closer to filling the available content area (similar scale to how the Videos/Flashcards tabs use the space).
-2. **Remove the running score.** Top-right currently shows "4 correct" while taking the exam. Remove this entirely — the score should only be revealed at the end (pass/fail + final %), never mid-exam. Keep "Question X of 30" — that's fine as-is.
-3. **Remove the right/wrong flash on each answer.** Currently selecting an answer highlights it green or red before moving on. Cut this — selecting an answer should silently record it and immediately advance to the next question, no color feedback, no "correct"/"incorrect" indication until the whole exam is submitted at the end.
-4. **Lock it like the video player.** Right now you can click off / navigate away mid-exam. Brayden wants the same lock behavior as `LockedVideoPlayer` (Prompt 174) applied here — once "Start Final Exam" is clicked, it should behave like a locked modal: no backdrop-click-to-close, no dismissing until the exam is submitted/completed. Reuse the same lock pattern/approach as the video modal if practical.
-5. **Strip all "per the video" phrasing from the actual questions.** Brayden's reasoning: the setter being tested doesn't need to know an answer came from a video — it should just read as a direct knowledge question. All 30 Final Exam questions AND all 32 Mini-Quiz questions have been rewritten in [[training-quiz-content]] (v2, 2026-07-01) to remove every instance of "per the video," "does the video say/mention/recommend/focus on/suggest," "described in the video," etc. Same correct answers and structure — just reworded. Swap this content into both `FINAL_EXAM_QUESTIONS` and `MINI_QUIZ_CONTENT`.
-
-**Do NOT change:** the 85% pass threshold, the "all 8 videos watched" gate to unlock the Final Exam tab, Prompt 180's watched-on-mini-quiz-completion logic, Flashcards tab, Prompt 182's stat-card/topic-chip start screen (keep that — just make the in-progress question card bigger once the exam starts), Script/AI Roleplay tabs. Follow [[DESIGN]] tokens/anti-rules for any sizing/layout changes (no shadows, no gradients, no hardcoded hex, no border-radius over 10px, no font-weight 600/700).
-
-**Verify:** Taking the exam shows a visibly larger question card, no live "X correct" counter, no green/red flash on answer selection (just silently advances), can't click off/dismiss the exam modal mid-attempt, and no question anywhere says "per the video" or similar — e.g. Q3 should read "Roughly what's the raw per-minute rate for AI receptionist usage, before an agency's markup?" not "...does the video mention...".
+- `FinalQuizTab`: in-progress/finished states now render as a full-screen locked modal (`position: fixed`, same pattern as `LockedVideoPlayer`/Prompt 174) — no backdrop-click-to-close and no X while `!finished`; X + backdrop-click both work once `finished`. Start screen (stat cards/chips from Prompt 182) untouched, still inline.
+- Bigger card: modal maxWidth 900 (was 640), question card padding 40×44 with a min-height, question font 21px (was 16px).
+- Removed the `picked`/live-feedback state entirely — `pick(i)` now records the answer and advances immediately, no green/red highlight, no live "X correct" counter. Score only reveals on the finished screen.
+- Swapped `MINI_QUIZ_CONTENT` (32 Qs) and `FINAL_EXAM_QUESTIONS` (30 Qs) to the v2 wording from [[training-quiz-content]] — every "per the video"/"the video says" phrase stripped, same correct answers. This pass already included Topic 6's BANT questions (the doc had them pre-merged for Prompt 184), so Prompt 184 below only needed the video ID + flashcards.
+- Verified via `npx vite build` + node count checks (30/32) + grep confirming zero "per the video" phrasing left in code. No live browser check — still no `.env.local` in this repo (same blocker as Prompt 182).
 
 ---
 
-### Prompt 184 — Video 6 revert: swap ID back + swap in BANT content (flashcards + mini-quiz + final exam)
+### ✅ Prompt 184 SHIPPED 2026-07-01 (`f6f4d2f`) — Video 6 reverted to Brad Lea BANT pick
 
-**Context (Brayden, 2026-07-01):** Video 6 (Qualifying) is being reverted. The current video ("Qualifying Customers," Sales School/Wolf of Wall Street, `wDgnnCRufOI`, 5:05, from Prompt 175) has bad audio — sounds like a phone recording in a noisy room, no mic. Brayden wants to go back to the very first pick, which turns out to have been fine all along — the original 2026-06-30 swap reason ("wasn't playing/loading") was actually just a YouTube pre-roll ad loading first, not a real bug. Brayden has now transcribed the original video and Falcon has rewritten all of Video 6's training content around it.
-
-**Change 1 — swap the video ID back.** In `TRAINING_VIDEOS`, Video 6 (Qualifying) changes from `wDgnnCRufOI` (5:05) to `dj3J75I0GYQ` (9:16) — "Genius Sales Qualifying Questions: Stop Wasting Time on Bad Leads," Brad Lea TV. Update the stored duration to 9:16.
-
-**Change 2 — swap in new Video 6 content, 3 places:**
-- `src/data/flashcards.js` — Category 6/Qualifying's 6 cards replaced with the BANT-based cards in [[training-flashcard-content]] (updated 2026-07-01). Same question-front/answer-back format as every other category, same category key/label, still 6 cards.
-- `MINI_QUIZ_CONTENT` — Mini-Quiz 6's 4 questions replaced with the BANT-based questions in [[training-quiz-content]] (updated 2026-07-01).
-- `FINAL_EXAM_QUESTIONS` — Topic 6's 3 questions (currently numbered 20-22) replaced with the BANT-based questions in [[training-quiz-content]]. Still exactly 3 questions for this topic, exam stays at 30 total.
-
-**Do NOT change:** any other video, any other category/topic's flashcards or quiz content, the 85% pass threshold, video count (still 8), Prompt 183's UX changes to the exam experience (bigger card/no live score/no flash/lock modal — build on top of that, don't revert it).
-
-**Verify:** Videos tab shows Video 6 as the Brad Lea "Genius Sales Qualifying Questions" video at 9:16. Flashcards → Qualifying category shows 6 new BANT-based cards (e.g. "What does BANT stand for?" → "Budget, Authority, Need, Timeline"). Final Exam and Mini-Quiz 6 no longer reference household income/coaching tone — they test BANT instead.
+- `TRAINING_VIDEOS[5]`: `youtubeId` `wDgnnCRufOI` → `dj3J75I0GYQ`, duration `5:05` → `9:16`, description updated to reference BANT (was still describing the old household-income math).
+- `flashcards.js` Category 6/Qualifying: all 6 cards replaced with BANT cards from [[training-flashcard-content]] (e.g. "What does BANT stand for?" → "Budget, Authority, Need, Timeline").
+- `MINI_QUIZ_CONTENT`/`FINAL_EXAM_QUESTIONS` Topic 6 were already BANT from the Prompt 183 content swap — confirmed no leftover "household income"/"coaching tone" text anywhere in `src/`.
+- Verified via `npx vite build` + grep for old Video 6 strings (all clean).
 
 ---
 

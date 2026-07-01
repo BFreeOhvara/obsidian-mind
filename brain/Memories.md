@@ -64,6 +64,16 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### [CC | 2026-07-01 — Prompts 183+184 shipped · `9b75c67`, `f6f4d2f`]
+
+- **183 (final exam UX):** `FinalQuizTab` in-progress/finished states now render as a full-screen locked modal — same `position: fixed` lock pattern as `LockedVideoPlayer` (Prompt 174), no backdrop-click/X-dismiss until `finished`. Bigger card (maxWidth 900, 21px question text). Removed the `picked`/live-feedback state — answers silently advance, no green/red flash, no live "X correct" counter; score only shows at the end. Swapped `MINI_QUIZ_CONTENT` (32 Qs) + `FINAL_EXAM_QUESTIONS` (30 Qs) to the v2 "no video references" wording from [[training-quiz-content]].
+- **184 (Video 6 revert):** `TRAINING_VIDEOS[5]` back to `dj3J75I0GYQ` (9:16, Brad Lea "Genius Sales Qualifying Questions") — the `wDgnnCRufOI` swap from Prompt 175 turned out to be an overreaction to a YouTube pre-roll ad, not an actual bug, and had worse audio. `flashcards.js` Category 6 replaced with BANT cards from [[training-flashcard-content]].
+- **Efficiency note:** the training-quiz-content doc already had Topic 6's BANT questions pre-merged into the same v2 revision used for 183, so by the time 184 ran, `MINI_QUIZ_CONTENT`/`FINAL_EXAM_QUESTIONS` needed zero further changes — 184 was just the video ID/duration + flashcards. Worth remembering when a content doc bundles content for two sequential prompts: check what's already landed before re-deriving it.
+- Same `.env.local`-missing blocker as Prompt 182 — verified via `npx vite build` + node count/grep checks + isolated token-accurate mockups, not a live logged-in browser session. Brayden should confirm both on Vercel.
+- LIVE_STATE "Next Up for CC" queue is now empty again.
+
+---
+
 ### [CC | 2026-07-01 — Prompt 182 shipped · `c6e9c21`]
 
 - `FINAL_EXAM_QUESTIONS` in `TrainingCenter.jsx`: 28 → 30 questions, added `f29` (Video 3/Discovery) and `f30` (Video 8/Time Management) per [[training-quiz-content]]. Stale "28 questions" comment and "25-30 questions" copy fixed to say 30.
