@@ -90,6 +90,13 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ---
 
+### [CC | 2026-06-30 — Prompt 179 shipped · `5489e28`]
+
+- `src/data/flashcards.js`: all 48 card front/back replaced with vocab-term → one-line definition format (glossary style). Same 8 categories × 6 cards. Final Exam untouched.
+- ⚠️ Vercel deploy was delayed on Prompt 178 — if live site doesn't update within minutes, Brayden checks Vercel dashboard.
+
+---
+
 ### [CC | 2026-06-30 — Prompt 178 shipped · `1832fa7`]
 
 - `src/data/flashcards.js`: all 48 card front/back replaced with short cue/term → short phrase format per Brayden (full Q&A sentences were too hard to memorize). Same 8 categories × 6 cards, same keys/ids/category names. Final Exam and all other tabs untouched.
