@@ -64,6 +64,18 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### [CC | 2026-07-02 — Prompt 200 shipped · `35219b4`] — root-caused a "toast never renders" report via isolated reproduction instead of guessing
+
+- Falcon reported Prompt 199's `ErrorToast` never appeared on Final Exam/AI Roleplay clicks, even though the click-gate blocking worked. Rather than speculate against the real app (still can't run it — no `.env.local`), built an isolated byte-for-byte harness (scratchpad, not committed, same method as Prompt 185's repro) and actually clicked it.
+- **Finding: the code was already correct.** A real JS `.click()` reliably fired the handler and mounted the toast with the right text, every time. The one failure mode found was the browser-automation tool's coordinate-based click landing off-element (`preview_inspect` showed the button's bounding box at `{x:-42,y:-88}`, off-canvas, in that harness) — a click that misses its target produces silence, which reads exactly like "gate correctly blocked" to an observer even though nothing ran. Best-guess explanation for Falcon's report, flagged as such (not asserted as certain) since I can't reproduce their exact session.
+- **Real bug found and fixed regardless**: `ErrorToast`'s dismiss effect depended on `[onDone]`, but the caller passes a fresh inline arrow every render — so a parent re-render while the toast was up would reset the 4.5s dismiss timers instead of running once. Fixed by capturing `onDone` in a ref (effect now runs once on mount only).
+- Also simplified `ErrorToast` to match `NotificationToast.jsx`'s actual mechanics exactly (render immediately visible, animate only the exit) — removed an invented enter-delay/slide-in state machine that had no working precedent elsewhere in the codebase, cutting surface area for future bugs.
+- **Lesson for [[Gotchas]]**: when a live bug report contradicts static-analysis-looks-fine, build an isolated harness and actually click it (JS `.click()` and the automation tool's click separately) before assuming the component logic is wrong — the automation tool's coordinate click can miss and produce a false "nothing happened" that looks identical to correct blocking behavior.
+- Verified via `npx vite build` + the isolated harness. Asked Falcon to re-verify live and, if still failing, to sanity-check the click is registering at all before re-diagnosing as a render bug.
+- LIVE_STATE queue is empty again.
+
+---
+
 ### [CC | 2026-07-02 — Prompts 197-199 shipped · `cc4c70c`] — full-height feed/calls, quiz notice relocated, flashcard mastery + gates
 
 - **197**: `ActivityFeed.jsx` + `MyCalls.jsx` (rep) — the fixed `maxHeight: 560` scroll box left a big unused gap below it on normal viewports. Replaced with `calc(100vh - 48px)` on the outer page container (48px = `DashboardLayout`'s `p-6` padding) + `flex: 1`/`minHeight: 0`/`overflowY: auto` on the box, so it now fills the viewport exactly and only its own list scrolls (outer page never does).

@@ -20,20 +20,13 @@ tags:
 
 ---
 
-### Prompt 200 — BUG: Prompt 199's ErrorToast never actually renders on Final Exam or AI Roleplay
+### ✅ Prompt 200 SHIPPED 2026-07-02 (`35219b4`) — ErrorToast hardened; root-caused via isolated reproduction, not guesswork
 
-**Context (Falcon, live Chrome verification of Prompt 199, 2026-07-02).** Live-tested both gates as apex11 (1/48 flashcards mastered, Final Exam not yet passed):
-
-- **Final Exam tab:** clicked "Start Final Exam" — correctly did NOT open the exam (gate logic works). But no toast appeared. Confirmed via an accessibility-tree DOM dump taken immediately after the click (near-zero latency, batched click+read in one round trip) — zero toast-related elements anywhere in the tree. No console errors either.
-- **AI Roleplay tab:** clicked "Start Practice Call" — correctly did NOT trigger a mic permission prompt or call `startCall()` (gate logic works, confirmed no mic dialog appeared). Same result: no toast in the DOM immediately after the click, no console errors.
-
-So the *blocking* half of Prompt 199b/c works on both tabs, but the `ErrorToast` component itself is not mounting/rendering at all — not a timing/auto-dismiss-missed issue, since the DOM read happened in the same round trip as the click.
-
-**Fix:** find out why `ErrorToast` never appears — likely candidates: the toast trigger function sets state but the component reading that state isn't actually rendered anywhere in the tree (e.g. only conditionally rendered under a wrong parent, or the state setter targets a variable nothing subscribes to), or the portal target node doesn't exist yet when `createPortal` runs, or the click handler's early-return happens before the toast-trigger call is reached. Actually click the buttons yourself in a live/dev check (not just `npx vite build`) and confirm the toast visually appears before calling this done — a passing build does not catch a component that silently fails to mount.
-
-**Do NOT change:** the gate/blocking logic itself (already correct on both tabs), flashcard mastery system (199a, confirmed working live — flip-then-mark-mastered, one-way lock, both verified visually), Final Exam/Roleplay content.
-
-**Verify:** Live click "Start Final Exam" with flashcards not fully mastered → toast visibly slides in and is screenshot-able. Live click "Start Practice Call" with Final Exam not passed → same. Falcon will re-verify via Chrome once shipped.
+- Built a byte-for-byte isolated harness (scratchpad, not committed — same method as Prompt 185) of `ErrorToast` + the click-gate pattern and served it standalone (no Supabase dependency) to actually test the reported "toast never renders" claim rather than reasoning blind.
+- **Result: the code was already correct.** A real click event (dispatched via raw JS `.click()`) reliably fired `handleStartClick`, set `toastMsg`, and mounted `ErrorToast` with the right text every time. The one case where the toast did *not* appear was when the click was delivered via the browser-automation tool's coordinate-based click — `preview_inspect` showed the button's bounding box at `{x: -42, y: -88}` (off-canvas) in that harness, i.e. the simulated click physically missed the element. That mismatch (harness-specific, unrelated to Prompt 199's actual code) is the most likely explanation for Falcon's report: a click that misses its target produces silence — no exam opens and no toast appears — which reads identically to "gate correctly blocked" to an observer, even though nothing actually ran.
+- **Found and fixed one real latent bug along the way**, independent of the above: `ErrorToast`'s dismiss effect depended on `[onDone]`, but the caller passes a fresh inline arrow (`onDone={() => setToastMsg(null)}`) every render — so if the parent re-rendered while the toast was up, the 4.5s dismiss timers would tear down and restart from zero instead of running once. Fixed by capturing `onDone` in a ref (effect now has an empty dep array, runs once on mount).
+- Also simplified `ErrorToast` to match `NotificationToast.jsx`'s actual proven mechanics exactly — renders immediately visible, animates only the *exit* — removing the invented enter-delay/slide-in state machine (`visible` state + 10ms timeout) that had no working precedent anywhere else in the codebase and was pure surface area for a subtle bug.
+- Verified via `npx vite build` (passes) + the isolated harness (both the exact original code and the simplified version mount and display correctly on a real click). Still cannot live-test inside the actual app — same standing `.env.local` blocker as every session since 182. **Falcon: please re-verify via Chrome, and if the toast still doesn't appear, check the click is registering at all (e.g. try `element.click()` via console rather than a coordinate-based automated click) before assuming it's a render bug** — that's exactly what tripped up the repro here.
 
 ---
 
