@@ -117,6 +117,26 @@ tags:
 
 ---
 
+### Prompt 194 — Activity Feed + My Calls: box with internal scroll, and outcome color-coding on My Calls
+
+**Context (Brayden, 2026-07-01, live screenshots comparing `/rep/feed` (Activity Feed) and `/rep/calls` (My Calls)).** Two related changes.
+
+**1) Both pages: put the list inside a scrollable box, not a scrolling page** — on `/rep/feed`, the list of activity entries currently just runs down the full page (the page itself scrolls). Same issue on `/rep/calls`. Wrap each list in a bordered container (reuse the same box treatment as the `MyLeads` table container — `--bg-surface`/`--border`/radius) with a fixed/max height and `overflow-y: auto`, so the box itself scrolls internally and the rest of the page (header, etc.) stays put. Apply this to both `/rep/feed` and `/rep/calls`.
+
+**2) My Calls row: match Activity Feed's "Outcome: ..." color-coded style exactly** — Activity Feed already shows each entry's outcome as `Outcome: {value}` in a color tied to the outcome (confirmed live: Appointment Booked = green, Not Interested = red). My Calls currently just shows the bare outcome value in plain muted text (from Prompt 191/193 — e.g. "Appointment Booked" with no color). Change My Calls' row to the same format and color logic: `Outcome: {c.outcome}`, colored the same way Activity Feed colors it. Reuse Activity Feed's exact color mapping/component if one exists (don't hand-roll a second copy that could drift) — extend it if needed to explicitly cover:
+- Appointment Booked → `--success` (green)
+- Not Interested → `--danger` (red)
+- Follow-Up → `--warning` (yellow) — not currently visible on Activity Feed's screenshot but should be added to the shared mapping now since My Calls needs it too
+- No Answer → not applicable in practice (My Calls only ever shows graded calls, and a no-answer call wouldn't have a grade), but leave the neutral/muted color in the shared mapping for Activity Feed's own use
+
+Do NOT add a phone icon to My Calls rows — the grade badge (A-/B+/etc.) already occupies that spot and stays exactly as-is; this change is only about the outcome text/color under the business name.
+
+**Do NOT change:** grade badges, click-to-open modal behavior (190-192), Activity Feed's row content/order otherwise, Mini-Quiz work from Prompt 193.
+
+**Verify:** Screenshot `/rep/feed` — list scrolls inside its own box, page itself doesn't need to scroll for more entries. Screenshot `/rep/calls` — same box/scroll treatment, and each row shows `Outcome: Appointment Booked` in green / `Outcome: Not Interested` in red (matching "FrostFree HVAC Co" and "ClearPipe Solutions LLC" respectively from the seeded sample data).
+
+---
+
 ### ✅ Prompt 183 SHIPPED 2026-07-01 (`9b75c67`) — final exam UX overhaul
 
 - `FinalQuizTab`: in-progress/finished states now render as a full-screen locked modal (`position: fixed`, same pattern as `LockedVideoPlayer`/Prompt 174) — no backdrop-click-to-close and no X while `!finished`; X + backdrop-click both work once `finished`. Start screen (stat cards/chips from Prompt 182) untouched, still inline.
