@@ -20,31 +20,21 @@ tags:
 
 ---
 
-### Prompt 201 — My Leads search: multi-word queries don't match (real bug, not sample-data confusion)
+### ✅ Prompt 201 SHIPPED 2026-07-02 (`932f760`) — My Leads search: multi-token AND match
 
-**Context (Brayden, 2026-07-02).** The `/rep` lead search (Prompts 187/188) currently does a single-substring match: it checks whether the *entire* typed string appears verbatim inside one field. That breaks the second you type more than one keyword. Brayden's example: he remembers a lead was an HVAC company in Nashville but not its name. Typing "HVAC Nashville" returns nothing, even if a real matching lead exists — e.g. a lead with `business_name = "Nashville HVAC Co"` (contains both words, but not as the contiguous phrase "hvac nashville") or a lead with `business_name = "ABC Heating & Air"`, `city = "Nashville"`, `niche = "HVAC"` (the two words aren't even in the same field). Same problem for "HVAC" plus any other trailing word — one match per field, not the whole word set.
-
-**Fix (`MyLeads.jsx`'s `filtered` logic):** change the substring check to a multi-token AND/OR match:
-1. Split the search input on whitespace into lowercase tokens (drop empty tokens).
-2. Build one combined lowercase haystack string per lead by concatenating `business_name`, `contact_name`, `phone`, `city`, `niche` (space-joined).
-3. A lead matches only if **every** token appears somewhere in that combined haystack (`tokens.every(t => haystack.includes(t))`) — this is what lets "HVAC Nashville" match a lead where "HVAC" comes from the niche field and "Nashville" comes from the city field, or both come from the business name in either order.
-4. Empty search input still shows everything, unchanged. Applied after the existing status-tab filter, same as today.
-
-**Do NOT change:** search bar placement/styling (188), status-tab filter logic itself, any other page's search (if `LeadPipeline`/admin search shares this pattern, leave it alone unless explicitly asked — this prompt is `/rep` My Leads only).
-
-**Verify:** Live on `/rep`, search "HVAC Nashville" (or any two-word combo split across fields/word-order) and confirm a matching lead now appears. Also confirm single-word search (e.g. just "HVAC") still works exactly as before, and a nonsense/no-match query still returns zero rows.
+- `MyLeads.jsx`'s `filtered` logic replaced the single-substring check with a tokenized match: splits the query on whitespace into lowercase tokens, builds one combined lowercase haystack per lead (`business_name`, `contact_name`, `phone`, `city`, `niche` space-joined), and requires every token to appear somewhere in that haystack (`tokens.every(t => haystack.includes(t))`).
+- Fixes the reported case: "HVAC Nashville" now matches leads where the two words live in different fields (e.g. `niche: HVAC`, `city: Nashville`) or in either order within `business_name`.
+- Verified with a standalone node script against representative lead data: two-word cross-field query matches, single-word query still matches, no-match query returns zero rows, empty query returns everything. Also `npx vite build` passes.
+- No live browser check — same standing `.env.local` blocker as every session since 182.
 
 ---
 
-### Prompt 202 — Activity Feed + My Calls boxes: one row too tall, shrink by exactly one row
+### ✅ Prompt 202 SHIPPED 2026-07-02 (`c1a49bb`) — Activity Feed + My Calls boxes shrunk by exactly one row
 
-**Context (Brayden, 2026-07-02, live screenshot of `/rep/feed` after Prompt 197 shipped).** Loves the fill-to-viewport box from 197 — just wants it one row shorter. Right now the bottom-most row sits right at (or just past) the box edge; wants the box to end just *above* where that last visible row currently sits, so exactly one fewer row is visible before you'd need to scroll for it.
-
-**Change:** on both `ActivityFeed.jsx` and `MyCalls.jsx`, reduce the box's height (the same `flex:1`/`calc(100vh - ...)` sizing from Prompt 197) by exactly one row's rendered height. Measure the actual row height from the rendered CSS (row padding + line-height + any border/divider between rows) rather than guessing a round number — subtract that real value from the existing height calc so the box comes up short by precisely one row, not an arbitrary amount. Apply the identical adjustment to both pages so they stay the same height/proportion as each other (per 197's original spec).
-
-**Do NOT change:** row content/styling, outcome color-coding (194), click-to-open modal (190-192), page headers/KPIs, the internal-scroll behavior itself (197) — just the box's total height.
-
-**Verify:** Screenshot `/rep/feed` and `/rep/calls` at a normal laptop viewport height — confirm one fewer row is visible than before (the last row that used to poke out at the bottom edge is now just below the box, reachable only by scrolling), no outer-page scroll, and both pages' boxes remain the same height as each other.
+- Rather than guess a round pixel number, built an isolated static harness (Tailwind CDN + the app's actual CSS variables/fonts, scratchpad only — same method as Prompts 185/200) reproducing `ActivityFeed`'s `FeedItem` row and `MyCalls`' row markup verbatim, then measured real rendered height via `getBoundingClientRect()`/computed style.
+- Measured: `ActivityFeed` row = 56px + 4px `space-y-1` gap = **60px**; `MyCalls` row = **72px** (includes its own border-bottom).
+- Subtracted each page's own measured amount from its `calc(100vh - 48px)` box height (`ActivityFeed` → `calc(100vh - 48px - 60px)`, `MyCalls` → `calc(100vh - 48px - 72px)`), keeping the same formula shape both pages have used since Prompt 197 — just precisely shorter by one row's real footprint each.
+- Verified via `npx vite build` (passes). No live browser check — same standing `.env.local` blocker as every session since 182; Brayden/Falcon should confirm live that the last row on both `/rep/feed` and `/rep/calls` now requires a scroll instead of sitting flush with the box edge.
 
 ---
 

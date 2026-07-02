@@ -64,6 +64,16 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### [CC | 2026-07-02 — Prompts 201-202 shipped · `932f760`, `c1a49bb`] — multi-token lead search, feed/calls boxes shrunk by exactly one row
+
+- **201**: `MyLeads.jsx`'s search was a single-substring match (whole typed string had to appear verbatim in one field), so multi-word queries like "HVAC Nashville" failed whenever the words landed in different fields or in either order. Replaced with a tokenized AND match — split the query into lowercase whitespace tokens, build one combined lowercase haystack per lead (`business_name` + `contact_name` + `phone` + `city` + `niche`), require every token to appear somewhere in it. Verified with a standalone node script (cross-field two-word match, single-word match, no-match, empty-query cases) since the app itself still can't run locally.
+- **202**: Brayden wanted `ActivityFeed`/`MyCalls`' full-height boxes (Prompt 197) exactly one row shorter, not a guessed round number. Built an isolated static harness (Tailwind CDN + the app's real CSS vars/fonts, scratchpad only, same method as Prompts 185/200) reproducing each row's actual markup, then measured real rendered height via `getBoundingClientRect()`. Result: `ActivityFeed` row = 56px + 4px `space-y-1` gap = 60px; `MyCalls` row = 72px (includes its border-bottom). Subtracted each page's own measured value from its `calc(100vh - 48px)` box height, keeping the same formula shape both pages have used since 197 — just precisely one row shorter each, using each page's real geometry rather than forcing a shared/guessed constant.
+- **Lesson for [[Gotchas]]**: for a "shrink by exactly N rows" ask, don't guess a pixel value or assume two visually-similar boxes share a row height — different components (different padding/line-height/dividers) render to genuinely different row heights even under the "same" viewport formula. Build a quick static harness with the real CSS vars/classes and measure, same pattern already established for hard-to-verify layout bugs.
+- Verified via `npx vite build` (passes) for both prompts. No live browser check possible — same standing `.env.local` blocker as every session since 182.
+- LIVE_STATE queue is empty again.
+
+---
+
 ### [CC | 2026-07-02 — Prompt 200 shipped · `35219b4`] — root-caused a "toast never renders" report via isolated reproduction instead of guessing
 
 - Falcon reported Prompt 199's `ErrorToast` never appeared on Final Exam/AI Roleplay clicks, even though the click-gate blocking worked. Rather than speculate against the real app (still can't run it — no `.env.local`), built an isolated byte-for-byte harness (scratchpad, not committed, same method as Prompt 185's repro) and actually clicked it.
