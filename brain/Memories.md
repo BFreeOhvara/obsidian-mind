@@ -3182,3 +3182,14 @@ Session resumed after context compaction. Prompt 148 seed bug (rep_profile_id �
 - Modal card now sizes itself per stage: `maxWidth 720` while playing (unchanged), `maxWidth 900` + `maxHeight 88vh` + `overflowY auto` during the quiz — matches `FinalQuizTab`'s modal dimensions exactly.
 - Verified `npx vite build` only — standing blocker persists: no `.env.local`, no live check (same as 182–192).
 - Status: SHIPPED + pushed to `master`; Prompt 193 cleared from [[LIVE_STATE]] queue. Prompt 194 (Activity Feed + My Calls scroll box, outcome color-coding) is next up.
+
+---
+
+## Session Log — 2026-07-02 (Prompt 194)
+
+**CC | 2026-07-02 — Activity Feed + My Calls: internal scroll box + outcome color-coding (shipped `4d813e1`)**
+
+- Wrapped the item lists on `/rep/feed` (`ActivityFeed.jsx`) and `/rep/calls` (`MyCalls.jsx`) in [[ohvara-dashboard]] with `maxHeight: 560` + `overflowY: auto` + `scrollbar-thin`, so each scrolls internally instead of the whole page. Used the fixed-maxHeight scroll-box convention already established elsewhere (`LeadPipeline`, `MyAppointments`, `CloserLeads`) rather than My Leads' own pattern, since My Leads uses a full-page `flex`/`calc(100vh...)` layout that doesn't fit these simpler pages — noted this substitution explicitly in the [[LIVE_STATE]] log so it's clear why the literal "MyLeads container" wasn't copied verbatim.
+- Exported `STATUS_COLORS` from `ActivityFeed.jsx` (was private) and imported it directly into `MyCalls.jsx` instead of duplicating the outcome→color map, per the prompt's explicit "don't hand-roll a second copy" instruction. `Follow-Up` → `--warning` was already in the map from earlier work, so no extension needed. My Calls row line changed from bare `{c.outcome}` (flat muted text) to `Outcome: {c.outcome}` colored via the shared map, with a `--text-muted` fallback for a null outcome.
+- Verified `npx vite build` only — standing blocker persists: no `.env.local`, no live check (same as 182–193).
+- Status: SHIPPED + pushed to `master`; Prompt 194 cleared from [[LIVE_STATE]] queue. Prompt 195 (My Leads UTC batch-refresh empty-window bug, root-caused by Falcon) is next up — reminder: read `016_daily_batch_cron.sql` in full before touching anything, per the prompt's own instruction.

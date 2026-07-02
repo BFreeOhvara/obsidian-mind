@@ -112,23 +112,12 @@ tags:
 
 ---
 
-### Prompt 194 — Activity Feed + My Calls: box with internal scroll, and outcome color-coding on My Calls
+### ✅ Prompt 194 SHIPPED 2026-07-02 (`4d813e1`) — Activity Feed + My Calls: internal scroll box + outcome color-coding
 
-**Context (Brayden, 2026-07-01, live screenshots comparing `/rep/feed` (Activity Feed) and `/rep/calls` (My Calls)).** Two related changes.
-
-**1) Both pages: put the list inside a scrollable box, not a scrolling page** — on `/rep/feed`, the list of activity entries currently just runs down the full page (the page itself scrolls). Same issue on `/rep/calls`. Wrap each list in a bordered container (reuse the same box treatment as the `MyLeads` table container — `--bg-surface`/`--border`/radius) with a fixed/max height and `overflow-y: auto`, so the box itself scrolls internally and the rest of the page (header, etc.) stays put. Apply this to both `/rep/feed` and `/rep/calls`.
-
-**2) My Calls row: match Activity Feed's "Outcome: ..." color-coded style exactly** — Activity Feed already shows each entry's outcome as `Outcome: {value}` in a color tied to the outcome (confirmed live: Appointment Booked = green, Not Interested = red). My Calls currently just shows the bare outcome value in plain muted text (from Prompt 191/193 — e.g. "Appointment Booked" with no color). Change My Calls' row to the same format and color logic: `Outcome: {c.outcome}`, colored the same way Activity Feed colors it. Reuse Activity Feed's exact color mapping/component if one exists (don't hand-roll a second copy that could drift) — extend it if needed to explicitly cover:
-- Appointment Booked → `--success` (green)
-- Not Interested → `--danger` (red)
-- Follow-Up → `--warning` (yellow) — not currently visible on Activity Feed's screenshot but should be added to the shared mapping now since My Calls needs it too
-- No Answer → not applicable in practice (My Calls only ever shows graded calls, and a no-answer call wouldn't have a grade), but leave the neutral/muted color in the shared mapping for Activity Feed's own use
-
-Do NOT add a phone icon to My Calls rows — the grade badge (A-/B+/etc.) already occupies that spot and stays exactly as-is; this change is only about the outcome text/color under the business name.
-
-**Do NOT change:** grade badges, click-to-open modal behavior (190-192), Activity Feed's row content/order otherwise, Mini-Quiz work from Prompt 193.
-
-**Verify:** Screenshot `/rep/feed` — list scrolls inside its own box, page itself doesn't need to scroll for more entries. Screenshot `/rep/calls` — same box/scroll treatment, and each row shows `Outcome: Appointment Booked` in green / `Outcome: Not Interested` in red (matching "FrostFree HVAC Co" and "ClearPipe Solutions LLC" respectively from the seeded sample data).
+- **1) Internal scroll** — `ActivityFeed.jsx`'s items list and `MyCalls.jsx`'s calls list both wrapped in `maxHeight: 560` + `overflowY: 'auto'` + `scrollbar-thin` (matching the `LeadPipeline`/`MyAppointments`/`CloserLeads` fixed-maxHeight scroll-box convention already used elsewhere in the app — the closest existing pattern to "MyLeads' table container," since My Leads itself uses a full-page flex-fill layout that doesn't apply to these simpler list pages). Loading/empty states stay outside the scroll box, unchanged. Page header/KPIs on both pages no longer scroll off with the list.
+- **2) Shared outcome color mapping** — exported `STATUS_COLORS` from `ActivityFeed.jsx` (was a private const) and imported it directly into `MyCalls.jsx` instead of duplicating the map, per the prompt's explicit "don't hand-roll a second copy" instruction. `Follow-Up` (`--warning` amber) was already present in the existing map from an earlier session, so no extension was needed. My Calls' row line changed from a bare `{c.outcome}` in flat muted text to `Outcome: {c.outcome}`, colored via `STATUS_COLORS[c.outcome]?.color` (falls back to `--text-muted` for a null outcome, matching the old dash-fallback behavior).
+- Unchanged per spec: grade badges, click-to-open modal behavior (190-192), Activity Feed's row content/order, Mini-Quiz work (193). No phone icon added to My Calls rows.
+- Verified via `npx vite build` (passes). No live check — still no `.env.local` in the repo (same standing blocker as 182-193). Brayden to confirm live: `/rep/feed` and `/rep/calls` both scroll inside their own boxes (page/header stays put), and My Calls rows show `Outcome: Appointment Booked` green / `Outcome: Not Interested` red, matching Activity Feed's coloring.
 
 ---
 
