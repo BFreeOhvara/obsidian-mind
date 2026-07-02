@@ -151,6 +151,20 @@ tags:
 
 ---
 
+### Prompt 197 — Activity Feed + My Calls: box should fill remaining viewport height, not a fixed 560px
+
+**Context (Brayden, 2026-07-02, live screenshot of `/rep/feed` after Prompt 194 shipped).** Likes the box-with-internal-scroll approach, but the box is a fixed `maxHeight: 560` — on a normal viewport there's a large gap of unused page below the box down to the bottom of the screen. Wants the box to grow to fill that remaining space instead of stopping short, while still never causing the outer page itself to scroll (the box's own internal scrollbar should be the only thing that scrolls).
+
+**Change:** on both `/rep/feed` (`ActivityFeed.jsx`) and `/rep/calls` (`MyCalls.jsx`), replace the fixed `maxHeight: 560` box with a flexible height that fills the remaining vertical space below the page header down to the bottom of the viewport (e.g. a flex-column page container with the header as a normal block and the box as `flex: 1` + `minHeight: 0` + `overflowY: auto`, or an explicit `calc(100vh - {header height + page padding}px)` — whichever fits `DashboardLayout`'s existing structure more cleanly, your call). Both boxes should end up the same height/percentage of the viewport as each other, so the two pages feel consistent.
+
+**Data note:** Falcon seeded 8 additional sample graded calls directly in Supabase (bringing the Test Rep's graded-calls total from 6 to 14) specifically so `/rep/calls`' box actually has enough rows to demonstrate real scrolling once it's taller — no further data work needed for this prompt.
+
+**Do NOT change:** row content/styling, outcome color-coding (194), click-to-open modal behavior (190-192), Activity Feed's content, page headers/KPIs above the box.
+
+**Verify:** Screenshot `/rep/feed` and `/rep/calls` at a normal laptop viewport height — confirm the box now extends down close to the bottom of the screen (no large unused gap below it), the outer page does not scroll, only the box's internal list scrolls, and both pages' boxes are the same height/proportion.
+
+---
+
 ### ✅ Prompt 183 SHIPPED 2026-07-01 (`9b75c67`) — final exam UX overhaul
 
 - `FinalQuizTab`: in-progress/finished states now render as a full-screen locked modal (`position: fixed`, same pattern as `LockedVideoPlayer`/Prompt 174) — no backdrop-click-to-close and no X while `!finished`; X + backdrop-click both work once `finished`. Start screen (stat cards/chips from Prompt 182) untouched, still inline.
