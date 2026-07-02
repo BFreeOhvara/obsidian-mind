@@ -179,6 +179,22 @@ tags:
 
 ---
 
+### Prompt 199 — fix "Mark as Mastered" flashcard system + gate Final Exam/AI Roleplay with slide-in error toasts
+
+**Context (Brayden, 2026-07-02).** Two related asks:
+
+**A) Flashcard mastery system is broken.** There's already a "Mark as Mastered" button under each flashcard (in the Flashcards tab of `TrainingCenter.jsx` — find the flashcard component, likely near `flashcards.js`'s consumer). Two problems Brayden flagged: (1) you can mark a card mastered without ever flipping it to see the answer — mastery should require the card to actually be flipped/viewed first; (2) you can un-mark a card once it's mastered, which he doesn't want — once mastered, it should stay mastered (button becomes a static "Mastered" indicator, not a toggle). **Fix:** disable/hide the "Mark as Mastered" button until the card has been flipped at least once in the current view; once clicked, remove the ability to un-click it (no toggle back to unmastered). No reset mechanism needed elsewhere — out of scope for this prompt.
+
+**B) Final Exam gate + error toast.** Currently the Final Exam is gated on all 8 videos watched (Prompt 182/183, 85% pass threshold, 30 questions) — confirm whether flashcard mastery is already a factor in `isTrainingComplete()`/the Final Exam's own start-gate or not before changing anything. Brayden wants the gate to also require **all 48 flashcards mastered** (using the fixed system from part A), in addition to all 8 videos watched. When a rep clicks "Start Final Exam" without meeting both conditions, show an error message that **slides in like the existing toast** (reuse `NotificationToast.jsx`'s slide-in animation/positioning — same visual pattern, this is a one-off inline validation message, not a new entry in the notifications table/bell) reading something like "Watch all 8 videos and master all flashcards before taking the Final Exam." Toast auto-dismisses same as the existing notification toast convention.
+
+**C) AI Roleplay gate + error toast.** Same slide-in toast pattern: if a rep clicks "Start Roleplay" (or whatever the actual start-call button is labeled in the AI Roleplay tab) without having passed the Final Exam (85%+), show a slide-in error toast reading something like "Pass the Final Exam before starting AI Roleplay."
+
+**Do NOT change:** the separate, broader `MyLeads` `TrainingGate`/`isTrainingComplete()` lead-access lock (that's a business-level gate covering videos+quiz+roleplay for unlocking leads entirely — leave it alone unless part B's new flashcard requirement needs to be threaded through it too, your call, but flag it either way). Video-lock behavior (174/193), Final Exam question content/scoring (182-186), mini-quiz (193), Prompt 198's video-grid notice.
+
+**Verify:** Flashcards tab — try to mark a card mastered without flipping it (should be blocked/disabled), flip it then mark mastered (should work), confirm no way to un-mark. Final Exam tab — with videos watched but flashcards not fully mastered (or vice versa), click Start → slide-in toast appears, exam does not open. AI Roleplay tab — without a passing Final Exam score, click Start → slide-in toast appears, call does not start.
+
+---
+
 ### ✅ Prompt 183 SHIPPED 2026-07-01 (`9b75c67`) — final exam UX overhaul
 
 - `FinalQuizTab`: in-progress/finished states now render as a full-screen locked modal (`position: fixed`, same pattern as `LockedVideoPlayer`/Prompt 174) — no backdrop-click-to-close and no X while `!finished`; X + backdrop-click both work once `finished`. Start screen (stat cards/chips from Prompt 182) untouched, still inline.
