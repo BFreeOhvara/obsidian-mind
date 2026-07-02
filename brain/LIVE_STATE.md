@@ -81,22 +81,14 @@ tags:
 
 ---
 
-### Prompt 191 — My Calls modal: bigger + richer feedback boxes + outcome status on the row
+### ✅ Prompt 191 SHIPPED 2026-07-01 (`c3cfaca`) — My Calls modal: bigger sizing + richer feedback cards + row outcome
 
-**Context (Brayden, 2026-07-01, live screenshots of Prompt 190's shipped modal).** Likes the direction, wants it bigger and denser.
-
-**1) Modal size** — the `CallDetailModal` from Prompt 190 is too small/cramped. Match the width/sizing convention of the existing lead-detail popup on `/rep` (My Leads) — find whatever modal/popup component or inline width value that one uses and reuse the same sizing approach here, rather than a one-off guessed width, so the two popups feel consistent across the portal.
-
-**2) Feedback sections become real boxes with more detail** — currently "what you did well" and "what to work on" are single lines. Falcon already migrated the `calls` table (migration `064_call_feedback_detail`) with 3 new nullable columns and seeded them on all 6 sample graded calls: `feedback_good_quote`, `feedback_improve_quote`, `feedback_improve_example`. Restructure each section into a bordered card (`--bg-elevated` bg, `--border` 1px border, radius per [[DESIGN]] ≤10px, padding ~16px) containing:
-- **What you did well** card: the existing `feedback_good` summary line (green, unchanged), then below it a "What you said" quoted sub-line pulling from `feedback_good_quote` (muted/quote styling, e.g. `--text-secondary`, maybe a left accent bar or quote-mark treatment).
-- **What to work on** card: the existing `feedback_improve` summary line (color-coded yellow/red per Prompt 190's severity logic, unchanged), then below it two sub-lines: "What you said" from `feedback_improve_quote`, and "Try instead" from `feedback_improve_example` (this one can lean slightly toward `--success`/neutral styling since it's the corrective example, not the problem — use your judgment per [[DESIGN]] tokens, just keep it visually distinct from the quote line above it).
-- All 6 seeded sample calls have every field populated, so this should render fully for every row today — no null-handling edge case to design around yet, but code defensively (hide a sub-line if its column is null) since real AI-graded calls may not always populate every field.
-
-**3) Row status swap** — replace the "Your calls are recorded." teaser line on each collapsed row with that call's actual outcome instead, pulled from `calls.outcome` (e.g. "Appointment Booked", "Not Interested" — already human-readable enum values, no relabeling needed). This replaces Prompt 190's placeholder line entirely; the row still opens the same modal on click.
-
-**Do NOT change:** modal dismiss behavior (X + backdrop, still not a locked modal), grade badge colors/shapes, player shell from Prompt 190, severity color logic, any other tab.
-
-**Verify:** Screenshot `/rep/calls` — rows now show outcome status instead of "Your calls are recorded." Click "FrostFree HVAC Co" — modal is visibly bigger (matches My Leads popup width), both feedback sections render as bordered boxes with quote/example sub-lines populated. Click "ClearPipe Solutions LLC" — same layout, improve box still red, quote/example sub-lines present.
+- **1) Sizing** — `CallDetailModal` now matches the `CallPrepModal` (My Leads' lead-detail popup) sizing convention exactly: `maxWidth: 960`, `maxHeight: '88vh'` + `overflowY: auto`, `background: '#0E0E1A'`, `border: 0.5px solid var(--border)`, `borderRadius: 14`, `boxShadow: 0 24px 64px rgba(0,0,0,0.6)` (was a one-off `maxWidth: 440` `glass` card before).
+- **2) Feedback cards** — query now also selects `feedback_good_quote`, `feedback_improve_quote`, `feedback_improve_example`. Both feedback sections are now `--bg-elevated`/`--border`/10px-radius bordered cards: "What you did well" card keeps the green summary line + a `"What you said" — {quote}` sub-line (text-secondary, left accent bar). "What to work on" card keeps the severity-colored summary line + `"What you said" — {quote}` (accent bar tinted to the severity color) + `"Try instead" — {example}` (success-tinted accent bar, visually distinct). Each sub-line is conditionally rendered (hidden if its column is null) per the prompt's defensive-coding note.
+- **3) Row status** — collapsed row's placeholder "Your calls are recorded." replaced with `c.outcome` (e.g. "Appointment Booked").
+- Verified the migration-064 columns (`feedback_good_quote`/`feedback_improve_quote`/`feedback_improve_example`, all nullable text) directly against the live Supabase schema via the Supabase MCP `list_tables` call, since **migration `064_call_feedback_detail.sql` isn't committed to `ohvara-dashboard`'s local `supabase/migrations/` folder** — Falcon applied it directly to remote (confirmed via `list_migrations`). Worth a follow-up to get that migration file committed to the repo so schema history stays in sync.
+- Unchanged per spec: modal dismiss (X + backdrop), grade badge colors/shapes, player shell, severity color logic, other tabs.
+- Verified `npx vite build` (passes). No live check — still no `.env.local` (same standing blocker as 182–190). Brayden to confirm live per the screenshot checklist.
 
 ---
 

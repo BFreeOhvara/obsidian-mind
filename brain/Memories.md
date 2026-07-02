@@ -3144,3 +3144,16 @@ Session resumed after context compaction. Prompt 148 seed bug (rep_profile_id �
 - Deliberately added `duration_seconds` to the `calls` select (prompt's own spec required it for the time readout) — filter/sort/limit untouched. Confirmed `twilio_recording_url` (not `recording_url`) is the field the `grade-call` edge function actually writes, via grep of `supabase/functions/`.
 - Verified `npx vite build` only — standing blocker persists: no `.env.local`, no live check (same as 182–189).
 - Status: SHIPPED + pushed to `master`; Prompt 190 cleared from [[LIVE_STATE]] queue.
+
+---
+
+## Session Log — 2026-07-01 (Prompt 191)
+
+**CC | 2026-07-01 — My Calls modal: bigger sizing + richer feedback cards + row outcome (shipped `c3cfaca`)**
+
+- `CallDetailModal` in [[ohvara-dashboard]] `MyCalls.jsx` resized to match `CallPrepModal` (My Leads' lead-detail popup) exactly — `maxWidth: 960`, `#0E0E1A` bg, radius 14, same shadow — instead of the one-off 440px `glass` card from Prompt 190.
+- Feedback sections became bordered `--bg-elevated` cards with quote/example sub-lines from migration 064's new columns (`feedback_good_quote`, `feedback_improve_quote`, `feedback_improve_example`) — all conditionally rendered (defensive null-handling per the prompt, even though all 6 seeded samples are fully populated today).
+- Row's placeholder "Your calls are recorded." replaced with the real `calls.outcome`.
+- **Gotcha found:** migration `064_call_feedback_detail.sql` was applied directly to the remote Supabase project (confirmed via Supabase MCP `list_migrations` — timestamp `20260702000000`) but **is not committed to `ohvara-dashboard`'s local `supabase/migrations/` folder** (last local file is `063_follow_up_at.sql`). Verified the three new column names/types directly against the live schema via MCP `list_tables` before trusting the prompt's column names. Flagging as a gap — Falcon should commit that migration file to the repo so schema history doesn't drift from what's actually live. See [[Gotchas]] candidate: always verify DB schema via Supabase MCP when a prompt references a migration that isn't in the local `supabase/migrations/` folder — the remote can be ahead of git.
+- Verified `npx vite build` only — standing blocker persists: no `.env.local`, no live check (same as 182–190).
+- Status: SHIPPED + pushed to `master`; Prompt 191 cleared from [[LIVE_STATE]] queue.
