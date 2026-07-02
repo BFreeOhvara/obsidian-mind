@@ -151,6 +151,50 @@ tags:
 
 ---
 
+### Prompt 197 — Activity Feed + My Calls: box should fill remaining viewport height, not a fixed 560px
+
+**Context (Brayden, 2026-07-02, live screenshot of `/rep/feed` after Prompt 194 shipped).** Likes the box-with-internal-scroll approach, but the box is a fixed `maxHeight: 560` — on a normal viewport there's a large gap of unused page below the box down to the bottom of the screen. Wants the box to grow to fill that remaining space instead of stopping short, while still never causing the outer page itself to scroll (the box's own internal scrollbar should be the only thing that scrolls).
+
+**Change:** on both `/rep/feed` (`ActivityFeed.jsx`) and `/rep/calls` (`MyCalls.jsx`), replace the fixed `maxHeight: 560` box with a flexible height that fills the remaining vertical space below the page header down to the bottom of the viewport (e.g. a flex-column page container with the header as a normal block and the box as `flex: 1` + `minHeight: 0` + `overflowY: auto`, or an explicit `calc(100vh - {header height + page padding}px)` — whichever fits `DashboardLayout`'s existing structure more cleanly, your call). Both boxes should end up the same height/percentage of the viewport as each other, so the two pages feel consistent.
+
+**Data note:** Falcon seeded 8 additional sample graded calls directly in Supabase (bringing the Test Rep's graded-calls total from 6 to 14) specifically so `/rep/calls`' box actually has enough rows to demonstrate real scrolling once it's taller — no further data work needed for this prompt.
+
+**Do NOT change:** row content/styling, outcome color-coding (194), click-to-open modal behavior (190-192), Activity Feed's content, page headers/KPIs above the box.
+
+**Verify:** Screenshot `/rep/feed` and `/rep/calls` at a normal laptop viewport height — confirm the box now extends down close to the bottom of the screen (no large unused gap below it), the outer page does not scroll, only the box's internal list scrolls, and both pages' boxes are the same height/proportion.
+
+---
+
+### Prompt 198 — move the mini-quiz heads-up notice off the video player, onto the Training Center grid page
+
+**Context (Brayden, 2026-07-02, live screenshots of `/rep/training`).** Prompt 193 put "You'll have a quick {n}-question check after this video" as a third muted line under the video title/duration inside the `LockedVideoPlayer` modal header (screenshot 1 — shows on the "What an AI Receptionist Does" player). Brayden doesn't want it there at all.
+
+**Change:**
+1. **Remove** that heads-up line entirely from `LockedVideoPlayer`'s playing-stage header (the line added in Prompt 193 point 3, `stage === 'playing'` only). Nothing else in the player header changes.
+2. **Add** a new standalone notice on the Training Center **Videos grid tab** (screenshot 2 — the `8 videos` / `Videos` tab showing the 8 video cards and the `X / 8 watched` progress bar). Place it as its own text line directly **above** that progress bar — not inside the progress-bar row/container, a fully separate element above it. Static copy, not per-video-count (this is shown before any video is picked, so it can't reference a specific video's question count like 193's version did) — something like: "Heads up — you'll get a quick mini quiz after every video." Muted/secondary text style, matching the existing small-caption convention used elsewhere on this page (e.g. `--text-secondary`, ~12-13px).
+
+**Do NOT change:** the progress bar itself (fill %, "X / Y watched" label), video grid cards, locked-video/no-skip behavior (Prompt 174/193), mini-quiz content/lock behavior (193), Final Exam, any other tab (Script/Flashcards/Final Exam/AI Roleplay).
+
+**Verify:** Open `/rep/training` Videos tab — confirm the new notice line sits above the progress bar as separate text (not merged into the bar), then open a video and confirm the old "quick N-question check" line is gone from the player header.
+
+---
+
+### Prompt 199 — fix "Mark as Mastered" flashcard system + gate Final Exam/AI Roleplay with slide-in error toasts
+
+**Context (Brayden, 2026-07-02).** Two related asks:
+
+**A) Flashcard mastery system is broken.** There's already a "Mark as Mastered" button under each flashcard (in the Flashcards tab of `TrainingCenter.jsx` — find the flashcard component, likely near `flashcards.js`'s consumer). Two problems Brayden flagged: (1) you can mark a card mastered without ever flipping it to see the answer — mastery should require the card to actually be flipped/viewed first; (2) you can un-mark a card once it's mastered, which he doesn't want — once mastered, it should stay mastered (button becomes a static "Mastered" indicator, not a toggle). **Fix:** disable/hide the "Mark as Mastered" button until the card has been flipped at least once in the current view; once clicked, remove the ability to un-click it (no toggle back to unmastered). No reset mechanism needed elsewhere — out of scope for this prompt.
+
+**B) Final Exam gate + error toast.** Currently the Final Exam is gated on all 8 videos watched (Prompt 182/183, 85% pass threshold, 30 questions) — confirm whether flashcard mastery is already a factor in `isTrainingComplete()`/the Final Exam's own start-gate or not before changing anything. Brayden wants the gate to also require **all 48 flashcards mastered** (using the fixed system from part A), in addition to all 8 videos watched. When a rep clicks "Start Final Exam" without meeting both conditions, show an error message that **slides in like the existing toast** (reuse `NotificationToast.jsx`'s slide-in animation/positioning — same visual pattern, this is a one-off inline validation message, not a new entry in the notifications table/bell) reading something like "Watch all 8 videos and master all flashcards before taking the Final Exam." Toast auto-dismisses same as the existing notification toast convention.
+
+**C) AI Roleplay gate + error toast.** Same slide-in toast pattern: if a rep clicks "Start Roleplay" (or whatever the actual start-call button is labeled in the AI Roleplay tab) without having passed the Final Exam (85%+), show a slide-in error toast reading something like "Pass the Final Exam before starting AI Roleplay."
+
+**Do NOT change:** the separate, broader `MyLeads` `TrainingGate`/`isTrainingComplete()` lead-access lock (that's a business-level gate covering videos+quiz+roleplay for unlocking leads entirely — leave it alone unless part B's new flashcard requirement needs to be threaded through it too, your call, but flag it either way). Video-lock behavior (174/193), Final Exam question content/scoring (182-186), mini-quiz (193), Prompt 198's video-grid notice.
+
+**Verify:** Flashcards tab — try to mark a card mastered without flipping it (should be blocked/disabled), flip it then mark mastered (should work), confirm no way to un-mark. Final Exam tab — with videos watched but flashcards not fully mastered (or vice versa), click Start → slide-in toast appears, exam does not open. AI Roleplay tab — without a passing Final Exam score, click Start → slide-in toast appears, call does not start.
+
+---
+
 ### ✅ Prompt 183 SHIPPED 2026-07-01 (`9b75c67`) — final exam UX overhaul
 
 - `FinalQuizTab`: in-progress/finished states now render as a full-screen locked modal (`position: fixed`, same pattern as `LockedVideoPlayer`/Prompt 174) — no backdrop-click-to-close and no X while `!finished`; X + backdrop-click both work once `finished`. Start screen (stat cards/chips from Prompt 182) untouched, still inline.
