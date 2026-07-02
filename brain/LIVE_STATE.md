@@ -101,6 +101,22 @@ tags:
 
 ---
 
+### Prompt 193 — Mini-quiz ("Quick Check") popup: restyle to match the Final Exam, lock it, add a heads-up notice
+
+**Context (Brayden, 2026-07-01, live screenshots comparing the post-video "Quick Check" popup vs. the Final Exam modal).** The mini-quiz popup currently looks like a translucent/"hologram" overlay — the background bleeds through it instead of a solid card over a dimmed backdrop, it's small, and its answer options are plain text rows with no letter badges. He wants it visually restyled to match `FinalQuizTab`'s modal exactly (from Prompts 183/185/186/190): solid opaque card (not see-through), same size/padding class, and the same lettered A/B/C/D accent-filled badge treatment on each option — reuse those exact styles/components rather than approximating them.
+
+**1) Visual restyle** — `MiniQuiz`'s popup should reuse `FinalQuizTab`'s card container styling (solid `--bg-elevated`/`#0E0E1A`-style opaque background, same border/radius/shadow, same `maxWidth` in the same size class) and the same lettered option-badge component (solid `--accent` circle + letter, from Prompt 186) instead of its current plain option rows. Keep the "QUICK CHECK · n/4" category label treatment (that part reads fine, just needs to sit on the new solid card). This is a pure visual/component-reuse pass — don't change which questions appear or the 4-question count per video.
+
+**2) Lock it — remove the ability to dismiss mid-quiz** — currently the mini-quiz popup can be closed out of (there's a visible X / it's not backdrop-locked). Brayden's concern: a rep could watch the video, then close the mini-quiz without finishing it. Remove the X and backdrop-click-to-close while the quiz is in progress, matching the locked pattern already used for the video player (`LockedVideoPlayer`, Prompt 174) and the Final Exam (Prompt 183) — same "can't escape without finishing" behavior, applied here too. (Mini-quiz itself stays non-gating/formative per [[training-videos]] Quiz Spec — this lock is only about not being able to bail out of the popup itself, not about right/wrong blocking progress within it.)
+
+**3) Add a heads-up notice, NOT on the video grid/cards** — somewhere a rep sees before or while watching a video, add a short line like "You'll have a quick 4-question check after this video." Do not add this as a label on the Training Center's video thumbnail grid (that page/cards stay as-is). The natural spot is inside the video player view itself (e.g. near the title/duration in `LockedVideoPlayer`) so it's seen right before the mini-quiz actually appears — use your judgment on exact placement within the player, just not on the grid.
+
+**Do NOT change:** Final Exam itself (183/185/186/190-192 all untouched), mini-quiz question content/count, the "watched" flag logic tied to mini-quiz completion (Prompt 180), video grid/card layout.
+
+**Verify:** Watch a video through to the mini-quiz — popup now renders as a solid opaque card matching the Final Exam's visual style, options show lettered accent badges, there's no X/backdrop-dismiss while questions remain. Confirm a "you'll have a quick check after this video" style notice appears somewhere in the video player view (not on the grid).
+
+---
+
 ### ✅ Prompt 183 SHIPPED 2026-07-01 (`9b75c67`) — final exam UX overhaul
 
 - `FinalQuizTab`: in-progress/finished states now render as a full-screen locked modal (`position: fixed`, same pattern as `LockedVideoPlayer`/Prompt 174) — no backdrop-click-to-close and no X while `!finished`; X + backdrop-click both work once `finished`. Start screen (stat cards/chips from Prompt 182) untouched, still inline.
