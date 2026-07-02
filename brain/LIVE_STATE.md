@@ -165,6 +165,20 @@ tags:
 
 ---
 
+### Prompt 198 — move the mini-quiz heads-up notice off the video player, onto the Training Center grid page
+
+**Context (Brayden, 2026-07-02, live screenshots of `/rep/training`).** Prompt 193 put "You'll have a quick {n}-question check after this video" as a third muted line under the video title/duration inside the `LockedVideoPlayer` modal header (screenshot 1 — shows on the "What an AI Receptionist Does" player). Brayden doesn't want it there at all.
+
+**Change:**
+1. **Remove** that heads-up line entirely from `LockedVideoPlayer`'s playing-stage header (the line added in Prompt 193 point 3, `stage === 'playing'` only). Nothing else in the player header changes.
+2. **Add** a new standalone notice on the Training Center **Videos grid tab** (screenshot 2 — the `8 videos` / `Videos` tab showing the 8 video cards and the `X / 8 watched` progress bar). Place it as its own text line directly **above** that progress bar — not inside the progress-bar row/container, a fully separate element above it. Static copy, not per-video-count (this is shown before any video is picked, so it can't reference a specific video's question count like 193's version did) — something like: "Heads up — you'll get a quick mini quiz after every video." Muted/secondary text style, matching the existing small-caption convention used elsewhere on this page (e.g. `--text-secondary`, ~12-13px).
+
+**Do NOT change:** the progress bar itself (fill %, "X / Y watched" label), video grid cards, locked-video/no-skip behavior (Prompt 174/193), mini-quiz content/lock behavior (193), Final Exam, any other tab (Script/Flashcards/Final Exam/AI Roleplay).
+
+**Verify:** Open `/rep/training` Videos tab — confirm the new notice line sits above the progress bar as separate text (not merged into the bar), then open a video and confirm the old "quick N-question check" line is gone from the player header.
+
+---
+
 ### ✅ Prompt 183 SHIPPED 2026-07-01 (`9b75c67`) — final exam UX overhaul
 
 - `FinalQuizTab`: in-progress/finished states now render as a full-screen locked modal (`position: fixed`, same pattern as `LockedVideoPlayer`/Prompt 174) — no backdrop-click-to-close and no X while `!finished`; X + backdrop-click both work once `finished`. Start screen (stat cards/chips from Prompt 182) untouched, still inline.
