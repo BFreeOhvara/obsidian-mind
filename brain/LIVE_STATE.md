@@ -36,6 +36,18 @@ tags:
 
 ---
 
+### Prompt 202 — Activity Feed + My Calls boxes: one row too tall, shrink by exactly one row
+
+**Context (Brayden, 2026-07-02, live screenshot of `/rep/feed` after Prompt 197 shipped).** Loves the fill-to-viewport box from 197 — just wants it one row shorter. Right now the bottom-most row sits right at (or just past) the box edge; wants the box to end just *above* where that last visible row currently sits, so exactly one fewer row is visible before you'd need to scroll for it.
+
+**Change:** on both `ActivityFeed.jsx` and `MyCalls.jsx`, reduce the box's height (the same `flex:1`/`calc(100vh - ...)` sizing from Prompt 197) by exactly one row's rendered height. Measure the actual row height from the rendered CSS (row padding + line-height + any border/divider between rows) rather than guessing a round number — subtract that real value from the existing height calc so the box comes up short by precisely one row, not an arbitrary amount. Apply the identical adjustment to both pages so they stay the same height/proportion as each other (per 197's original spec).
+
+**Do NOT change:** row content/styling, outcome color-coding (194), click-to-open modal (190-192), page headers/KPIs, the internal-scroll behavior itself (197) — just the box's total height.
+
+**Verify:** Screenshot `/rep/feed` and `/rep/calls` at a normal laptop viewport height — confirm one fewer row is visible than before (the last row that used to poke out at the bottom edge is now just below the box, reachable only by scrolling), no outer-page scroll, and both pages' boxes remain the same height as each other.
+
+---
+
 ### ✅ Prompt 200 SHIPPED 2026-07-02 (`35219b4`) — ErrorToast hardened; root-caused via isolated reproduction, not guesswork
 
 - Built a byte-for-byte isolated harness (scratchpad, not committed — same method as Prompt 185) of `ErrorToast` + the click-gate pattern and served it standalone (no Supabase dependency) to actually test the reported "toast never renders" claim rather than reasoning blind.
