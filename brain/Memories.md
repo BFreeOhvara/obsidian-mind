@@ -3169,3 +3169,16 @@ Session resumed after context compaction. Prompt 148 seed bug (rep_profile_id �
 - Unchanged: modal size (960/88vh from 191), dismiss behavior, grade badge, severity logic, query.
 - Verified `npx vite build` only — standing blocker persists: no `.env.local`, no live check (same as 182–191).
 - Status: SHIPPED + pushed to `master`; Prompt 192 cleared from [[LIVE_STATE]] queue.
+
+---
+
+## Session Log — 2026-07-02 (Prompt 193)
+
+**CC | 2026-07-02 — Mini-quiz restyled to match Final Exam + locked + heads-up notice (shipped `84f8fc2`)**
+
+- `MiniQuiz` in [[ohvara-dashboard]] `TrainingCenter.jsx` reskinned to match `FinalQuizTab`'s solid-card look: question in a `.glass` card (40×44 padding, 21px text), options as full rows with lettered accent badges (26×26, mono font) instead of plain text rows. Pulled the `['A','B','C','D']` literal out of `FinalQuizTab` into a shared module-level `OPTION_LETTERS` constant both components now use — avoids the two drifting apart later. Right/wrong feedback coloring preserved (still non-gating, still auto-advances).
+- **Found the actual dismiss bug while implementing the lock**: the video modal's backdrop `onClick` fired `closeVideo()` whenever `stage !== 'playing'` — i.e. exactly during the quiz — and the header X button only rendered in that same window. So the quiz (not the video) was the one part of the flow that could be bailed out of. Removed both entirely; the whole modal now only closes via `onDone()`, matching the `LockedVideoPlayer`/Final Exam "can't escape" pattern end-to-end.
+- Added a heads-up line under the video title/duration header (playing stage only, not on the grid): "You'll have a quick {n}-question check after this video" — `n` derived from `buildMiniQuiz(activeVideo).length`, not hardcoded, so it can't drift from the actual per-video question count.
+- Modal card now sizes itself per stage: `maxWidth 720` while playing (unchanged), `maxWidth 900` + `maxHeight 88vh` + `overflowY auto` during the quiz — matches `FinalQuizTab`'s modal dimensions exactly.
+- Verified `npx vite build` only — standing blocker persists: no `.env.local`, no live check (same as 182–192).
+- Status: SHIPPED + pushed to `master`; Prompt 193 cleared from [[LIVE_STATE]] queue. Prompt 194 (Activity Feed + My Calls scroll box, outcome color-coding) is next up.
