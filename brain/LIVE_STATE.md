@@ -92,23 +92,12 @@ tags:
 
 ---
 
-### Prompt 192 — My Calls modal: reorder (feedback above player) + restructure feedback cards into labeled fields
+### ✅ Prompt 192 SHIPPED 2026-07-01 (`997cde8`) — My Calls modal: feedback cards above player + labeled fields
 
-**Context (Brayden, 2026-07-01, live screenshot of Prompt 191's shipped modal).** Sizing and the card treatment are good, but two issues: (1) the player is at the top and the feedback cards below it — Brayden wants the order flipped, feedback cards first, player at the bottom. (2) The feedback cards themselves are readable but still feel like "a wall of words in a box" — the quote/example sub-lines are single run-on paragraphs with em-dashes separating clauses (e.g. `"What you said" — Prospect: "..." Rep: "..." Rep: "..."`). Wants each card to read like clearly labeled fields, not a paragraph.
-
-**1) Reorder** — inside `CallDetailModal`, move the two feedback cards ("what you did well" / "what to work on") above the audio player shell. Player shell stays functionally/visually identical (Prompt 190/191), just moves to the bottom of the modal body, right before the close.
-
-**2) Restructure each card into explicit labeled fields**, not inline paragraphs:
-- Give each card a real header/title, distinct from the summary sentence below it — e.g. small-caps or bold label row: `WHAT YOU DID WELL` (green) / `WHAT TO WORK ON` (severity-colored, same yellow/red logic from 190).
-- Under the header: the existing summary sentence (`feedback_good` / `feedback_improve`) as the main line.
-- Then break the quote/example content out of the single run-on line into its own clearly separated sub-row(s), each with a small muted label above or beside it (not inline with an em-dash):
-  - `WHAT YOU SAID` (label) → the quote text on its own line below the label.
-  - For the "what to work on" card only, an additional `TRY INSTEAD` (label) → the example text on its own line below the label, kept visually distinct from the "what you said" quote above it (e.g. different accent-bar color or a divider between the two fields, per [[DESIGN]] tokens — no new hardcoded hex).
-- Goal: someone should be able to scan the card top-to-bottom and immediately see four distinct pieces — label, summary, what-was-said, try-instead — not parse one dense paragraph.
-
-**Do NOT change:** modal size/sizing convention from Prompt 191, dismiss behavior, grade badge, severity color logic, the underlying data/query (same 3 quote/example columns, same conditional-render-if-null behavior), any other tab.
-
-**Verify:** Screenshot the modal for "NorthStar Heating" (B+) — feedback cards appear above the player, each card has a clear header label, and "what you said" / "try instead" are visually separate labeled fields rather than one paragraph. Confirm nothing else moved or changed.
+- **1) Reorder** — the two feedback cards now render before the audio player shell in `CallDetailModal`; player is unchanged, just moved to the end of the modal body (right before the closing `</div>`).
+- **2) Labeled fields** — each card now has: a `section-label`-styled header (`What You Did Well` green / `What To Work On` severity-colored) → the summary sentence as its own line (`feedback_good`/`feedback_improve`, no more ✓/↗ prefix since the header now carries that) → a `0.5px solid var(--border)` divider + `What You Said` label + the quote on its own italicized line. The "what to work on" card gets a second divided field, `Try Instead` (label colored `--success` to read as the corrective/positive one), + the example on its own line. No hardcoded hex — reused the existing `section-label` class + design tokens throughout.
+- Unchanged per spec: modal size (960/88vh/etc. from 191), dismiss behavior, grade badge, severity color logic (`IMPROVE_SEVERE`), the query/conditional-null-render behavior, other tabs.
+- Verified `npx vite build` (passes). No live check — still no `.env.local` (same standing blocker as 182–191). Brayden to confirm live: feedback cards above player, four distinct labeled pieces per card (header/summary/what-you-said/try-instead), no run-on paragraph.
 
 ---
 

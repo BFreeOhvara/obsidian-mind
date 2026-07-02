@@ -3157,3 +3157,15 @@ Session resumed after context compaction. Prompt 148 seed bug (rep_profile_id �
 - **Gotcha found:** migration `064_call_feedback_detail.sql` was applied directly to the remote Supabase project (confirmed via Supabase MCP `list_migrations` — timestamp `20260702000000`) but **is not committed to `ohvara-dashboard`'s local `supabase/migrations/` folder** (last local file is `063_follow_up_at.sql`). Verified the three new column names/types directly against the live schema via MCP `list_tables` before trusting the prompt's column names. Flagging as a gap — Falcon should commit that migration file to the repo so schema history doesn't drift from what's actually live. See [[Gotchas]] candidate: always verify DB schema via Supabase MCP when a prompt references a migration that isn't in the local `supabase/migrations/` folder — the remote can be ahead of git.
 - Verified `npx vite build` only — standing blocker persists: no `.env.local`, no live check (same as 182–190).
 - Status: SHIPPED + pushed to `master`; Prompt 191 cleared from [[LIVE_STATE]] queue.
+
+---
+
+## Session Log — 2026-07-01 (Prompt 192)
+
+**CC | 2026-07-01 — My Calls modal: feedback cards above player + labeled fields (shipped `997cde8`)**
+
+- Reordered `CallDetailModal` ([[ohvara-dashboard]] `MyCalls.jsx`): feedback cards now render before the audio player shell (was player-then-feedback in 190/191).
+- Restructured each feedback card from a run-on paragraph into distinct labeled fields: `section-label` header (green/severity-colored) → summary sentence → divider + "What You Said" label + italicized quote → (improve card only) divider + "Try Instead" label (success-colored) + example. Reused the existing `section-label` CSS class, no new hardcoded hex.
+- Unchanged: modal size (960/88vh from 191), dismiss behavior, grade badge, severity logic, query.
+- Verified `npx vite build` only — standing blocker persists: no `.env.local`, no live check (same as 182–191).
+- Status: SHIPPED + pushed to `master`; Prompt 192 cleared from [[LIVE_STATE]] queue.
