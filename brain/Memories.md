@@ -3193,3 +3193,17 @@ Session resumed after context compaction. Prompt 148 seed bug (rep_profile_id �
 - Exported `STATUS_COLORS` from `ActivityFeed.jsx` (was private) and imported it directly into `MyCalls.jsx` instead of duplicating the outcome→color map, per the prompt's explicit "don't hand-roll a second copy" instruction. `Follow-Up` → `--warning` was already in the map from earlier work, so no extension needed. My Calls row line changed from bare `{c.outcome}` (flat muted text) to `Outcome: {c.outcome}` colored via the shared map, with a `--text-muted` fallback for a null outcome.
 - Verified `npx vite build` only — standing blocker persists: no `.env.local`, no live check (same as 182–193).
 - Status: SHIPPED + pushed to `master`; Prompt 194 cleared from [[LIVE_STATE]] queue. Prompt 195 (My Leads UTC batch-refresh empty-window bug, root-caused by Falcon) is next up — reminder: read `016_daily_batch_cron.sql` in full before touching anything, per the prompt's own instruction.
+
+---
+
+## Session Log — 2026-07-02 (Prompt 195)
+
+**CC | 2026-07-02 — My Leads empty-window bug fixed at the root (shipped `4e552fb`)**
+
+- Read `016_daily_batch_cron.sql` first as instructed. Confirmed via Supabase MCP (`execute_sql` against `cron.job`) that the live `daily-batch-assign` cron (id 12) really is `5 6 * * *` (06:05 UTC) — the migration file's committed `'5 0 * * *'` is stale text from before Brayden's 2026-06-22 reschedule; `MyLeads.jsx`'s countdown target already correctly reflects 06:05 UTC, so no drift there.
+- Fixed `useMyLeads()` in `src/hooks/useLeads.js` ([[ohvara-dashboard]]): replaced `.eq('batch_date', <UTC-today computed independently in JS>)` with a two-step lookup — fetch the rep's `MAX(batch_date)` first (cheap, indexed), then fetch full rows for that date. Took Brayden's primary-recommended fix direction (show most-recent-batch) over the "align cutovers" alternative, since it's correct by construction for the whole bug class — including a cron that's delayed or fails outright — not just the specific 6h5m gap window.
+- Verified against **live** Supabase data (read-only, via MCP — this part didn't need `.env.local`): confirmed a real rep's current batch (`2026-07-02`, 150 leads) and confirmed `leads_batch_date_idx`/`leads_assigned_rep_id_idx` exist so the extra round-trip is cheap.
+- **Investigated the "duplicate cron" side note and found it's NOT dead weight** — `assign-daily-batch` (id 1, 06:00 UTC, edge function) does simple round-robin distribution of brand-new unassigned leads only; `daily-batch-assign` (id 12, 06:05 UTC, `assign_daily_batches()`) additionally rolls over unworked leads and re-surfaces if the pool is dry. They're sequential and complementary, not redundant — left both untouched per the prompt's explicit "don't change unless genuinely wrong" instruction.
+- **Found the identical bug pattern in `src/pages/admin/Overview.jsx:97`** (same `.eq('batch_date', new Date().toISOString().split('T')[0])` gating an admin per-rep view) — did NOT fix it, since Prompt 195 only scoped the rep-facing dashboard. Flagged in [[LIVE_STATE]] as a follow-up rather than silently expanding scope.
+- Verified `npx vite build` only, plus the live-data Supabase checks above — no rendered-browser check (still no `.env.local`, same standing blocker as 182–194).
+- Status: SHIPPED + pushed to `master`; Prompt 195 cleared from [[LIVE_STATE]] queue. Prompt 196 (My Payouts — show Closed date alongside Paid date on paid rows) is next up.
