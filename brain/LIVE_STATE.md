@@ -132,6 +132,15 @@ tags:
 
 ---
 
+### ✅ Prompt 195 follow-up SHIPPED 2026-07-02 (`16853e5`) — admin Overview same empty-window bug fixed
+
+- Fixed the identical bug flagged (not fixed) at the end of Prompt 195: `src/pages/admin/Overview.jsx:97`'s `RepRow` expanded "Today's Leads" query filtered `.eq('batch_date', new Date().toISOString().split('T')[0])` — an independently-computed UTC "today" — against the same `assign_daily_batches()` cron that doesn't advance `batch_date` until 06:05 UTC. Same admin view went empty for the same ~6h nightly window that Prompt 195 fixed on the rep-facing `/rep` My Leads page.
+- **Fix** — mirrored `useMyLeads()` exactly (`src/hooks/useLeads.js`): added a lookup for the rep's `MAX(batch_date)` first (`.order('batch_date', desc).limit(1).maybeSingle()`), then filter the leads query on that value instead of computed-today. Same two-step pattern, same reasoning (survives a delayed/failed cron, not just the known window).
+- Verified `npx vite build` (passes). No live check — still no `.env.local` in the repo (same standing blocker as 182-195); confirmed via `ls` that the file genuinely doesn't exist, not just unset.
+- Status: SHIPPED + pushed to `master`. Not part of the numbered prompt queue — this closed out the Prompt 195 follow-up flag directly. Brayden to confirm live: admin Overview → expand a rep row → "Today's Leads" no longer goes empty between UTC midnight and ~06:05 UTC.
+
+---
+
 ### Prompt 196 — My Commissions → My Payouts: show Closed date alongside Paid date on paid rows
 
 **Context (Brayden, 2026-07-01, live screenshot of `/rep/commissions`).** The Pending row already shows "Closed on {date}" under the deal line. Paid rows currently only show "Paid on {date}" — missing the closed date entirely. Brayden wants paid rows to show **both**, so you can see how long the deal sat before payout: `Closed on {date} · Paid on {date}` (closed date first, dot separator, then paid date — same visual pattern already used for the deal-line stats like "Closed $1,485 · 10% · $149 earned").

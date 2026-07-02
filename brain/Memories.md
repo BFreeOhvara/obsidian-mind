@@ -3207,3 +3207,14 @@ Session resumed after context compaction. Prompt 148 seed bug (rep_profile_id �
 - **Found the identical bug pattern in `src/pages/admin/Overview.jsx:97`** (same `.eq('batch_date', new Date().toISOString().split('T')[0])` gating an admin per-rep view) — did NOT fix it, since Prompt 195 only scoped the rep-facing dashboard. Flagged in [[LIVE_STATE]] as a follow-up rather than silently expanding scope.
 - Verified `npx vite build` only, plus the live-data Supabase checks above — no rendered-browser check (still no `.env.local`, same standing blocker as 182–194).
 - Status: SHIPPED + pushed to `master`; Prompt 195 cleared from [[LIVE_STATE]] queue. Prompt 196 (My Payouts — show Closed date alongside Paid date on paid rows) is next up.
+
+---
+
+## Session Log — 2026-07-02 (Prompt 195 follow-up)
+
+**CC | 2026-07-02 — admin Overview empty-window bug fixed (shipped `16853e5`)**
+
+- Closed out the follow-up Prompt 195 flagged but didn't fix: `src/pages/admin/Overview.jsx:97`'s `RepRow` expanded "Today's Leads" query had the identical bug pattern — `.eq('batch_date', new Date().toISOString().split('T')[0])` against an independently-computed UTC "today," gated by the same `assign_daily_batches()` cron that doesn't advance `batch_date` until 06:05 UTC. Same ~6h nightly empty-window as the rep-facing bug, just on the admin side.
+- Fixed by mirroring `useMyLeads()` in `src/hooks/useLeads.js` ([[ohvara-dashboard]]) exactly: look up the rep's `MAX(batch_date)` first (`.order('batch_date', desc).limit(1).maybeSingle()`), then filter the leads query on that value instead of computed-today.
+- Verified `npx vite build` only (passes) — no rendered-browser check, confirmed `.env.local` still doesn't exist in the repo (same standing blocker as 182–195).
+- Status: SHIPPED + pushed to `master`. Not a numbered prompt — direct continuation of the Prompt 195 follow-up flag.
