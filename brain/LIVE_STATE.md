@@ -157,6 +157,20 @@ Do NOT add a phone icon to My Calls rows — the grade badge (A-/B+/etc.) alread
 
 ---
 
+### Prompt 196 — My Commissions → My Payouts: show Closed date alongside Paid date on paid rows
+
+**Context (Brayden, 2026-07-01, live screenshot of `/rep/commissions`).** The Pending row already shows "Closed on {date}" under the deal line. Paid rows currently only show "Paid on {date}" — missing the closed date entirely. Brayden wants paid rows to show **both**, so you can see how long the deal sat before payout: `Closed on {date} · Paid on {date}` (closed date first, dot separator, then paid date — same visual pattern already used for the deal-line stats like "Closed $1,485 · 10% · $149 earned").
+
+**Data note:** Falcon confirmed `appointments.closed_at` is already populated for every paid payout row for the Test Rep except one ("Texas Road Kings Towing," which was null) — seeded that one directly (`2026-06-08`, two days before its existing `paid_at` of `2026-06-10`) so all 7 rows now have both dates and this is a pure UI change, no further data work needed.
+
+**Change:** on `/rep/commissions`'s "My Payouts" list, for rows with `status = 'paid'`, render `Closed on {appointment.closed_at, formatted} · Paid on {paid_at, formatted}` in place of the current paid-only line. **Pending rows are unchanged** — confirmed with Brayden they should keep showing just "Closed on {date}" with no paid date (nothing to show yet since it hasn't been paid).
+
+**Do NOT change:** Pending row format, the deal-line stats above it, payout amounts/status badges, chart/summary cards, any other tab.
+
+**Verify:** Screenshot `/rep/commissions` — every "Paid" row now shows `Closed on {date} · Paid on {date}` with the closed date earlier than the paid date; the "Pending" row (NorthStar Heating) is untouched, still just `Closed on Jun 30`.
+
+---
+
 ### ✅ Prompt 183 SHIPPED 2026-07-01 (`9b75c67`) — final exam UX overhaul
 
 - `FinalQuizTab`: in-progress/finished states now render as a full-screen locked modal (`position: fixed`, same pattern as `LockedVideoPlayer`/Prompt 174) — no backdrop-click-to-close and no X while `!finished`; X + backdrop-click both work once `finished`. Start screen (stat cards/chips from Prompt 182) untouched, still inline.
