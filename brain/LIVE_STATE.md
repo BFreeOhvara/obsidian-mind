@@ -20,6 +20,22 @@ tags:
 
 ---
 
+### Prompt 201 — My Leads search: multi-word queries don't match (real bug, not sample-data confusion)
+
+**Context (Brayden, 2026-07-02).** The `/rep` lead search (Prompts 187/188) currently does a single-substring match: it checks whether the *entire* typed string appears verbatim inside one field. That breaks the second you type more than one keyword. Brayden's example: he remembers a lead was an HVAC company in Nashville but not its name. Typing "HVAC Nashville" returns nothing, even if a real matching lead exists — e.g. a lead with `business_name = "Nashville HVAC Co"` (contains both words, but not as the contiguous phrase "hvac nashville") or a lead with `business_name = "ABC Heating & Air"`, `city = "Nashville"`, `niche = "HVAC"` (the two words aren't even in the same field). Same problem for "HVAC" plus any other trailing word — one match per field, not the whole word set.
+
+**Fix (`MyLeads.jsx`'s `filtered` logic):** change the substring check to a multi-token AND/OR match:
+1. Split the search input on whitespace into lowercase tokens (drop empty tokens).
+2. Build one combined lowercase haystack string per lead by concatenating `business_name`, `contact_name`, `phone`, `city`, `niche` (space-joined).
+3. A lead matches only if **every** token appears somewhere in that combined haystack (`tokens.every(t => haystack.includes(t))`) — this is what lets "HVAC Nashville" match a lead where "HVAC" comes from the niche field and "Nashville" comes from the city field, or both come from the business name in either order.
+4. Empty search input still shows everything, unchanged. Applied after the existing status-tab filter, same as today.
+
+**Do NOT change:** search bar placement/styling (188), status-tab filter logic itself, any other page's search (if `LeadPipeline`/admin search shares this pattern, leave it alone unless explicitly asked — this prompt is `/rep` My Leads only).
+
+**Verify:** Live on `/rep`, search "HVAC Nashville" (or any two-word combo split across fields/word-order) and confirm a matching lead now appears. Also confirm single-word search (e.g. just "HVAC") still works exactly as before, and a nonsense/no-match query still returns zero rows.
+
+---
+
 ### ✅ Prompt 200 SHIPPED 2026-07-02 (`35219b4`) — ErrorToast hardened; root-caused via isolated reproduction, not guesswork
 
 - Built a byte-for-byte isolated harness (scratchpad, not committed — same method as Prompt 185) of `ErrorToast` + the click-gate pattern and served it standalone (no Supabase dependency) to actually test the reported "toast never renders" claim rather than reasoning blind.
