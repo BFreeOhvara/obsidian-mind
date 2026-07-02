@@ -64,6 +64,17 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### [CC | 2026-07-02 — Prompts 197-199 shipped · `cc4c70c`] — full-height feed/calls, quiz notice relocated, flashcard mastery + gates
+
+- **197**: `ActivityFeed.jsx` + `MyCalls.jsx` (rep) — the fixed `maxHeight: 560` scroll box left a big unused gap below it on normal viewports. Replaced with `calc(100vh - 48px)` on the outer page container (48px = `DashboardLayout`'s `p-6` padding) + `flex: 1`/`minHeight: 0`/`overflowY: auto` on the box, so it now fills the viewport exactly and only its own list scrolls (outer page never does).
+- **198**: Moved the "quick N-question check after this video" line off `LockedVideoPlayer`'s header (Prompt 193) onto the Videos grid tab as a static line above the progress strip — Brayden didn't want it inside the player.
+- **199**: Flashcard "Mark as Mastered" was two-way and didn't require viewing the answer first — fixed with a `viewed` state (resets per-card, set on flip) gating the button, and made mastery one-way (no un-mark). Built a shared `ErrorToast` component (same visual pattern as `NotificationToast.jsx`, portaled, not routed through the notifications table) to gate Final Exam start (now also requires all 48 flashcards mastered, not just videos) and AI Roleplay start (now requires a passed Final Exam) — both show a slide-in toast instead of a hard lock screen when blocked.
+- Flagged (not changed, per the prompt's own "your call" carve-out): the separate `MyLeads`/`isTrainingComplete()` lead-unlock gate in `useTraining.js` is driven by legacy `quiz_passed_at` (the old 20-question `QuizTab`), not flashcard mastery or the Final Exam — genuinely different system, left alone.
+- Verified via `npx vite build` only — same standing `.env.local` blocker as every session since 182 (no live logged-in browser check possible).
+- LIVE_STATE queue is empty again.
+
+---
+
 ### [CC | 2026-07-01 — Prompt 185 shipped · `808b47e`] — root-caused the exam modal off-screen bug
 
 - Falcon's Prompt 185 report described the Final Exam question card rendering above the viewport (`top: -164px`) after Prompt 183. Diagnosed properly instead of guessing: reproduced in an isolated static HTML harness mirroring `DashboardLayout.jsx`'s structure (scratchpad, not committed) rather than reasoning blind, since the app itself still can't run locally (no `.env.local`).
