@@ -20,6 +20,23 @@ tags:
 
 ---
 
+### Prompt 200 — BUG: Prompt 199's ErrorToast never actually renders on Final Exam or AI Roleplay
+
+**Context (Falcon, live Chrome verification of Prompt 199, 2026-07-02).** Live-tested both gates as apex11 (1/48 flashcards mastered, Final Exam not yet passed):
+
+- **Final Exam tab:** clicked "Start Final Exam" — correctly did NOT open the exam (gate logic works). But no toast appeared. Confirmed via an accessibility-tree DOM dump taken immediately after the click (near-zero latency, batched click+read in one round trip) — zero toast-related elements anywhere in the tree. No console errors either.
+- **AI Roleplay tab:** clicked "Start Practice Call" — correctly did NOT trigger a mic permission prompt or call `startCall()` (gate logic works, confirmed no mic dialog appeared). Same result: no toast in the DOM immediately after the click, no console errors.
+
+So the *blocking* half of Prompt 199b/c works on both tabs, but the `ErrorToast` component itself is not mounting/rendering at all — not a timing/auto-dismiss-missed issue, since the DOM read happened in the same round trip as the click.
+
+**Fix:** find out why `ErrorToast` never appears — likely candidates: the toast trigger function sets state but the component reading that state isn't actually rendered anywhere in the tree (e.g. only conditionally rendered under a wrong parent, or the state setter targets a variable nothing subscribes to), or the portal target node doesn't exist yet when `createPortal` runs, or the click handler's early-return happens before the toast-trigger call is reached. Actually click the buttons yourself in a live/dev check (not just `npx vite build`) and confirm the toast visually appears before calling this done — a passing build does not catch a component that silently fails to mount.
+
+**Do NOT change:** the gate/blocking logic itself (already correct on both tabs), flashcard mastery system (199a, confirmed working live — flip-then-mark-mastered, one-way lock, both verified visually), Final Exam/Roleplay content.
+
+**Verify:** Live click "Start Final Exam" with flashcards not fully mastered → toast visibly slides in and is screenshot-able. Live click "Start Practice Call" with Final Exam not passed → same. Falcon will re-verify via Chrome once shipped.
+
+---
+
 ### ✅ Prompt 185 SHIPPED 2026-07-01 (`808b47e`) — exam modal off-screen bug fixed (root cause, not just the symptom)
 
 - Root cause was **not** sizing/overflow (Prompt 183's `maxHeight: 88vh` + `overflowY: auto` on the card were already correct) — it's that `DashboardLayout.jsx`'s `.page-enter` wrapper carries a persisted CSS `transform` (`animation: fadeSlideUp 0.35s ease both` in `index.css` — `fill-mode: both` keeps `transform: translateY(0)` applied after the animation ends). Per the CSS spec, any ancestor with a non-`none` transform becomes the containing block for `position: fixed` descendants — so the exam modal was fixed relative to that scrollable page wrapper, not the true viewport. Scrolling the page before clicking "Start Final Exam" pushed the modal off-screen by the scroll amount, matching Falcon's exact `top: -164px` finding.
