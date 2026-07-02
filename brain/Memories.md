@@ -3218,3 +3218,14 @@ Session resumed after context compaction. Prompt 148 seed bug (rep_profile_id �
 - Fixed by mirroring `useMyLeads()` in `src/hooks/useLeads.js` ([[ohvara-dashboard]]) exactly: look up the rep's `MAX(batch_date)` first (`.order('batch_date', desc).limit(1).maybeSingle()`), then filter the leads query on that value instead of computed-today.
 - Verified `npx vite build` only (passes) — no rendered-browser check, confirmed `.env.local` still doesn't exist in the repo (same standing blocker as 182–195).
 - Status: SHIPPED + pushed to `master`. Not a numbered prompt — direct continuation of the Prompt 195 follow-up flag.
+
+---
+
+## Session Log — 2026-07-02 (Prompt 196)
+
+**CC | 2026-07-02 — My Payouts: Closed date alongside Paid date on paid rows (shipped `53824bb`)**
+
+- Added `closed_at` to the `appointments` join in `useMyPayouts()` (`src/hooks/usePayouts.js`, [[ohvara-dashboard]]) — confirmed the column exists live via Supabase MCP before wiring it in. `MyCommissions.jsx`'s paid-row label changed from `Paid on {date}` to `Closed on {closed_at} · Paid on {paid_at}`; pending rows untouched.
+- Verified against live Test Rep data via MCP: 6 paid payouts all have `closed_at < paid_at` (confirms the "Texas Road Kings Towing" row Falcon seeded is correct), plus the 1 pending row (NorthStar Heating) — exact match to the prompt's stated verification data.
+- Verified `npx vite build` only + the live Supabase check — no rendered-browser check (still no `.env.local`, same standing blocker as 182–195).
+- Status: SHIPPED + pushed to `master`; Prompt 196 cleared from [[LIVE_STATE]] queue. **No more numbered prompts queued** — LIVE_STATE's "Next Up for CC" list is now empty of pending work; next session should check North Star's Current Focus per the queue's own empty-state instructions, or wait for Eagle/Falcon to queue new prompts.
