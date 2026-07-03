@@ -20,6 +20,31 @@ tags:
 
 ---
 
+### Prompt 204 (QUEUED 2026-07-03, Falcon) — Script Practice UX overhaul: combine say+fork always, condense opener, fix vitals question, categorized color-coded branch options, declutter flowchart
+
+Brayden reviewed the live Training Center → Script tab (both Practice walk and Flowchart view) via 4 screenshots and flagged 5 problems. Fix all 5:
+
+**1. Say+Fork must ALWAYS combine on one screen — no "Next" tap before seeing/picking options, anywhere in the script.**
+Prompt 80 (`73d0b54`) built `SayWithFork` in `ScriptWalk.jsx` to combine an adjacent say+fork into one screen (say line + clickable options together) whenever the fork immediately follows the say. Live screenshots show it NOT combining for the opener: "Open the Call" node renders as a bare say + "Next" button; clicking Next reveals a SEPARATE screen ("What did they do? → Do they confirm? → Yes/speaking or Wrong number"). Same pattern on the following node (Indeed-ask say renders alone with just Next, its 3-way fork would presumably be its own separate screen too). Root-cause why `nextForkForSay` / `SayWithFork` isn't triggering here — check whether discoveryScript.js's current opener node structure has the fork as the true next step after the say, or whether the combining logic regressed since Prompt 80. Fix so EVERY say-then-fork pair in the entire script (opener, vitals, pain, handoff, objections) renders say text + its response options together on one screen, zero extra "Next" tap ever required to reach the options. This applies to both Practice mode and the live Call Now walk (same shared `ScriptWalk` engine).
+
+**2. Condense the opener into a single node.**
+Currently split across 2-3 separate say+click nodes (confirm-business → indeed-ask → bridge). Brayden wants ONE opening line: "Hey, is this [Business Name]? I saw y'all had an Indeed listing up for a [receptionist / dispatcher / front desk]. I was wondering who I should speak to about that?" Drop the "wrong number / not them" fork as a required click — that response doesn't change the setter's next move (they know to keep going), so it doesn't need its own branch. Only branch where the prospect's response genuinely changes the next line — don't force a click for self-evident, low-value forks.
+
+**3. Vitals: replace the "how many calls are you getting" step — no on-the-spot math for the setter.**
+Current flow asks the daily/weekly call volume, but the Practice UI's capture box is labeled "Missed calls/week" — forcing the setter to mentally convert whatever raw number the prospect gives into a weekly-missed figure live on the call. Replace with one direct question: "How many calls would you say you're missing a day?" — setter pastes the prospect's number in verbatim, no conversion, no math. Cut the separate "how many calls are you getting" question if this replaces its purpose (it reads as a redundant surface-level question per Brayden). Audit the rest of Section 2 (Vitals) in `brain/setter-script-v2-flow.md` / `discoveryScript.js` for other surface-level or repetitive questions and trim anything that doesn't add pain-surfacing value or creates a repetitive-sounding call — the goal is relive-the-pain-then-build-urgency with natural conversational flow, not a rigid Q&A march.
+
+**4. Branch options should be color-coded response CATEGORIES, not verbatim quotes.**
+Where a node has multiple response options, each should represent a general category the prospect's real (unscripted) answer could fall into — not exact wording — e.g. Good (green) / Hesitant (yellow) / Bad (red) — so the setter picks whichever bucket the actual answer fits and stays in control of the conversation without needing an exact-phrase match. Apply this pattern consistently across the whole script. Use only the 4 existing DESIGN.md tokens (`--accent`, `--success`, `--warning`, `--danger` — confirm before picking, no invented tokens per the Prompt 134 lesson). Audit current option labels — some may already be category-like via the `BRANCH —` / `↳ IF` markers, others may still be literal quotes; recategorize + recolor where needed.
+
+**5. Flowchart view is visually cluttered — rework node layout/spacing.**
+Training Center → Script tab → Flowchart view (`ScriptFlowchart.jsx`): nodes overlap and text is unreadable in denser branches — Brayden's 4th screenshot shows the Booking Objections branch with SAY boxes overlapping each other and connector lines crossing through text. Rework layout spacing (wider gaps between nodes/columns, no overlap at default zoom) so the tree is legible without the user having to manually drag/zoom to untangle it — keep the existing top-down boxes+lines style (Prompt 27/91), just fix density/spacing for branches with many nested forks.
+
+**Where to look:** `discoveryScript.js` (script content + node structure), `brain/setter-script-v2-flow.md` (source doc — keep in sync with whatever discoveryScript.js ends up as, this doc is what future rewrites are built from), `ScriptWalk.jsx` (`SayWithFork` / `nextForkForSay` combining logic, `advanceThenPick`), `ScriptFlowchart.jsx` (layout), `Badge.jsx` / DESIGN.md (color tokens).
+
+**Verification (rule #11):** Screenshot Practice mode confirming say+fork now combine on ONE screen for the opener, the new vitals "missing a day" question, and at least one deeper branch (e.g. Booking Objections) — plus the decluttered Flowchart view. Standard Chrome-MCP-from-Desktop workaround if the CLI session can't drive Chrome directly.
+
+---
+
 ### ✅ Prompt 203 SHIPPED 2026-07-02 (`48f30b7`) — "New" status badge now matches the "New" tab's blue
 
 - Found the actual color source: `Badge.jsx`'s shared `STATUS_STYLES` map (not `MyLeads.jsx` itself — `MyLeads.jsx`'s `TAB_COLORS` map has a comment noting it already mirrors `Badge.jsx`'s colors, so that was the single source of truth to fix).
