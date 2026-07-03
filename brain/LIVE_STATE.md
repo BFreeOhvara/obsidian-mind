@@ -20,6 +20,18 @@ tags:
 
 ---
 
+### Prompt 203 — My Leads: "New" status badge isn't color-coded like the other statuses
+
+**Context (Brayden, 2026-07-02, live screenshot of `/rep`).** The status-tab filter row (New/Appointment Booked/Follow-Up/No Answer/Not Interested) already color-codes each label — "New" renders in the accent light-blue there. The other statuses' badges in the table's STATUS column are already colored to match their tab (green for Appointment Booked, etc. — confirm exact set while in the file). Only the "New" badge in the table is left grey/muted instead of matching its tab's blue.
+
+**Fix (`MyLeads.jsx`, wherever the STATUS column badge color is mapped):** add/fix the `New` case in that status→color map so it uses the same accent blue as the "New" filter tab (`--accent` per [[DESIGN]], or whatever exact token/class the tab itself uses — reuse that value directly rather than a new hardcoded color, so the tab and the badge can't drift apart).
+
+**Do NOT change:** the other status badge colors (already correct), tab styling/order, table layout, search (201) or any other column.
+
+**Verify:** `/rep` My Leads table — "New" status badges now render in the same light-blue as the "New" tab label, matching how the other statuses already match their tabs.
+
+---
+
 ### ✅ Prompt 201 SHIPPED 2026-07-02 (`932f760`) — My Leads search: multi-token AND match
 
 - `MyLeads.jsx`'s `filtered` logic replaced the single-substring check with a tokenized match: splits the query on whitespace into lowercase tokens, builds one combined lowercase haystack per lead (`business_name`, `contact_name`, `phone`, `city`, `niche` space-joined), and requires every token to appear somewhere in that haystack (`tokens.every(t => haystack.includes(t))`).
