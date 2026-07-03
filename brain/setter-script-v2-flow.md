@@ -1,6 +1,6 @@
 ---
-date: 2026-06-28
-description: "Complete branching setter script — pure say-this lines, no meta text, no closer name. Every node is something the setter reads out loud. Built from transcript research (S1–S5). For CC to implement into discoveryScript.js."
+date: 2026-07-03
+description: "Complete branching setter script — pure say-this lines, no meta text, no closer name. Every node is something the setter reads out loud. Built from transcript research (S1–S5), condensed opener + trimmed vitals per Prompt 204. Source of truth mirrored in discoveryScript.js."
 tags:
   - brain
   - setter
@@ -15,33 +15,29 @@ tags:
 > - No closer name. Use "our team" / "we" / "they."
 > - Branches = what the prospect said. Setter clicks what they heard → next say node.
 > - `[First Name]`, `[Business Name]`, `[niche]` = dynamic tokens.
+> - **Response categories (added Prompt 204):** every fork option is tagged `[GOOD]` / `[HESITANT]` / `[BAD]` in `discoveryScript.js` — the setter triages the prospect's real (unscripted) answer into whichever bucket it fits (green/yellow/red), not an exact-phrase match. Untagged options are pure logistics (e.g. "which day"), not sentiment triage.
 
 ---
 
 ## SECTION 1 — Opener
-*id: opener | color: var(--accent-blue) | kind: opener*
+*id: opener | color: var(--accent) | kind: opener*
 
-**Node: confirm-business**
-SAY: "Hey, is this [Business Name]?"
-→ "Yes / speaking" → **node: indeed-ask**
-→ Wrong number / not them → END
-
-**Node: indeed-ask**
-SAY: "Hey — I saw y'all had an Indeed listing up. I was wondering who I should speak to about that?"
-→ "That's me / you got them" → **node: bridge**
-→ "Let me transfer you / that's [Name]" → **node: transferred**
-→ "What's this about?" → **node: permission-frame**
+**Node: open-and-ask** *(condensed from confirm-business + indeed-ask, Prompt 204 — one line does both jobs, no separate "is this you" beat before the listing ask)*
+SAY: "Hey, is this [Business Name]? I saw y'all had an Indeed listing up for a [receptionist / dispatcher / front desk]. I was wondering who I should speak to about that?"
+→ "That's me / you got them" `[GOOD]` → **node: bridge**
+→ "Let me transfer you / that's [Name]" `[HESITANT]` → **node: transferred**
+→ "What's this about?" `[HESITANT]` → **node: permission-frame**
+*("Wrong number / not them" is no longer a branch — Prompt 204: that response doesn't change the setter's next move, so it's not worth a click. Just mark Not Interested and move on.)*
 
 **Node: transferred**
 SAY: "Hey [Name] — yeah, I was just asking about your listing for a [receptionist / dispatcher / front desk]. Quick question about how you're handling calls while that search is going — you got a minute?"
-→ "Sure / yeah" → **node: bridge**
-→ "What is this?" → **node: permission-frame**
-→ "I'm busy" → **node: permission-frame**
+→ "Sure / yeah" `[GOOD]` → **node: bridge**
+→ "What is this? / I'm busy" `[HESITANT]` → **node: permission-frame**
 
 **Node: permission-frame**
 SAY: "I know this is out of nowhere — you can totally tell me you're slammed and I'll let you go. Quick question first though: while you're looking for that person, who's catching the phones when your team's tied up?"
-→ They engage → **node: bridge**
-→ "Not interested / goodbye" → END
+→ They engage `[GOOD]` → **node: bridge**
+→ "Not interested / goodbye" `[BAD]` → END
 
 **Node: bridge**
 SAY: "Quick question — while that search is going, what's actually happening right now when a call comes in and nobody's free to grab it?"
@@ -50,27 +46,21 @@ SAY: "Quick question — while that search is going, what's actually happening r
 ---
 
 ## SECTION 2 — Vitals Check
-*id: vitals | color: var(--accent-teal) | kind: branch*
+*id: vitals | color: var(--accent) | kind: branch*
+
+*Trimmed Prompt 204 — cut "how many calls are you getting" (redundant with the new direct missed-per-day ask) and "how often does that happen in a week" (redundant once a per-day figure is given), and merged "who picks it up" + "where does it go" into one line so the setter isn't marching through back-to-back volume questions. 9 lines → 7.*
 
 **Node: pov-opener**
 SAY: "Most [niche] owners I talk to, their crew's out on jobs and the calls are the thing that slips through the cracks the most — even after they've tried to fix it. Is that kind of the situation, or is it something different for you?"
-→ "Yeah, exactly / pretty much" → **node: current-setup**
-→ "A bit different for us..." → **node: current-setup**
+→ They answer → **node: current-setup**
 
-**Node: current-setup**
-SAY: "Walk me through what happens right now when a call comes in — who picks it up?"
-→ They answer → **node: volume**
+**Node: current-setup** *(merged with the old leakage question)*
+SAY: "Walk me through what happens right now when a call comes in — who picks it up, and where does it go if nobody's free? Voicemail, a cell, does it ever just not get answered at all?"
+→ They answer → **node: missed-per-day**
 
-**Node: volume**
-SAY: "On a normal day, how many calls are you getting in?"
-→ They answer → **node: leakage**
-
-**Node: leakage**
-SAY: "And when nobody gets to it, where does it go — voicemail, a cell? Does it ever just not get picked up at all?"
-→ They answer → **node: frequency**
-
-**Node: frequency**
-SAY: "How often does that happen — in a given week?"
+**Node: missed-per-day** *(replaces the old "how many calls are you getting" + "how often per week" pair — Prompt 204 fix 3)*
+SAY: "How many calls would you say you're missing a day?"
+⊞ CAPTURE: setter types in exactly the number the prospect says (a **daily** figure) — the app multiplies ×7 to store the weekly figure the pricing formula expects. No mental math for the setter, ever.
 → They answer → **node: ticket**
 
 **Node: ticket**
@@ -96,19 +86,18 @@ SAY: "What made now the time to post for this — was there a specific moment, o
 
 **Node: temperature-check**
 SAY: "So on one side — what's been slipping. On the other — every call caught, every job booked. What does that gap actually look like?"
-→ "They gave real numbers / engaged" → **node: consequence**
-→ "Vague / not sure / minimizing" → **node: name-pain**
-→ "We're fine / not a big deal" → SECTION 4 (node: handoff-bridge)
+→ "They gave real numbers / engaged" `[GOOD]` → **node: consequence**
+→ "Vague / not sure / minimizing" `[HESITANT]` → **node: name-pain**
+→ "We're fine / not a big deal" `[BAD]` → SECTION 4 (node: handoff-bridge)
 
 **Node: consequence**
 SAY: "So just to make sure I've got this right — when it goes to voicemail, that's not just a missed call. That's probably a job that goes to whoever picks up next. Is that kind of what you're seeing?"
-→ "Yeah, exactly" → **node: gap-build**
-→ "Sometimes / kind of" → **node: gap-build**
+→ "Yeah, exactly / sometimes" `[GOOD]` → **node: gap-build**
 
 **Node: name-pain**
 SAY: "Most [niche] owners I talk to, even when they feel on top of it, are losing three to five jobs a week they never even know about. Does that resonate at all, or do you feel like you've got it covered?"
-→ "Yeah, probably / fair" → **node: gap-build**
-→ "We're pretty good honestly" → SECTION 4 (node: handoff-bridge)
+→ "Yeah, probably / fair" `[GOOD]` → **node: gap-build**
+→ "We're fine / not a big deal" `[BAD]` → SECTION 4 (node: handoff-bridge)
 
 **Node: gap-build**
 SAY: "So on one side — [their number] calls a week going unanswered, [their estimate] per job. On the other side, every one of those gets picked up, every estimate gets booked. What does that gap look like over a month?"
@@ -139,12 +128,11 @@ SAY: "They're going to review your situation before the call and put together wh
 
 **Node: time-ask**
 SAY: "Does [Tuesday morning] or [Wednesday afternoon] work better for you?"
-→ "Tuesday / morning works" → **node: lock-time**
-→ "Neither / let me think" → SECTION 5 (node: obj-send-info)
-→ "Just send me some info" → SECTION 5 (node: obj-send-info)
-→ "I don't have time this week" → SECTION 5 (node: obj-no-time)
-→ "Who is this / what company?" → SECTION 5 (node: obj-who-is-this)
-→ "How much does this cost?" → SECTION 5 (node: obj-how-much)
+→ "Tuesday / morning works" `[GOOD]` → **node: lock-time**
+→ "Neither / let me think" `[HESITANT]` → SECTION 5 (node: obj-send-info)
+→ "I don't have time this week" `[HESITANT]` → SECTION 5 (node: obj-no-time)
+→ "Who is this / what company?" `[HESITANT]` → SECTION 5 (node: obj-who-is-this)
+→ "How much does this cost?" `[HESITANT]` → SECTION 5 (node: obj-how-much)
 
 **Node: lock-time**
 SAY: "What time on [day] works — morning or afternoon?"
@@ -165,13 +153,13 @@ SAY: "Got it. Our team will have everything you told me today in front of them b
 
 **Node: obj-send-info**
 SAY: "Yeah, totally — I can do that. The thing is, anything I send is going to be pretty generic. The stuff that actually matters is specific to what you just told me about your setup — that's exactly what our team would be working from. Easier to just grab 15 minutes and have them walk you through it directly."
-→ "Okay, fair" → **node: time-ask** (back to handoff)
-→ "I still want to see something first" → **node: obj-send-info-2**
+→ "Okay, fair" `[GOOD]` → **node: time-ask** (back to handoff)
+→ "I still want to see something first" `[HESITANT]` → **node: obj-send-info-2**
 
 **Node: obj-send-info-2**
 SAY: "Can I ask — are you actually going to read it? Because I know how packed inboxes get, and I don't want to put something together that just disappears in there. That's why I'd rather get you 15 minutes with someone who can actually answer your questions."
-→ "Okay fine" → **node: time-ask** (back to handoff)
-→ "Yeah, still want it" → **node: obj-send-info-3**
+→ "Okay fine" `[GOOD]` → **node: time-ask** (back to handoff)
+→ "Yeah, still want it" `[HESITANT]` → **node: obj-send-info-3**
 
 **Node: obj-send-info-3**
 SAY: "Okay — I'll send it over today. And I'm going to drop a 15-minute placeholder on your calendar for [day]. If you read it and it's not worth your time, just decline — no hard feelings. If it's interesting, we're already set."
@@ -179,8 +167,8 @@ SAY: "Okay — I'll send it over today. And I'm going to drop a 15-minute placeh
 
 **Node: obj-no-time**
 SAY: "No problem — what works better, [Tuesday of next week] or [Wednesday of next week]?"
-→ Picks a day → **node: lock-time** (back to handoff)
-→ "Those don't work either" → **node: obj-no-time-2**
+→ Picks a day `[GOOD]` → **node: lock-time** (back to handoff)
+→ "Those don't work either" `[HESITANT]` → **node: obj-no-time-2**
 
 **Node: obj-no-time-2**
 SAY: "Got it — what's a better week for you?"
@@ -192,8 +180,8 @@ SAY: "We work with [niche] businesses specifically on the call-coverage issue we
 
 **Node: obj-how-much**
 SAY: "Honestly depends on your call volume and setup — which is exactly what our team figures out on the call. That's why I didn't want to guess at a number before they've seen your actual situation."
-→ "Okay" → **node: time-ask** (back to handoff)
-→ "I just need a ballpark" → **node: obj-how-much-2**
+→ "Okay" `[GOOD]` → **node: time-ask** (back to handoff)
+→ "I just need a ballpark" `[HESITANT]` → **node: obj-how-much-2**
 
 **Node: obj-how-much-2**
 SAY: "The range is wide depending on what you need, which is exactly why the call is worth 15 minutes — they'll give you a real number based on what you just told me."
