@@ -64,6 +64,16 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### [CC | 2026-07-02 — Prompt 203 shipped · `48f30b7`] — "New" status badge fixed at its real shared source, not the page that reported it
+
+- Brayden reported "New" status badges in My Leads render grey while every other status matches its filter tab's color. The prompt pointed at `MyLeads.jsx`, but the actual color map lives in `Badge.jsx`'s shared `STATUS_STYLES` — `MyLeads.jsx`'s own `TAB_COLORS` comment already said it mirrors `Badge.jsx`, which was the tell.
+- Fixed `'New'` in `Badge.jsx` to use `--info` blue (matching `'Contacted'`'s existing pattern and the "New" tab), instead of adding a one-off override in `MyLeads.jsx`. Since `Badge.jsx` is shared, this also fixes "New" badges in `CloserLeads`, `CloserPipeline`, `CallLeads`, admin `Overview`, and `LeadCard` — not just My Leads. Scope decision: the prompt's own instruction ("reuse that value directly ... so they can't drift apart") pointed at fixing the shared source rather than a page-local patch.
+- Verified via `npx vite build` + an isolated static harness (scratchpad, not committed) — `preview_inspect` confirmed the badge and the tab resolve to the identical computed color.
+- **Lesson for [[Gotchas]]**: when a prompt names a specific file for a "should match X" color/style bug, check whether that file actually owns the value or just consumes a shared source (a comment referencing "mirrors X's colors" is usually the giveaway) — fixing the shared source is both less code and prevents the same drift from recurring elsewhere in the app.
+- LIVE_STATE queue is empty again.
+
+---
+
 ### [CC | 2026-07-02 — Prompts 201-202 shipped · `932f760`, `c1a49bb`] — multi-token lead search, feed/calls boxes shrunk by exactly one row
 
 - **201**: `MyLeads.jsx`'s search was a single-substring match (whole typed string had to appear verbatim in one field), so multi-word queries like "HVAC Nashville" failed whenever the words landed in different fields or in either order. Replaced with a tokenized AND match — split the query into lowercase whitespace tokens, build one combined lowercase haystack per lead (`business_name` + `contact_name` + `phone` + `city` + `niche`), require every token to appear somewhere in it. Verified with a standalone node script (cross-field two-word match, single-word match, no-match, empty-query cases) since the app itself still can't run locally.

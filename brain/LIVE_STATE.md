@@ -20,15 +20,13 @@ tags:
 
 ---
 
-### Prompt 203 — My Leads: "New" status badge isn't color-coded like the other statuses
+### ✅ Prompt 203 SHIPPED 2026-07-02 (`48f30b7`) — "New" status badge now matches the "New" tab's blue
 
-**Context (Brayden, 2026-07-02, live screenshot of `/rep`).** The status-tab filter row (New/Appointment Booked/Follow-Up/No Answer/Not Interested) already color-codes each label — "New" renders in the accent light-blue there. The other statuses' badges in the table's STATUS column are already colored to match their tab (green for Appointment Booked, etc. — confirm exact set while in the file). Only the "New" badge in the table is left grey/muted instead of matching its tab's blue.
-
-**Fix (`MyLeads.jsx`, wherever the STATUS column badge color is mapped):** add/fix the `New` case in that status→color map so it uses the same accent blue as the "New" filter tab (`--accent` per [[DESIGN]], or whatever exact token/class the tab itself uses — reuse that value directly rather than a new hardcoded color, so the tab and the badge can't drift apart).
-
-**Do NOT change:** the other status badge colors (already correct), tab styling/order, table layout, search (201) or any other column.
-
-**Verify:** `/rep` My Leads table — "New" status badges now render in the same light-blue as the "New" tab label, matching how the other statuses already match their tabs.
+- Found the actual color source: `Badge.jsx`'s shared `STATUS_STYLES` map (not `MyLeads.jsx` itself — `MyLeads.jsx`'s `TAB_COLORS` map has a comment noting it already mirrors `Badge.jsx`'s colors, so that was the single source of truth to fix).
+- `'New'` was grey/muted (`transparent` bg, `--text-secondary`) while `'Contacted'` and every other lead status already used a matching semantic color. Changed `'New'` to the same `--info` blue (`info-dim` bg, `info` text, `rgba(56,189,248,0.20)` border) as `'Contacted'` and the My Leads "New" filter tab — reusing the existing token pattern rather than inventing a new one.
+- Since `Badge.jsx` is the single shared color source across the app (confirmed via grep — used by `MyLeads`, `CloserLeads`, `CloserPipeline`, `CallLeads`, admin `Overview`, `LeadCard`, etc.), this fixes "New" status badges everywhere they render, not just My Leads — the correct scope per the fix's own "reuse that value so they can't drift apart" framing.
+- Verified two ways: `npx vite build` (passes) + an isolated static harness (scratchpad, not committed) rendering both the tab label and the badge with the real CSS variables — `preview_inspect` confirmed both resolve to the identical computed color `rgb(56, 189, 248)`.
+- No live browser check — same standing `.env.local` blocker as every session since 182.
 
 ---
 
