@@ -1,6 +1,6 @@
 ---
 date: 2026-07-03
-description: "Setter script v3 — SHIPPED live 2026-07-03 (Prompt 205, `b4d9cf3`). v3.1 warm-lead opener patch SHIPPED 2026-07-03 (Prompt 209, `8df9bfa`). v3.2 pain-math/job-title/hedge patch SHIPPED 2026-07-04 (Prompt 210, `a21cd6b`). v3.3 intro-recovery/indeed-hook/qualifier patch + calls_missed_per_week x5 SHIPPED 2026-07-04 (Prompt 211, `7190ac2` + `fce1857`)."
+description: "Setter script v3 — SHIPPED live 2026-07-03 (Prompt 205, `b4d9cf3`). v3.1 warm-lead opener patch SHIPPED 2026-07-03 (Prompt 209, `8df9bfa`). v3.2 pain-math/job-title/hedge patch SHIPPED 2026-07-04 (Prompt 210, `a21cd6b`). v3.3 intro-recovery/indeed-hook/qualifier patch + calls_missed_per_week x5 SHIPPED 2026-07-04 (Prompt 211, `7190ac2` + `fce1857`). v3.4 transferring option/qualifier trim/handoff+pitch rewrite SHIPPED 2026-07-04 (Prompt 212, `55f0564`)."
 tags:
   - brain
   - setter
@@ -72,6 +72,29 @@ SAY: "Quick question — are missed calls part of the reason you're posting for 
 → `[BAD]` "No, we've got it covered, just growing" → **node: on-top-of-it-check**
 
 **4. `calls_missed_per_week` capture multiplier changed `× 7` → `× 5`.** Added mid-session as a resolved (not proposed) item, once Brayden asked Falcon directly for a recommendation on the question Prompt 210 had left pending. Falcon's call: ×5, for consistency (the script now speaks a pain number on a 5-day basis) and defensibility (most Ohvara niches don't run a full 7-day call week). Implemented in `discoveryScript.js`'s Vitals `captures` config — same `capture.multiplier` mechanism Prompt 204 built, just the constant changed. `recommend-stack` needed no code change — it only consumes the value.
+
+---
+
+## ✅ v3.4 PATCH SHIPPED 2026-07-04 (Prompt 212, `55f0564`) — transferring option on indeed-hook, trim qualifier tail, cut "based on your pain" line, tailor the pitch
+
+Brayden walked four more Practice screens live, all shipped. Item 4 (the pitch rewrite) was confirmed with Brayden directly before building, per its own flag below.
+
+**1. Add a "Transferring" option to `indeed-hook`'s fork.** Currently only two options exist ("That's me" / "What's this about?"). Add a third — functionally identical to "That's me," same target, since being told "let me transfer you" at this point in the call doesn't change the next line once actually connected:
+
+**Node: indeed-hook** *(add third option, same target as "That's me")*
+→ `[GOOD]` "That's me" → **node: qualifier**
+→ `[GOOD]` "Transferring" *(NEW)* → **node: qualifier**
+→ `[BAD]` "What's this about?" / pushback → **node: disarm-early**
+
+**2. Trim `qualifier`'s SAY line — the doc's "or something like that" tail was Brayden talking to Falcon, not intended script text.**
+SAY: "Quick question — are missed calls part of the reason you're posting for this role, or are you just growing?" *(ends at "growing" — no tail)*
+
+**3. Cut "and I do this based on you and your pain" from `handoff-bridge`, smooth "service businesses" → "businesses just like yours."**
+SAY: "I don't want to waste your time here. I have a team that works with businesses just like yours. If you're missing [their number] calls a day and your average client's worth [$ticket], that's $[annual] you're leaving on the table every year from calls that just don't get picked up."
+
+**4. Add a tailored/personal framing to `pitch-receptionist`** — Brayden's ask: keep what's already there (he likes it), just make it feel built specifically around the fact they're hiring for this exact role, not a generic pitch. Explicitly rejected the obvious lazy version ("yeah, we fix your issue" — too open-ended/boring). Proposed opening reframe, rest unchanged:
+SAY: "Basically, instead of filling this role with a person, we'd build you an AI receptionist made for exactly this — not some robot press-one thing, a real human feel, we can even make it your voice — it catches the calls you'd otherwise miss, does missed-call text-back, answers questions, and books appointments straight to your calendar. All you'd have to do is show up to the meeting — and it means you might not even need to finish out this hire the way you'd planned."
+*(This is a creative-judgment rewrite, not a mechanical edit — Brayden should react to the exact wording before CC builds it, same as any content proposal in this doc.)*
 
 [[setter-transcripts-camden-cash]] · [[setter-script-v2-flow]] · [[ohvara-setter-discovery-script]] · [[LIVE_STATE]]
 

@@ -20,6 +20,16 @@ tags:
 
 ---
 
+### ✅ Prompt 212 SHIPPED 2026-07-04 (`55f0564`) — transferring option on indeed-hook, trim qualifier tail, cut "based on your pain" line, tailor the receptionist pitch
+
+- **`indeed-hook`'s fork gets a third option, "Transferring"** — same target as "That's me" (`qualifier`), added to BOTH occurrences of the indeed-hook subtree (main path + the intro-recovery duplicate from Prompt 211). No shared-node mechanism exists in this DSL, so both copies of the subtree got the new option independently, consistent with the file's existing duplication pattern.
+- **`qualifier`'s SAY line trimmed** — dropped the "or something like that" tail across all 8 occurrences (6 original + the 2 new "Transferring" copies), now ending cleanly at "...or are you just growing?"
+- **`handoff-bridge` cut "and I do this based on you and your pain"**, "[niche] businesses" → "businesses just like yours" (the `[niche]` token is now unused anywhere in the script — dropped from the file's header-comment token list too, since it was the only remaining usage).
+- **`pitch-receptionist` reframed** to open on "instead of filling this role with a person, we'd build you an AI receptionist made for exactly this..." — **confirmed the exact wording with Brayden before building**, per the doc's own flag that this was a creative-judgment call, not a mechanical edit.
+- Verified live via the standing temporary `/dev-script-preview` route (removed pre-commit): walked Yeah/speaking → indeed-hook → confirmed "Transferring" appears as a third option → clicked it → landed on the trimmed qualifier wording → Yeah → Vitals → Pain → Handoff, confirmed both the cut handoff-bridge line and the reframed pitch-receptionist line render as specced. `npx vite build` passes.
+
+---
+
 ### ✅ Prompt 211 SHIPPED 2026-07-04 (`7190ac2`, `fce1857`) — "No" recovery branch on intro, indeed-hook reverted to neutral, qualifier wording smoothed, calls_missed_per_week → ×5
 
 - Added a real third option to `intro`'s BRANCH: "No" → `intro-recovery` (SAY: "Okay — were you hiring for a [job title]?") → if they confirm/engage, `intro-recovery-check` (SAY: "Are you actively looking to hire for that?") → "Yes" re-enters the indeed-hook/qualifier/disarm-early subtree (duplicated inline — this DSL has no in-section node-reuse, only cross-section `route` jumps, so convergent paths get copied, matching the file's existing style), "No, not interested" ends the call. A genuinely-wrong-number response at `intro-recovery` also ends the call immediately.
