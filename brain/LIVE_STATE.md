@@ -20,6 +20,17 @@ tags:
 
 ---
 
+### ✅ Prompt 205 SHIPPED 2026-07-03 (`b4d9cf3`) — Camden Cash v3 script live, one design correction
+
+- Replaced `DISCOVERY_SCRIPT` with the v3 content from `brain/setter-script-v3-camden-style.md` — binary qualifier opener, do-the-math pain framing, direct AI-receptionist pitch, and a genuine clean-exit on real capacity objections (`obj-too-busy`'s BAD path, exactly as specced — no push, straight to Not Interested). All parsing/routing machinery untouched; added one new `routeTarget()` case (`opener`) for a gatekeeper-becomes-decision-maker backref, though in the end that specific path routes to Vitals directly instead (see below).
+- **New requirement the prompt implied but didn't spell out the math for:** v3's `[their number]`/`[monthly]`/`[annual]`/`[$ticket]` tokens needed live computation, not static substitution. Built this into `ScriptWalk.jsx`'s `renderText()` — `[their number]` is now the *raw daily* missed-call count (not the ×7'd weekly figure `[their number]` meant in v2), `[monthly]`/`[annual]` derive from `weekly_missed × 4.33 × ticket` (reusing the real pricing formula's weeks/month constant). This required adding a `captureLocal()` path so the raw daily number the setter types persists in shared state (previously it only lived in a component-local `useState` that couldn't reach later sections) — also fixes a latent bug where back-navigation lost the typed value.
+- **One deliberate simplification vs. the doc:** `obj-who-is-this`'s "That's me" (gatekeeper turns out to be the decision maker) routes straight to Vitals instead of back through the opener's `qualifier` node as the doc specified — the app's router jumps to a section's start, not an arbitrary node inside one, and re-asking the yes/no gate mid-objection-handling didn't make sense anyway (qualifier's own GOOD path is "go to Vitals"). Logged for Brayden's awareness, not re-litigated without direction.
+- Verified live via the same temporary preview-route technique as Prompt 204: full happy path Opener→Vitals→Pain→Handoff→Close, the `obj-too-busy` re-engage AND clean-exit legs, and the capture math end-to-end (typed "3" + "250" ticket → Pain line read "$22,733/mo, $272,796/yr, 3 missed calls a day" — exactly `21 × 4.33 × 250` and `×12`).
+- **Flagged for Brayden, not blocking:** those monthly/annual numbers run much bigger than Camden's own anecdotal example, because his was calls-missed-*per-month* and this script deliberately asks calls-missed-*per-day* — worth a gut-check once this runs on a few real calls.
+- `npx vite build` passes. `brain/setter-script-v2-flow.md` overwritten with the full v3 tree (same file, not renamed, per the prompt's instruction).
+
+---
+
 ### ✅ Prompt 204 SHIPPED 2026-07-03 (`1b8415c`) — opener combine root-caused, condensed opener, daily vitals capture, category-colored forks, canvas legibility
 
 - **Root cause of fix 1:** `SayWithFork`'s combine logic in `ScriptWalk.jsx` was gated `if (mode === 'live' && step?.type === 'say')` — Practice mode literally could never combine, by design, since Prompt 80. Removed the `mode === 'live'` gate; every say-then-fork pair now combines in both Practice and the live Call Now walk (same shared engine).

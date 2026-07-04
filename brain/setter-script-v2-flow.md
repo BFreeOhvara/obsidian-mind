@@ -1,209 +1,225 @@
 ---
 date: 2026-07-03
-description: "Complete branching setter script — pure say-this lines, no meta text, no closer name. Every node is something the setter reads out loud. Built from transcript research (S1–S5), condensed opener + trimmed vitals per Prompt 204. Source of truth mirrored in discoveryScript.js."
+description: "Complete branching setter script — pure say-this lines, no meta text, no closer name. Every node is something the setter reads out loud. v3: near-verbatim Camden Cash adaptation per Prompt 205, replacing the v2 transcript-research script. Source of truth mirrored in discoveryScript.js."
 tags:
   - brain
   - setter
   - sales-script
 ---
 
-# Setter Script v2 — Full Branching Flow
+# Setter Script v3 — Camden Cash, Near-Verbatim (shipped Prompt 205)
 
-> **Rules for implementation:**
+> **This overwrites the v2 (S1–S5 transcript-research) script per Brayden's approval — see [[setter-script-v3-camden-style]] for the full source spec with `[from: "..."]` quote attribution and the "why this had to diverge from pure verbatim" notes. This note is the DSL-translated version that mirrors `discoveryScript.js` exactly — read the v3 spec note for the reasoning, read this one for the exact shipped tree.**
+>
+> **Rules for implementation (unchanged since v2):**
 > - Every `say` node = exact words the setter reads out loud. Nothing else.
 > - No instructional text, no "do this," no coach notes on screen.
 > - No closer name. Use "our team" / "we" / "they."
 > - Branches = what the prospect said. Setter clicks what they heard → next say node.
-> - `[First Name]`, `[Business Name]`, `[niche]` = dynamic tokens.
-> - **Response categories (added Prompt 204):** every fork option is tagged `[GOOD]` / `[HESITANT]` / `[BAD]` in `discoveryScript.js` — the setter triages the prospect's real (unscripted) answer into whichever bucket it fits (green/yellow/red), not an exact-phrase match. Untagged options are pure logistics (e.g. "which day"), not sentiment triage.
+> - `[Business Name]`, `[niche]` = dynamic tokens filled from the lead.
+> - `[their number]` = raw daily missed-call count (the setter's own typed number, no math). `[monthly]`/`[annual]` = computed live (`weekly_missed × 4.33 × ticket`, weekly_missed itself the ×7'd daily figure — same weeks/month constant the real pricing formula uses). `[$ticket]` = dollar-formatted ticket value. All computed in `ScriptWalk.jsx`'s `renderText()`.
+> - **Response categories:** every sentiment fork option is tagged `[GOOD]`/`[HESITANT]`/`[BAD]` → colored via `CATEGORY_COLORS` (Prompt 204). Pure routing forks (who picked up, which objection) are left untagged.
 
 ---
 
 ## SECTION 1 — Opener
 *id: opener | color: var(--accent) | kind: opener*
 
-**Node: open-and-ask** *(condensed from confirm-business + indeed-ask, Prompt 204 — one line does both jobs, no separate "is this you" beat before the listing ask)*
-SAY: "Hey, is this [Business Name]? I saw y'all had an Indeed listing up for a [receptionist / dispatcher / front desk]. I was wondering who I should speak to about that?"
-→ "That's me / you got them" `[GOOD]` → **node: bridge**
-→ "Let me transfer you / that's [Name]" `[HESITANT]` → **node: transferred**
-→ "What's this about?" `[HESITANT]` → **node: permission-frame**
-*("Wrong number / not them" is no longer a branch — Prompt 204: that response doesn't change the setter's next move, so it's not worth a click. Just mark Not Interested and move on.)*
+**Node: intro** *(routing, no tags)*
+SAY: "Hey, is this [Business Name]?"
+→ "Yeah / speaking" → **node: indeed-hook**
+→ "Transferred" → **node: transferred**
 
-**Node: transferred**
-SAY: "Hey [Name] — yeah, I was just asking about your listing for a [receptionist / dispatcher / front desk]. Quick question about how you're handling calls while that search is going — you got a minute?"
-→ "Sure / yeah" `[GOOD]` → **node: bridge**
-→ "What is this? / I'm busy" `[HESITANT]` → **node: permission-frame**
+**Node: indeed-hook**
+SAY: "Hey — I saw y'all had an Indeed listing up for a [receptionist / dispatcher / front desk]. I was wondering who I should speak to about that."
+→ `[GOOD]` "That's me" → **node: qualifier**
+→ `[BAD]` "What's this about?" / pushback → **node: disarm-early**
 
-**Node: permission-frame**
-SAY: "I know this is out of nowhere — you can totally tell me you're slammed and I'll let you go. Quick question first though: while you're looking for that person, who's catching the phones when your team's tied up?"
-→ They engage `[GOOD]` → **node: bridge**
-→ "Not interested / goodbye" `[BAD]` → END
+**Node: transferred** *(routing, no tags)*
+SAY: "Hey [Name] — yeah, I saw your Indeed listing for a [receptionist]. I don't want to waste your time, seriously — got a sec?"
+→ "Engages" → **node: qualifier**
+→ "Pushback" → **node: disarm-early**
 
-**Node: bridge**
-SAY: "Quick question — while that search is going, what's actually happening right now when a call comes in and nobody's free to grab it?"
-→ They answer → SECTION 2 (node: pov-opener)
+**Node: disarm-early** *(reached from both indeed-hook's BAD path and transferred's pushback — repeated inline in discoveryScript.js, same as v2's shared-node convention)*
+SAY: "Nah, there's nothing to sell you, man — genuinely just a real quick question."
+→ `[GOOD]` "Engages" → **node: qualifier**
+→ `[BAD]` "Still shuts it down" → ▸ Set status Not Interested.
 
----
+**Node: qualifier** — the binary yes/no move (reached from indeed-hook/GOOD, transferred/engages, and disarm-early/GOOD — repeated inline in each place)
+SAY: "Do you want to stop missing calls — yes or no?"
+→ `[GOOD]` "Yeah" → SECTION 2 (Vitals)
+→ `[HESITANT]` "Depends" → SECTION 2 (Vitals)
+→ `[BAD]` "No, we've got it covered / pretty on top of it" → **node: on-top-of-it-check**
 
-## SECTION 2 — Vitals Check
-*id: vitals | color: var(--accent) | kind: branch*
+**Node: on-top-of-it-check**
+SAY: "You're pretty on top of it, I got you — is it more that calls just aren't the bottleneck right now, or you've got someone dedicated catching every one?"
+→ `[HESITANT]` "Answers, any gap surfaces" → SECTION 2 (Vitals)
+→ `[BAD]` "Genuinely solid, no gap" → **node: clean-exit-no-pain**
 
-*Trimmed Prompt 204 — cut "how many calls are you getting" (redundant with the new direct missed-per-day ask) and "how often does that happen in a week" (redundant once a per-day figure is given), and merged "who picks it up" + "where does it go" into one line so the setter isn't marching through back-to-back volume questions. 9 lines → 7.*
-
-**Node: pov-opener**
-SAY: "Most [niche] owners I talk to, their crew's out on jobs and the calls are the thing that slips through the cracks the most — even after they've tried to fix it. Is that kind of the situation, or is it something different for you?"
-→ They answer → **node: current-setup**
-
-**Node: current-setup** *(merged with the old leakage question)*
-SAY: "Walk me through what happens right now when a call comes in — who picks it up, and where does it go if nobody's free? Voicemail, a cell, does it ever just not get answered at all?"
-→ They answer → **node: missed-per-day**
-
-**Node: missed-per-day** *(replaces the old "how many calls are you getting" + "how often per week" pair — Prompt 204 fix 3)*
-SAY: "How many calls would you say you're missing a day?"
-⊞ CAPTURE: setter types in exactly the number the prospect says (a **daily** figure) — the app multiplies ×7 to store the weekly figure the pricing formula expects. No mental math for the setter, ever.
-→ They answer → **node: ticket**
-
-**Node: ticket**
-SAY: "Do you have a rough sense of what one of those calls is worth if it turns into a job?"
-→ They answer → **node: monthly-gap**
-
-**Node: monthly-gap**
-SAY: "So if a handful of those are slipping through every week — what's that running you a month?"
-→ They say a number → **node: previous-attempts**
-
-**Node: previous-attempts**
-SAY: "What's kept you from solving it before now — just the timing, or is it harder than it looks to find the right person?"
-→ They answer → **node: why-now**
-
-**Node: why-now**
-SAY: "What made now the time to post for this — was there a specific moment, or has it just been building?"
-→ They answer → SECTION 3 (temperature-check)
+**Node: clean-exit-no-pain**
+SAY: "Okay, well, that's a different story then. Okay man, well have a good day, good luck to you."
+→ ▸ Set status Not Interested.
 
 ---
 
-## SECTION 3 — Pain Amplification
-*id: pain | color: var(--accent-orange) | kind: branch*
+## SECTION 2 — Vitals
+*id: vitals | color: var(--accent) | kind: branch — capture nodes, no forks*
 
-**Node: temperature-check**
-SAY: "So on one side — what's been slipping. On the other — every call caught, every job booked. What does that gap actually look like?"
-→ "They gave real numbers / engaged" `[GOOD]` → **node: consequence**
-→ "Vague / not sure / minimizing" `[HESITANT]` → **node: name-pain**
-→ "We're fine / not a big deal" `[BAD]` → SECTION 4 (node: handoff-bridge)
+**Node: volume** *(rapport warm-up, not captured)*
+SAY: "Out of curiosity — don't mind the question, it'll make sense in a second, and you can hang up if this sounds irrelevant — how many calls do you think you get in a month?"
+→ answer → **node: missed**
 
-**Node: consequence**
-SAY: "So just to make sure I've got this right — when it goes to voicemail, that's not just a missed call. That's probably a job that goes to whoever picks up next. Is that kind of what you're seeing?"
-→ "Yeah, exactly / sometimes" `[GOOD]` → **node: gap-build**
+**Node: missed** *(direct daily-miss capture — `capture.multiplier: 7`, `rawField: calls_missed_per_day`. Setter types the raw daily number; the app silently converts ×7 into `calls_missed_per_week`, the real DB column the pricing formula reads. The raw daily number is what `[their number]` displays later.)*
+SAY: "Ballpark, how many do you think you're missing a day?"
+→ answer → **node: ticket**
+
+**Node: ticket** *(capture: `avg_ticket`)*
+SAY: "And what do you charge a client typically — like [$250] bucks?"
+→ answer → SECTION 3 (Pain)
+
+---
+
+## SECTION 3 — Pain
+*id: pain | color: var(--warning) | kind: branch*
+
+**Node: do-the-math** *(auto-advance, no fork)*
+SAY: "So check me out — you're potentially leaving what, like $[monthly] on the table every month. That's, I mean, $[annual] on the table every year from something like [their number] missed calls a day."
+→ [auto-advance] → **node: reflection**
+
+**Node: reflection**
+SAY: "Is that something you're doing anything about, or not really important to you?"
+→ `[GOOD]` "Engaged / yeah we should" → SECTION 4 (Handoff)
+→ `[HESITANT]` "Minimizes / we're fine" → **node: name-pain**
+→ `[BAD]` "Pushback, you're trying to sell me a service" → **node: disarm-2**
 
 **Node: name-pain**
-SAY: "Most [niche] owners I talk to, even when they feel on top of it, are losing three to five jobs a week they never even know about. Does that resonate at all, or do you feel like you've got it covered?"
-→ "Yeah, probably / fair" `[GOOD]` → **node: gap-build**
-→ "We're fine / not a big deal" `[BAD]` → SECTION 4 (node: handoff-bridge)
+SAY: "So if I called you — what time do you close at? [time]. If I called you at [time+1hr] and you're not able to get to the phone, why would I go to you versus somebody that can answer the phone?"
+→ `[GOOD]` "Engages" → SECTION 4 (Handoff)
+→ `[BAD]` "Still no" → **node: clean-exit-no-pain** (Pain-local — same wording as opener's, ▸ Set status Not Interested.)
 
-**Node: gap-build**
-SAY: "So on one side — [their number] calls a week going unanswered, [their estimate] per job. On the other side, every one of those gets picked up, every estimate gets booked. What does that gap look like over a month?"
-→ They say a number → **node: year-out**
+**Node: disarm-2**
+SAY: "Yeah, no, there's nothing to buy, man — I just happen to see you guys. I mean, $[annual] every year — is that like anything you're doing anything about, or not important?"
+→ `[GOOD]` "Re-engages" → SECTION 4 (Handoff)
+→ `[BAD]` "Still cold" → **node: compete-check**
 
-**Node: year-out**
-SAY: "If nothing changed — same volume, same leakage — what does that add up to by this time next year?"
-→ They answer → **node: flip**
-
-**Node: flip**
-SAY: "And if that gap closed — every call answered, no jobs slipping — what would that actually change for [Business Name] day to day?"
-→ They answer → SECTION 4 (node: handoff-bridge)
+**Node: compete-check** — labeling move
+SAY: "My question for you is — if you're leaving that much money on the table and not doing anything about it, how's that going to affect your ability to compete with everybody else in your area?"
+→ `[GOOD]` "Engages" → SECTION 4 (Handoff)
+→ `[BAD]` "Still no" → **node: clean-exit-no-pain** (Pain-local)
 
 ---
 
 ## SECTION 4 — Handoff
-*id: handoff | color: var(--accent-green) | kind: branch*
+*id: handoff | color: var(--success) | kind: branch*
 
-**Node: handoff-bridge**
-SAY: "Okay — here's what I want to do. Everything you just told me — the volume, what's slipping, your typical job value — I'm going to pass all of that to our team, who works specifically with [niche] businesses on this exact problem."
+**Node: handoff-bridge** *(auto-advance)*
+SAY: "I don't want to waste your time here. I have a team that works with [niche] businesses, and I do this based on you and your pain — if you're missing [their number] calls a day and your average client's worth [$ticket], that's $[annual] you're leaving on the table every year from calls that just don't get picked up."
+→ [auto-advance] → **node: pitch-receptionist**
 
-→ [auto-advance] → **node: frame-call**
-
-**Node: frame-call**
-SAY: "They're going to review your situation before the call and put together what would actually make sense for [Business Name] — not some generic package. It's 15 minutes."
-
+**Node: pitch-receptionist** *(auto-advance — the product description, near-verbatim)*
+SAY: "It'd be like an AI receptionist. Not some robot press-one thing — a real human, we can even make it your voice — and it funnels the calls you'd otherwise miss straight through. It can also do missed-call text-back. It answers questions and books appointments straight to your calendar, so all you have to do is show up to the meeting."
 → [auto-advance] → **node: time-ask**
 
-**Node: time-ask**
-SAY: "Does [Tuesday morning] or [Wednesday afternoon] work better for you?"
-→ "Tuesday / morning works" `[GOOD]` → **node: lock-time**
-→ "Neither / let me think" `[HESITANT]` → SECTION 5 (node: obj-send-info)
-→ "I don't have time this week" `[HESITANT]` → SECTION 5 (node: obj-no-time)
-→ "Who is this / what company?" `[HESITANT]` → SECTION 5 (node: obj-who-is-this)
-→ "How much does this cost?" `[HESITANT]` → SECTION 5 (node: obj-how-much)
-
-**Node: lock-time**
-SAY: "What time on [day] works — morning or afternoon?"
-→ They give time → **node: confirm-number**
-
-**Node: confirm-number**
-SAY: "[Day] at [time] — perfect. I'll send you a quick text right now to confirm. What's the best number for that?"
-→ They give number → **node: close-confirm**
-
-**Node: close-confirm**
-SAY: "Got it. Our team will have everything you told me today in front of them before the call — you won't have to re-explain anything."
-→ END ✅
+**Node: time-ask** *(only "picks a time" is tagged — the other 4 are routing into which objection got raised, not a sentiment fork)*
+SAY: "Take 15 minutes. Worst case scenario, you get to see what it looks like and stop wasting your time. Best case scenario, our team shows you exactly how you're leaving money on the table and how to fix it. How's that sound? [Tuesday morning] or [Wednesday afternoon]?"
+→ `[GOOD]` "Picks a time" → SECTION 6 (Close)
+→ "Just send me some info" → SECTION 5 (obj-send-info)
+→ "I don't have time this week" → SECTION 5 (obj-no-time)
+→ "Who is this / what company?" → SECTION 5 (obj-who-is-this)
+→ "How much does this cost?" → SECTION 5 (obj-how-much)
 
 ---
 
 ## SECTION 5 — Booking Objections
-*id: objections | color: var(--accent-purple) | kind: branch*
+*id: objections | color: var(--danger) | kind: branch*
+
+**Node: entry-chooser** *(added for the DSL — same convention v2 used: the app routes generically to "Objections," so the setter picks which objection actually came up from a top-level fork. Untagged — pure routing.)*
+SAY: BRANCH — "What's the objection?"
+→ "Too busy / on a job" → **node: obj-too-busy**
+→ "Just send me some info / want to see something first" → **node: obj-send-info**
+→ "Who is this / what company?" → **node: obj-who-is-this**
+→ "I don't have time this week" → **node: obj-no-time**
+→ "How much does this cost?" → **node: obj-how-much**
+
+**Node: obj-too-busy** — the "why are you on the phone" callout
+SAY: "Okay, well, if you're that busy, why are you on the phone with me and not on the job or taking care of something more important?"
+→ `[GOOD]` "Re-engages" → restates time-ask's line ("Take 15 minutes...") → SECTION 6 (Close)
+→ `[BAD]` "Genuinely a real 'we don't want more clients right now'" → "All right, man — you have a good one, take care." → ▸ Set status Not Interested. **(deliberate departure from v2 — a real capacity objection gets a clean exit, not a push)**
 
 **Node: obj-send-info**
-SAY: "Yeah, totally — I can do that. The thing is, anything I send is going to be pretty generic. The stuff that actually matters is specific to what you just told me about your setup — that's exactly what our team would be working from. Easier to just grab 15 minutes and have them walk you through it directly."
-→ "Okay, fair" `[GOOD]` → **node: time-ask** (back to handoff)
-→ "I still want to see something first" `[HESITANT]` → **node: obj-send-info-2**
+SAY: "I could send that over, but honestly — when was the last time an email did more for you than an actual conversation? Let's hop on a quick call instead, [time] tomorrow — I'll show you, there's nothing to buy."
+→ `[GOOD]` "Okay, fair" → "Does [Tuesday morning] or [Wednesday afternoon] work better for you?" → SECTION 6 (Close)
+→ `[HESITANT]` "Still wants info first" → **node: obj-send-info-2**
 
-**Node: obj-send-info-2**
-SAY: "Can I ask — are you actually going to read it? Because I know how packed inboxes get, and I don't want to put something together that just disappears in there. That's why I'd rather get you 15 minutes with someone who can actually answer your questions."
-→ "Okay fine" `[GOOD]` → **node: time-ask** (back to handoff)
-→ "Yeah, still want it" `[HESITANT]` → **node: obj-send-info-3**
+**Node: obj-send-info-2** *(single path)*
+SAY: "Fair enough — I'll send it over today. And I'm going to drop a 15-minute placeholder on your calendar for [day]. If you read it and it's not worth your time, just decline, no hard feelings. If it's interesting, we're already set."
+→ "Okay" → ▸ Set status Follow-Up (send info + placeholder).
 
-**Node: obj-send-info-3**
-SAY: "Okay — I'll send it over today. And I'm going to drop a 15-minute placeholder on your calendar for [day]. If you read it and it's not worth your time, just decline — no hard feelings. If it's interesting, we're already set."
-→ "Okay" → END (send email + placeholder)
+**Node: obj-who-is-this** *(routing, no tags)*
+SAY: "Who would be responsible for looking at any possible hidden gaps in your call flow system that could be causing you guys to miss out on thousands of dollars every month? Is that you?"
+→ "That's me" → SECTION 2 (Vitals) **(simplified from the v3 spec's "→ qualifier" — by this point they're mid-conversation about the real pain, re-asking the yes/no gate doesn't add anything; qualifier's own GOOD path is "go to Vitals" anyway, so this skips straight there)**
+→ "That's [owner]" → **node: gatekeeper-timing**
+
+**Node: gatekeeper-timing** *(routing, no tags)*
+SAY: "No worries — do you know a good time [owner] is usually in later this week?"
+→ "Gives a window" → ▸ Set status Follow-Up (log the callback window).
+→ "Only reachable by email" → **node: gatekeeper-email**
+
+**Node: gatekeeper-email** *(single path)*
+SAY: "No worries — what's the best email?"
+→ "Gives email" → ▸ Set status Follow-Up (logged email, thanked and exited).
 
 **Node: obj-no-time**
-SAY: "No problem — what works better, [Tuesday of next week] or [Wednesday of next week]?"
-→ Picks a day `[GOOD]` → **node: lock-time** (back to handoff)
-→ "Those don't work either" `[HESITANT]` → **node: obj-no-time-2**
+SAY: "No problem — what works better, [Tuesday next week] or [Wednesday next week]?"
+→ `[GOOD]` "Picks a day" → SECTION 6 (Close)
+→ `[BAD]` "Those don't work either" → **node: obj-no-time-2**
 
-**Node: obj-no-time-2**
+**Node: obj-no-time-2** *(single path)*
 SAY: "Got it — what's a better week for you?"
-→ They give a week → END (log callback)
-
-**Node: obj-who-is-this**
-SAY: "We work with [niche] businesses specifically on the call-coverage issue we just walked through. Our team builds out what that looks like for your exact setup — that's the point of the call."
-→ "Okay" → **node: time-ask** (back to handoff)
+→ "Gives a week" → ▸ Set status Follow-Up (log the week they gave).
 
 **Node: obj-how-much**
-SAY: "Honestly depends on your call volume and setup — which is exactly what our team figures out on the call. That's why I didn't want to guess at a number before they've seen your actual situation."
-→ "Okay" `[GOOD]` → **node: time-ask** (back to handoff)
-→ "I just need a ballpark" `[HESITANT]` → **node: obj-how-much-2**
+SAY: "Honestly depends on your call volume and setup — which is exactly what our team figures out on the call. Didn't want to guess at a number before they've seen your actual situation."
+→ `[GOOD]` "Okay" → "Does [Tuesday morning] or [Wednesday afternoon] work better for you?" → SECTION 6 (Close)
+→ `[HESITANT]` "Just need a ballpark" → **node: obj-how-much-2**
 
-**Node: obj-how-much-2**
+**Node: obj-how-much-2** *(single path)*
 SAY: "The range is wide depending on what you need, which is exactly why the call is worth 15 minutes — they'll give you a real number based on what you just told me."
-→ "Fine" → **node: time-ask** (back to handoff)
-
-**Node: obj-hard-stop**
-SAY: "No problem — sounds like the timing just isn't right. When would be better — is [next month] more realistic, or closer to [later season]?"
-→ They give a date → END (log callback)
+→ "Does [Tuesday morning] or [Wednesday afternoon] work better for you?" → SECTION 6 (Close)
 
 ---
 
+## SECTION 6 — Close
+*id: close | color: var(--accent) | kind: close*
+
+**Node: confirm-number** *(v3 collapses v2's separate "morning or afternoon" ask into this one line, since time-ask's own two options are already AM/PM-qualified)*
+SAY: "[Day] at [time] — I'm going to see what I can do for you. There's nothing, you don't got to buy anything. What's the best number so I can send you a quick text right now to confirm?"
+→ gives number → **node: close-confirm**
+
+**Node: close-confirm** *(terminal)*
+SAY: "Got it. Our team will have everything you told me today in front of them before the call — you won't have to re-explain anything."
+→ ▸ Set status Appointment Booked. Log the time and number.
+
+---
+
+## Where this diverges from pure Camden verbatim
+
+See [[setter-script-v3-camden-style]] for the full source-attributed rationale. Summary: no "ring a bell" name-drop (no public rep brand), no client-count/CEO framing (setter isn't the closer — "our team"), Indeed listing replaces his generic hook, setter always books the 15-minute call rather than closing on the spot.
+
 ## Token Reference
 
-| Token | Filled from |
-|-------|-------------|
-| `[First Name]` | Lead first name |
+| Token | Source |
+|-------|--------|
 | `[Business Name]` | Lead business name |
 | `[niche]` | Lead niche |
 | `[receptionist / dispatcher / front desk]` | Lead job posting type |
-| `[their number]` | Setter fills in during call |
-| `[their estimate]` | Setter fills in during call |
-| `[Tuesday morning]` / `[Wednesday afternoon]` | Current week + 1 |
-| `[day]` / `[time]` | What prospect picked |
+| `[Name]` / `[owner]` | Setter fills in verbally during the call |
+| `[day]` / `[time]` / `[time+1hr]` | What the prospect picked |
+| `[Tuesday morning]` / `[Wednesday afternoon]` / `[Tuesday next week]` / `[Wednesday next week]` | Current week + 1 |
+| `[their number]` | Computed — raw daily missed-call count as the setter typed it |
+| `[$ticket]` | Computed — dollar-formatted `avg_ticket` |
+| `[monthly]` / `[annual]` | Computed — `weekly_missed × 4.33 × ticket`, `× 12` for annual |
 
-[[ohvara-setter-discovery-script]] · [[LIVE_STATE]] · [[North Star]]
+**Known open item (flagged for Brayden, not blocking):** the monthly/annual pain numbers run noticeably larger than Camden's own anecdotal example, because his was calls-missed-*per-month* and this script asks calls-missed-*per-day* (an intentional Ohvara adaptation per the v3 spec) — worth a gut-check against real call data once a few of these run live.
+
+[[setter-script-v3-camden-style]] · [[setter-transcripts-camden-cash]] · [[ohvara-setter-discovery-script]] · [[LIVE_STATE]] · [[North Star]]
