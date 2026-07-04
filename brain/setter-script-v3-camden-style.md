@@ -1,6 +1,6 @@
 ---
 date: 2026-07-03
-description: "Setter script v3 — SHIPPED live 2026-07-03 (Prompt 205, `b4d9cf3`). This doc now also carries a v3.1 PATCH PROPOSAL to Section 1 (warm-lead opener) awaiting Brayden's confirmation before it goes back to CC."
+description: "Setter script v3 — SHIPPED live 2026-07-03 (Prompt 205, `b4d9cf3`). v3.1 warm-lead opener patch (Section 1) SHIPPED 2026-07-03 (Prompt 209, `8df9bfa`)."
 tags:
   - brain
   - setter
@@ -12,7 +12,7 @@ tags:
 
 > **Status: SHIPPED live in `discoveryScript.js` (Prompt 205, `b4d9cf3`).** Source: [[setter-transcripts-camden-cash]] (full transcript — no second Camden video available). Every SAY line has a `[from: "..."]` tag showing its exact source quote. Fork options are tagged `[GOOD]` / `[HESITANT]` / `[BAD]` matching `CATEGORY_COLORS` in `discoveryScript.js`.
 >
-> **⚠️ v3.1 PATCH PROPOSED below (Section 1 only) — NOT YET SHIPPED.** Brayden's 07-03 follow-up: the opener still reads like a blind cold call ("just happened to notice, nothing to sell you"), but Ohvara's setters aren't cold-calling — the business already told the world it has a coverage gap by posting the job. Camden has no equivalent video (no cold-caller targets businesses actively hiring for the exact role being pitched), so this section departs from pure verbatim on purpose. See "v3.1 — Warm-Lead Opener" below; Sections 2-5 are unchanged and still live as shipped.
+> **✅ v3.1 PATCH SHIPPED 2026-07-03 (Prompt 209, `8df9bfa`).** Brayden's 07-03 follow-up: the opener still read like a blind cold call ("just happened to notice, nothing to sell you"), but Ohvara's setters aren't cold-calling — the business already told the world it has a coverage gap by posting the job. Camden has no equivalent video (no cold-caller targets businesses actively hiring for the exact role being pitched), so this section departs from pure verbatim on purpose. Confirmed specifically via the qualifier line — Brayden wanted the binary yes/no kept but felt "Do you want to stop missing calls — yes or no?" was pushy; this patch's qualifier ("Are missed calls part of why you're posting for this role? Yes or no?") resolves that too. See "v3.1 — Warm-Lead Opener" below; Sections 2-5 are unchanged. **One shipped deviation from this doc:** the hook's self-introduction uses the existing `[Rep Name]` token, not this doc's `[First Name]` — `[First Name]` was never wired into `discoveryScript.js`'s `fillTokens()`, so using it verbatim would have shipped a literal unfilled placeholder into a live script.
 
 **Tagging rule applied below:** sentiment forks (how the prospect responded to a question) get `[GOOD]`/`[HESITANT]`/`[BAD]` tags. Pure routing forks (who picked up the phone, was it transferred) are left untagged — they're not a sentiment signal, just a path split.
 
@@ -29,7 +29,7 @@ Four unavoidable adaptations — everything else is his actual wording:
 
 ---
 
-## SECTION 1 — Opener (v3, as shipped — see v3.1 patch below for the proposed replacement)
+## SECTION 1 — Opener (v3 as originally shipped Prompt 205 — SUPERSEDED live by the v3.1 patch below, Prompt 209)
 *id: opener | color: var(--accent) | kind: opener*
 
 **Node: intro** *(routing, no color tags)*
@@ -65,7 +65,7 @@ SAY: "Do you want to stop missing calls — yes or no?"
 
 ---
 
-## v3.1 — Warm-Lead Opener (PROPOSED PATCH, Section 1 only)
+## v3.1 — Warm-Lead Opener (SHIPPED PATCH, Section 1 only — Prompt 209, `8df9bfa`)
 
 **Why this changes:** the shipped opener above still plays it coy — "just happened to notice," disarm the sales-pushback like the prospect might reasonably wonder why a stranger is asking about their call volume. But an Indeed-sourced lead already told us they're understaffed by posting the job. Pretending not to know why we're calling wastes the one advantage Ohvara has that Camden's blind cold-calls don't: **we already know they're hiring for the exact problem we solve.** No source video exists for this angle — Camden never targets businesses mid-hire for the role his pitch replaces — so this section is written fresh rather than adapted from a transcript line.
 
@@ -272,6 +272,6 @@ SAY: "The range is wide depending on what you need, which is exactly why the cal
 - `obj-too-busy`'s clean exit on a real "we don't want more clients" objection is new behavior vs. today's script (which pushes through most objections) — confirm you want setters to actually drop a lead on this specific objection rather than logging it as a callback.
 - No second Camden video exists (he doesn't have another live-cold-call-for-AI-receptionist video) — this is built entirely from the one call plus his supporting commentary. If a different creator's example ever gets found, treat it as a v4 pass rather than trying to force it into this one.
 
-**Status: Prompt 205 shipped the base v3 script live.** The v3.1 warm-lead opener patch above is proposed, not yet confirmed by Brayden or queued for CC — queue it as Prompt 207 once he signs off on the wording. Separately, Prompt 206 (canvas legibility, Fable 5 recommended) is queued in [[LIVE_STATE]] for the Script tab's canvas view, which is still hard to read per Brayden's 07-03 screenshot even after Prompt 204's fix attempt.
+**Status: both the base v3 script (Prompt 205, `b4d9cf3`) and the v3.1 warm-lead opener patch (Prompt 209, `8df9bfa`) are shipped live.** The Script tab's canvas view (the reason Prompt 206/208 existed) has since been replaced twice over — first with a text outline (Prompt 208), then with a direct Practice-mode landing (Prompt 209) — see [[LIVE_STATE]].
 
 [[setter-transcripts-camden-cash]] · [[setter-script-v2-flow]] · [[ohvara-setter-discovery-script]] · [[LIVE_STATE]]

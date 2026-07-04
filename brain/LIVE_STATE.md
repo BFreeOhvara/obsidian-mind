@@ -20,6 +20,17 @@ tags:
 
 ---
 
+### ✅ Prompt 209 SHIPPED 2026-07-03 (`8df9bfa`) — Script tab = Practice directly; two root-caused Practice bugs; v3.1 opener patch live
+
+- Script tab (`TrainingCenter.jsx`) and `CloserScript.jsx` now render `ScriptWalk` `mode="practice"` directly (starting at the Opener) instead of `ScriptOutline` — no accordion/landing view in front of it. `ScriptOutline.jsx` had exactly those two call sites; both swapped, so it's fully dead — deleted (grepped first to confirm zero remaining imports). `CloserScript.jsx` keys `ScriptWalk` on the active sub-tab (`key={tab}`) so switching Closer/Setter remounts fresh instead of reusing the other script's stale stack/index position.
+- **Root cause, fork colors only visible on hover:** `CATEGORY_COLORS` values are `var(--success)`-style CSS var references, and the option buttons' resting border appended a hex alpha suffix straight onto that string (`` `${c}55` `` → e.g. `var(--success)55`) — invalid CSS, silently dropped by the browser. Only the hover handler's plain `c` assignment (valid) ever painted a colored border. Fixed: resting border is now solid-colored by default in both `Fork` and `SayWithFork`; hover just brightens via `filter` now instead of the broken alpha hack.
+- **Root cause, recurring "Go to Vitals" stopover screens:** `advanceThenPick` (the combined say+fork handler Prompt 204 added) never called `followRouteIfNeeded`, unlike `advance()`/`chooseOption()` — so an option landing on a route step via a combined screen (e.g. the qualifier's `[GOOD]` path) showed a standalone `RouteCard` needing an extra tap. Added the same check there. Verified live: qualifier `[GOOD]` now lands directly on Vitals' first question.
+- Removed the per-screen italic coaching-note paragraph (`section.tips`) from Practice mode entirely — that field is untouched and still feeds `buildCallScript`'s SAY-THIS stepper elsewhere.
+- Applied the confirmed v3.1 warm-lead opener patch (folds in Prompt 207) to `discoveryScript.js`: new qualifier "Are missed calls part of why you're posting for this role? Yes or no?" at all 4 occurrences, revised indeed-hook/transferred/disarm-early SAY lines, relabeled qualifier answer options, added the "might not even need to finish out this hire" line to Handoff. **Deviation from the doc, flagged:** used the existing working `[Rep Name]` token instead of the doc's `[First Name]` (never wired into `fillTokens()` — would've shipped a literal unfilled placeholder).
+- Verified live via the standing temporary `/dev-script-preview` route (Chrome MCP, removed pre-commit): both surfaces land directly in Practice at the Opener, new qualifier wording confirmed on screen, fork colors visible at rest, qualifier `[GOOD]` path has no stopover, Closer↔Setter tab switch resets cleanly. `npx vite build` passes.
+
+---
+
 ### ✅ Prompt 208 SHIPPED 2026-07-03 (`aae99c3`) — canvas replaced with a text outline; no connector lines, nothing left to overlap
 
 - New `ScriptOutline.jsx`: collapsible per-section accordions, left-border color-coded to each section's token. Hierarchy is indentation only — SAY lines, fork questions, and options (color-coded dot via `CATEGORY_COLORS` for tagged options, neutral outline dot for untagged routing forks) nest by depth. No SVG/canvas connectors anywhere, so nothing can visually cross or overlap — this sidesteps the whole problem class Prompts 204/206 kept fighting.
@@ -39,14 +50,6 @@ tags:
 - **Verified (rule #11), via the temporary preview-route + Chrome MCP pattern:** programmatic overlap check across all 54 rendered nodes (real DOM rects, zoom-independent) = **zero overlaps**; the whole 5011×2111 graph fits at default zoom (~0.27) with nothing cut off; full-canvas screenshot at default zoom + Booking Objections block zoomed (clean layered tree, category-colored edges, every line readable) + opener block zoomed (dedup visible — one qualifier node with multiple colored edges converging); node click still enters practice mode at the right section.
 - Honest caveat on the "every node readable at default zoom" criterion: at full-fit zoom (~0.27) the *structure* is clean and complete but paragraph-length SAY text is too small to read — that's physics for 54 sentence-length nodes, not layout. One scroll-wheel notch in makes any block fully readable with zero hunting/rearranging, which is the substance of the ask.
 - `npx vite build` passes.
-
----
-
-### Prompt 207 (DRAFTED, NOT YET CONFIRMED — do not build until Brayden signs off) — Warm-lead opener rewrite (Section 1 only)
-
-Brayden's feedback on the live v3 script: it still opens like a blind cold call ("just happened to notice, nothing to sell you"), but Ohvara's setters are calling businesses that already told the world they have a coverage gap by posting the job — that should be used as leverage, not hidden. Proposed rewrite is written out in full in **`brain/setter-script-v3-camden-style.md`** under "v3.1 — Warm-Lead Opener" (revised `indeed-hook`/`transferred`/`disarm-early`/`qualifier` nodes, plus one added line to Handoff's `pitch-receptionist` node tying the pitch back to the hire itself). Sections 2-5 are untouched.
-
-**Do not queue this for execution until Brayden explicitly confirms the wording** — it's a content proposal awaiting his reaction, not a decided change like Prompt 205 was. Once confirmed, this is a small, surgical content edit (4 nodes' SAY text + fork option labels in Section 1, one appended sentence in Section 4) — no machinery changes, same pattern as Prompt 205.
 
 ---
 
