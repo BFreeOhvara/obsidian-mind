@@ -20,6 +20,15 @@ tags:
 
 ---
 
+### ✅ Prompt 215 SHIPPED 2026-07-04 (`12f0619`) — merged say-chains render as ONE continuous block; Handoff's 3-line chain split into 2 screens
+
+- `SayCard`/`SayWithFork`/new `SayChain` now share one `SayBlock` renderer — a merged chain (Pain's 2-line do-the-math+reflection, Handoff's bridge+pitch) shows as one continuous bordered card, not N stacked boxes. Confirmed live via `parentElement` equality on the rendered paragraphs.
+- Added an authorable `[[BREAK]]` line-marker (discoveryScript.js `makeStep()`) that caps a say-chain before it reaches a fork. Applied only to Handoff's `pitch-receptionist` line: screen A = bridge+pitch as one block ending in a plain Next; screen B = `time-ask` alone as its own block + the existing 5-option fork (colors unchanged from Prompt 214). Pain's 2-line chain has no marker — stays merged as a single screen, just one-block now.
+- `ScriptWalk.jsx`: generalized the chain-scan to track `brokeEarly`; a screenBreak before a fork produces `sayChainPlain` (merged block + plain Next via new `advanceTo()`) instead of `sayChainForFork`.
+- Verified live via the standing temporary `/dev-script-preview` route (removed pre-commit): full Opener→Vitals→Pain→Handoff walk; Pain's 2 lines confirmed sharing one parent block; Handoff now 2 screens (bridge+pitch block+Next, then ask+fork); fork colors and "Picks a time"→Close unaffected. `npx vite build` passes. See [[Memories]] for full detail.
+
+---
+
 ### ✅ Prompt 214 SHIPPED 2026-07-04 (`7d3014f`) — Handoff fork color-split, handoff-bridge math restate trimmed, 3 bare-Next time re-asks fixed
 
 - Root-caused the "all 5 green" report: Handoff's own section accent IS `var(--success)` green, so untagged fork options (Prompt 213's newly-embedded objections) fell back to it by coincidence. Tagged per Falcon's proposed split: "Just send me some info"/"I don't have time this week" → `[HESITANT]` amber; "Who is this / what company?"/"How much does this cost?" → `[BAD]` red; "Picks a time" stays `[GOOD]` green. Confirmed live via computed border-color check.

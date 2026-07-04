@@ -64,6 +64,30 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-04 (cont. 6) — Falcon session: merged chains should be one continuous block, not stacked boxes; Handoff split into 2 screens (Prompt 215 queued)
+
+**What happened:** Brayden reviewed Handoff live post-Prompt 214 and flagged that the merged chain (Prompt 213's fix) renders as three separate bordered boxes stacked on one screen, which visually reads as three distinct response moments even though only the last one (the ask) is a real decision point — the "not smooth"/"throws it off" feeling. He proposed two options and asked which was better: split it back into separate steps, or cram it into one box. Neither, exactly — diagnosed it as a presentation problem, not a pacing problem, and proposed a third option he then confirmed:
+
+1. **Render any merged chain as ONE continuous text block, not N separate boxes** — applies everywhere Prompt 213's merging happens (Pain's 2-line chain included), fixes the "looks like multiple response points" confusion at the source without touching pacing.
+2. **Handoff's 3-line chain specifically is long enough to also split into 2 screens** — bridge+pitch as one block ending in a plain Next, then the ask as its own block+fork. Pain's shorter 2-line chain doesn't need the same split, just the one-block rendering fix.
+
+Queued as **Prompt 215**. Framed clearly in the prompt as NOT a revert of Prompt 213 — the chain-merge logic stays, this is purely about how a merged chain is visually presented, plus one deliberate length-based exception for Handoff.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 215 (merged chains render as one block not stacked boxes; split Handoff's 3-line chain into 2 screens) is queued for CC in LIVE_STATE.`
+
+---
+
+### [CC | 2026-07-04 — Prompt 215 shipped · `12f0619`] — merged say-chains now render as one continuous block; Handoff's 3-line chain split into 2 screens
+
+- **Root cause of the "throws it off" feeling:** `SayWithFork` mapped each say line in a merged chain to its OWN bordered `<div>` — visually three distinct response-moment cards stacked on one screen, even though only the last line was an actual decision point. Refactored `SayCard`/`SayWithFork`/the new `SayChain` to share one `SayBlock` renderer: all lines in a merged run now sit inside a single bordered card as separate `<p>`s, confirmed live via `parentElement` equality checks (Pain's 2-line chain, Handoff's bridge+pitch chain both share one parent node now).
+- **Added an authorable `[[BREAK]]` line-marker** (discoveryScript.js `makeStep()`) that caps a say-chain before it reaches a fork, instead of the chain-scan always running all the way to the next fork. Applied it to the end of Handoff's `pitch-receptionist` line only — splits the 3-line chain into screen A (bridge+pitch, one block, plain Next) and screen B (`time-ask` alone, one block + the existing 5-option fork). Pain's 2-line chain has no marker, so it stays merged as a single screen (just one-block now instead of two boxes), per the prompt's explicit scoping.
+- **`ScriptWalk.jsx` mechanics:** generalized the `sayChainForFork` scan to also track `brokeEarly` — if a screenBreak step is hit before a fork, the run becomes `sayChainPlain` (merged block + plain Next advancing past the whole run) instead of `sayChainForFork`. Added `advanceTo(targetIndex)` (refactored `advance()` to call it with `+1`) so the plain-Next case can jump multiple steps at once rather than one at a time.
+- Verified live via the standing temporary `/dev-script-preview` route (removed pre-commit): full Opener→Vitals→Pain→Handoff walk; confirmed Pain's 2 lines share one parent block; confirmed Handoff now shows bridge+pitch as one block ending in a plain Next, then time-ask alone + fork (colors still correct — green/amber/amber/red/red) on the next screen; "Picks a time" still lands directly on Close. `npx vite build` passes.
+- LIVE_STATE queue empty — nothing further queued from Falcon as of this session.
+
+---
+
 ### [CC | 2026-07-04 — Prompt 214 shipped · `7d3014f`] — Handoff fork color-split, handoff-bridge math-restate trimmed, 3 bare-Next time re-asks fixed
 
 - **Root cause of the "all 5 options green" report:** the Handoff section's own accent color IS `var(--success)` (green) — untagged fork options fall back to the section accent, so Prompt 213's newly-embedded objection options (never tagged) rendered the same green as the real `[GOOD]` "Picks a time" option, just by coincidence of the section's color. Tagged the 4 objection options per Falcon's proposed split, confirmed live: "Just send me some info" / "I don't have time this week" → `[HESITANT]` amber; "Who is this / what company?" / "How much does this cost?" → `[BAD]` red; "Picks a time" stays green.
