@@ -64,6 +64,23 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-03 (cont. 3) — Falcon session: canvas legibility still broken (Fable 5 flagged) + warm-lead opener patch proposed
+
+**What happened:** Brayden reviewed the live shipped v3 script (Prompt 205) two ways — the Script tab canvas view, and the actual call flow himself — and raised two separate issues.
+
+**1. Canvas is still illegible after Prompt 204's fix.** Screenshot shows inconsistent spacing (huge gaps in some areas, tightly overlapping/text-covering-text clusters in others), doesn't give a readable full-script overview. This is the second attempt at the same problem class — Prompt 204 fix 5 already tried a `minZoom`/spacing constant tweak and it didn't hold up once real branch density varied across the tree. **Queued as Prompt 206 in [[LIVE_STATE]], explicitly recommending Fable 5 over Sonnet** per the standing model-routing rule and the repeat-stuck self-flag convention — this likely needs an actual auto-layout rework, not another constant tweak.
+
+**2. Strategic content gap: the opener still plays it coy like a blind cold call.** Brayden's key insight: Ohvara's setters aren't cold-calling — the Indeed listing means the business already told the world it has a coverage gap. Camden's transcript has no equivalent (he never targets businesses mid-hire for the exact role his pitch replaces), so there's no source video to adapt from here — this needed original judgment, not a transcript port. Proposed a "v3.1 — Warm-Lead Opener" patch in [[setter-script-v3-camden-style]]: the hook states the real reason for the call up front instead of "just happened to notice," the disarm reframes around "before you spend time/money hiring" instead of feigning ignorance, the binary qualifier gets repointed at the actual premise ("are missed calls part of why you're posting this role, yes or no?"), and one line gets added to Handoff tying the pitch back to the hire itself ("you might not even need to finish out this hire"). Sections 2-5 unaffected.
+
+**Deliberately NOT queued as an executable CC prompt yet** — written up as Prompt 207 in [[LIVE_STATE]] but explicitly marked "do not build until Brayden confirms the wording," since this is a content proposal awaiting his reaction, unlike Prompt 205 which was an already-decided change.
+
+**Also on record, not urgent:** CC flagged in the Prompt 205 log that the new per-day-missed-calls math produces monthly/annual pain numbers much larger than Camden's own anecdotal example (~$22K/mo vs his ~$3K/mo) — worth a gut-check once this runs on real calls, may read as inflated. Not raised by Brayden this session; noted here so it doesn't get lost.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 206 (canvas legibility, Fable 5 recommended) is queued for CC. Prompt 207 (warm-lead opener patch) is drafted in setter-script-v3-camden-style.md but needs Brayden's explicit confirmation before it's actually queued for CC to build.`
+
+---
+
 ### [CC | 2026-07-03 — Prompt 205 shipped · `b4d9cf3`] — Camden Cash v3 script live, computed pain tokens, one routing simplification
 
 - Replaced `DISCOVERY_SCRIPT` in `discoveryScript.js` with the full v3 tree from [[setter-script-v3-camden-style]] — binary "stop missing calls, yes or no?" qualifier opener, do-the-math pain framing, direct AI-receptionist product pitch, and the specced clean-exit on a genuine "we don't want more clients" objection (no push, straight to Not Interested — a real behavior change from the old script). Pure content/DSL-translation swap — `fillTokens`, `buildScriptFlow`, `parseSteps`, `capture`/`captures` mechanism all untouched.

@@ -20,6 +20,24 @@ tags:
 
 ---
 
+### Prompt 206 (QUEUED 2026-07-03, Falcon) — Script tab canvas is still illegible after Prompt 204's fix — recommend Fable 5, not Sonnet
+
+Brayden screenshotted the live Script tab canvas (`/rep/training`, Script → the node-graph view) and it's still broken after Prompt 204's fix 5 (which raised `minZoom` to 0.32 and widened `COL`/`ROW` spacing in `ScriptCanvas.jsx`). Current symptoms, from the screenshot: wildly inconsistent spacing — some node groups have huge empty gaps between them, others are tightly clustered with boxes overlapping and covering each other's text, and the overall layout doesn't give a readable overview of the full script without extensive manual pan/zoom (reads as "doesn't show the complete script").
+
+**This is the second attempt at essentially the same class of problem (canvas layout/spacing).** Per the standing model-routing rule (Sonnet for small fixes and routine tasks, Fable 5 for bigger autonomous builds) and the self-flag convention for repeat-stuck problems — recommend running this one on **Fable 5** rather than Sonnet. A single spacing-constant tweak already failed to hold up once; this likely needs an actual layout-algorithm rework (proper auto-layout — e.g. a real tree/DAG layout pass sized to each node's real text length and fork-option count, not fixed column/row constants that break down once branch density varies across the tree), which is a bigger, more autonomous build than a one-line constant change.
+
+**What "done" looks like:** every node in the tree readable at a sensible default zoom without manual rearrangement, consistent spacing regardless of how many forks/children a given branch has, no text-covering-text overlaps anywhere in the tree (including the denser Booking Objections branch), and the full script visible/navigable without needing to hunt for hidden nodes. Screenshot the whole canvas at default zoom plus the densest branch zoomed in, both via Chrome MCP, before marking done (rule #11).
+
+---
+
+### Prompt 207 (DRAFTED, NOT YET CONFIRMED — do not build until Brayden signs off) — Warm-lead opener rewrite (Section 1 only)
+
+Brayden's feedback on the live v3 script: it still opens like a blind cold call ("just happened to notice, nothing to sell you"), but Ohvara's setters are calling businesses that already told the world they have a coverage gap by posting the job — that should be used as leverage, not hidden. Proposed rewrite is written out in full in **`brain/setter-script-v3-camden-style.md`** under "v3.1 — Warm-Lead Opener" (revised `indeed-hook`/`transferred`/`disarm-early`/`qualifier` nodes, plus one added line to Handoff's `pitch-receptionist` node tying the pitch back to the hire itself). Sections 2-5 are untouched.
+
+**Do not queue this for execution until Brayden explicitly confirms the wording** — it's a content proposal awaiting his reaction, not a decided change like Prompt 205 was. Once confirmed, this is a small, surgical content edit (4 nodes' SAY text + fork option labels in Section 1, one appended sentence in Section 4) — no machinery changes, same pattern as Prompt 205.
+
+---
+
 ### ✅ Prompt 205 SHIPPED 2026-07-03 (`b4d9cf3`) — Camden Cash v3 script live, one design correction
 
 - Replaced `DISCOVERY_SCRIPT` with the v3 content from `brain/setter-script-v3-camden-style.md` — binary qualifier opener, do-the-math pain framing, direct AI-receptionist pitch, and a genuine clean-exit on real capacity objections (`obj-too-busy`'s BAD path, exactly as specced — no push, straight to Not Interested). All parsing/routing machinery untouched; added one new `routeTarget()` case (`opener`) for a gatekeeper-becomes-decision-maker backref, though in the end that specific path routes to Vitals directly instead (see below).
