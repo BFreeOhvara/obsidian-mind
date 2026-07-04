@@ -20,6 +20,18 @@ tags:
 
 ---
 
+### ✅ Prompt 208 SHIPPED 2026-07-03 (`aae99c3`) — canvas replaced with a text outline; no connector lines, nothing left to overlap
+
+- New `ScriptOutline.jsx`: collapsible per-section accordions, left-border color-coded to each section's token. Hierarchy is indentation only — SAY lines, fork questions, and options (color-coded dot via `CATEGORY_COLORS` for tagged options, neutral outline dot for untagged routing forks) nest by depth. No SVG/canvas connectors anywhere, so nothing can visually cross or overlap — this sidesteps the whole problem class Prompts 204/206 kept fighting.
+- **Dedup** reuses Prompt 206's approach: content-hash of each step sequence; a repeated identical subtree (the qualifier reachable 3 ways, several objection branches re-converging on the "Tuesday or Wednesday" re-ask) renders `same path as above — "<quoted first line>"` instead of repeating the full subtree.
+- **Real bug caught in verification:** first draft nested a `role="button"` span (the "Practice this section" trigger) INSIDE the section header's actual `<button>` element — invalid HTML, and it silently ate the inner click (confirmed via a real click test before I'd have shipped it blind). Fixed to two sibling `<button>`s in the header row: one for collapse-toggle, one for practice.
+- **`ScriptWalk.jsx`/practice mode/Call Now untouched**, per Brayden's twice-repeated instruction — `ScriptOutline` reuses the identical `PracticeView` shell (`ScriptWalk` `mode="practice"`) and the same section-level click contract the canvas already had (both only ever supported jumping to a section's start, not a specific node — `ScriptWalk`'s API has no finer granularity, so this isn't a regression).
+- Swapped both real usages: `TrainingCenter.jsx`'s Script tab AND `CloserScript.jsx` (which renders the linear, fork-free closer script through the same component — verified both render correctly, live).
+- **Cleanup done in this same prompt** (not deferred): removed `ScriptCanvas.jsx`, `@dagrejs/dagre` (Prompt 206), and `@xyflow/react` (Prompt 48/61) — grepped first, zero remaining imports of any of the three. No competing "map" implementation left in the repo. Bundle dropped from ~1.69MB to ~1.52MB (pre-existing >500kB chunk warning persists — confirmed unrelated to these deps specifically, still present after removal).
+- **Verified live** (temp preview route + Chrome MCP, removed pre-commit): Opener section screenshotted showing the deduped qualifier reference; Booking Objections showing its converging re-ask reference; the linear closer script rendering correctly through the same component; click-to-practice entering/exiting correctly after the button-nesting fix. `npx vite build` passes.
+
+---
+
 ### ✅ Prompt 206 SHIPPED 2026-07-03 (`b72b5f1`, ran on Fable 5 per the prompt's routing call) — script canvas rebuilt on real auto-layout; zero overlaps, full script now on canvas
 
 - **Three root causes found, none of which a spacing constant could fix:** (1) the fixed `ROW=174` vertical step ignored real node heights — v3's long SAY lines wrap to ~200px+ at the fixed 240px node width, so the next node physically covered them, while short pill nodes left oversized gaps (both of Brayden's symptoms at once); (2) the opener rendered as ONE card showing only its first line — v3's entire Section 1 decision tree was literally not on the canvas, which is most of "doesn't show the complete script"; (3) naive expansion of that tree would've been ~18 columns wide because the script DSL inlines identical subtrees (the qualifier subtree appears 4×).
