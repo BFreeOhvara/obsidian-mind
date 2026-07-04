@@ -20,6 +20,16 @@ tags:
 
 ---
 
+### ✅ Prompt 211 SHIPPED 2026-07-04 (`7190ac2`, `fce1857`) — "No" recovery branch on intro, indeed-hook reverted to neutral, qualifier wording smoothed, calls_missed_per_week → ×5
+
+- Added a real third option to `intro`'s BRANCH: "No" → `intro-recovery` (SAY: "Okay — were you hiring for a [job title]?") → if they confirm/engage, `intro-recovery-check` (SAY: "Are you actively looking to hire for that?") → "Yes" re-enters the indeed-hook/qualifier/disarm-early subtree (duplicated inline — this DSL has no in-section node-reuse, only cross-section `route` jumps, so convergent paths get copied, matching the file's existing style), "No, not interested" ends the call. A genuinely-wrong-number response at `intro-recovery` also ends the call immediately.
+- `indeed-hook` reverted to a neutral ask using the real `[job title]` token: "Hey — I saw you were hiring for a [job title]. I was wondering who I should speak to about that." Dropped the diagnostic clause per Brayden's reasoning (don't imply anything before confirming the decision-maker). Fork option relabeled "Sure / yeah" → "That's me" to match the doc; targets unchanged. `transferred`'s SAY line still has its diagnostic clause — deliberately untouched, flagged in the doc as Brayden's own open call, not silently matched.
+- `qualifier` reworded across all 5 occurrences (2 original + 2 under Transferred + 1 new one for the intro-recovery path) to drop the "yes or no?" tag: "Quick question — are missed calls part of the reason you're posting for this role, or are you just growing or something like that?" Same 3 fork options/targets unchanged.
+- **`calls_missed_per_week`'s capture multiplier changed `×7` → `×5`** in `discoveryScript.js`'s Vitals `captures` config — Brayden's resolved decision (item 4, added to the queue mid-session): matches the real recommend-stack pricing input to the same workweek basis the Prompt 210 pain-math already uses. `recommend-stack` itself needed no change — it just consumes the value.
+- Verified live via the standing temporary `/dev-script-preview` route (removed pre-commit): walked the new "No" branch both ways (engage → intro-recovery-check → Yes → neutral indeed-hook wording with `[job title]` fallback → smoothed qualifier → straight to Vitals, no stopover; genuinely-wrong-number → immediate Not Interested). The ×5 multiplier change is a one-line arithmetic constant swap in the same mechanism Prompt 204 already verified live (multiplier field on the capture config) — confirmed via direct code inspection + `Math.round(3*5)=15` rather than re-walking a UI path with no visible display surface for this specific saved field. `npx vite build` passes both commits.
+
+---
+
 ### ✅ Prompt 210 SHIPPED 2026-07-04 (`a21cd6b`) — workweek pain-math formula, `[job title]` token, trimmed vitals hedge
 
 - `ScriptWalk.jsx`'s `renderText()`: `monthly`/`annual` now compute as `daily_missed × 5 × 4 × ticket` / `monthly × 12`, replacing the old `weekly_missed(×7) × 4.33 × ticket`. **`calls_missed_per_week` (the real `recommend-stack` pricing input) deliberately left untouched** — needs Brayden's explicit confirmation before changing, since it moves real recommended pricing on every lead. Still open — see [[Memories]] 2026-07-04 entry.

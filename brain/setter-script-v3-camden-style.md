@@ -1,6 +1,6 @@
 ---
 date: 2026-07-03
-description: "Setter script v3 — SHIPPED live 2026-07-03 (Prompt 205, `b4d9cf3`). v3.1 warm-lead opener patch (Section 1) SHIPPED 2026-07-03 (Prompt 209, `8df9bfa`). v3.2 pain-math/job-title/hedge patch SHIPPED 2026-07-04 (Prompt 210, `a21cd6b`)."
+description: "Setter script v3 — SHIPPED live 2026-07-03 (Prompt 205, `b4d9cf3`). v3.1 warm-lead opener patch SHIPPED 2026-07-03 (Prompt 209, `8df9bfa`). v3.2 pain-math/job-title/hedge patch SHIPPED 2026-07-04 (Prompt 210, `a21cd6b`). v3.3 intro-recovery/indeed-hook/qualifier patch + calls_missed_per_week x5 SHIPPED 2026-07-04 (Prompt 211, `7190ac2` + `fce1857`)."
 tags:
   - brain
   - setter
@@ -24,11 +24,54 @@ Three changes from Brayden's live-review-with-a-real-lead session, all shipped.
 
 **1. Pain-math formula changed.** `[monthly]`/`[annual]` in `ScriptWalk.jsx`'s `renderText()` now compute as `monthly = daily_missed × 5 × 4 × ticket`, `annual = monthly × 12` — replacing the old `weekly_missed(×7) × 4.33 × ticket`. Verified: 3 missed/day × $250 ticket → $15,000/mo, $180,000/yr exactly.
 
-**Still open, not shipped — needs Brayden's explicit confirmation:** `calls_missed_per_week` (still `daily_missed × 7`) feeds the REAL client-pricing formula in `recommend-stack` (`callsMissedPerWeek × 4.33 × avgTicket × 0.15`) — the price Nate actually quotes on close calls. This was deliberately left untouched since it changes real recommended pricing on every lead, not just script copy. Decision pending — see [[Memories]] 2026-07-04 entry.
+**RESOLVED 2026-07-04 (Prompt 211, `fce1857`):** `calls_missed_per_week` now computes as `daily_missed × 5`, matching the pain-math's workweek basis — Brayden's explicit call, made when asked directly. See "v3.3" below.
 
 **2. `[job title]` token shipped**, replacing the `[receptionist / dispatcher / front desk]` placeholder-list. Confirmed field: `leads.posting_title` (migration 027, populated by the `indeed-scraper` edge function from the real Indeed posting headline) — not `job_title` (migration 003, a separate field used for `stackRecommendation.js` labor-cost math). Falls back to "front desk role" for leads with no posting (Maps-sourced). **Still open, not resolved:** Maps-sourced leads have no real hiring signal at all — the whole warm-lead opener premise (v3.1) doesn't strictly apply to them. Worth a future pass to check current lead-source mix and possibly branch the opener by source.
 
 **3. Vitals opener hedge trimmed** to: *"Out of curiosity — how many calls do you think you get in a month?"*
+
+---
+
+## ✅ v3.3 PATCH SHIPPED 2026-07-04 (Prompt 211, `7190ac2` + `fce1857`) — recovery branch on "no", indeed-hook reverted to neutral, qualifier smoothed, calls_missed_per_week × 5
+
+Brayden reviewed three Practice screens live (Opener's `intro`, `indeed-hook`, `qualifier`) and wanted all three adjusted, plus a 4th item (the `calls_missed_per_week` pricing-formula question Prompt 210 had left open) resolved mid-session. All four shipped in `ohvara-dashboard`.
+
+**1. `intro` needs a real "No" branch — currently only "Yeah/speaking" and "Transferred" exist.** Prompt 204 dropped a "wrong number" option as a non-branch, but Brayden now wants a recovery sequence instead of just assuming it's self-evident:
+
+**Node: intro** *(add third option)*
+SAY: "Hey, is this [Business Name]?"
+→ "Yeah / speaking" → **node: indeed-hook**
+→ "Transferred" → **node: transferred**
+→ "No" *(NEW)* → **node: intro-recovery**
+
+**Node: intro-recovery** *(NEW)*
+SAY: "Okay — were you hiring for a [job title]?"
+→ confirms / engages → **node: intro-recovery-check**
+→ genuinely wrong number/business → END
+
+**Node: intro-recovery-check** *(NEW)*
+SAY: "Are you actively looking to hire for that?"
+→ "Yes" → **node: indeed-hook**
+→ "No, not interested" → END (Set status Not Interested)
+
+**2. `indeed-hook` reverts to a neutral "who should I speak to" ask — drop the diagnostic framing.** Brayden's reasoning: we shouldn't imply anything about their situation ("that usually means calls are slipping somewhere...") until we actually know we're talking to the decision-maker — that diagnostic belongs after confirmation, not before.
+
+**Node: indeed-hook** *(REVERT toward original wording, now using the real `[job title]` token from Prompt 210 instead of a bracketed list)*
+SAY: "Hey — I saw you were hiring for a [job title]. I was wondering who I should speak to about that."
+→ `[GOOD]` "That's me" → **node: qualifier**
+→ `[BAD]` "What's this about?" / pushback → **node: disarm-early**
+
+*(Not changed, flagging as an open question rather than deciding: `transferred`'s SAY line still has the "that's usually a sign calls are slipping" diagnostic clause — arguably fine there since by definition we've been routed to the actual decision-maker at that point, but worth Brayden's explicit call on whether it should match `indeed-hook`'s new neutral tone for consistency.)*
+
+**3. `qualifier` wording smoothed — drop the "yes or no?" tag, make it read as a natural either/or.** This is a deliberate refinement OVER the earlier explicit "keep it binary yes/no" instruction from the v3.1 patch — noting the change of direction rather than silently treating it as the same ask.
+
+**Node: qualifier** *(reworded, same 3 fork options/targets unchanged)*
+SAY: "Quick question — are missed calls part of the reason you're posting for this role, or are you just growing or something like that?"
+→ `[GOOD]` "Yeah" → SECTION 2
+→ `[HESITANT]` "Kind of / it's part of it" → SECTION 2
+→ `[BAD]` "No, we've got it covered, just growing" → **node: on-top-of-it-check**
+
+**4. `calls_missed_per_week` capture multiplier changed `× 7` → `× 5`.** Added mid-session as a resolved (not proposed) item, once Brayden asked Falcon directly for a recommendation on the question Prompt 210 had left pending. Falcon's call: ×5, for consistency (the script now speaks a pain number on a 5-day basis) and defensibility (most Ohvara niches don't run a full 7-day call week). Implemented in `discoveryScript.js`'s Vitals `captures` config — same `capture.multiplier` mechanism Prompt 204 built, just the constant changed. `recommend-stack` needed no code change — it only consumes the value.
 
 [[setter-transcripts-camden-cash]] · [[setter-script-v2-flow]] · [[ohvara-setter-discovery-script]] · [[LIVE_STATE]]
 
