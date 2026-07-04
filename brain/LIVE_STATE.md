@@ -20,6 +20,15 @@ tags:
 
 ---
 
+### ✅ Prompt 214 SHIPPED 2026-07-04 (`7d3014f`) — Handoff fork color-split, handoff-bridge math restate trimmed, 3 bare-Next time re-asks fixed
+
+- Root-caused the "all 5 green" report: Handoff's own section accent IS `var(--success)` green, so untagged fork options (Prompt 213's newly-embedded objections) fell back to it by coincidence. Tagged per Falcon's proposed split: "Just send me some info"/"I don't have time this week" → `[HESITANT]` amber; "Who is this / what company?"/"How much does this cost?" → `[BAD]` red; "Picks a time" stays `[GOOD]` green. Confirmed live via computed border-color check.
+- `handoff-bridge`'s SAY line no longer re-derives the annual number — now: "I don't want to waste your time here. Like I said — that's $[annual] a year you're leaving on the table just from calls that don't get picked up. Here's what I'd do for you:" — flows straight into the unchanged pitch.
+- Found the real bug the hypothesis pointed at: 3 shortened time re-asks (after "Okay, fair," "Okay" on pricing, "Just need a ballpark") ended in a bare `→ Go to Close` with no fork — a re-objecting prospect would've been auto-routed to Close as if they'd agreed. Added `Picks a time [GOOD]` / `Still hesitant [HESITANT]` to each, mirroring the working "I don't have time this week" re-ask pattern. Fallback logs Follow-Up status only, no new pitch dialogue invented.
+- Verified live via the standing temporary `/dev-script-preview` route (removed pre-commit): full Opener→Vitals→Pain→Handoff walk, fork colors confirmed via computed style, "Just send me some info"→"Okay, fair" path confirmed the fixed re-ask shows the new fork and "Picks a time" lands on Close. `npx vite build` passes. See [[Memories]] for full detail.
+
+---
+
 ### ✅ Prompt 213 SHIPPED 2026-07-04 (`6c054eb`) — generalized say+fork combine; root-caused Objections two-click bug
 
 - **Generalized the say+fork combine.** `ScriptWalk.jsx`'s lookahead (Prompt 204/209, only checked one step ahead for an adjacent fork) replaced with a chain scan: all consecutive plain-SAY steps up to a trailing fork now render on one screen. Fixes Pain's `do-the-math`+`reflection` (2 lines) and Handoff's 3-line pitch, both of which needed an extra "Next" tap before reaching their fork. **Scoped deliberately, confirmed with Brayden first:** only chains that end in a fork merge — Vitals' 3 capture questions and Close's 2-line outro (which end in a route/action, not a fork) are left paced one line at a time, since those weren't flagged as broken and merging them would've bundled multiple data-capture inputs onto one screen, changing the deliberate one-question-at-a-time call pacing.

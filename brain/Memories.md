@@ -64,6 +64,44 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### [CC | 2026-07-04 — Prompt 214 shipped · `7d3014f`] — Handoff fork color-split, handoff-bridge math-restate trimmed, 3 bare-Next time re-asks fixed
+
+- **Root cause of the "all 5 options green" report:** the Handoff section's own accent color IS `var(--success)` (green) — untagged fork options fall back to the section accent, so Prompt 213's newly-embedded objection options (never tagged) rendered the same green as the real `[GOOD]` "Picks a time" option, just by coincidence of the section's color. Tagged the 4 objection options per Falcon's proposed split, confirmed live: "Just send me some info" / "I don't have time this week" → `[HESITANT]` amber; "Who is this / what company?" / "How much does this cost?" → `[BAD]` red; "Picks a time" stays green.
+- **`handoff-bridge`'s SAY line trimmed** to reference the annual number Pain already stated instead of re-deriving it: `"I don't want to waste your time here. Like I said — that's $[annual] a year you're leaving on the table just from calls that don't get picked up. Here's what I'd do for you:"` — flows straight into the unchanged product pitch. Verified live: Pain showed $180,000/yr, Handoff's line referenced the same $180,000 a screen later with no restated math.
+- **Found the real bare-Next bug Prompt 214 asked to hunt for.** All 5 "Tuesday/Wednesday" occurrences in `discoveryScript.js` checked; 3 shortened time re-asks (after "Okay, fair" on the info objection, "Okay" on the pricing objection, "Just need a ballpark") ended in a plain `→ Go to Close` route with no fork — so a prospect who re-objected to the second time-ask had no path, they'd just get auto-routed to Close as if they'd agreed. Added a `Picks a time [GOOD]` / `Still hesitant [HESITANT]` branch to each, mirroring the working pattern already used by "I don't have time this week"'s re-ask (`Picks a day [GOOD]` / `Those don't work either [BAD]`). The `[HESITANT]` fallback logs `Follow-Up` status rather than inventing new pitch dialogue — flagging this as a judgment call (the exact fallback wording wasn't specified in the prompt), safe because it's a procedural action chip, not spoken script content.
+- Verified live via the standing temporary `/dev-script-preview` route (added to `App.jsx`, removed pre-commit): walked Yeah/speaking → That's me → Yeah → Vitals (3/$250) → Pain ($180,000/yr) → Engaged → Handoff; confirmed the 5-option fork's border colors via computed style (green/amber/amber/red/red); walked "Just send me some info" → "Okay, fair" → confirmed the previously-bare-Next re-ask now shows "Picks a time"/"Still hesitant" → "Picks a time" lands directly on Close. `npx vite build` passes both before and after the temp route removal.
+- LIVE_STATE queue empty — nothing further queued from Falcon as of this session.
+
+---
+
+### 2026-07-04 (cont. 5) — Falcon session: correcting myself — there WAS a real leftover bare-Next bug, found via 4 screenshots
+
+**What happened:** Told Brayden in the prior entry that his "always options, never a dead-end Next" principle was already fully satisfied by Prompt 213 — he pushed back, sent 4 screenshots as evidence, and he was right to. Went through all 4 carefully instead of re-asserting the prior claim:
+
+- Two are genuinely fine as a bare Next (Vitals' "how many calls a month," Close's "what's the best number") — neither branches the script differently depending on the answer, so no fork is needed there; explained this distinction to Brayden (a fork is only needed when the answer changes what gets said next, not just because the setter stopped talking).
+- The final "Got it, our team will have everything..." line is correctly terminal (actual end of the call).
+- **But one is real:** a shortened time re-ask node ("Does [Tuesday morning] or [Wednesday afternoon] work better for you?") renders with a bare Next and no fork options, when it should show the same Picks-a-time/objection fork `time-ask` shows on the first ask. Folded into the still-unshipped **Prompt 214** as item 3, with a hypothesis for CC to verify: likely a route-jump re-entry into a shortened time-ask variant (used when looping back from an objection) that Prompt 213's chain-merge fix didn't cover, since that fix applied to the forward walk-through, not necessarily every re-entry path.
+
+**Lesson for [[Gotchas]]:** don't reassure "this is already fixed" from memory of what a prompt was *scoped* to do — Prompt 213 fixed the forward-walk case specifically; that doesn't guarantee every route-jump re-entry into the same node got the same treatment. When a person pushes back with "no, I'm looking right at it," the right move is to actually go look at what they sent, not repeat the prior claim more firmly.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 214 is queued for CC in LIVE_STATE — now three items: color-split time-ask's fork, cut the redundant math restate in handoff-bridge, AND fix a shortened time re-ask node that's missing its fork options entirely (real bug, found via Brayden's screenshots, not yet root-caused).`
+
+---
+
+### 2026-07-04 (cont. 4) — Falcon session: color-split the new Handoff fork, cut redundant math restate (Prompt 214 queued)
+
+**What happened:** Brayden reviewed Prompt 213's shipped output live and found the newly-merged Handoff fork (created by embedding all 4 objection options directly into Handoff, per 213's routing-bug fix) renders all 5 options green — a genuinely new bug surface, not the same node CC checked coloring on in 213 (that was the now-deleted standalone Objections section). Queued as **Prompt 214**: only "Picks a time" should be green; the 4 objection options split into `[HESITANT]` (soft stalls: "send me info," "no time this week") and `[BAD]` (skeptical pushback: "who is this," "how much"). Flagged the split as Falcon's proposal, adjustable.
+
+**Second, sharper catch — Brayden noticed real redundancy, not just a vibe complaint.** He described wanting the Handoff section to "flow smoother," and pointed at `handoff-bridge` restating the same math Pain's `do-the-math` already delivered — the annual-dollar-loss number gets calculated out loud twice, seconds apart, which is what's actually causing the "chunky" feeling rather than anything about screen-merging (213 already fixed the screen-merging). Fix: `handoff-bridge` now references the number instead of re-deriving it ("Like I said — that's $[annual] a year...") instead of restating the full "if you're missing X calls a day, worth $Y" clause a second time.
+
+**Also confirmed, not a new item:** Brayden independently re-articulated the exact principle behind Prompt 213's fix (a monologue should always end in either more chained lines or real options, never a dead-end Next) — reassured him this is already satisfied (Vitals/Close's capture pauses are legitimate response points, not empty clicks) rather than treating it as a new open audit.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 214 (color-split time-ask's merged fork, cut redundant math restate in handoff-bridge) is queued for CC in LIVE_STATE.`
+
+---
+
 ### 2026-07-04 (cont. 3) — Falcon session: two real Practice-mode bugs found reviewing Prompt 212 (Prompt 213 queued)
 
 **What happened:** Brayden reviewed Prompt 212's shipped output live and caught two real bugs, not content requests — both queued as **Prompt 213**.
