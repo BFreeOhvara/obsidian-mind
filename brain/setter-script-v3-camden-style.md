@@ -1,6 +1,6 @@
 ---
 date: 2026-07-03
-description: "Setter script v3 — SHIPPED live 2026-07-03 (Prompt 205, `b4d9cf3`). v3.1 warm-lead opener patch (Section 1) SHIPPED 2026-07-03 (Prompt 209, `8df9bfa`)."
+description: "Setter script v3 — SHIPPED live 2026-07-03 (Prompt 205, `b4d9cf3`). v3.1 warm-lead opener patch (Section 1) SHIPPED 2026-07-03 (Prompt 209, `8df9bfa`). v3.2 pain-math/job-title/hedge patch SHIPPED 2026-07-04 (Prompt 210, `a21cd6b`)."
 tags:
   - brain
   - setter
@@ -15,6 +15,22 @@ tags:
 > **✅ v3.1 PATCH SHIPPED 2026-07-03 (Prompt 209, `8df9bfa`).** Brayden's 07-03 follow-up: the opener still read like a blind cold call ("just happened to notice, nothing to sell you"), but Ohvara's setters aren't cold-calling — the business already told the world it has a coverage gap by posting the job. Camden has no equivalent video (no cold-caller targets businesses actively hiring for the exact role being pitched), so this section departs from pure verbatim on purpose. Confirmed specifically via the qualifier line — Brayden wanted the binary yes/no kept but felt "Do you want to stop missing calls — yes or no?" was pushy; this patch's qualifier ("Are missed calls part of why you're posting for this role? Yes or no?") resolves that too. See "v3.1 — Warm-Lead Opener" below; Sections 2-5 are unchanged. **One shipped deviation from this doc:** the hook's self-introduction uses the existing `[Rep Name]` token, not this doc's `[First Name]` — `[First Name]` was never wired into `discoveryScript.js`'s `fillTokens()`, so using it verbatim would have shipped a literal unfilled placeholder into a live script.
 
 **Tagging rule applied below:** sentiment forks (how the prospect responded to a question) get `[GOOD]`/`[HESITANT]`/`[BAD]` tags. Pure routing forks (who picked up the phone, was it transferred) are left untagged — they're not a sentiment signal, just a path split.
+
+---
+
+## ✅ v3.2 PATCH SHIPPED 2026-07-04 (Prompt 210, `a21cd6b`) — pain-math formula change, job-title token, trimmed vitals hedge
+
+Three changes from Brayden's live-review-with-a-real-lead session, all shipped.
+
+**1. Pain-math formula changed.** `[monthly]`/`[annual]` in `ScriptWalk.jsx`'s `renderText()` now compute as `monthly = daily_missed × 5 × 4 × ticket`, `annual = monthly × 12` — replacing the old `weekly_missed(×7) × 4.33 × ticket`. Verified: 3 missed/day × $250 ticket → $15,000/mo, $180,000/yr exactly.
+
+**Still open, not shipped — needs Brayden's explicit confirmation:** `calls_missed_per_week` (still `daily_missed × 7`) feeds the REAL client-pricing formula in `recommend-stack` (`callsMissedPerWeek × 4.33 × avgTicket × 0.15`) — the price Nate actually quotes on close calls. This was deliberately left untouched since it changes real recommended pricing on every lead, not just script copy. Decision pending — see [[Memories]] 2026-07-04 entry.
+
+**2. `[job title]` token shipped**, replacing the `[receptionist / dispatcher / front desk]` placeholder-list. Confirmed field: `leads.posting_title` (migration 027, populated by the `indeed-scraper` edge function from the real Indeed posting headline) — not `job_title` (migration 003, a separate field used for `stackRecommendation.js` labor-cost math). Falls back to "front desk role" for leads with no posting (Maps-sourced). **Still open, not resolved:** Maps-sourced leads have no real hiring signal at all — the whole warm-lead opener premise (v3.1) doesn't strictly apply to them. Worth a future pass to check current lead-source mix and possibly branch the opener by source.
+
+**3. Vitals opener hedge trimmed** to: *"Out of curiosity — how many calls do you think you get in a month?"*
+
+[[setter-transcripts-camden-cash]] · [[setter-script-v2-flow]] · [[ohvara-setter-discovery-script]] · [[LIVE_STATE]]
 
 ---
 

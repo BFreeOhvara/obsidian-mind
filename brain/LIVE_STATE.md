@@ -20,6 +20,15 @@ tags:
 
 ---
 
+### ✅ Prompt 210 SHIPPED 2026-07-04 (`a21cd6b`) — workweek pain-math formula, `[job title]` token, trimmed vitals hedge
+
+- `ScriptWalk.jsx`'s `renderText()`: `monthly`/`annual` now compute as `daily_missed × 5 × 4 × ticket` / `monthly × 12`, replacing the old `weekly_missed(×7) × 4.33 × ticket`. **`calls_missed_per_week` (the real `recommend-stack` pricing input) deliberately left untouched** — needs Brayden's explicit confirmation before changing, since it moves real recommended pricing on every lead. Still open — see [[Memories]] 2026-07-04 entry.
+- `[job title]` token wired into `fillTokens()` in `discoveryScript.js`, reading `lead.posting_title` (confirmed via recon: migration 027, populated by the `indeed-scraper` edge function from the real Indeed posting headline — NOT `job_title`, a different field used for `stackRecommendation.js` labor-cost math). Falls back to "front desk role" for leads with no posting (e.g. Maps-sourced). Replaced both opener occurrences of the old `[receptionist / dispatcher / front desk]` / `[receptionist]` placeholders.
+- Vitals `volume` node hedge trimmed to: *"Out of curiosity — how many calls do you think you get in a month?"*
+- Verified live via temporary `/dev-script-preview` route (removed pre-commit): two leads (with/without `posting_title`) confirmed correct token + fallback rendering; typed 3 missed/day + $250 ticket → Pain line read exactly `$15,000/mo, $180,000/yr` (= `3×5×4×250` / `×12`, not the old ×7×4.33 which would read $22,733/mo). `npx vite build` passes.
+
+---
+
 ### ✅ Prompt 209 SHIPPED 2026-07-03 (`8df9bfa`) — Script tab = Practice directly; two root-caused Practice bugs; v3.1 opener patch live
 
 - Script tab (`TrainingCenter.jsx`) and `CloserScript.jsx` now render `ScriptWalk` `mode="practice"` directly (starting at the Opener) instead of `ScriptOutline` — no accordion/landing view in front of it. `ScriptOutline.jsx` had exactly those two call sites; both swapped, so it's fully dead — deleted (grepped first to confirm zero remaining imports). `CloserScript.jsx` keys `ScriptWalk` on the active sub-tab (`key={tab}`) so switching Closer/Setter remounts fresh instead of reusing the other script's stale stack/index position.
