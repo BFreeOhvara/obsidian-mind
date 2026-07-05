@@ -105,6 +105,27 @@ Brayden reviewed the shipped bridge+pitch merged screen live and dictated a rewr
 **Node: pitch-receptionist** *(reworded opening only; feature list and closer unchanged)*
 SAY: "instead of filling this role with a person, we'd build you a system made exactly for this — it catches the calls you'd otherwise miss, does missed-call text-back, answers questions, and books appointments straight to your calendar. All you'd have to do is show up to the meeting — and it means you might not even need to finish out this hire the way you'd planned."
 
+---
+
+## v3.6 SHIPPED 2026-07-05 (`0063f68`) — trim `time-ask`'s worst-case/best-case line
+
+Brayden reviewed the live `time-ask` screen and wants it tightened: keep "worst-case/best-case" framing, add "actually" to the worst-case clause, and replace "shows you exactly how you're leaving money on the table and how to fix it" with punchier "plug this money hole" language (his "and something like that, you know what I mean" read as him handing off the exact phrasing, not dictating it verbatim).
+
+**Node: time-ask** *(SAY line only — fork options below it unchanged)*
+SAY: "Take 15 minutes. Worst-case scenario, you get to see what it actually looks like and stop wasting your time. Best-case scenario, our team shows you exactly how to plug this money hole. How's that sound? [Tuesday morning] or [Wednesday afternoon]?"
+
+*(Cut "and how to fix it" — redundant once "plug this money hole" carries the fix implication. Fork options and routing untouched.)*
+
+---
+
+## v3.7 — architecture note: when a plain "Next" is legitimate vs. not (2026-07-05, Falcon, undoes part of v3-era Prompt 215)
+
+Brayden articulated a general rule that overrides Prompt 215's earlier length-based screen split for Handoff: a plain "Next" (no fork) only belongs at a genuine capture/pause point — where the setter is actually waiting on and recording a real prospect answer (Vitals' 3 numeric captures, the phone-number ask). It does NOT belong as a pacing break between two lines of pure monologue where no prospect response is expected at all. If nothing the prospect could say would change anything at that junction, don't stop — keep it one continuous flow until the point where a response is genuinely expected.
+
+Applied: Handoff's `bridge` → `pitch-receptionist` → `time-ask` is pure monologue until `time-ask`'s real fork. Prompt 215's 2-screen split (bridge+pitch ending in a plain Next, then time-ask+fork) was a pacing choice, not a correctness one — per this rule it's wrong, and Prompt 220 undoes it: the whole chain merges into one screen ending directly in the real fork. Pain's 2-line chain is unaffected (already correctly one screen ending in its own fork).
+
+**Use this rule going forward for any new script content:** a plain Next is a smell unless it's sitting on a real capture point. If a merged chain ends in a plain Next, ask whether the prospect was actually expected to say something there — if not, keep extending the block until it hits the real decision point.
+
 Once merged with the unchanged `handoff-bridge` line (and once Prompt 216 lands, rendering as one continuous paragraph), the full screen reads:
 "I don't want to waste your time here. Like I said — that's $[annual] a year you're leaving on the table just from calls that don't get picked up. Here's what I'd do for you: instead of filling this role with a person, we'd build you a system made exactly for this — it catches the calls you'd otherwise miss, does missed-call text-back, answers questions, and books appointments straight to your calendar. All you'd have to do is show up to the meeting — and it means you might not even need to finish out this hire the way you'd planned."
 

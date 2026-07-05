@@ -20,6 +20,15 @@ tags:
 
 ---
 
+### ✅ Prompts 219+220 SHIPPED 2026-07-05 (`0063f68`) — Handoff's bridge+pitch+time-ask merged into ONE screen, time-ask wording trimmed
+
+- **220 (structural):** removed the `[[BREAK]]` marker Prompt 215 added after `pitch-receptionist` — per Brayden's principle (a plain Next is only legitimate at a genuine capture/pause point, never a pacing break between two lines of pure monologue with no response expected), and since `bridge`→`pitch-receptionist`→`time-ask` is monologue end to end until the actual fork, it now renders as ONE continuous block (all 3 lines joined via Prompt 216's single-paragraph `SayBlock`) ending directly in `time-ask`'s real fork — no intermediate Next tap.
+- **219 (content):** `time-ask`'s SAY line trimmed to "Worst-case scenario, you get to see what it actually looks like and stop wasting your time. Best-case scenario, our team shows you exactly how to plug this money hole." — "and how to fix it" folded into "plug this money hole."
+- **Full audit performed** (per Brayden's ask, same rigor as Prompt 218's route audit): checked every section for 2+ consecutive plain-SAY lines not ending in a fork. Found: Vitals' 3-question chain (ends in a route, each is a real question expecting a real spoken answer — left untouched, matches Brayden's own explicit exclusion) and Close's phone-number-ask→confirmation pair (first line is a real capture point, second is the follow-up — left untouched, also explicitly excluded). All single-say-then-action pairs throughout Handoff's objection branches are single lines (not 2-line monologue chains), so not an instance of the bug. The "Just need a ballpark" objection's 2-say chain already auto-merges since it ends in a fork (no separate fix needed). **No other instances found beyond the one already fixed.**
+- Verified live via the standing temp `/dev-script-preview` route (removed pre-commit): confirmed via direct DOM inspection (`querySelectorAll('p')`) exactly one `<p>` containing all 3 merged lines with the new wording, ending in the 5-option fork; "Picks a time" still routes correctly to Close; Close's phone-number-ask remains its own untouched single-line screen. `npx vite build` passes; `git diff --stat` confirmed only `discoveryScript.js` changed.
+
+---
+
 ### ✅ Prompt 218 SHIPPED 2026-07-05 (`613b310`) — Handoff's "who is this" objection no longer re-enters Vitals
 
 - Root-caused: `discoveryScript.js` Handoff section, `"Who is this / what company?"` objection's decision-maker fork — `↳ IF That's me: → Go to Vitals Check` — routed backward into Vitals (section 2), a section already completed earlier in the same call. Confirmed live via the standing temp `/dev-script-preview` route: full Opener→Vitals→Pain→Handoff walk, clicked the objection → "That's me" → landed back on Vitals' first question with a bare Next, exactly as Brayden reported.
