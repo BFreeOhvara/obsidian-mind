@@ -128,7 +128,7 @@ Applied: Handoff's `bridge` → `pitch-receptionist` → `time-ask` is pure mono
 
 ---
 
-## v3.8 PATCH CONFIRMED 2026-07-05 (queued as Prompt 221) — tighten the whole Handoff monologue; split the day-offer back into its own beat after a real response
+## v3.8 PATCH SHIPPED 2026-07-05 (Prompt 221, `a3d2ced`) — tighten the whole Handoff monologue; split the day-offer back into its own beat after a real response
 
 Brayden reviewed the now-merged Handoff screen live: likes the feel, but wants the monologue itself shortened without losing energy, plus stronger word choices, and — despite the "no Next without an expected response" rule just established — wants a real pause inserted after "How's that sound?" before naming specific days. That's not a contradiction of v3.7: it's a genuine fork (the prospect actually responds — "Good," or an objection), not a bare pacing Next. Naming "[Tuesday morning] or [Wednesday afternoon]" only after they've shown interest is more natural than rattling off two specific times before they've said anything.
 

@@ -20,24 +20,12 @@ tags:
 
 ---
 
-### Prompt 221 (QUEUED 2026-07-05, Falcon, CONFIRMED) — tighten Handoff monologue; split day-offer into its own beat after a real response
+### ✅ Prompt 221 SHIPPED 2026-07-05 (`a3d2ced`) — Handoff monologue tightened, day-offer split into a confirm-time fork
 
-Full spec in [[setter-script-v3-camden-style]] under "v3.8 PATCH CONFIRMED 2026-07-05." Brayden confirmed all 4 open items directly: cut the "finish out this hire" closer, cut "does missed-call text-back," ship the day-offer split-fork structure, ship the monologue text as written.
-
-**Node: handoff-bridge + pitch-receptionist + time-ask** *(merged block — replaces the current Prompt 220 merge)*
-SAY: "Look, I don't want to waste your time — that's $[annual] a year slipping through the cracks. So instead of filling this role, we'll build you a system made exactly for this — it catches the calls you'd otherwise miss, answers questions, and books appointments straight to your calendar. All you have to do is show up. Take 15 minutes — worst case, you see exactly what it looks like. Best case, we plug that money hole for you. How's that sound?"
-→ `[GOOD]` "Good" / shows interest → **node: confirm-time** *(NEW)*
-→ "Just send me some info" → existing `obj-send-info` path *(unchanged)*
-→ "I don't have time this week" → existing path *(unchanged)*
-→ "Who is this / what company?" → existing path *(unchanged)*
-→ "How much does this cost?" → existing path *(unchanged)*
-
-**Node: confirm-time** *(NEW — mirrors the "Who is this?" fix's sub-fork pattern from Prompt 218)*
-SAY: "Good — so does [Tuesday morning] or [Wednesday afternoon] work best for you?"
-→ `[GOOD]` picks a time → **node: confirm-number** *(same target `time-ask` already routed to)*
-→ `[HESITANT]` still hesitant → Follow-Up status *(same fallback the other objection sub-forks use)*
-
-**Verification (rule #11):** screenshot the tightened monologue rendering as one continuous block (per Prompt 216/220's merge), confirm it ends in the real fork (no bare Next), confirm "Good" now routes to the new `confirm-time` screen naming both days with its own Picks-a-time/still-hesitant fork, and confirm the other 4 objection paths are unaffected.
+- Monologue shortened: cut "Like I said —" filler and the redundant "just from calls that don't get picked up" restatement, cut "does missed-call text-back" (contradicted the line's own "catches the calls you'd otherwise miss" claim), cut the "might not even need to finish out this hire" closer, punchier "slipping through the cracks" swapped in for "leaving on the table." Ends on a plain "How's that sound?" with no days named yet.
+- New `confirm-time` node (only reached after the prospect actually shows interest, mirrors the "Who is this?" objection's sub-fork pattern from Prompt 218): "Good — so does [Tuesday morning] or [Wednesday afternoon] work best for you?" → Picks a time `[GOOD]` → Close; Still hesitant `[HESITANT]` → `Set status Follow-Up.`
+- Other 4 objection paths (send info, no time this week, who is this, cost) untouched — confirmed live, unaffected.
+- Verified live via a temporary `/dev-script-preview` route (`startSectionId="handoff"`, added to `App.jsx`, tested, fully removed before commit). `npx vite build` passes; `git diff --stat` confirmed only `discoveryScript.js` changed. Full detail: [[Memories]].
 
 ---
 
