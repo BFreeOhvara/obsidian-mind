@@ -36,13 +36,11 @@ tags:
 
 ---
 
-### Prompt 216 (QUEUED 2026-07-04, Falcon) — remove the internal paragraph gap inside merged say-blocks; truly one continuous line
+### ✅ Prompt 216 SHIPPED 2026-07-05 (`b9c515b`) — merged say-blocks now render as one flowing paragraph, no internal gap
 
-Prompt 215 correctly merged multi-line say-chains into a single bordered box, but the original lines are still rendering as separate paragraphs WITHIN that one box (visible blank-line gap between them) — confirmed on both Pain's 2-line chain and Handoff's bridge+pitch screen (both screenshotted live by Brayden). He wants zero visual gap: the lines should read as one truly continuous flowing paragraph, joined by a space, not stacked as separate paragraphs inside the same box.
-
-**What to do:** find wherever the merged chain's lines are being joined for render (likely `.map()`-ing each line into its own `<p>`/block element with margin, inside `ScriptWalk.jsx`'s combined-say rendering from Prompt 215) and join them with a single space into one flat string/paragraph instead — no line break, no blank-line gap, no separate paragraph elements. Applies everywhere a chain-merge produces multi-line content: Pain's 2-line chain, Handoff's bridge+pitch screen (post-215's 2-screen split), and any other merged chain in the script.
-
-**Verification (rule #11):** screenshot Pain and Handoff's bridge+pitch screen confirming the text now reads as one unbroken paragraph with no visible gap between the original lines.
+- Root cause: `ScriptWalk.jsx`'s `SayBlock` (shared renderer for `SayCard`/`SayChain`/`SayWithFork` since Prompt 215) mapped each merged line to its own `<p>` inside a flex column with `gap: 14` — same bordered box, but a visible blank-line gap between the original lines.
+- Fix: `SayBlock` now joins all lines into one flat string with a plain space (`says.map(...).join(' ')`) and renders a single `<p>` — no flex/gap, no separate paragraph elements.
+- Verified live via the standing temp `/dev-script-preview` route (removed pre-commit): inspected the DOM directly (`querySelectorAll('p')` inside the bordered box) on both Pain's 2-line chain and Handoff's bridge+pitch screen — confirmed exactly one `<p>` element containing both original lines joined by a space, in both cases. `npx vite build` passes; `git diff --stat` confirmed only `ScriptWalk.jsx` changed after route cleanup.
 
 ---
 
