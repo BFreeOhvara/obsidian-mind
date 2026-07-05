@@ -126,10 +126,78 @@ Applied: Handoff's `bridge` → `pitch-receptionist` → `time-ask` is pure mono
 
 **Use this rule going forward for any new script content:** a plain Next is a smell unless it's sitting on a real capture point. If a merged chain ends in a plain Next, ask whether the prospect was actually expected to say something there — if not, keep extending the block until it hits the real decision point.
 
+---
+
+## v3.8 PATCH CONFIRMED 2026-07-05 (queued as Prompt 221) — tighten the whole Handoff monologue; split the day-offer back into its own beat after a real response
+
+Brayden reviewed the now-merged Handoff screen live: likes the feel, but wants the monologue itself shortened without losing energy, plus stronger word choices, and — despite the "no Next without an expected response" rule just established — wants a real pause inserted after "How's that sound?" before naming specific days. That's not a contradiction of v3.7: it's a genuine fork (the prospect actually responds — "Good," or an objection), not a bare pacing Next. Naming "[Tuesday morning] or [Wednesday afternoon]" only after they've shown interest is more natural than rattling off two specific times before they've said anything.
+
+**Changes, in order:**
+1. **Opening tightened, stronger lingo.** Cut "Like I said —" filler; swapped "you're leaving on the table" → "slipping through the cracks" per Brayden's explicit ask for punchier language over Camden's original "leaving on the table" phrasing. Dropped the restated "just from calls that don't get picked up" — already established earlier in Pain, redundant here (Brayden: "you maybe don't even need to say that").
+2. **Cut "does missed-call text-back."** Brayden flagged the internal contradiction: the line already claims the system "catches the calls you'd otherwise miss," so following it with "does missed-call text-back" implies calls still get missed. Dropped rather than reworded — the capability still exists and setters can mention it live if asked, it just doesn't need to be in the base pitch.
+3. **Cut the closing "...and it means you might not even need to finish out this hire the way you'd planned."** Brayden voiced explicit doubt about this line ("I don't know if I like that line as much") — combined with the shortening goal, cutting it. *(Flagging this specific cut for confirmation — it's the one change here that isn't a direct instruction, just a read on his hesitation. Easy to restore if he wants it back.)*
+4. **Time-ask trimmed further**, same worst-case/best-case shape, shorter phrasing.
+5. **Day-offer split out of the monologue into its own follow-up node**, gated behind a real fork on "How's that sound?" — mirrors the exact pattern already used for the "Who is this?" objection fix (Prompt 218): a `[GOOD]` response leads to a short "does [day] or [day] work best" ask with its own Picks-a-time/Still-hesitant fork, rather than naming both days cold.
+
+**Node: handoff-bridge + pitch-receptionist + time-ask** *(merged block, replacing the current Prompt 220 merge)*
+SAY: "Look, I don't want to waste your time — that's $[annual] a year slipping through the cracks. So instead of filling this role, we'll build you a system made exactly for this — it catches the calls you'd otherwise miss, answers questions, and books appointments straight to your calendar. All you have to do is show up. Take 15 minutes — worst case, you see exactly what it looks like. Best case, we plug that money hole for you. How's that sound?"
+→ `[GOOD]` "Good" / shows interest → **node: confirm-time** *(NEW)*
+→ "Just send me some info" → existing `obj-send-info` path *(unchanged)*
+→ "I don't have time this week" → existing path *(unchanged)*
+→ "Who is this / what company?" → existing path *(unchanged)*
+→ "How much does this cost?" → existing path *(unchanged)*
+
+**Node: confirm-time** *(NEW — mirrors the "Who is this?" fix's sub-fork pattern from Prompt 218)*
+SAY: "Good — so does [Tuesday morning] or [Wednesday afternoon] work best for you?"
+→ `[GOOD]` picks a time → **node: confirm-number** *(same target `time-ask` already routed to)*
+→ `[HESITANT]` still hesitant → Follow-Up status *(same fallback the other objection sub-forks use)*
+
+**Confirmed by Brayden 2026-07-05, all four as drafted** — cut the "finish out this hire" closer, cut "does missed-call text-back," ship the day-offer split-fork structure, ship the monologue text as written. Queued to CC as Prompt 221.
+
 Once merged with the unchanged `handoff-bridge` line (and once Prompt 216 lands, rendering as one continuous paragraph), the full screen reads:
 "I don't want to waste your time here. Like I said — that's $[annual] a year you're leaving on the table just from calls that don't get picked up. Here's what I'd do for you: instead of filling this role with a person, we'd build you a system made exactly for this — it catches the calls you'd otherwise miss, does missed-call text-back, answers questions, and books appointments straight to your calendar. All you'd have to do is show up to the meeting — and it means you might not even need to finish out this hire the way you'd planned."
 
 *(Creative-judgment call, flagging explicitly: swapped "an AI receptionist" for "a system" per Brayden's own wording. Tradeoff — "system" is vaguer than "AI receptionist," which is the actual product term used elsewhere in Training Center materials. If that ambiguity is a problem on live calls, easy to swap back to "an AI receptionist made exactly for this" while keeping everything else cut. Flagging for Brayden's sign-off before CC builds it, same as every prior pitch rewrite in this doc.)*
+
+---
+
+## v3.9 PATCH SHIPPED 2026-07-05 (Prompt 222, `8b5a9bb`) — remove "Transferred" from `intro`, fix the transfer buffer on `indeed-hook`, add a not-available option
+
+Brayden reviewed `intro` and `indeed-hook` live and flagged three things:
+
+**1. `intro`'s "Transferred" option doesn't make sense at this stage.** At "Hey, is this the business?" nobody has said why they're calling yet, so there's nothing to transfer *about* — that only makes sense one beat later, once the caller has stated their reason (`indeed-hook`). Remove it entirely; color-tag the remaining two.
+
+**Node: intro** *(remove "Transferred," color-tag the rest)*
+SAY: "Hey, is this [Business Name]?"
+→ `[GOOD]` "Yeah / speaking" → **node: indeed-hook**
+→ `[BAD]` "No" → **node: intro-recovery** *(unchanged, from v3.1)*
+
+**2. `indeed-hook`'s "Transferring" option should be `[HESITANT]` (yellow), not `[GOOD]` (green).** Getting transferred isn't a clean "yes, that's me" — it's an in-between outcome, closer visually to a soft-maybe than a confirmed hit.
+
+**3. `indeed-hook`'s "Transferring" shouldn't route straight to `qualifier` like Prompt 212 shipped it.** Brayden's catch: whoever picks up after a transfer wasn't on the line for the original hook — routing them straight into `qualifier` skips re-establishing why you're calling, which reads as jarring/repeats-itself to them even though the setter hasn't repeated anything (they just haven't heard it yet). Needs a buffer re-intro. Brayden dictated a version that folds the re-intro AND the qualifying question into one line (no separate "who should I speak to" needed, since a transferred contact already implicitly is the person to talk to) — Falcon's take: this is a good design, not just an acceptable one — it saves a full beat versus a generic buffer, keeps the disarming tone ("I don't know if you can help me"), and the folded qualifying question does double duty. Only edits made to Brayden's dictated wording: swapped in the real `[job title]` token (matches the rest of the script instead of hardcoding "receptionist") and cut the "or something like that" tail per the same cleanup precedent applied to `qualifier` in Prompt 212.
+
+**4. Add a new `indeed-hook` option for "they're not here / I'll leave a message"** — a realistic outcome Brayden flagged as common, not currently handled at all. Kept minimal per this doc's standing pattern (no new pitch invented) — just enough to log a real follow-up rather than dead-ending.
+
+**Node: indeed-hook** *(fork rebuilt: Transferring recolored + retargeted, new not-available option added)*
+SAY: "Hey — I saw you were hiring for a [job title]. I was wondering who I should speak to about that."
+→ `[GOOD]` "That's me" → **node: qualifier**
+→ `[HESITANT]` "Transferring" *(recolored from GOOD; retargeted)* → **node: transfer-reintro** *(NEW)*
+→ `[HESITANT]` "They're not here right now / I'll leave a message" *(NEW)* → **node: not-available** *(NEW)*
+→ `[BAD]` "What's this about?" / pushback → **node: disarm-early**
+
+**Node: transfer-reintro** *(NEW — replaces Prompt 212's direct Transferring→qualifier shortcut)*
+SAY: "Hey — I saw y'all were hiring for a [job title]. I don't know if you can help me, but are you guys missing calls? Is that part of why you're posting for the role?"
+→ `[GOOD]` "Yeah" → SECTION 2 *(same target as `qualifier`'s GOOD option)*
+→ `[HESITANT]` "Kind of / it's part of it" → SECTION 2
+→ `[BAD]` "No, we've got it covered, just growing" → **node: on-top-of-it-check**
+
+**Node: not-available** *(NEW)*
+SAY: "No worries — is there a better time to try them, or should I just leave a quick message?"
+→ gets a callback time / leaves message → log Follow-Up status, END *(no further pitch — nobody qualified to hear it is on the line)*
+
+**Cleanup flag for CC:** the old standalone `transferred` node (SECTION 1, base v3 script — "Hey [Name] — yeah, I saw your Indeed listing...") was `intro`'s original "Transferred" target. Once "Transferred" is removed from `intro`, check whether anything else still routes to that node — if it's now unreachable, delete it rather than leave dead code, matching this project's standing cleanup discipline (same call made for the old standalone Objections section in Prompt 213).
+
+*(Falcon's direct answer to Brayden's question: yes, I like the `transfer-reintro` line — ship it as dictated with just the `[job title]` token swap and tail trim above.)*
 
 [[setter-transcripts-camden-cash]] · [[setter-script-v2-flow]] · [[ohvara-setter-discovery-script]] · [[LIVE_STATE]]
 

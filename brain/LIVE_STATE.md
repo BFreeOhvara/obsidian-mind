@@ -20,6 +20,39 @@ tags:
 
 ---
 
+### Prompt 221 (QUEUED 2026-07-05, Falcon, CONFIRMED) — tighten Handoff monologue; split day-offer into its own beat after a real response
+
+Full spec in [[setter-script-v3-camden-style]] under "v3.8 PATCH CONFIRMED 2026-07-05." Brayden confirmed all 4 open items directly: cut the "finish out this hire" closer, cut "does missed-call text-back," ship the day-offer split-fork structure, ship the monologue text as written.
+
+**Node: handoff-bridge + pitch-receptionist + time-ask** *(merged block — replaces the current Prompt 220 merge)*
+SAY: "Look, I don't want to waste your time — that's $[annual] a year slipping through the cracks. So instead of filling this role, we'll build you a system made exactly for this — it catches the calls you'd otherwise miss, answers questions, and books appointments straight to your calendar. All you have to do is show up. Take 15 minutes — worst case, you see exactly what it looks like. Best case, we plug that money hole for you. How's that sound?"
+→ `[GOOD]` "Good" / shows interest → **node: confirm-time** *(NEW)*
+→ "Just send me some info" → existing `obj-send-info` path *(unchanged)*
+→ "I don't have time this week" → existing path *(unchanged)*
+→ "Who is this / what company?" → existing path *(unchanged)*
+→ "How much does this cost?" → existing path *(unchanged)*
+
+**Node: confirm-time** *(NEW — mirrors the "Who is this?" fix's sub-fork pattern from Prompt 218)*
+SAY: "Good — so does [Tuesday morning] or [Wednesday afternoon] work best for you?"
+→ `[GOOD]` picks a time → **node: confirm-number** *(same target `time-ask` already routed to)*
+→ `[HESITANT]` still hesitant → Follow-Up status *(same fallback the other objection sub-forks use)*
+
+**Verification (rule #11):** screenshot the tightened monologue rendering as one continuous block (per Prompt 216/220's merge), confirm it ends in the real fork (no bare Next), confirm "Good" now routes to the new `confirm-time` screen naming both days with its own Picks-a-time/still-hesitant fork, and confirm the other 4 objection paths are unaffected.
+
+---
+
+### ✅ Prompt 222 SHIPPED 2026-07-05 (`8b5a9bb`) — "Transferred" removed from `intro`, `indeed-hook`'s transfer buffer fixed, not-available option added
+
+- **intro:** dropped the dead "Transferred" option; BRANCH question trimmed to "Do they confirm?"; remaining two color-tagged: "Yeah / speaking" `[GOOD]`, "No" `[BAD]`.
+- **indeed-hook:** "Transferring" recolored `[GOOD]`→`[HESITANT]` and retargeted from the direct qualifier shortcut to a new transfer-reintro line ("Hey — I saw y'all were hiring for a [job title]. I don't know if you can help me, but are you guys missing calls? Is that part of why you're posting for the role?"), forking into the same 3 downstream targets so nothing needed duplicating.
+- **New option:** "They're not here right now / I'll leave a message" `[HESITANT]` → "No worries — is there a better time to try them, or should I just leave a quick message?" → `Set status Follow-Up.`, terminal.
+- Applied consistently to **both** places this pattern is unrolled in the file (direct Yeah/speaking path and the No→recovery→Yes path) — the brain doc spec only named one conceptual node, but this codebase fully unrolls duplicated branches rather than referencing shared nodes.
+- Old standalone `transferred` node (base v3) confirmed dead (its only route in was intro's removed option; repo-wide grep found no other references) — deleted, ~24 lines.
+- Verified live via a temporary `/dev-script-preview` route (added to `App.jsx`, tested, fully removed before commit — no such route existed this session). `npx vite build` passes; `git diff --stat` confirmed only `discoveryScript.js` changed. Full detail: [[Memories]] session log 2026-07-05 (Prompt 222 shipped).
+- **Process note:** Prompt 221 was added to this queue (above 222) mid-session, after 222 was already picked up and in progress — so 222 shipped before 221. No conflict (different sections of the file), but flagging so the "top to bottom" ordering assumption doesn't get treated as violated silently.
+
+---
+
 ### ✅ Prompts 219+220 SHIPPED 2026-07-05 (`0063f68`) — Handoff's bridge+pitch+time-ask merged into ONE screen, time-ask wording trimmed
 
 - **220 (structural):** removed the `[[BREAK]]` marker Prompt 215 added after `pitch-receptionist` — per Brayden's principle (a plain Next is only legitimate at a genuine capture/pause point, never a pacing break between two lines of pure monologue with no response expected), and since `bridge`→`pitch-receptionist`→`time-ask` is monologue end to end until the actual fork, it now renders as ONE continuous block (all 3 lines joined via Prompt 216's single-paragraph `SayBlock`) ending directly in `time-ask`'s real fork — no intermediate Next tap.
