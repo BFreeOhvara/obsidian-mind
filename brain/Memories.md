@@ -3804,3 +3804,7 @@ Session resumed after context compaction. Prompt 148 seed bug (rep_profile_id �
 
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 221 (Handoff's bridge+pitch+time-ask monologue tightened — cut filler/contradiction/hesitant-closer, punchier wording; day-offer split out of the monologue into a new confirm-time node gated behind a real "Good/shows interest" fork, mirroring Prompt 218's Who-is-this sub-fork pattern; other 4 objection paths unaffected) shipped 2026-07-05, commit a3d2ced, verified live via a temporary /dev-script-preview route (added + removed this session), pushed. LIVE_STATE's CC queue is now empty — check [[North Star]]'s Current Focus, or wait for Falcon to queue the next item.`
+
+---
+
+**[CC | 2026-07-05 — Session close, Prompts 221+222 both shipped]** — Confirmed both queue items this session are shipped and logged: Prompt 222 (`8b5a9bb`) and Prompt 221 (`a3d2ced`), both in `ohvara-dashboard`, both pushed; vault log/LIVE_STATE updates for both pushed to `obsidian-mind` (`1921aa4`, `e9d6be9`, `0716b87`). LIVE_STATE's "Next Up for CC" queue is empty. No open blockers for Brayden beyond what's already carried in the two entries above (Prompt 211's transferred-node neutral-tone question, Prompt 213's never-reproduced Objections color bug).
