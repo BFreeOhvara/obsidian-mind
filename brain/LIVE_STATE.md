@@ -20,6 +20,38 @@ tags:
 
 ---
 
+### ✅ Prompt 218 SHIPPED 2026-07-05 (`613b310`) — Handoff's "who is this" objection no longer re-enters Vitals
+
+- Root-caused: `discoveryScript.js` Handoff section, `"Who is this / what company?"` objection's decision-maker fork — `↳ IF That's me: → Go to Vitals Check` — routed backward into Vitals (section 2), a section already completed earlier in the same call. Confirmed live via the standing temp `/dev-script-preview` route: full Opener→Vitals→Pain→Handoff walk, clicked the objection → "That's me" → landed back on Vitals' first question with a bare Next, exactly as Brayden reported.
+- **Full route audit performed** (per Brayden's ask — not just the one instance): grepped every `Go to `/`→ Go` line in `discoveryScript.js`. Section order is Opener(1)→Vitals(2)→Pain(3)→Handoff(4)→Close(5). All ~30 other route lines are forward-only (Opener→Vitals throughout the qualifier fork, Pain→Handoff, Handoff→Close ×4). **This was the only backward route in the entire script** — no other instance of the bug class found.
+- **Fix:** replaced the bad route with an embedded time-ask fork, matching the exact pattern already used for Handoff's other 3 non-"Picks a time" objections (e.g. "How much does this cost?"): `"That's me"` → `"Does [Tuesday morning] or [Wednesday afternoon] work better for you?"` → `Picks a time [GOOD]` → Close, `Still hesitant [HESITANT]` → Follow-Up status. No more re-entering earlier sections; "That's [owner]" gatekeeper-timing branch untouched (was already correct).
+- Verified live: re-walked Opener→Vitals→Pain→Handoff→"Who is this?"→"That's me" — now shows the new time-ask fork; "Picks a time" correctly lands on Close ("[Day] at [time]..."). `npx vite build` passes. Temp `/dev-script-preview` route added to `App.jsx` for the walk, removed before commit (confirmed clean diff — only `discoveryScript.js` changed).
+
+---
+
+### Prompt 217 (QUEUED 2026-07-05, Falcon) — smooth bridge→pitch transition, cut robot/voice aside from `pitch-receptionist`
+
+Brayden reviewed the shipped bridge+pitch screen live and wants the opening reworded. Full spec + rationale in [[setter-script-v3-camden-style]] under "v3.5 PATCH PROPOSED 2026-07-05."
+
+**Node: pitch-receptionist** — replace SAY with:
+"instead of filling this role with a person, we'd build you a system made exactly for this — it catches the calls you'd otherwise miss, does missed-call text-back, answers questions, and books appointments straight to your calendar. All you'd have to do is show up to the meeting — and it means you might not even need to finish out this hire the way you'd planned."
+
+Cut entirely: "Basically," / "an AI receptionist" / "not some robot press-one thing, a real human feel, we can even make it your voice." `handoff-bridge` (the preceding line, "...Here's what I'd do for you:") is unchanged — the new opening is written to flow directly off it. Feature list and closing line unchanged.
+
+**Verification (rule #11):** screenshot the merged bridge+pitch screen confirming the new wording reads live, no leftover "Basically"/robot-voice language.
+
+---
+
+### Prompt 216 (QUEUED 2026-07-04, Falcon) — remove the internal paragraph gap inside merged say-blocks; truly one continuous line
+
+Prompt 215 correctly merged multi-line say-chains into a single bordered box, but the original lines are still rendering as separate paragraphs WITHIN that one box (visible blank-line gap between them) — confirmed on both Pain's 2-line chain and Handoff's bridge+pitch screen (both screenshotted live by Brayden). He wants zero visual gap: the lines should read as one truly continuous flowing paragraph, joined by a space, not stacked as separate paragraphs inside the same box.
+
+**What to do:** find wherever the merged chain's lines are being joined for render (likely `.map()`-ing each line into its own `<p>`/block element with margin, inside `ScriptWalk.jsx`'s combined-say rendering from Prompt 215) and join them with a single space into one flat string/paragraph instead — no line break, no blank-line gap, no separate paragraph elements. Applies everywhere a chain-merge produces multi-line content: Pain's 2-line chain, Handoff's bridge+pitch screen (post-215's 2-screen split), and any other merged chain in the script.
+
+**Verification (rule #11):** screenshot Pain and Handoff's bridge+pitch screen confirming the text now reads as one unbroken paragraph with no visible gap between the original lines.
+
+---
+
 ### ✅ Prompt 215 SHIPPED 2026-07-04 (`12f0619`) — merged say-chains render as ONE continuous block; Handoff's 3-line chain split into 2 screens
 
 - `SayCard`/`SayWithFork`/new `SayChain` now share one `SayBlock` renderer — a merged chain (Pain's 2-line do-the-math+reflection, Handoff's bridge+pitch) shows as one continuous bordered card, not N stacked boxes. Confirmed live via `parentElement` equality on the rendered paragraphs.

@@ -64,6 +64,33 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-05 (cont.) — Falcon session: objection fork restarts the whole script; full routing audit queued (Prompt 218)
+
+**What happened:** Brayden reproduced a real routing bug live (3 screenshots): Handoff's `"Who is this / what company?"` objection option → a "who would be responsible / is that you?" decision-maker screen with `"That's me"`/`"That's [owner]"` fork → selecting `"That's me"` lands back on **Vitals**' "how many calls do you get in a month" — a section already completed earlier in the same call, effectively restarting the whole script. He also asked directly whether CC can audit its own full body of work (all prompts/sections it's built) in one pass rather than him manually clicking through every screen to catch more of these. Answer: yes — queued **Prompt 218** asking CC not just to fix this one instance but to systematically walk every fork's route target across all of `discoveryScript.js` and confirm none point backward into an earlier section, fixing every instance found and posting the full audit list back to Memories.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 216 (paragraph-gap), 217 (pitch-receptionist rewrite, needs sign-off), and 218 (objection-fork restart bug + full routing audit) are all queued for CC in LIVE_STATE.`
+
+---
+
+### 2026-07-05 — Falcon session: smooth bridge→pitch transition, cut robot/voice aside (Prompt 217 queued)
+
+**What happened:** Brayden reviewed the live Handoff bridge+pitch screen and dictated a rewrite of `pitch-receptionist`'s opening: drop "Basically," (doesn't flow off `handoff-bridge`'s "Here's what I'd do for you:"), cut "not some robot press-one thing, a real human feel, we can even make it your voice" entirely, and swap "an AI receptionist" for "a system"/"tailored system" language per his own words — reasoning that the product doesn't need heavy explanation if it's framed as solving the exact problem they already signaled. Feature list and closing "might not even need to finish out this hire" line left untouched — not flagged. Wrote the rewrite as **v3.5 PATCH PROPOSED** in [[setter-script-v3-camden-style]], queued as **Prompt 217** in [[LIVE_STATE]] (still awaiting Brayden's sign-off before CC builds it, per this doc's standing pattern for creative pitch rewrites — flagged explicitly that "a system" trades away the "AI receptionist" branding term used elsewhere in Training Center materials, easy to revert if that matters live). Prompt 216 (internal paragraph-gap fix) remains queued, unshipped, ahead of 217 in the queue.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 216 (paragraph-gap fix) and Prompt 217 (pitch-receptionist rewrite, needs Brayden's sign-off on wording) are both queued for CC in LIVE_STATE.`
+
+---
+
+### 2026-07-04 (cont. 7) — Falcon session: kill the remaining internal paragraph gap inside merged boxes (Prompt 216 queued)
+
+**What happened:** Brayden confirmed Prompt 215 shipped correctly (Pain and Handoff both now render as one bordered box instead of stacked separate ones) but found one more layer of the same complaint: inside that single box, the original lines still show as separate paragraphs with a visible blank-line gap between them. He wants zero gap — one truly continuous flowing paragraph, lines joined by a space, not stacked. Queued as **Prompt 216**, scoped to wherever the merged-chain lines get joined for render (likely still rendering each original line as its own paragraph element inside the combined box from 215's fix).
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 216 (remove internal paragraph gap inside merged say-blocks) is queued for CC in LIVE_STATE.`
+
+---
+
 ### 2026-07-04 (cont. 6) — Falcon session: merged chains should be one continuous block, not stacked boxes; Handoff split into 2 screens (Prompt 215 queued)
 
 **What happened:** Brayden reviewed Handoff live post-Prompt 214 and flagged that the merged chain (Prompt 213's fix) renders as three separate bordered boxes stacked on one screen, which visually reads as three distinct response moments even though only the last one (the ask) is a real decision point — the "not smooth"/"throws it off" feeling. He proposed two options and asked which was better: split it back into separate steps, or cram it into one box. Neither, exactly — diagnosed it as a presentation problem, not a pacing problem, and proposed a third option he then confirmed:
@@ -3649,3 +3676,18 @@ Session resumed after context compaction. Prompt 148 seed bug (rep_profile_id �
 
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 213 (generalized say+fork chain combine for Pain/Handoff, Objections two-click bug root-caused and fixed via direct routing at Handoff, standalone Objections section deleted) shipped 2026-07-04, commit 6c054eb, verified live, pushed. LIVE_STATE's CC queue is now empty — check North Star's Current Focus for what's next. Two things still open for Brayden: (1) carried over from Prompt 211 — should transferred's SAY line drop its diagnostic clause to match indeed-hook's new neutral tone; (2) NEW — the reported green Objections fork-coloring bug did not reproduce in testing (confirmed red/var(--danger) both via direct entry and the real Handoff-routed path) — ask Brayden to re-check on his end since it may have been a stale-build/cache issue, or was already resolved by this session's routing fix removing that screen from the real flow entirely.`
+
+## Session Log — 2026-07-05 (Prompt 218 shipped) — Handoff objection no longer re-enters Vitals; full route audit found no other instances
+
+**What happened:** Executed the queued [[LIVE_STATE]] Prompt 218 (Brayden's live reproduction: Handoff's `"Who is this / what company?"` objection → `"That's me"` was landing back on Vitals' first question, appearing to restart the whole call) in `ohvara-dashboard`, commit `613b310`, pushed.
+
+- **Root cause confirmed exactly as Brayden's hypothesis suspected.** `discoveryScript.js`'s Handoff section had `↳ IF That's me: → Go to Vitals Check` — a leftover route that was never repointed after Prompt 213's objection-embedding work moved this decision-maker check's logic around. `routeTarget()` matched "vitals" in the text and jumped straight to section 2, even though Vitals (and Pain, and the rest of Handoff) had already run earlier in the same call.
+- **Full route audit, not just the one instance** (Brayden's explicit ask): grepped every `Go to `/`→ Go` line in the file — Opener(1)→Vitals(2)→Pain(3)→Handoff(4)→Close(5) is the section order. All other ~30 route lines are forward-only (Opener's qualifier fork → Vitals throughout, Pain → Handoff, Handoff's 4 clean paths → Close). **This was the single backward route in the entire script** — confirmed, not assumed, by checking every match.
+- **Fix:** replaced the bad route with an inline embedded fork, mirroring the exact pattern Handoff already uses for its other 3 non-"Picks a time" objections (e.g. "How much does this cost?"'s "Just need a ballpark" branch): `"That's me"` → `"Does [Tuesday morning] or [Wednesday afternoon] work better for you?"` → `Picks a time [GOOD]` → Close, `Still hesitant [HESITANT]` → Follow-Up status (send info). `"That's [owner]"` gatekeeper-timing branch was untouched — it was already correct (forward to Follow-Up, no route at all).
+- **Verified live** via a temporary `/dev-script-preview` route added to `App.jsx` (unauthenticated, mounts `ScriptWalk` directly with a demo lead) — walked the full Opener→Vitals(captured 3/day, $250 ticket)→Pain(engaged)→Handoff path, clicked the objection, clicked "That's me": now shows the new time-ask fork instead of re-entering Vitals; clicked "Picks a time" and confirmed it lands correctly on Close's "[Day] at [time]..." line. Route removed before commit — confirmed via `git diff --stat` that only `discoveryScript.js` changed.
+- `npx vite build` passes.
+
+**Lesson:** logged to [[Gotchas]] — `"Go to X"` routes in `discoveryScript.js` are just regex-matched section jumps (`routeTarget()` string-matches "vitals"/"pain"/"handoff"/"opener" in the route line's text), with no awareness of call history, so a route left over from an earlier version of the script can silently point backward into an already-completed section. Whenever a Handoff/Close-stage objection gets its content embedded (the established pattern since Prompt 213 for this DSL's no-cross-section-node-routing limitation), double check its resolution routes FORWARD, not to whatever the original standalone node used to route to.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 218 (Handoff's "who is this" objection no longer re-enters Vitals; full backward-route audit of discoveryScript.js found no other instances) shipped 2026-07-05, commit 613b310, verified live, pushed. LIVE_STATE's CC queue is now empty — check North Star's Current Focus for what's next. Two things still open for Brayden, carried over unresolved: (1) from Prompt 211 — should transferred's SAY line drop its diagnostic clause to match indeed-hook's neutral tone; (2) from Prompt 213 — the reported green Objections fork-coloring bug never reproduced (confirmed red/var(--danger)) — ask Brayden to re-check on his end.`
