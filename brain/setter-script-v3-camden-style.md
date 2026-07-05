@@ -96,6 +96,20 @@ SAY: "I don't want to waste your time here. I have a team that works with busine
 SAY: "Basically, instead of filling this role with a person, we'd build you an AI receptionist made for exactly this — not some robot press-one thing, a real human feel, we can even make it your voice — it catches the calls you'd otherwise miss, does missed-call text-back, answers questions, and books appointments straight to your calendar. All you'd have to do is show up to the meeting — and it means you might not even need to finish out this hire the way you'd planned."
 *(This is a creative-judgment rewrite, not a mechanical edit — Brayden should react to the exact wording before CC builds it, same as any content proposal in this doc.)*
 
+---
+
+## v3.5 SHIPPED 2026-07-05 (`a5941da`) — smooth the bridge→pitch transition, cut the robot/voice aside
+
+Brayden reviewed the shipped bridge+pitch merged screen live and dictated a rewrite: drop "Basically," as the opener (doesn't flow off `handoff-bridge`'s "Here's what I'd do for you:"), cut "not some robot press-one thing, a real human feel, we can even make it your voice" entirely, and swap "an AI receptionist" for plainer "a system" language — his words: "we build a tailored system, a call answering system, whatever, made exactly for this... we don't really have to explain the product that much if it solves their problem." Feature list (missed-call text-back / answers questions / books appointments) and the closing "might not even need to finish out this hire" line are untouched — he didn't flag those.
+
+**Node: pitch-receptionist** *(reworded opening only; feature list and closer unchanged)*
+SAY: "instead of filling this role with a person, we'd build you a system made exactly for this — it catches the calls you'd otherwise miss, does missed-call text-back, answers questions, and books appointments straight to your calendar. All you'd have to do is show up to the meeting — and it means you might not even need to finish out this hire the way you'd planned."
+
+Once merged with the unchanged `handoff-bridge` line (and once Prompt 216 lands, rendering as one continuous paragraph), the full screen reads:
+"I don't want to waste your time here. Like I said — that's $[annual] a year you're leaving on the table just from calls that don't get picked up. Here's what I'd do for you: instead of filling this role with a person, we'd build you a system made exactly for this — it catches the calls you'd otherwise miss, does missed-call text-back, answers questions, and books appointments straight to your calendar. All you'd have to do is show up to the meeting — and it means you might not even need to finish out this hire the way you'd planned."
+
+*(Creative-judgment call, flagging explicitly: swapped "an AI receptionist" for "a system" per Brayden's own wording. Tradeoff — "system" is vaguer than "AI receptionist," which is the actual product term used elsewhere in Training Center materials. If that ambiguity is a problem on live calls, easy to swap back to "an AI receptionist made exactly for this" while keeping everything else cut. Flagging for Brayden's sign-off before CC builds it, same as every prior pitch rewrite in this doc.)*
+
 [[setter-transcripts-camden-cash]] · [[setter-script-v2-flow]] · [[ohvara-setter-discovery-script]] · [[LIVE_STATE]]
 
 ---

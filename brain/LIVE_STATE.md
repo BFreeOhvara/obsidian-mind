@@ -29,16 +29,10 @@ tags:
 
 ---
 
-### Prompt 217 (QUEUED 2026-07-05, Falcon) — smooth bridge→pitch transition, cut robot/voice aside from `pitch-receptionist`
+### ✅ Prompt 217 SHIPPED 2026-07-05 (`a5941da`) — bridge→pitch transition smoothed, robot/voice aside cut from `pitch-receptionist`
 
-Brayden reviewed the shipped bridge+pitch screen live and wants the opening reworded. Full spec + rationale in [[setter-script-v3-camden-style]] under "v3.5 PATCH PROPOSED 2026-07-05."
-
-**Node: pitch-receptionist** — replace SAY with:
-"instead of filling this role with a person, we'd build you a system made exactly for this — it catches the calls you'd otherwise miss, does missed-call text-back, answers questions, and books appointments straight to your calendar. All you'd have to do is show up to the meeting — and it means you might not even need to finish out this hire the way you'd planned."
-
-Cut entirely: "Basically," / "an AI receptionist" / "not some robot press-one thing, a real human feel, we can even make it your voice." `handoff-bridge` (the preceding line, "...Here's what I'd do for you:") is unchanged — the new opening is written to flow directly off it. Feature list and closing line unchanged.
-
-**Verification (rule #11):** screenshot the merged bridge+pitch screen confirming the new wording reads live, no leftover "Basically"/robot-voice language.
+- `pitch-receptionist`'s SAY line replaced exactly per Brayden's dictated wording: cut "Basically," / "an AI receptionist" / "not some robot press-one thing, a real human feel, we can even make it your voice" — new opening "instead of filling this role with a person, we'd build you a system made exactly for this..." flows directly off `handoff-bridge`'s unchanged "...Here's what I'd do for you:" with no jarring restart. Feature list and closing line ("might not even need to finish out this hire") untouched.
+- Verified live via the standing temporary `/dev-script-preview` route (removed pre-commit): full Opener→Vitals→Pain→Handoff walk, merged bridge+pitch screen confirmed reading as one continuous block with the new wording, no leftover "Basically"/robot-voice language. `npx vite build` passes; `git diff --stat` confirmed only `discoveryScript.js` changed after route cleanup.
 
 ---
 
