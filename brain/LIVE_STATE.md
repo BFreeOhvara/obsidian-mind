@@ -22,13 +22,13 @@ tags:
 
 ---
 
-### 🔲 Prompt 235 QUEUED 2026-07-06 (Eagle, bug + style follow-up on Prompt 234) — fix broken calendar popup when All Time is active, add a default box around All Time
+### ✅ Prompt 235 SHIPPED 2026-07-06 (`53e5f06`, pushed) — fixed calendar-popup ghosting bug, All Time gets a default box
 
-**My Stats page, the new day-calendar + All Time control from Prompt 234.**
+**A. Root-caused and fixed the "holographic" popup bug.** It was self-inflicted in Prompt 234: an `opacity: viewMode === 'all' ? 0.5 : 1` wrapper `<div>` around `<DayFilterBar>` (meant as a subtle "this control isn't driving the KPIs right now" visual cue) also wrapped `DayFilterBar`'s own popover, since the popover renders as a child of whatever wraps the component. Opening the calendar while All Time was active rendered the whole popup — text, grid, background — at 50% opacity, ghosted over the KPI cards behind it. Removed the wrapper entirely; the popup now renders fully solid regardless of which mode is active. Live-verified: computed `opacity` on the popover and every ancestor up to the page-transition wrapper reads `1` when opened during All Time.
 
-**A. Bug — calendar popup renders broken/"holographic" when All Time is the active selection.** Brayden opened the day-calendar while All Time was selected and got a visibly broken popup: text and calendar-grid numbers overlapping/ghosted with the KPI card behind it (looked semi-transparent, like a stacking/z-index/background bug), not the clean solid popup it renders as when a specific day is selected instead. **Investigate and fix first** — likely something conditional on the All-Time-active state is leaking into the calendar popup's own styling (background/opacity/z-index tied to the wrong element, or a shared class colliding). The popup must render identically solid/normal regardless of whether All Time or a specific day is the currently-active selection — there's no reason opening the calendar should look any different based on which button was active before you opened it.
+**B. All Time button now has a default bordered box.** Swapped its unselected-state variant from `ghost` (no border at all) to `secondary` (bordered, matches the day-trigger button's always-boxed look) — filled/`primary` still applies when it's the active selection.
 
-**B. Style — give the "All Time" button a default box/border, not just bare text.** Right now All Time has a filled/highlighted look only when it's the active selection (fine, keep that) — but in its default *unselected* state it's just floating text with no visual container ("the words are up there"), unlike the date-trigger button next to it which always has a bordered box whether or not it's active. Give All Time the same always-has-a-box treatment as the date trigger — a visible bordered box in its default state so it reads as a clickable control, distinct from its filled/active-selected look.
+`npx vite build` passes. Live-verified both fixes with real data/no mocking.
 
 ---
 

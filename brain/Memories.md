@@ -64,6 +64,23 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-06 (cont. 29) — CC session: Prompt 235 shipped + pushed — fixed a bug I introduced in Prompt 234 (calendar-popup ghosting) + All Time default box
+
+**[CC | 2026-07-06 — Prompt 235: root-caused the "holographic" calendar popup, gave All Time a default box]** — Read LIVE_STATE's queue (Prompt 235, Eagle's bug+style follow-up on Prompt 234), executed against `ohvara-dashboard`.
+
+**A.** Brayden reported the day-calendar popup rendered visibly broken — ghosted/translucent, overlapping the KPI card behind it — whenever it was opened while All Time was the active selection. Root cause: my own Prompt 234 addition, an `opacity: viewMode === 'all' ? 0.5 : 1` wrapper `<div>` around `<DayFilterBar>` meant as a subtle "not currently driving the KPIs" visual cue. Since `DayFilterBar`'s popover renders as a child of whatever wraps the component, that opacity applied to the *entire popover* too — not just the always-visible trigger buttons — producing exactly the ghosting Brayden saw. Fix: removed the wrapper entirely. Live-verified via `getComputedStyle` on the popover and every ancestor up to the page-transition wrapper: all read `opacity: 1` when opened during All Time (one further-up ancestor, the `.page-enter` class, read `0` — but that's the same known rAF/CSS-animation blind spot already logged after Prompt 231's KPICard verification, where mount animations don't advance in this specific headless preview tool; unrelated to this fix and would affect the whole page equally, not just the calendar popup).
+
+**B.** Also fixed the smaller style ask alongside it: All Time's unselected state was `ghost` variant (zero border, "just floating text" per Brayden) — swapped to `secondary` (bordered box) so it always reads as a clickable control, matching the day-trigger button's default look. `primary` (filled) still applies when active.
+
+`npx vite build` passes. Committed (`53e5f06`) and pushed to `origin/master` per standing authorization. LIVE_STATE queue is now empty.
+
+**Lesson:** a "nice to have" visual affordance I added beyond what a prompt actually asked for (the opacity dimming in Prompt 234) was the direct cause of the very next prompt's bug report. When wrapping a shared component in a page-specific style for a cosmetic reason, check whether that component renders a portal/absolute-positioned child (popover, modal, tooltip) that will inherit the wrapper's styling unintentionally — cheaper to skip the unrequested polish than to debug its side effects a prompt later. Ties into [[Patterns]]/scope discipline: don't add features beyond what's asked.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 235 is shipped, pushed, and live-verified (ohvara-dashboard@53e5f06). Fixed a bug from Prompt 234 (calendar popup opacity ghosting) plus gave the All Time button a default bordered box. LIVE_STATE queue is empty.`
+
+---
+
 ### 2026-07-06 (cont. 28) — CC session: Prompt 234 shipped + pushed — My Stats gets shared DayFilterBar + All Time toggle, live-verified with real data
 
 **[CC | 2026-07-06 — Prompt 234: replace My Stats' 5-tab selector with the shared single-day DayFilterBar + a standalone All Time button]** — Read LIVE_STATE's queue (Prompt 234, Eagle's follow-up on Brayden's live review of Prompt 233), executed against `ohvara-dashboard`.
