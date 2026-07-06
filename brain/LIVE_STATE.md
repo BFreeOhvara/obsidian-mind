@@ -20,7 +20,7 @@ tags:
 
 ---
 
-### ✅ Prompt 231 SHIPPED 2026-07-06 (`e33c840`, unpushed — needs authorization) — 6 UI fixes from Brayden's live review
+### ✅ Prompt 231 SHIPPED 2026-07-06 (`e33c840`, pushed) — 6 UI fixes from Brayden's live review
 
 **A. Activity Feed row divider** — dropped the `isLast` conditional in `ActivityFeed.jsx`'s `FeedItem`; every row (including the last) now gets unconditional `border-bottom: 0.5px solid var(--border)`, matching `MyCalls.jsx`.
 
@@ -34,7 +34,7 @@ tags:
 
 **F. LiveClock** — `formatInTimezone` opts switched to `hour: 'numeric', minute: '2-digit', hour12: true` (12h + AM/PM); dropped the `timezoneAbbr` call entirely; added a `border: 0.5px solid var(--border)` box around the time span only. In `MyLeads.jsx` and `Overview.jsx`, swapped the sibling order so the existing static date span renders before `<LiveClock>` (both already used the `"Monday, Jul 6"`-style format, so no date-format change needed — just reorder). **Live-verified** as apex11: header read "Monday, Jul 6" then a bordered "12:30 AM" box.
 
-Verified end-to-end via real seeded login (`apex11`/`Apex2026!` — Prompt 230's local `.env.local` key fix means real login now works, no `AuthContext` mocking needed) rather than temp mock routes. `npx vite build` passes. `git status --short` clean. Committed `e33c840` — **push still needs Brayden's authorization** per standing convention.
+Verified end-to-end via real seeded login (`apex11`/`Apex2026!` — Prompt 230's local `.env.local` key fix means real login now works, no `AuthContext` mocking needed) rather than temp mock routes. `npx vite build` passes. `git status --short` clean. **Pushed** — Brayden authorized it; `git push origin master` landed `13cd766..e33c840` on `origin/master`, which also carried Prompt 230's previously-stranded `b49f9e0` (`.env.example` doc fix) along with it. `ohvara-dashboard` `master` now matches `origin/master` exactly.
 
 ---
 
