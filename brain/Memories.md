@@ -4302,3 +4302,12 @@ No code touched this session (Eagle/Cowork, vault-only) — Prompt 231 is queued
 
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompts 239, 240, 241 all shipped + pushed this session (285ddc4, 92d975c, 4be0da9). LIVE_STATE's Next Up for CC queue is empty — nothing pending. Check North Star's Current Focus, or wait for Eagle/Falcon to queue new work.`
+
+---
+
+## Session Log — 2026-07-06 (Eagle) — Prompt 242 queued: Settings X button, remove password change + Calling section
+
+**What happened:** Confirmed Prompts 239/240/241 all shipped + pushed. Brayden reviewed the live Settings page and wants three changes: (A) an X close button top-right, since opening it from the gear icon feels like it should be dismissible; (B) remove the Change Password section entirely — he doesn't want reps able to change their own password from here; (C) remove the Calling/working-hours section entirely — informational-only today, not needed. Also answered a factual question (not a build item): payouts run through the existing Stripe Connect flow, which requires a real bank account (routing + account number) — Chime would work fine since it provides standard bank account details via its partner bank, but PayPal isn't supported through Stripe Connect payouts, that would need a separate integration. Queued the 3 build items as **Prompt 242** in [[LIVE_STATE]]. No code touched this session (Eagle/Cowork, vault-only).
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 242 is queued in LIVE_STATE: add an X close button top-right of the Settings page, remove the Change Password section entirely (fields + handler, not just hidden), remove the Calling/working-hours section entirely (check if working_hours_* columns are referenced elsewhere before deciding to leave/flag them). Nothing else queued.`

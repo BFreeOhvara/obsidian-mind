@@ -18,7 +18,19 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
-*(Queue empty — nothing pending for CC. Prompt 236 was superseded by Prompt 238 before either was built — never shipped separately.)*
+### 🔲 Prompt 242 QUEUED 2026-07-06 (Eagle, from Brayden's live review of Settings) — X close button, remove Change Password + remove Calling section
+
+**Settings page (`src/pages/Settings.jsx`, opened via the sidebar gear icon).**
+
+**A. Add an X close control, top-right of the page.** Feels like it should behave like a dismissible panel when opened from the gear icon — add an X in the top-right corner that navigates back (to wherever the rep was before opening Settings, or a sensible default like `/rep` if there's no reliable "came from" state).
+
+**B. Remove the Change Password section entirely** (New Password/Confirm Password fields + Update Password button, under Account). Brayden doesn't want reps able to change their own password from here — remove the UI and whatever handler/mutation backs it, don't just hide it.
+
+**C. Remove the Calling section entirely** (Start/End working-hours fields + Save button, bottom of the page). It's informational-only today (nothing gated on it per its own subtitle) and not needed — remove the section, its fields, and whatever `working_hours_*` read/write wiring backs it. Check whether `working_hours_*` columns are referenced anywhere else before deciding whether to leave them in place or note them as now-fully-dead — report which.
+
+---
+
+
 
 ---
 
