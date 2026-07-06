@@ -20,16 +20,18 @@ tags:
 
 ---
 
-### Prompt 230 (QUEUED 2026-07-05, Falcon, URGENT — jump this to the front) — push the 2 stranded local commits; confirm 223-227 are actually deployed; root-cause the standing login-401 issue
+### ✅ Prompt 230 SHIPPED 2026-07-06 (`13cd766` pushed + `b49f9e0`) — pushed stranded commits, confirmed 223-229 all live, root-caused the login-401 for real
 
-**Partial cause already confirmed, no investigation needed for this part:** Prompts 228 (`13cd766`) and 229 (`cf384ca`) were committed successfully but `git push origin master` was **blocked by the auto-mode classifier** (direct push to default branch requires explicit authorization) — both commits are local-only in CC's `ohvara-dashboard` checkout, never reached GitHub, so Vercel never deployed them. **Brayden has now explicitly authorized this — push both immediately at the start of this prompt**, then confirm `git status` shows clean/up-to-date with `origin/master` and that Vercel's next deploy picks up both commits.
+**1. Push:** Brayden authorized it — `git push origin master` succeeded (`13cd766`, which includes `cf384ca` as its ancestor). `ohvara-dashboard` `master` now matches `origin/master` exactly (0 ahead/behind).
 
-**Still needs real investigation:**
-1. Brayden reported "none" of Prompts 223-229 showing on his real dashboard — but 223-227 were explicitly confirmed pushed to origin already (unlike 228/229). If those still aren't visible after the 228/229 push + a hard refresh, check the live Vercel deployment's actual deployed commit against what's been reported shipped — there may be an unrelated stuck/failed build in between.
-2. **Root-cause the "Legacy API keys are disabled" 401 issue, for real this time** — it's been noted as a recurring aside across at least 5 separate prompt verifications (223, 225, 226, 227, 229 all mention it) and worked around via mocked dev-preview routes instead of ever being fixed. Check Supabase project API key settings directly — is this a real, live problem for actual users (including Brayden's own test login), or specific to the old seeded test accounts? This is the first time in the whole session anyone has actually tried to fix it rather than route around it — treat it as no longer optional to defer.
-3. Report back plainly: confirm the push resolved 228/229, confirm whether 223-227 are actually live now too, and give a real status on the login/401 issue rather than another aside.
+**2. Deployment confirmed via Vercel MCP, not assumed:** `ohvara-dashboard.vercel.app`'s production alias points at `dpl_EWatuUMqducSKez4vL3bQASovUzX` = commit `13cd766`, `readyState: READY`, `aliasError: null` — Prompts 223-229 are ALL genuinely live in production (each of 223-227 has its own earlier READY production deployment too). This was never a Vercel/deployment gap.
 
-**This is urgent — treat as blocking, not routine backlog.**
+**3. Root-caused the 401 for real (previously only routed around across 223/225/226/227/229):** Supabase disabled legacy JWT API keys project-wide on 2026-06-14 (confirmed via `get_publishable_keys` — the `anon` key shows `disabled: true`) in favor of a new `sb_publishable_...` key. Direct `curl` proof: the old key returns `401 {"message":"Legacy API keys are disabled"}`; the new key returns `200`.
+   - **Production was never affected** — pulled the live deployed JS bundle from `ohvara-dashboard.vercel.app` and confirmed it already embeds the new `sb_publishable_...` key (Vercel's env var was updated correctly at some point, just never propagated to the local dev machine). Brayden and real users have working logins right now; his "nothing showing" report is NOT an auth or deployment problem.
+   - **The actual bug was local-only:** `ohvara-dashboard/.env.local`'s `VITE_SUPABASE_ANON_KEY` still had the old disabled legacy JWT — this is why every temp `/dev-preview*` verification harness across 5+ prompts had to mock `AuthContext` instead of testing with real login. Fixed `.env.local` to the new publishable key (gitignored, local-only change, not committed). **Verified end-to-end**: real login as the seeded `apex11@ohvara.internal` Test Rep against the live Supabase project succeeded with zero mocking — full My Leads dashboard loaded with real batch/stats/training data, no console errors.
+   - Also fixed the committed `.env.example` template (`b49f9e0`, **still unpushed — needs authorization**) — it had the same disabled legacy key hardcoded as a live-looking example, which would have handed the identical bug to any future fresh clone. Replaced with a placeholder + a note on the 2026-06-14 legacy-key disable, since the classifier correctly blocked writing the actual key value into a committed template file.
+
+**Remaining action for Brayden:** `git push origin master` from `~/ohvara-dashboard` to land `b49f9e0` (the `.env.example` doc fix) — small, no functional effect on prod, but closes the loop for future setups.
 
 ---
 
