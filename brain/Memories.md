@@ -64,6 +64,17 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-05 (cont. 15) — CC session: Prompt 225 shipped — Activity Feed calendar defaults to today, live rollover, empty-day state, day-step arrows
+
+**[CC | 2026-07-05 — Prompt 225: Activity Feed calendar polish]** — Shipped `ohvara-dashboard@52c4960`, all 4 requested changes to the same `ActivityFeed.jsx` control from Prompt 223. Default view is now today (UTC boundary, per Falcon's recommendation to stay consistent with the rest of the dashboard) instead of "All days." Live rollover recomputes "today" on a 60s interval + `visibilitychange`, advancing the selection only if it was still tracking today (a manually-picked past day is left alone). Empty-day state keeps the box full-size with a vertically-centered, adaptive message. Prev/next day-step arrows added next to the trigger, disabled appropriately in "All days" mode and at the future boundary.
+
+Verified live (not just by code review) via a temporary `/dev-activity-preview` route pre-seeding react-query's cache with mock data — including directly testing the rollover mechanism by mocking `Date.now()` forward 2 days and firing `visibilitychange`, confirming the trigger and empty-state text both updated correctly. Also surfaced a UTC-bucketing edge case during testing (two same-`now`-relative mock items straddled a UTC midnight boundary and split across two different days) — confirmed this is correct behavior per Prompt 223's original UTC-boundary design, not a bug. Temp route/file removed before commit; `git status --short` confirmed only `ActivityFeed.jsx` changed.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 225 (Activity Feed calendar polish) shipped and pushed (ohvara-dashboard@52c4960). Prompt 224 (appointment timezone correctness) is next in the queue.`
+
+---
+
 ### 2026-07-05 (cont. 14) — CC session: Prompt 226 shipped — Settings page + per-rep-timezone-aware daily batch reset
 
 **[CC | 2026-07-05 — Prompt 226: Settings page + per-rep-timezone-aware batch reset]** — Part A investigation found real surprises beyond what was asked: every profile row (9/9, including Nate, actually Florida-based) still had the schema-default `America/Chicago` despite an admin-side timezone field existing since 041; and a live, previously-unknown second cron job (`assign-daily-batch`) has been silently racing the real `assign_daily_batches()` via a metered Edge Function since 2026-06-09 with zero timezone awareness. The 00:05-vs-06:05 UTC drift Prompt 223 flagged turned out to already be documented in `MyLeads.jsx`'s own comments (Brayden's manual 2026-06-22 reschedule) — not actually unexplained.

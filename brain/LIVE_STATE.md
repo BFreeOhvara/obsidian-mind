@@ -30,21 +30,13 @@ tags:
 
 ---
 
-### Prompt 225 (QUEUED 2026-07-05, Falcon) — Activity Feed calendar: default to today (not "All days"), live day-rollover, empty-day state, prev/next day step
+### ✅ Prompt 225 SHIPPED 2026-07-05 (`52c4960`) — Activity Feed calendar: default to today, live rollover, empty-day state, day-step arrows
 
-Brayden reviewed the shipped Prompt 223 calendar filter live. Four changes to the same `ActivityFeed.jsx` control:
-
-**1. Default the view to today, not "All days."** On load, the page should auto-select and filter to the current day rather than showing everything unfiltered — trigger button should read the actual date (e.g. "Jul 5"), not "All days," by default. Keep "All days" reachable via the existing clear/`X` — just not the default.
-
-*(Falcon's recommendation, flagging the tradeoff rather than deciding silently: Prompt 223 built the calendar to bucket by the same UTC calendar-day boundary the lead-reset cron uses, for consistency with what "today" means elsewhere in this dashboard. Recommend keeping that same UTC-boundary definition for the auto-selected default "today," rather than switching to the viewer's browser-local day — otherwise this control's idea of "today" would disagree with the rest of the dashboard's. If Brayden wants "today" to instead mean the viewer's own local calendar day for this specific page, say so and it's a small change — but default to UTC-boundary consistency unless told otherwise.)*
-
-**2. Live day-rollover — no manual refresh needed.** If a rep leaves this tab open across the day boundary, the "today" selection (and the filtered results) should update automatically once the real day rolls over, without requiring a page reload. At minimum, recompute "today" on an interval (e.g. checked every few minutes) or on tab focus/visibility-change; a full-blown websocket push isn't necessary here.
-
-**3. Empty-day state.** If the selected day (default today, or any past day picked via the calendar) has zero matching activity rows, keep the box rendered at its normal size/border — don't collapse or hide it — and show centered text in the middle: "No activity today" when the selected day is the current day, or an adaptive "No activity on [Month Day]" when a different day is selected.
-
-**4. Add prev/next day-step arrows** next to the date trigger, for quick one-day-at-a-time back/forward navigation, complementing (not replacing) the existing calendar-jump dropdown from Prompt 223 — e.g. a "‹  Jul 5  ›" style control, where the arrows step one day at a time and the calendar icon still opens the full picker for jumping to an arbitrary day.
-
-**Verification (rule #11):** screenshot the page on load showing today auto-selected (not "All days"); confirm a day with zero calls shows the empty state, not a blank/collapsed box; confirm the prev/next arrows step one day at a time and match whatever the calendar dropdown would show for that same day; describe how the live-rollover was tested (can't literally wait for midnight — simulate by mocking the clock/date forward, or describe the interval/focus-check mechanism clearly enough to verify by code review if a live test isn't practical).
+- Default view is now today (UTC calendar day, consistent with the boundary `assign_daily_batches()` uses elsewhere) instead of "All days" — trigger button reads the actual date (e.g. "Jul 6") on load. "All days" still reachable via the existing clear/`X`.
+- Live rollover: a `todayStr` value recomputes on a 60s interval and on `visibilitychange`; if the current selection was still tracking today at the moment of rollover it advances automatically, but a manually-picked past day (or "All days") is left alone. Verified live, not just by code review — mocked `Date.now()` forward 2 days in a temp harness and fired `visibilitychange`: the trigger advanced from "Jul 6" to "Jul 8," the Next-day arrow re-disabled, and the empty state correctly read "No activity today" (not a stale date).
+- Empty-day state: box stays full-size (no collapse), message is vertically centered, text is adaptive — "No activity today" vs "No activity on Jul 4" vs the original "No activity yet" for "All days".
+- Prev/next day-step arrows added next to the date trigger — disabled when in "All days" mode (no day to step from) and when stepping forward would pass today; calendar-jump dropdown from Prompt 223 untouched and still opens from the same trigger.
+- Verified via a temporary `/dev-activity-preview` route pre-seeding react-query's cache with mock `calls` data at the exact `['activity', profileId]` key (real seeded logins still 401 — same infra issue as Prompts 223/226, unrelated to this change) — confirmed all 4 behaviors live, including the UTC-bucketing edge case where two mock "today" items straddled a UTC midnight boundary and correctly split across Jul 5/Jul 6, which is correct behavior, not a bug. Temp route/file and a temporary `AuthContext` export fully removed before commit; `git status --short` confirmed only `ActivityFeed.jsx` changed. `npx vite build` passes.
 
 ---
 
