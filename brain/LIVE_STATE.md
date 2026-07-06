@@ -22,11 +22,11 @@ tags:
 
 ---
 
-### 🔲 Prompt 233 QUEUED 2026-07-06 (Eagle, from Brayden's live review of My Stats) — All Time + Custom range tabs on My Stats
+### ✅ Prompt 233 SHIPPED 2026-07-06 (`3e73e77`, pushed) — All Time + Custom range tabs on My Stats
 
-**My Stats page (`src/pages/rep/MyStats.jsx` — confirm actual filename), top KPI row (Total Dials / Booked / Booking Rate / Avg Call Duration) + the Day/Week/Month tab bar above it.**
+Added **All Time** (new default/first tab) and **Custom** to My Stats' Day/Week/Month tab bar. Custom reveals an inline range calendar (tab-triggered, not a popover) — extracted MyCommissions' `RangeCalendar` into shared `src/components/ui/RangeCalendar.jsx` (component + `useRangeCalendar` hook) per the prompt's "don't build a third variant" instruction, and refactored MyCommissions to use the shared version too. `useRepStats`/`getPeriodRange` (`useProfiles.js`) now support `'all'` (no bound) and `'custom'` ({from,to}, falls back to all-time until a full range is picked). Top 4 KPI boxes recompute for whichever of the 5 views is active; Last 7 Days chart + Completed Days heatmap left untouched per scope.
 
-Add two new view options alongside the existing Day/Week/Month tabs: **All Time** (becomes the new default/first-selected tab — Brayden: "it starts with all time") and **Custom**. Selecting Custom reveals a date-range calendar — reuse the exact 2-endpoint range-picker pattern already built for the Commissions page (`RangeCalendar` in `MyCommissions.jsx`, from Prompt 231D/232 — contiguous start+end click-to-select, hover preview), don't rebuild a third variant. Whichever of the 5 views is active (Day/Week/Month/All Time/Custom) drives all 4 top stat boxes: Total Dials, Booked, Booking Rate, Avg Call Duration recompute for exactly that window (All Time = no lower bound; Custom = the picked start/end range, inclusive). Leave the "Last 7 Days" chart and "Completed Days" heatmap below untouched — this is scoped to the top KPI row + tab selector only, Brayden didn't ask for those to change.
+`npx vite build` passes. **Live login broken as of this prompt** — `apex11`/`Apex2026!` now returns `400 invalid_credentials` (worked fine in Prompts 230-232) — not yet root-caused, needs Brayden's attention. Verified instead via the same mocked-`AuthContext` temp-route harness used in Prompts 227-230 (fully reverted before commit): all 5 tabs render All-Time-first, Custom reveals calendar with correct hints, 2-day range scopes KPIs and labels correctly, same-day pick collapses to single date, Clear Range works, Commissions popover unaffected by the extraction. Pushed per standing authorization. See [[Memories]] for full detail.
 
 ---
 

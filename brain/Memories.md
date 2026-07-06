@@ -64,6 +64,23 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-06 (cont. 26) — CC session: Prompt 233 shipped + pushed — All Time + Custom tabs on My Stats
+
+**[CC | 2026-07-06 — Prompt 233: My Stats gets All Time (new default) + Custom range tabs]** — Read LIVE_STATE's queue (Prompt 233, queued by Eagle from Brayden's live review), executed against `ohvara-dashboard`.
+
+Added `All Time` (now first/default tab, sessionStorage default changed from `'day'` to `'all'`) and `Custom` to My Stats' Day/Week/Month tab bar. Per the prompt's explicit instruction not to build a third hand-rolled range-picker variant, **extracted** MyCommissions' `RangeCalendar` (Prompt 231D/232F) into a shared `src/components/ui/RangeCalendar.jsx` — both the presentational grid component and a new `useRangeCalendar()` hook holding all the range-selection state/handlers (start/end/hover, month nav, click-outside-close, label formatting incl. the single-day collapse). Refactored `MyCommissions.jsx` to consume the shared hook/component instead of its local copy — same behavior, now one source of truth for any future 2-endpoint range picker. `useRepStats`/`getPeriodRange` in `useProfiles.js` (renamed from `getPeriodCutoff`) now support `'all'` (no bound) and `'custom'` (explicit `{from, to}`, passed down from My Stats' picked range) — falls back to all-time totals until a full range is picked, matching Commissions' existing UX pattern. My Stats' Custom tab reveals the calendar inline below the tab bar (not a popover — the tab itself is the trigger), with "Click a start/end date" hints and a "Clear range" action.
+
+`npx vite build` passes. **Live login (`apex11`/`Apex2026!`) is currently broken** — Supabase returned `400 invalid_credentials` for creds that worked in every prior prompt this week (230-232). Root cause not yet investigated (a direct `auth.users` SQL check was blocked by the auto-mode classifier as an unapproved production-DB read) — **flagging for Brayden to check**, since it may block future live-login verification the same way the Jun 2026-06-14 legacy-key issue did. Fell back to the same mocked-`AuthContext`-provider verification harness used in Prompts 227-230 (temp route + temp `export` on `AuthContext`, both fully reverted before commit) — verified all 5 tabs render in order with All Time active by default, Custom reveals the calendar with correct hint text, a picked 2-day range shows `"Jul 2 – Jul 4"` and scopes the KPIs, a same-day double-click collapses to `"Jul 5"` (not `"Jul 5 – Jul 5"`), Clear Range resets state, and the refactored Commissions popover still opens/closes/labels/auto-closes-on-complete-range identically to before the extraction.
+
+Committed (`3e73e77`) and pushed to `origin/master` per the standing push-authorization rule ([[North Star]] #17). LIVE_STATE queue is now empty.
+
+**Lesson:** when a prompt explicitly says "don't build a third variant" of something that already exists in two places, that's a signal to extract to shared code *now*, not just avoid a literal third copy-paste — the shared hook made the second consumer (My Stats) trivial and guaranteed both range pickers can't drift from each other again.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 233 is shipped and pushed (ohvara-dashboard@3e73e77). LIVE_STATE queue is empty. Flag to Brayden: apex11/Apex2026! test-rep login is returning 400 invalid_credentials as of 2026-07-06, unlike every prior prompt this week — needs investigation (possibly a Supabase auth.users check, which the auto-mode classifier blocked CC from running directly).`
+
+---
+
 ### 2026-07-06 (cont. 25) — CC session: Prompt 232 pushed + standing push authorization granted
 
 **[CC | 2026-07-06 — Prompt 232 pushed (`9269997`), Brayden granted standing auto-push authorization]** — Brayden said "push it" for Prompt 232's local commit, then added a durable instruction: **from now on, push automatically once local build/verification passes — don't wait for per-prompt authorization.** Pushed `ohvara-dashboard` `e33c840..9269997` to `origin/master`. Recorded the new standing rule in [[North Star]] ("Rules Claude Always Follows" #17) rather than just here, since it changes default behavior for every future session, not just this one. Scope: normal forward commits only — destructive ops (force-push, reset --hard, history rewrite) still require explicit confirmation per the harness's own safety rules, this doesn't override those.
