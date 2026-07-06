@@ -64,6 +64,30 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-05 (cont. 18) — CC session: Prompt 227 shipped — single-day-only calendars everywhere, live clock, notification gating removed. Queue empty.
+
+**[CC | 2026-07-05 — Prompt 227: lock calendars to single-day-only, live clock, strip notification gating]** — Five-part prompt reversing/extending Prompts 225-226. Shipped `ohvara-dashboard@961419c`.
+
+(1) Activity Feed: removed the `X`/clear affordance for good — `selectedDate` can no longer be null, always a real day (defaults to today). (2) My Calls (rep): built the identical single-day system by extracting the calendar UI out of `ActivityFeed.jsx` into a shared `src/components/ui/DayFilterBar.jsx` (+ `useDayFilter` hook) — both pages now share one component instead of a second copy. (3) New `src/components/ui/LiveClock.jsx` (1s interval, tied to the viewer's own `profile.timezone`) added next to the existing static date on rep My Leads and admin Overview (the literal dashboard-home route). (4) Settings' Notifications section deleted entirely, and `isNotificationCategoryEnabled` gating stripped from every producer (`useDealClosedNotifier`, `useBadgeNotifier`, `useFollowUpNotifier`, `useAppointmentBookedNotifier`, `useAppointmentReminder5MinNotifier`, `grade-call`'s `call_graded` check) — migration 065 reverts `notify_rep_on_message_reply()` to 043's original unconditional insert, applied directly to production via Supabase MCP and verified live via `pg_get_functiondef`. Deleted the now-fully-dead `useNotificationPrefs`/`isNotificationCategoryEnabled`/`useInvalidateNotificationPrefs` helpers and the whole `src/lib/notificationCategories.js` file; left `notification_prefs`/`working_hours_*` columns in place (harmless, the latter still backs Calling). (5) Batch-ready notification investigation: found `useLeadsUnlockedNotifier` (`leads_unlocked` category) — **defined but never called from any component**, confirmed by grepping the whole repo. It never actually fired in production. Deleted the function and its category entry entirely, as instructed, rather than just making it non-optional.
+
+Verified via a temporary `/dev-preview227/:page` route + mocked `AuthContext`/react-query cache (real seeded logins still 401, same infra issue as every recent prompt) — accessibility-tree snapshots confirmed no clear/X anywhere, day-step arrows work, date-specific empty states, LiveClock visibly ticking (9s elapsed between two reads matched) and timezone-correct (ET→PT showed the right 3h offset + abbreviation swap) on both My Leads and Overview, and Settings shows Regional/Account/Payouts/Calling with no Notifications section. Screenshot tool itself timed out again (same known issue as Prompt 224, unrelated to this change) — used snapshots instead. Temp route/file and the temporary `AuthContext` export fully removed before commit; `git status --short` confirmed clean, `npx vite build` passes.
+
+**Queue status: LIVE_STATE's "Next Up for CC" is now empty.**
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 227 shipped and pushed (ohvara-dashboard@961419c), migration 065 applied to production. LIVE_STATE's queue is empty — nothing pending from Eagle/Falcon. Check North Star's Current Focus for what's next, or wait for new prompts to be queued.`
+
+---
+
+### 2026-07-05 (cont. 17) — Falcon session: lock calendar to single-day-only, mirror on My Calls, live clock, strip the notification toggle (Prompt 227 queued)
+
+**What happened:** Brayden reviewed all four just-shipped prompts (223-226) live and asked for a mix of reversals and new work, bundled into **Prompt 227**: (1) remove Activity Feed's "All days"/clear-`X` option entirely — Prompt 225 had kept it reachable per Falcon's own earlier recommendation, but Brayden wants single-day-only with zero escape hatch, permanently; (2) build the identical single-day calendar (same no-clear constraint) on My Calls; (3) a live, actually-ticking clock on the dashboard home page and My Leads, tied to the Settings timezone field (Prompt 226) rather than a static refresh-based timestamp; (4) remove Prompt 226's Notifications toggle section from Settings entirely — Brayden doesn't want reps able to disable any notifications, so the gating logic needs to actually come out, not just default to "on" and stay hidden; (5) investigate whether a "your batch/leads are ready to call" notification exists, and delete it outright if so (not just make it non-optional) — considered unnecessary noise. Flagged explicitly in the prompt that this session's queue entry needs to note it's reversing parts of 225/226, not just adding on top silently.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 227 (remove Activity Feed's all-days option, mirror single-day calendar on My Calls, live timezone-aware clock on dashboard home + My Leads, remove Settings' notification toggle, delete the batch-ready notification if it exists) is queued for CC — note it reverses parts of the just-shipped Prompts 225 and 226, don't just layer on top.`
+
+---
+
 ### 2026-07-05 (cont. 16) — CC session: Prompt 224 shipped — appointment timezone correctness (closer view) + confirm-time location callback. Queue now empty.
 
 **[CC | 2026-07-05 — Prompt 224: appointment timezone correctness + confirm-time]** — Part A's real finding: the storage bug Brayden was worried about didn't actually exist. `CallModal.jsx` already infers the client's timezone from `lead.state` and stores an unambiguous UTC instant, fully labeled on the booking side. The real gap was narrower and one-sided: `CloserPipeline.jsx`/`AppointmentCard.jsx` displayed Nate's own configured zone with zero label — a bare time that could be misread either way. Also confirmed no `zip`/`address` column exists on `leads` at all (city/state are the only location fields, both 100% populated across 559 real rows) — the graceful-fallback Brayden asked for is a safety net, not a live gap.
