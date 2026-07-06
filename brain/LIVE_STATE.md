@@ -22,11 +22,11 @@ tags:
 
 ---
 
-### 🔲 Prompt 241 QUEUED 2026-07-06 (Eagle, design decision confirmed with Brayden) — My Payouts becomes range-aware, matching the 3 stat boxes
+### ✅ Prompt 241 SHIPPED 2026-07-06 (`4be0da9`, pushed) — My Payouts becomes range-aware, matching the 3 stat boxes
 
-**Commissions page (`MyCommissions.jsx`), the My Payouts list from Prompt 231C.**
+Filtered the payouts list in `MyCommissions.jsx` to whichever window the 3 KPI boxes above are already scoped to (All Time, a picked day, or a picked range, inclusive of both endpoints) — the "Last 30 Days" chart stays fixed as decided/confirmed. Caught a real bug while wiring the filter: an initial pass filtered on `p.created_at` (the payout record's own timestamp), but the row's own displayed "Closed on" label prefers `appointment.closed_at` for paid deals — those two dates can diverge (payout records get created later than the actual close), so a picked range briefly excluded/included rows that visually looked like they should/shouldn't be there. Fixed by extracting a shared `payoutClosedDate(p)` helper used by both the filter and the display label, so they can never disagree. Empty state distinguishes "No payouts yet" (never had any) from "No payouts in this range." (has some, just not in this window). 5-row scroll cap unchanged.
 
-Brayden flagged a real inconsistency: the 3 top stat boxes (Total Earned/Closed Deals/Avg Per Deal) already respond to the `RangeCalendar`/All-Time picker (Prompt 231D), but the My Payouts list below always shows everything regardless of the picker — so the page currently reads as filtered / not-filtered / filtered depending on section, which feels broken. **Decision (confirmed with Brayden, explicit tradeoff discussed):** the "Last 30 Days" chart stays fixed/unaffected by the picker — it's self-labeled with its own window, same precedent already approved for My Stats' "Last 7 Days" chart staying fixed while its KPI boxes above became range-aware (Prompt 233). **Only My Payouts changes:** filter the payouts list to whichever window is active — All Time (everything, current behavior), a single picked day, or a picked range (inclusive of both endpoints) — mirroring exactly how the 3 stat boxes above it already compute their own scoping. Keep Prompt 231C's 5-row scroll cap as-is; this only changes which rows are eligible to appear, not the display/scroll behavior.
+`npx vite build` passes. **Live-verified** in the real Commissions page (test rep, apex11): All Time shows 7 payouts (Jun 30/29/22×2/19×2/8); picking Jun 20–30 correctly narrows to exactly the 4 rows whose "Closed on" label falls in that window (Jun 30, 29, 22×2) and the KPI boxes above show matching $594/4 deals — filter and display agree. Picking an empty range (May 5–6) shows "No payouts in this range." No console errors.
 
 ---
 

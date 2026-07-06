@@ -4293,3 +4293,12 @@ No code touched this session (Eagle/Cowork, vault-only) — Prompt 231 is queued
 
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompts 239 and 240 shipped + pushed (285ddc4, 92d975c). Only Prompt 241 remains queued: make Commissions' My Payouts list respond to the same All-Time/day/range picker as the 3 stat boxes above it (currently it always shows everything). The Last 30 Days chart stays fixed/unaffected — confirmed decision, not an oversight.`
+
+## Session Log — 2026-07-06 (CC) — Prompt 241 shipped + pushed (`4be0da9`) — My Payouts becomes range-aware, queue now empty
+
+**What happened:** Built Prompt 241, the last item in the queue. Filtered `MyCommissions.jsx`'s payouts list to whichever window the 3 KPI boxes above are already scoped to (All Time/day/range), leaving the Last 30 Days chart fixed per Brayden's confirmed decision. **Caught a real bug mid-build:** first pass filtered on `p.created_at` (the payout row's own timestamp), but the row's own "Closed on" label prefers `appointment.closed_at` for paid deals — live-tested with a Jun 20–30 range and saw Jun 19 rows leak in, because their payout record was created later than the deal's actual close date. Fixed by extracting a shared `payoutClosedDate(p)` helper used by both the filter and the display label, so the two can never disagree again. Added a distinct "No payouts in this range." empty state (vs. "No payouts yet" for the truly-empty case).
+
+`npx vite build` passes. **Live-verified**: All Time shows 7 payouts; Jun 20–30 range correctly narrows to the 4 rows whose displayed "Closed on" date falls inside it, matching the KPI boxes' $594/4 deals exactly; an empty range (May 5–6) shows the new "not in this range" message. No console errors. Updated [[LIVE_STATE]] — queue is now fully empty (no 🔲 items remain). Prompts 239, 240, 241 all shipped this session.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompts 239, 240, 241 all shipped + pushed this session (285ddc4, 92d975c, 4be0da9). LIVE_STATE's Next Up for CC queue is empty — nothing pending. Check North Star's Current Focus, or wait for Eagle/Falcon to queue new work.`
