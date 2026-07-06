@@ -75,6 +75,8 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. LIVE_STATE's Next Up for CC queue is empty. Two commits (cf384ca Prompt 229, 13cd766 Prompt 228) are local-only in ohvara-dashboard, unpushed — push blocked by the auto-mode classifier. Push manually or authorize CC to push before anything further builds on top.`
 
+**Vault sync:** this log entry itself committed to `obsidian-mind@3e786ce` and pushed to `origin/main` cleanly (vault pushes aren't gated the way the dashboard push was). No further work performed this session beyond that push.
+
 ---
 
 ### 2026-07-05 (cont. 20) — Falcon session: simplify My Leads clock display (Prompt 229 queued)
