@@ -64,6 +64,21 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-05 (cont. 16) — CC session: Prompt 224 shipped — appointment timezone correctness (closer view) + confirm-time location callback. Queue now empty.
+
+**[CC | 2026-07-05 — Prompt 224: appointment timezone correctness + confirm-time]** — Part A's real finding: the storage bug Brayden was worried about didn't actually exist. `CallModal.jsx` already infers the client's timezone from `lead.state` and stores an unambiguous UTC instant, fully labeled on the booking side. The real gap was narrower and one-sided: `CloserPipeline.jsx`/`AppointmentCard.jsx` displayed Nate's own configured zone with zero label — a bare time that could be misread either way. Also confirmed no `zip`/`address` column exists on `leads` at all (city/state are the only location fields, both 100% populated across 559 real rows) — the graceful-fallback Brayden asked for is a safety net, not a live gap.
+
+Shipped `ohvara-dashboard@1d0f996`: closer-facing displays now show the client's local time with an explicit abbreviation (new `timezoneAbbr()`), plus Nate's own equivalent only when it actually differs (tooltip in the tight pipeline table, secondary line on the roomier appointment card). `confirm-time`'s SAY line now states the lead's city/state back before locking a time, wired as one composite `[city], [state]` token (avoids a dangling comma if either field's missing) the same pattern as `[job title]` in Prompt 210.
+
+Verified against a real production appointment (Dallas, TX; `19:30 UTC`) rendering "Jun 13, 2:30 PM CT" + "yours: 3:30 PM ET" against a mocked Eastern-timezone Nate profile — both instants check out exactly. Screenshot tool itself timed out for an unrelated reason during this verification; used the accessibility-tree snapshot instead, which gave exact text content (arguably better proof than a screenshot for this kind of check). Temp routes/files removed before commit; `git status --short` confirmed only the 4 intended files changed.
+
+**Queue status: LIVE_STATE's "Next Up for CC" is now empty** — Prompts 224, 225, 226 all shipped this session. Nothing queued; check North Star's Current Focus or wait for Eagle/Falcon to add more.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompts 224, 225, and 226 all shipped this session (ohvara-dashboard@1d0f996, @52c4960, @7a49e12). LIVE_STATE's queue is empty — nothing pending from Eagle/Falcon. Check North Star's Current Focus for what's next, or wait for new prompts to be queued.`
+
+---
+
 ### 2026-07-05 (cont. 15) — CC session: Prompt 225 shipped — Activity Feed calendar defaults to today, live rollover, empty-day state, day-step arrows
 
 **[CC | 2026-07-05 — Prompt 225: Activity Feed calendar polish]** — Shipped `ohvara-dashboard@52c4960`, all 4 requested changes to the same `ActivityFeed.jsx` control from Prompt 223. Default view is now today (UTC boundary, per Falcon's recommendation to stay consistent with the rest of the dashboard) instead of "All days." Live rollover recomputes "today" on a 60s interval + `visibilitychange`, advancing the selection only if it was still tracking today (a manually-picked past day is left alone). Empty-day state keeps the box full-size with a vertically-centered, adaptive message. Prev/next day-step arrows added next to the trigger, disabled appropriately in "All days" mode and at the future boundary.
