@@ -4163,3 +4163,14 @@ No code touched this session (Eagle/Cowork, vault-only) — Prompt 231 is queued
 
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 234 is queued in LIVE_STATE: on My Stats, remove the Day/Week/Month/Custom tabs (from Prompt 233) and replace with the shared single-day DayFilterBar (same component as Activity Feed/My Calls, defaulting to today) plus a standalone All Time toggle button next to it, driving the same 4 KPI boxes. Do not add an all-time mode to DayFilterBar itself — that's deliberately single-day-only per Prompt 227. Nothing else queued.`
+
+---
+
+## Session Log — 2026-07-06 (Eagle) — Prompt 235 queued: fix broken All-Time+calendar popup, box around All Time
+
+**What happened:** Confirmed Prompt 234 shipped + pushed (`b516a28`/`e6552aa`). Brayden opened the new day-calendar on My Stats while All Time was the active selection and hit a real visual bug: the calendar popup rendered broken/"holographic" — overlapping/ghosted text with the KPI card behind it, not the clean solid popup it shows when a specific day is active instead. Queued as **Prompt 235** part A (investigate + fix — the popup must render the same regardless of which button was active before opening it) and part B (give the All Time button a default bordered box like the date-trigger has, since right now it's bare unstyled text until it's actively selected). No code touched this session (Eagle/Cowork, vault-only).
+
+**Vault note:** `LIVE_STATE.md` had picked up a large trailing whitespace line with no final newline (not data loss this time, just junk) — cleaned up as part of reconstructing from HEAD before adding this entry, same workaround pattern as the last few sessions.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 235 is queued in LIVE_STATE: fix the My Stats calendar popup rendering broken/transparent when opened while All Time is the active selection (should look identical to opening it with a day selected), and give the All Time button a default bordered box in its unselected state (currently bare text, unlike the date-trigger button). Nothing else queued.`

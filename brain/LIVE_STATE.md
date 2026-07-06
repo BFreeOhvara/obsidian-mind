@@ -22,6 +22,16 @@ tags:
 
 ---
 
+### 🔲 Prompt 235 QUEUED 2026-07-06 (Eagle, bug + style follow-up on Prompt 234) — fix broken calendar popup when All Time is active, add a default box around All Time
+
+**My Stats page, the new day-calendar + All Time control from Prompt 234.**
+
+**A. Bug — calendar popup renders broken/"holographic" when All Time is the active selection.** Brayden opened the day-calendar while All Time was selected and got a visibly broken popup: text and calendar-grid numbers overlapping/ghosted with the KPI card behind it (looked semi-transparent, like a stacking/z-index/background bug), not the clean solid popup it renders as when a specific day is selected instead. **Investigate and fix first** — likely something conditional on the All-Time-active state is leaking into the calendar popup's own styling (background/opacity/z-index tied to the wrong element, or a shared class colliding). The popup must render identically solid/normal regardless of whether All Time or a specific day is the currently-active selection — there's no reason opening the calendar should look any different based on which button was active before you opened it.
+
+**B. Style — give the "All Time" button a default box/border, not just bare text.** Right now All Time has a filled/highlighted look only when it's the active selection (fine, keep that) — but in its default *unselected* state it's just floating text with no visual container ("the words are up there"), unlike the date-trigger button next to it which always has a bordered box whether or not it's active. Give All Time the same always-has-a-box treatment as the date trigger — a visible bordered box in its default state so it reads as a clickable control, distinct from its filled/active-selected look.
+
+---
+
 ### ✅ Prompt 234 SHIPPED 2026-07-06 (`b516a28`, pushed) — single-day DayFilterBar + All Time toggle on My Stats
 
 Removed the Day/Week/Month/Custom tabs entirely — replaced with the same shared `DayFilterBar`/`useDayFilter` (prev/next day-step arrows + click-to-pick single-day calendar) used on Activity Feed and My Calls, defaulting to today, plus a standalone "All Time" button next to it. Only two states now: a specific day, or all-time lifetime totals. `RangeCalendar`/`useRangeCalendar` (from Prompt 233) stay in use on `MyCommissions.jsx`; My Stats no longer imports them. Reused the existing `'custom'`-style `{from,to}` bounds in `useRepStats` for single-day queries (from===to) rather than adding a third period type — today still special-cases through the `rep_today_metrics` RPC for exact parity with My Leads' "Calls Today", but only when the selected day is actually today.
