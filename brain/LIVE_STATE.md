@@ -46,6 +46,8 @@ Prompt 237 added a start-day star (5-point star SVG, amber `var(--warning)` fill
 
 **Fix:** wire the same "first graded call" data source `DayFilterBar` already uses (`MIN(created_at) WHERE grade IS NOT NULL`, per Prompt 232C) into `RangeCalendar`/`useRangeCalendar` as well, and render the identical star marker Prompt 237 built — same SVG, same color, same tooltip text, same suppress-when-selected rule (a range calendar has more "selected" cells than a single-day one — the star should stay suppressed on the start day if it falls anywhere inside the currently-picked range, not just on an exact single-day match). One fix to the shared component covers both Commissions and My Stats, same as Prompt 237 covered both Activity Feed and My Calls with a single change.
 
+**Confirm this is fully generic, not apex11-specific — Brayden's forward-looking ask:** when he onboards a new appointment setter and they make their first dial, that rep's own first-graded-call day should automatically show as the star on all 4 calendar pages (Activity Feed, My Calls, My Commissions, My Stats) — no manual step, no hardcoded account. This should already be true by construction (the query is scoped to the logged-in rep's own `rep_id`/session, not a fixed account), but explicitly verify and report that it's genuinely per-rep-dynamic rather than something that happened to only get tested against apex11's data, since this is exactly the kind of assumption worth confirming rather than taking for granted.
+
 ---
 
 ### ✅ Prompt 238 SHIPPED 2026-07-06 (`c1586b6`, pushed) — My Stats' calendar swaps to the shared RangeCalendar (single day OR range)

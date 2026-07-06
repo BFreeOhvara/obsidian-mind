@@ -4253,3 +4253,12 @@ No code touched this session (Eagle/Cowork, vault-only) — Prompt 231 is queued
 
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 240 is queued in LIVE_STATE: add the same start-day star (5-point star SVG, amber var(--warning), "Your start day" tooltip, from Prompt 237) to the shared RangeCalendar component used by both Commissions and My Stats — currently only DayFilterBar (Activity Feed/My Calls) has it. Suppress the star when the start day falls inside the currently-picked range, not just on an exact single-day match. Nothing else queued beyond Prompt 239 (video anti-skip ceiling), which is still pending.`
+
+---
+
+## Session Log — 2026-07-06 (Eagle) — noted: start-day star must be generic per-rep for future setters
+
+**What happened:** Brayden confirmed the intent behind the start-day star feature going forward: when he onboards a new appointment setter and they make their first dial, that day should automatically show as the star on all 4 calendar pages for that rep — no manual setup. This should already hold true by construction (the underlying query is scoped to the logged-in rep's own session/`rep_id`, computed live, not hardcoded to apex11), but folded an explicit verification requirement into **Prompt 240** (still queued, not yet shipped) rather than assuming it's fine — CC should confirm and report this is genuinely per-rep-dynamic before marking 240 done. No new prompt number needed, no code touched this session (Eagle/Cowork, vault-only).
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 240 (add start-day star to the shared RangeCalendar used by Commissions + My Stats) now also includes an explicit requirement to confirm the star's underlying date query is genuinely per-rep-dynamic (scoped to whichever rep is logged in) rather than something only verified against apex11's data — this matters because Brayden wants every future setter's own first-dial day to show correctly with zero manual setup. Prompt 239 (video anti-skip ceiling) is also still queued. Nothing else queued.`
