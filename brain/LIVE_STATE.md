@@ -34,6 +34,21 @@ tags:
 
 ---
 
+### 🔲 Prompt 243 QUEUED 2026-07-06 (Eagle, from Brayden — a full script-review map, not a code change) — produce a deduplicated node-by-node map of discoveryScript.js
+
+**Deliverable is a reference document, not a UI/code change** (though flag if a quick fix to the existing in-app Flowchart is low-effort and worth doing alongside — see below).
+
+Brayden wants to review/edit the ENTIRE call script systematically — every section, every branch, every objection fork — without re-walking the same content multiple times just because several paths converge back into it. This codebase intentionally **fully unrolls** the branching tree (verbatim duplication at each occurrence, confirmed pattern from Prompts 218/222 — no shared node references, since every line must read exactly as spoken), which means the SAME conceptual node/question can appear at 2+ separate literal locations in `discoveryScript.js`. Walking the live `ScriptWalk` UI naturally re-shows that duplicated content every time a different path reaches it — exactly the redundant review Brayden wants to avoid.
+
+**Investigate first, then build:** read the full current `discoveryScript.js` (all sections: Opener, Vitals, Pain, Handoff incl. every objection sub-fork, Close) and produce a **markdown reference document** — save it in the vault (e.g. `brain/discovery-script-map.md`, linked from [[skills/Index]] or [[North Star]]) — structured as:
+- One entry per **unique conceptual node** (not one entry per literal code occurrence) — its SAY line(s), its BRANCH options with color tags (`[GOOD]`/`[HESITANT]`/`[BAD]`), and where each option routes to.
+- For any node whose content is duplicated verbatim at multiple points in the file (per the unrolled-tree pattern), call that out explicitly — e.g. "This exact fork also appears at: `indeed-hook` under the 'Yeah/speaking' path AND under the 'No→recovery→Yes' path — reviewing it once here covers both."
+- Organized so Brayden can read it top-to-bottom once, section by section, and know he's covered every unique decision point in the entire script exactly one time — no path needs walking twice to be confident nothing was missed.
+
+**Also worth a quick check (report, don't necessarily build unless it's a small lift):** does the existing in-app Training Center "Flowchart" tab (`buildScriptFlow()`, built when the script was a simpler structure) already visually render each unrolled duplicate as a separate box? If merging those into one deduplicated view there would be a small change, flag it as a follow-up option — but the markdown doc is the actual deliverable Brayden asked for, don't block on the flowchart.
+
+---
+
 ### ✅ Prompt 241 SHIPPED 2026-07-06 (`4be0da9`, pushed) — My Payouts becomes range-aware, matching the 3 stat boxes
 
 Filtered the payouts list in `MyCommissions.jsx` to whichever window the 3 KPI boxes above are already scoped to (All Time, a picked day, or a picked range, inclusive of both endpoints) — the "Last 30 Days" chart stays fixed as decided/confirmed. Caught a real bug while wiring the filter: an initial pass filtered on `p.created_at` (the payout record's own timestamp), but the row's own displayed "Closed on" label prefers `appointment.closed_at` for paid deals — those two dates can diverge (payout records get created later than the actual close), so a picked range briefly excluded/included rows that visually looked like they should/shouldn't be there. Fixed by extracting a shared `payoutClosedDate(p)` helper used by both the filter and the display label, so they can never disagree. Empty state distinguishes "No payouts yet" (never had any) from "No payouts in this range." (has some, just not in this window). 5-row scroll cap unchanged.
