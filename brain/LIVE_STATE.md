@@ -22,6 +22,14 @@ tags:
 
 ---
 
+### 🔲 Prompt 233 QUEUED 2026-07-06 (Eagle, from Brayden's live review of My Stats) — All Time + Custom range tabs on My Stats
+
+**My Stats page (`src/pages/rep/MyStats.jsx` — confirm actual filename), top KPI row (Total Dials / Booked / Booking Rate / Avg Call Duration) + the Day/Week/Month tab bar above it.**
+
+Add two new view options alongside the existing Day/Week/Month tabs: **All Time** (becomes the new default/first-selected tab — Brayden: "it starts with all time") and **Custom**. Selecting Custom reveals a date-range calendar — reuse the exact 2-endpoint range-picker pattern already built for the Commissions page (`RangeCalendar` in `MyCommissions.jsx`, from Prompt 231D/232 — contiguous start+end click-to-select, hover preview), don't rebuild a third variant. Whichever of the 5 views is active (Day/Week/Month/All Time/Custom) drives all 4 top stat boxes: Total Dials, Booked, Booking Rate, Avg Call Duration recompute for exactly that window (All Time = no lower bound; Custom = the picked start/end range, inclusive). Leave the "Last 7 Days" chart and "Completed Days" heatmap below untouched — this is scoped to the top KPI row + tab selector only, Brayden didn't ask for those to change.
+
+---
+
 ### ✅ Prompt 232 SHIPPED 2026-07-06 (`9269997`, pushed — `origin/master` matches local) — 6 UI fixes from Brayden's live review of Prompt 231
 
 **Standing rule as of this prompt:** Brayden granted standing push authorization — pushes now happen automatically once local build/verification passes, no per-prompt "push it" needed (see [[North Star]] rule #17). This entry's push was still done under the old ask-first pattern; future entries won't call out push status as a separate step.
