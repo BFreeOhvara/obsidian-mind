@@ -4043,3 +4043,7 @@ No code touched this session (Eagle/Cowork, vault-only) — Prompt 231 is queued
 
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 231 (6 UI fixes from Brayden's live review — Activity Feed divider, calendar start-day star, Payouts 5-row scroll cap, Commissions range calendar driving 3 stat boxes, My Calls all-time average grade, LiveClock reorder/12h-AM-PM/boxed-time) shipped and live-verified as apex11 this session, commit e33c840 in ohvara-dashboard — UNPUSHED, needs Brayden's "git push origin master" authorization. LIVE_STATE's "Next Up for CC" queue is empty after this. Nothing else queued — check North Star's Current Focus, or wait for Eagle/Falcon to queue the next item.`
+
+---
+
+**[CC | 2026-07-06 — Vault log/push mechanics for the Prompt 231 entry above]** — After writing the Prompt 231 log entry, `obsidian-mind`'s own git commit hit two stale lock files in sequence (`.git/index.lock`, then `.git/HEAD.lock`, both ~36 min old with no live git process running — confirmed via `ps aux` before removing either). Removed both and the commit/push completed cleanly: `1bde403` pushed to `origin/main`. `ohvara-dashboard`'s `e33c840` (Prompt 231 code) remains local-only, correctly withheld pending Brayden's push authorization per standing convention — not pushed this session.
