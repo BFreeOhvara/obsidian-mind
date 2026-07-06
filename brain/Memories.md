@@ -4137,3 +4137,14 @@ No code touched this session (Eagle/Cowork, vault-only) — Prompt 231 is queued
 
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 233 is queued in LIVE_STATE: add All Time (new default) + Custom (date-range calendar, reusing Commissions' existing RangeCalendar pattern) tabs to My Stats, alongside the existing Day/Week/Month tabs, driving the 4 top KPI boxes (Total Dials/Booked/Booking Rate/Avg Call Duration). Scoped to the top KPI row + tab bar only. Nothing else queued. If this entry or Prompt 233 in LIVE_STATE is missing, brain files may be getting clobbered by a local open editor (e.g. Obsidian) — check for that before re-queueing.`
+
+---
+
+## Session Log — 2026-07-06 (Eagle) — Prompt 234 queued: My Stats selector simplified to shared day-picker + All Time button
+
+**What happened:** Confirmed Prompt 233 shipped + pushed (`3e73e77`) and live-verified (`b7d660a` — also noted the apex11 test-rep password had rotated, unrelated/not a bug). Brayden reviewed the live All Time/Day/Week/Month/Custom tab bar and likes the page overall, but wants the selector simplified: drop Day/Week/Month/Custom entirely, replace with the same shared single-day `DayFilterBar` calendar used on Activity Feed/My Calls (defaulting to today, per that shared convention), plus a separate standalone "All Time" toggle button alongside it. Queued as **Prompt 234** in [[LIVE_STATE]] — noted for CC that `DayFilterBar` itself must NOT regain an all-time/unfiltered mode (Prompt 227 deliberately removed that for Activity Feed/My Calls), so the All Time toggle here is a My-Stats-only addition sitting next to the shared component, not a change to the shared component's own behavior. No code touched this session (Eagle/Cowork, vault-only).
+
+**Vault instability, still recurring:** found `LIVE_STATE.md`/`Memories.md` truncated at the tail again relative to HEAD (`b7d660a`) before writing this entry — same pattern as the last two sessions. Reconstructed from HEAD + this entry, same workaround as before. This has now happened on 3 consecutive sessions; if Brayden hasn't checked for an open Obsidian buffer on these two files yet, it's worth confirming directly rather than continuing to route around it silently.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 234 is queued in LIVE_STATE: on My Stats, remove the Day/Week/Month/Custom tabs (from Prompt 233) and replace with the shared single-day DayFilterBar (same component as Activity Feed/My Calls, defaulting to today) plus a standalone All Time toggle button next to it, driving the same 4 KPI boxes. Do not add an all-time mode to DayFilterBar itself — that's deliberately single-day-only per Prompt 227. Nothing else queued.`

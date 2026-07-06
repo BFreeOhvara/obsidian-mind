@@ -22,6 +22,18 @@ tags:
 
 ---
 
+### 🔲 Prompt 234 QUEUED 2026-07-06 (Eagle, follow-up on Prompt 233's live result) — replace Day/Week/Month/Custom tabs with the shared single-day DayFilterBar + a standalone All Time button
+
+**My Stats page (`src/pages/rep/MyStats.jsx`), the tab bar above the 4 KPI boxes.**
+
+Brayden likes Prompt 233's result overall but wants the selector redesigned: **remove the Day, Week, Month, and Custom tabs entirely** (so the `RangeCalendar` built in Prompt 233 for the Custom tab is no longer used on this page — fine to leave it in `MyCommissions.jsx` where it's still needed, just don't wire it here anymore). **Replace them with the exact same single-day calendar control already used on Activity Feed and My Calls** — the shared `DayFilterBar`/`useDayFilter` component (prev/next day-step arrows + a date-trigger button that opens a single-click-to-pick calendar, per Prompt 223/225/227's convention). This becomes the default view, defaulting to **today** (same convention as Activity Feed/My Calls) — matches Brayden: "that's what it's on by default."
+
+**Add a standalone "All Time" button next to the day selector** (not a `DayFilterBar` mode — that component was deliberately built single-day-only with no unfiltered/all-time state per Prompt 227's explicit decision, so don't reintroduce that there; this is a My-Stats-page-specific toggle sitting alongside it). Clicking All Time switches the 4 KPI boxes (Total Dials/Booked/Booking Rate/Avg Call Duration) to lifetime aggregates, overriding whatever day is selected; clicking a day in the calendar (or the prev/next arrows) switches back to that single day's stats. Only two states needed now: **a specific day** (via the shared calendar, defaulting to today) or **All Time** (via the standalone button) — no week/month aggregate view anymore.
+
+Since this reuses the exact shared `DayFilterBar` component, the Prompt 231/232 "start day" star should come along for free (no extra work expected) — worth a quick live check that it still renders correctly on this page's calendar too.
+
+---
+
 ### ✅ Prompt 233 SHIPPED 2026-07-06 (`3e73e77`, pushed) — All Time + Custom range tabs on My Stats
 
 Added **All Time** (new default/first tab) and **Custom** to My Stats' Day/Week/Month tab bar. Custom reveals an inline range calendar (tab-triggered, not a popover) — extracted MyCommissions' `RangeCalendar` into shared `src/components/ui/RangeCalendar.jsx` (component + `useRangeCalendar` hook) per the prompt's "don't build a third variant" instruction, and refactored MyCommissions to use the shared version too. `useRepStats`/`getPeriodRange` (`useProfiles.js`) now support `'all'` (no bound) and `'custom'` ({from,to}, falls back to all-time until a full range is picked). Top 4 KPI boxes recompute for whichever of the 5 views is active; Last 7 Days chart + Completed Days heatmap left untouched per scope.
