@@ -249,6 +249,7 @@ TBD — do not hardcode any dialer assumption anywhere in the codebase.
 14. All reps and Nate on Profile A only until second closer confirmed
 15. Setup fee (`$297`) always presented as one-time, separate from monthly
 16. **Never drive Claude in Chrome / browser actions directly from a Cowork (Eagle/Falcon) session.** Brayden runs his own Claude Chrome session with everything already logged in. Any task needing a browser (Supabase SQL editor, GitHub, live site verification, etc.) gets written up as a self-contained prompt file artifact in the Ohvara folder and handed to Brayden to paste into Claude Chrome himself — never attempted directly via the `Claude_in_Chrome` MCP tools from Eagle/Falcon.
+17. **Standing push authorization (2026-07-06):** once local build/verification passes on any repo (`ohvara-dashboard`, `Scraper`, `obsidian-mind`), push to `origin` automatically — don't wait for a per-prompt "push it." Brayden confirmed this after repeatedly authorizing pushes one at a time across Prompts 230-232. Still hold on genuinely destructive/irreversible git ops (force-push, reset --hard, history rewrite) — this only covers normal forward commits.
 
 ---
 

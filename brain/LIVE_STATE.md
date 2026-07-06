@@ -18,11 +18,13 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
-*(Queue empty — nothing pending for CC. Prompt 232 shipped locally, `9269997`, push pending Brayden's authorization.)*
+*(Queue empty — nothing pending for CC.)*
 
 ---
 
-### ✅ Prompt 232 SHIPPED 2026-07-06 (`9269997`, committed, NOT pushed — needs authorization) — 6 UI fixes from Brayden's live review of Prompt 231
+### ✅ Prompt 232 SHIPPED 2026-07-06 (`9269997`, pushed — `origin/master` matches local) — 6 UI fixes from Brayden's live review of Prompt 231
+
+**Standing rule as of this prompt:** Brayden granted standing push authorization — pushes now happen automatically once local build/verification passes, no per-prompt "push it" needed (see [[North Star]] rule #17). This entry's push was still done under the old ask-first pattern; future entries won't call out push status as a separate step.
 
 Brayden reviewed Prompt 231's live result (screenshots of My Leads header, My Calls incl. calendar open, My Commissions) and had 5 follow-ups + 1 new feature ask. Investigate-first items were called out explicitly.
 

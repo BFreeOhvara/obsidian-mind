@@ -64,6 +64,15 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-06 (cont. 25) — CC session: Prompt 232 pushed + standing push authorization granted
+
+**[CC | 2026-07-06 — Prompt 232 pushed (`9269997`), Brayden granted standing auto-push authorization]** — Brayden said "push it" for Prompt 232's local commit, then added a durable instruction: **from now on, push automatically once local build/verification passes — don't wait for per-prompt authorization.** Pushed `ohvara-dashboard` `e33c840..9269997` to `origin/master`. Recorded the new standing rule in [[North Star]] ("Rules Claude Always Follows" #17) rather than just here, since it changes default behavior for every future session, not just this one. Scope: normal forward commits only — destructive ops (force-push, reset --hard, history rewrite) still require explicit confirmation per the harness's own safety rules, this doesn't override those.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/North Star.md — continuing Ohvara work. Prompt 232 is fully shipped and pushed (ohvara-dashboard@9269997). Standing rule: push automatically after passing verification, no need to ask each time.`
+
+---
+
 ### 2026-07-06 (cont. 24) — CC session: Prompt 232 shipped locally — 6 UI fixes from Brayden's live review, push pending authorization
 
 **[CC | 2026-07-06 — Prompt 232: LiveClock fill, bigger avg badge, calendar-star date bug fixed, star restyle, training exit/resume, single-day range label]** — Read [[LIVE_STATE]]'s queue, executed all 6 items top to bottom against the real `ohvara-dashboard` repo and live Supabase project (`jjextitmbptoaolacocs`), as Test Rep `apex11`.
