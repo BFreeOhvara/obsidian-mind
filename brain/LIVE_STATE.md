@@ -20,6 +20,75 @@ tags:
 
 ---
 
+### Prompt 226 (QUEUED 2026-07-05, Falcon, REVISED) — Settings page with a locked timezone field; daily lead-reset becomes per-rep-timezone-aware
+
+**The ask, refined:** right now `assign_daily_batches()` (migration 016) fires at one fixed UTC instant for every rep (nominally 00:05 UTC — Prompt 223 also flagged a side-finding that it empirically fires closer to 06:05 UTC, a ~6h unexplained drift, never root-caused). Brayden wants each rep's batch reset to happen at *their own* local midnight instead. He clarified the mechanism he wants: a **Settings page** on the dashboard where a timezone gets set explicitly and locked — not derived from the rep's browser/OS clock, not silently defaulted. Once set, the reset should run like clockwork off that stored value with no live "checking" of anything — practically, this means: the moment a timezone is locked in, the exact daily UTC instant corresponding to that rep's local midnight is knowable in advance (e.g. Central time's midnight is always 05:00 or 06:00 UTC depending on DST), and the system just fires on that schedule going forward. Falcon confirmed this is the right mental model and the right design — flagging only that *some* scheduled mechanism has to exist to fire at that instant (same as any cron/alarm), which isn't the "continuous checking" Brayden was picturing, but is still effectively zero ongoing overhead once the timezone is locked.
+
+**Part A — investigate and report:**
+1. **Confirm whether a Settings page/nav item exists anywhere in the app today.** Falcon does not have direct repo access and could not confirm this from memory — do not assume either way. If one exists, report what's already on it. If not, this prompt includes building one (see Part B).
+2. Confirm exactly how `profiles.timezone` (migration 042, default `America/Chicago`) is currently set — is it ever set explicitly anywhere, or does every account just silently inherit the schema default? Report what's actually populated on real rep rows.
+3. Confirm `assign_daily_batches()`'s exact current logic (read the migration 016 SQL directly) — does it process all reps in one pass with no per-rep filtering at all, and is there any existing "last assigned" tracking column per rep, or would one need to be added?
+4. Root-cause the 00:05-vs-~06:05 UTC drift Prompt 223 flagged, while already in this code.
+5. **Cost check, explicit:** confirm whether this function runs as pure SQL inside Postgres (pg_cron calling a SQL function directly — not separately metered on Supabase, part of the DB compute already paid for) or whether it invokes a Supabase Edge Function (which IS metered per-invocation). Going from once-daily to every-15-minutes is a ~96x invocation multiplier — cheap/negligible if pure SQL, worth flagging explicitly to Brayden before shipping if it's Edge-Function-based. Report which one it is.
+
+**Part B — build, based on Part A's findings:**
+
+1. **Settings page** (new nav item if Part A confirms none exists) — Brayden explicitly asked Falcon to propose a fuller settings set, not just the one field, and said he'll trim what he doesn't want: **gear icon, placed next to the profile block at the bottom of the sidebar** (next to "Test Rep / apex11," where Sign Out already lives) — the standard convention, easy to relocate if it looks wrong live. Proposed sections, ranked by how load-bearing each one is:
+
+   - **Regional** *(required — this is why the prompt exists)*: **Timezone** — dropdown of real IANA zone names (not fixed offsets), self-service, locked once set, drives the reset logic below.
+   - **Account** *(straightforward, low-risk to include)*: display name, email, phone number (used for caller ID/callbacks), change password.
+   - **Payouts** *(a pointer, not a new form)*: "Manage payout account" linking out to the rep's existing Stripe Connect Express dashboard — do NOT build a custom bank-info form here, that's already handled and working (2026-07-03 audit: 2 reps genuinely connected via Stripe Connect); a duplicate field would conflict with it.
+   - **Notifications** *(include only if it's a small lift)*: toggle(s) for which events notify the rep (new lead assigned, appointment reminder, etc.) — only build this if Part A finds the existing 22-row notification system already has distinct categories to toggle; if it's a single undifferentiated stream, skip rather than inventing categorization that doesn't exist yet, and report that back instead.
+   - **Calling** *(optional, lowest priority, flag as easy to cut)*: working hours (local, using the same timezone) — purely informational for now, no gating logic tied to it yet, but sets up future use (e.g. feeding into Prompt 224's appointment-timezone work). Falcon is explicitly unsure this one earns its place — include it, but call it out as the first candidate to cut if Brayden doesn't want it.
+
+   Brayden's own words: "build a pretty good one... I'll take out what I don't like." Ship this proposed set; don't gate on additional confirmation first, since he's already said he'll edit after seeing it.
+
+2. Change `assign_daily_batches()`'s cron schedule to run more frequently (e.g. every 15 minutes) rather than once daily at a single UTC instant.
+3. Make the function per-rep-aware: for each rep, compute whether local midnight has passed in their stored `profiles.timezone` (real Postgres `AT TIME ZONE` conversion against the IANA zone name, so DST is handled automatically) since their last batch assignment, tracked via a "last assigned local date" column (add one if Part A confirms none exists) — only assign once per rep's own local calendar day.
+
+**Verification (rule #11):** screenshot the new/confirmed-existing Settings page (gear icon placement + all sections built) and the timezone field working (set it, confirm it persists). Describe (can't literally wait across timezones live) how the reset logic was verified — e.g. seed 2-3 test reps with different `profiles.timezone` values, manually invoke `assign_daily_batches()` at a few simulated UTC instants, confirm each rep is only assigned once their own local midnight has passed. Report Part A's findings (Settings page existence, drift root-cause, cost check) explicitly in the Memories log entry, and explicitly call out which proposed settings sections got built vs. skipped and why.
+
+---
+
+### Prompt 225 (QUEUED 2026-07-05, Falcon) — Activity Feed calendar: default to today (not "All days"), live day-rollover, empty-day state, prev/next day step
+
+Brayden reviewed the shipped Prompt 223 calendar filter live. Four changes to the same `ActivityFeed.jsx` control:
+
+**1. Default the view to today, not "All days."** On load, the page should auto-select and filter to the current day rather than showing everything unfiltered — trigger button should read the actual date (e.g. "Jul 5"), not "All days," by default. Keep "All days" reachable via the existing clear/`X` — just not the default.
+
+*(Falcon's recommendation, flagging the tradeoff rather than deciding silently: Prompt 223 built the calendar to bucket by the same UTC calendar-day boundary the lead-reset cron uses, for consistency with what "today" means elsewhere in this dashboard. Recommend keeping that same UTC-boundary definition for the auto-selected default "today," rather than switching to the viewer's browser-local day — otherwise this control's idea of "today" would disagree with the rest of the dashboard's. If Brayden wants "today" to instead mean the viewer's own local calendar day for this specific page, say so and it's a small change — but default to UTC-boundary consistency unless told otherwise.)*
+
+**2. Live day-rollover — no manual refresh needed.** If a rep leaves this tab open across the day boundary, the "today" selection (and the filtered results) should update automatically once the real day rolls over, without requiring a page reload. At minimum, recompute "today" on an interval (e.g. checked every few minutes) or on tab focus/visibility-change; a full-blown websocket push isn't necessary here.
+
+**3. Empty-day state.** If the selected day (default today, or any past day picked via the calendar) has zero matching activity rows, keep the box rendered at its normal size/border — don't collapse or hide it — and show centered text in the middle: "No activity today" when the selected day is the current day, or an adaptive "No activity on [Month Day]" when a different day is selected.
+
+**4. Add prev/next day-step arrows** next to the date trigger, for quick one-day-at-a-time back/forward navigation, complementing (not replacing) the existing calendar-jump dropdown from Prompt 223 — e.g. a "‹  Jul 5  ›" style control, where the arrows step one day at a time and the calendar icon still opens the full picker for jumping to an arbitrary day.
+
+**Verification (rule #11):** screenshot the page on load showing today auto-selected (not "All days"); confirm a day with zero calls shows the empty state, not a blank/collapsed box; confirm the prev/next arrows step one day at a time and match whatever the calendar dropdown would show for that same day; describe how the live-rollover was tested (can't literally wait for midnight — simulate by mocking the clock/date forward, or describe the interval/focus-check mechanism clearly enough to verify by code review if a live test isn't practical).
+
+---
+
+### Prompt 224 (QUEUED 2026-07-05, Falcon) — appointment timezone correctness (client-local, not Nate's Florida time) + script confirms the lead's location before locking a time
+
+**The real problem Brayden raised:** Nate (the closer) is based in Florida (Eastern). Appointments get booked with businesses all over the country — e.g. a Texas lead (Central, one hour behind Nate). If "Tuesday morning" or a specific time gets captured/stored assuming Nate's timezone (or the rep's, or ambiguously with no timezone at all), the appointment could land at the wrong actual real-world instant, and Nate could call/show up an hour off from what the client actually agreed to. This needs to be based on **the client's local timezone**, not Nate's or the rep's.
+
+**Part A — investigate and REPORT current state, don't guess:**
+1. How is an appointment's date/time currently captured in the booking flow (`confirm-time`/`confirm-number` → wherever it lands in `CloserPipeline`/`AppointmentCardModal`) — is a timezone assumed/attached at all right now, and if so whose?
+2. `profiles.timezone` (migration 042) is already used for "appointment-time display elsewhere" per Prompt 223's finding — report exactly where/how it's used today. Is it the rep's timezone, Nate's, or something else? Does anything already attempt to account for the *client's* timezone, or is that missing entirely?
+3. What real data exists on a `leads` row that could reliably determine the client's actual timezone — city + state (confirmed present, used in Prompt 201's search), zip code if present (best signal for TZ lookup), or only area code as a rough proxy? Report what's actually populated on real lead rows, not just what columns exist in the schema.
+
+**Part B — fix, based on Part A's findings:** appointment times must be stored as an unambiguous absolute instant derived from **the client's local timezone** (using whatever real field from Part A's findings is most reliable — likely city/state, ideally zip if populated), not Nate's or the rep's. Wherever Nate views a booked appointment (`CloserPipeline`, `AppointmentCardModal`, anywhere else it surfaces), the time should display with an explicit timezone label so it's never ambiguous — e.g. show the client's local time clearly labeled, and if useful also show Nate's own local equivalent, rather than a bare time that could silently be misread as Nate's own zone.
+
+**Part C — script content, confirms the location before locking a time.** Brayden's ask: at the point the appointment time gets confirmed, the script should state back the lead's actual location using data already on file — both as a natural personalization touch and to implicitly confirm timezone before locking a specific time. Update **`confirm-time`** (Prompt 221's node, currently "Good — so does [Tuesday morning] or [Wednesday afternoon] work best for you?"):
+
+SAY: "Good — looks like you guys are out in [city], [state] — does [Tuesday morning] or [Wednesday afternoon] work best for you?"
+
+Wire `[city]`/`[state]` the same way `[job title]` was wired to `leads.posting_title` (Prompt 210) — read the real fields, fall back gracefully if either is missing on a given lead (flag what the fallback should say if CC finds gaps in real data during Part A).
+
+**Verification (rule #11):** report Part A's findings in full in the Memories log entry (this is as important as the code change). For Part B, confirm via a concrete example — e.g. a Texas lead vs. Nate's Florida profile — that the stored appointment instant is correct and that Nate's view labels the timezone explicitly, not just a bare time. For Part C, screenshot the updated `confirm-time` screen with a real lead's city/state rendering correctly.
+
+---
+
 ### ✅ Prompt 223 SHIPPED 2026-07-05 (`48cca38`) — Activity Feed single-day calendar filter + timestamp/reset investigation
 
 - **Part A findings:** Activity Feed row timestamps are raw `calls.created_at` (timestamptz, UTC) formatted client-side via `toLocaleTimeString`/`toLocaleDateString` with **no `timeZone` option** — so the displayed time is whoever's *browser* is viewing the page, not the rep's own timezone (a `profiles.timezone` column exists but is never read in this path). The daily lead reset is a real mechanism — pg_cron job `daily-batch-assign` (`supabase/migrations/016_daily_batch_cron.sql`) running `assign_daily_batches()`, nominally `5 0 * * *` (00:05 UTC), keyed entirely off Postgres `CURRENT_DATE` — **one fixed UTC instant for every rep, zero per-rep timezone adjustment**, despite `profiles.timezone` existing (used only for appointment-time display elsewhere, migration 042). Side-finding: `useLeads.js`/`admin/Overview.jsx` comments claim the cron empirically fires ~06:05 UTC (not the nominal 00:05) — flagging the discrepancy, not fixing it (out of scope for this prompt).

@@ -64,6 +64,53 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-05 (cont. 13) — Falcon session: fleshed out full Settings page spec for Prompt 226 (Brayden's call to build broad, he'll trim)
+
+**What happened:** Brayden asked Falcon to propose a fuller Settings page rather than just the one timezone field — "throw in whatever other settings you think should be in there... build a pretty good one... I'll take out what I don't like." Expanded Prompt 226's Part B with a ranked section list: Regional/Timezone (required, drives the reset logic), Account (name/email/phone/password — low-risk to include), Payouts (a link out to the existing Stripe Connect dashboard, explicitly NOT a new banking form, to avoid duplicating the already-working flow), Notifications (only if the existing notification system already has distinct categories to toggle — skip and report back otherwise, don't invent categorization), and Calling/working-hours (flagged as the lowest-priority, first-to-cut item — informational only for now, ties toward the appointment-timezone work in Prompt 224). Gear icon placement proposed next to the profile block at the bottom of the sidebar, matching the standard convention. Told CC to just ship the proposed set rather than gating on further confirmation, since Brayden already said he'd edit after seeing it live.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 226 now includes a full proposed Settings page (Regional/Timezone, Account, Payouts-link-out, conditional Notifications, optional Calling/working-hours) alongside the per-rep-timezone-aware reset logic — CC should build the proposed set and report what got included/skipped, not wait for further sign-off. Prompts 224 and 225 also still queued.`
+
+---
+
+### 2026-07-05 (cont. 12) — Falcon session: Prompt 226 refined — Settings page with locked timezone field, not just backend cron logic
+
+**What happened:** Brayden clarified the mechanism he wants for per-rep timezone handling: a Settings page on the dashboard with a timezone field, set explicitly and locked (not derived from the rep's device clock). He also floated banking info possibly living in Settings too, but wasn't sure — flagged in the prompt as NOT to build, since bank details are already handled by the existing working Stripe Connect onboarding flow (confirmed working, 2 reps connected, per the 2026-07-03 audit) — a custom banking field would likely duplicate/conflict with that. Also corrected a small technical misunderstanding: once a timezone is locked, the corresponding daily UTC reset instant is knowable in advance and the system just runs on that fixed schedule — but *some* scheduled mechanism still has to exist to fire at that instant (same as any cron/alarm); this isn't literally "zero checking," just effectively zero ongoing overhead once set. Confirmed his core framing (locked, explicit, not device-derived) was exactly right. Revised **Prompt 226** in [[LIVE_STATE]] to include building/confirming the Settings page and timezone field as Part B item 1, alongside the per-rep-aware reset cron logic.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 226 was revised to include a Settings page + locked timezone field (not just backend cron changes) — check LIVE_STATE for the current full spec before it ships. Prompts 224 (appointment timezone) and 225 (Activity Feed calendar polish) are also still queued.`
+
+---
+
+### 2026-07-05 (cont. 11) — Falcon session: per-rep-timezone lead reset feasibility + queued (Prompt 226)
+
+**What happened:** Brayden asked directly whether the daily lead-reset (currently one fixed UTC instant for every rep, per Prompt 223's audit) could instead run at each rep's own local midnight, set deliberately at account creation rather than inferred from their device clock. Confirmed feasible and explained the standard pattern: run the reset cron more frequently (e.g. every 15 min) with per-rep logic checking whether local midnight has passed in that rep's stored `profiles.timezone` (already exists, currently unused for this purpose) since their last assignment, using Postgres's native `AT TIME ZONE` conversion against real IANA zone names so DST is handled automatically. Queued **Prompt 226**: investigate how `profiles.timezone` is actually set today (no confirmed account-creation UI yet), read `assign_daily_batches()`'s exact current logic, root-cause the previously-flagged 00:05-vs-~06:05 UTC drift while already in this code, then build the per-rep-aware version with a "last assigned local date" tracking column and a deliberate admin-set timezone at account creation.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompts 224 (appointment timezone correctness), 225 (Activity Feed calendar defaults/rollover/empty-state), and 226 (per-rep-timezone-aware lead reset, locked at account creation) are all queued for CC in LIVE_STATE.`
+
+---
+
+### 2026-07-05 (cont. 10) — Falcon session: Activity Feed calendar defaults to today, live rollover, empty-day state, day-step arrows (Prompt 225 queued)
+
+**What happened:** Brayden reviewed the shipped Prompt 223 calendar filter live and wants four refinements: (1) default the page to today's date auto-selected, not the current "All days" default; (2) if a rep leaves the tab open across midnight, the "today" selection should update live without a manual refresh; (3) a day with zero calls should still render the box at normal size with centered "No activity today" (or an adaptive per-date version) instead of looking blank/broken; (4) add prev/next day-step arrows next to the date trigger for quick navigation, alongside the existing calendar dropdown. Flagged one design tradeoff rather than deciding silently: Prompt 223 built the filter to bucket by the same UTC calendar-day boundary the lead-reset cron uses (for consistency with "today" elsewhere in the dashboard) — recommended keeping that same definition for the new auto-selected default rather than switching to the viewer's browser-local day, since otherwise this page's "today" would quietly disagree with the rest of the dashboard's. Queued as **Prompt 225**.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 224 (appointment timezone correctness) and Prompt 225 (Activity Feed: default-to-today, live rollover, empty-day state, day-step arrows) are both queued for CC in LIVE_STATE.`
+
+---
+
+### 2026-07-05 (cont. 9) — Falcon session: appointment timezone correctness raised (Prompt 224) — Nate's Florida time vs. client's actual local time
+
+**What happened:** Following the Activity Feed timestamp discussion, Brayden raised a more consequential version of the same class of problem: Nate (the closer) is in Florida (Eastern), but appointments get booked with clients across the country — if a booked time gets captured/stored assuming Nate's or the rep's timezone instead of the client's actual local timezone, Nate could call/show up at the wrong real instant (e.g. an hour off from a Texas client). Confirmed his reasoning directly: appointment times need to be anchored to **the client's local timezone**, since that's the real-world commitment being made — not Nate's, not the rep's — and separately confirmed the earlier Activity Feed timestamp behavior is fine as-is (that one's just a rep viewing their own past calls on their own device, low stakes; this one has real money/no-show risk attached).
+
+Queued **Prompt 224**: (Part A) investigate and report — not guess — how appointment times are currently captured/stored, how `profiles.timezone` (migration 042, already used somewhere for "appointment-time display" per Prompt 223's finding) is actually being used today, and what real client-location data exists on `leads` rows reliably enough to derive a timezone (city/state confirmed present; zip if populated would be better). (Part B) fix so stored appointment times are unambiguous instants anchored to the client's actual local timezone, with Nate's view showing an explicit timezone label rather than a bare time. (Part C) script content: `confirm-time` (Prompt 221's node) gets the lead's city/state stated back before locking a time — "Good — looks like you guys are out in [city], [state] — does [Tuesday morning] or [Wednesday afternoon] work best for you?" — wired the same way `[job title]` was wired to real lead data in Prompt 210.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 224 (appointment timezone correctness — investigate current state, fix to anchor on client's local timezone not Nate's, add [city]/[state] confirmation to confirm-time) is queued for CC in LIVE_STATE. This is a real correctness/no-show-risk issue, not just polish — treat Part A's findings as important to report back accurately.`
+
+---
+
 ### 2026-07-05 (cont. 8) — CC session: Prompt 223 shipped — Activity Feed single-day calendar filter + timestamp/reset-boundary investigation
 
 **[CC | 2026-07-05 — Prompt 223: Activity Feed single-day calendar filter]** — Investigated Activity Feed timestamp rendering (browser-local, no explicit timezone) and the daily lead-reset mechanism (fixed-UTC `pg_cron` job `assign_daily_batches()`, not per-rep-timezone-aware). Built a single-day calendar filter on `rep/feed` bucketing by UTC calendar date to match that reset boundary. Verified via a temp mock-data harness (real seeded logins 401'd, unrelated to this change), removed before commit. Shipped `ohvara-dashboard@48cca38`, pushed. No blockers; nothing left queued in LIVE_STATE.
