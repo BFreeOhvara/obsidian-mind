@@ -38,6 +38,16 @@ Prompt 232E shipped exit-and-resume + an anti-skip-forward floor, and it's worki
 
 ---
 
+### 🔲 Prompt 240 QUEUED 2026-07-06 (Eagle, follow-up on Prompt 237's star marker) — add the same start-day star to the shared RangeCalendar (Commissions + My Stats)
+
+**Shared `RangeCalendar`/`useRangeCalendar` component (Commissions from Prompt 231D, My Stats from Prompt 238).**
+
+Prompt 237 added a start-day star (5-point star SVG, amber `var(--warning)` fill, "Your start day" tooltip, suppressed when that day is also the currently-selected day) to the shared `DayFilterBar` calendar used on Activity Feed and My Calls. Brayden noticed Jun 11 is missing that same star on the Commissions and My Stats calendars (`RangeCalendar`) — he wants it there too, same day, same visual treatment, on both pages since they share the component.
+
+**Fix:** wire the same "first graded call" data source `DayFilterBar` already uses (`MIN(created_at) WHERE grade IS NOT NULL`, per Prompt 232C) into `RangeCalendar`/`useRangeCalendar` as well, and render the identical star marker Prompt 237 built — same SVG, same color, same tooltip text, same suppress-when-selected rule (a range calendar has more "selected" cells than a single-day one — the star should stay suppressed on the start day if it falls anywhere inside the currently-picked range, not just on an exact single-day match). One fix to the shared component covers both Commissions and My Stats, same as Prompt 237 covered both Activity Feed and My Calls with a single change.
+
+---
+
 ### ✅ Prompt 238 SHIPPED 2026-07-06 (`c1586b6`, pushed) — My Stats' calendar swaps to the shared RangeCalendar (single day OR range)
 
 Reversed Prompt 234's `DayFilterBar` choice: My Stats now reuses the exact same `RangeCalendar`/`useRangeCalendar` as `MyCommissions.jsx` — pick a single day (two clicks on the same day) or a contiguous range (click start, click end), identical interaction to Commissions. Folded in Prompt 236's fix against this component instead of `DayFilterBar`: no range picked falls back to All Time (mirrors Commissions' own default exactly — no more "defaults to today" from Prompt 234), the trigger shows a neutral "Custom Range" placeholder and the calendar pre-highlights nothing while All Time is active, and completing a pick immediately becomes the active filter in the same action (no stale-highlight confusion). All Time button just calls `clearRange()`. `DayFilterBar` itself (Activity Feed/My Calls) is untouched, still single-day-only per Prompt 227.

@@ -4244,3 +4244,12 @@ No code touched this session (Eagle/Cowork, vault-only) — Prompt 231 is queued
 
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 239 is queued in LIVE_STATE: training video player's anti-skip-forward ceiling should be based on furthest-position-ever-reached (monotonic high-water mark, never decreases on rewind) rather than current/last-saved position, so an accidental rewind doesn't force re-watching already-earned progress. Resume-on-reopen stays tied to last exit position (Prompt 232E's existing behavior, unchanged). Investigate current video_positions jsonb shape first — likely needs a second value added per video. Nothing else queued.`
+
+---
+
+## Session Log — 2026-07-06 (Eagle) — Prompt 240 queued: start-day star missing from RangeCalendar (Commissions + My Stats)
+
+**What happened:** Brayden noticed the Jun 11 start-day star (Prompt 237, shipped on the shared `DayFilterBar` used by Activity Feed/My Calls) doesn't appear on the Commissions or My Stats calendars, which use the separate shared `RangeCalendar`/`useRangeCalendar` component (Prompt 231D, reused by My Stats per Prompt 238). Queued as **Prompt 240** in [[LIVE_STATE]]: wire the same first-graded-call data source and identical star treatment into `RangeCalendar`, covering both pages in one fix since they share the component — including handling the suppress-when-selected rule correctly for a range (not just an exact single-day match). No code touched this session (Eagle/Cowork, vault-only).
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 240 is queued in LIVE_STATE: add the same start-day star (5-point star SVG, amber var(--warning), "Your start day" tooltip, from Prompt 237) to the shared RangeCalendar component used by both Commissions and My Stats — currently only DayFilterBar (Activity Feed/My Calls) has it. Suppress the star when the start day falls inside the currently-picked range, not just on an exact single-day match. Nothing else queued beyond Prompt 239 (video anti-skip ceiling), which is still pending.`
