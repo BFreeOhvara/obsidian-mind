@@ -18,13 +18,9 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
-### 🔲 Prompt 243 QUEUED 2026-07-06 (Eagle, revised — mirror only, no analysis, no edits) — copy the current discoveryScript.js verbatim into the vault
+### ✅ Prompt 243 SHIPPED 2026-07-06 (`[vault commit — see Memories]`, pushed) — discoveryScript.js mirrored verbatim into the vault
 
-**This is a read-only mirror task. Do NOT edit, analyze, restructure, or otherwise touch the actual script — just copy its current real content into Atlas so Eagle can work from it directly.**
-
-Context: Eagle doesn't have a reliable live connection to the actual current `ohvara-dashboard` working copy CC uses (the only local clone Eagle could find on Brayden's machine, `~/Desktop/ohvara-dashboard`, is stale — stuck at "Prompt 177," dozens of prompts behind). Brayden wants Eagle (not CC) to personally build a node-by-node path list of the ENTIRE script for him to review one path at a time and greenlight/reject changes per path — but Eagle needs an accurate, current copy of the file to do that from.
-
-**The only task here:** read the full, current `src/lib/discoveryScript.js` verbatim (every section — Opener/intro, Vitals, Pain, Handoff incl. every objection sub-fork, Close, and whatever else exists) and write its exact content into a new vault file, e.g. `brain/discovery-script-current-mirror.md` (wrap the source in a code block, preserve it byte-for-byte — no summarizing, no reformatting, no "cleaning up"). Commit + push as normal. That's it — no map, no dedup analysis, no doc structure. Eagle will build the actual path list from this mirror once it's in the vault.
+Read-only mirror, exactly as scoped — no analysis, no restructuring, no editing of the real script. Copied the full, current `src/lib/discoveryScript.js` (repo HEAD `4be0da9`, unchanged since — Prompt 242's edits this session touched `Settings.jsx`/`useSettings.js` only) byte-for-byte into a new vault file, [[discovery-script-current-mirror]] (`brain/discovery-script-current-mirror.md`), wrapped in a fenced code block. Verified fidelity with a `diff --strip-trailing-cr` between the extracted code block and the live source file — identical content (only difference was CRLF-vs-LF line endings, expected: the repo file is CRLF, the vault markdown is LF). No map, no dedup analysis, no doc structure — Eagle builds the actual path-by-path list from this mirror directly, per the corrected division of labor from the prior session's log entry.
 
 ---
 
