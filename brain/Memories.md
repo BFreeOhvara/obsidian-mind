@@ -4191,3 +4191,12 @@ No code touched this session (Eagle/Cowork, vault-only) — Prompt 231 is queued
 
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 235 is queued in LIVE_STATE: fix the My Stats calendar popup rendering broken/transparent when opened while All Time is the active selection (should look identical to opening it with a day selected), and give the All Time button a default bordered box in its unselected state (currently bare text, unlike the date-trigger button). Nothing else queued.`
+
+---
+
+## Session Log — 2026-07-06 (Eagle) — Prompt 236 queued: stop showing a stale date while All Time is active
+
+**What happened:** Confirmed Prompt 235 shipped + pushed (`53e5f06`/`e391de7`) — Brayden confirmed the ghosting bug is fixed and likes how the popup looks now. But he caught a real underlying UX bug while testing it: with All Time active, the date trigger still shows a specific date ("Jul 6") and the calendar pre-highlights that day as if selected, requiring a second click on the same day before stats actually change — confusing, and he flagged it as likely to trip up real reps. Queued as **Prompt 236** in [[LIVE_STATE]]: while All Time is active, the trigger shouldn't show any date and the calendar shouldn't pre-highlight a day; clicking a day should always both highlight it and immediately activate it as the filter in one action, never requiring a repeat click. No code touched this session (Eagle/Cowork, vault-only).
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 236 is queued in LIVE_STATE: on My Stats, while All Time is the active view, the date-trigger button should show no date (not a lingering "Jul 6") and the calendar popup should show no day pre-highlighted, since none is actually the active filter — clicking a day should highlight + activate it in a single click, never needing a second click to actually change the stats. Nothing else queued.`

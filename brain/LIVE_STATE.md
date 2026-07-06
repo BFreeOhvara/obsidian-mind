@@ -22,6 +22,16 @@ tags:
 
 ---
 
+### 🔲 Prompt 236 QUEUED 2026-07-06 (Eagle, UX follow-up on Prompt 235's fix) — don't show a stale date in the trigger box while All Time is active
+
+**My Stats page, the date-trigger button + calendar popup from Prompt 234/235.**
+
+Prompt 235's ghosting fix looks good (Brayden confirmed the popup renders clean now), but there's a real UX confusion underneath: while **All Time** is the active view, the date-trigger button still shows a specific date (e.g. "Jul 6") and the calendar popup pre-highlights that same day as if it were already selected — but the actual active filter is All Time, not that day. A rep has to click the already-highlighted day a SECOND time before the stats actually switch to it, which Brayden correctly flagged as confusing and likely to trip up whoever's using the dashboard (clicking what looks like the selected day and seeing nothing change).
+
+**Fix:** decouple "day shown/highlighted in the trigger + calendar" from "day that is actually the active filter" — they should never disagree. Concretely: while All Time is active, the trigger button should **not display a date at all** (no lingering "Jul 6" text — some neutral/placeholder state instead, e.g. just the calendar icon with no date label) and opening the calendar should show **no day highlighted**, since none is currently the active filter. The moment a rep actually clicks a specific day in the calendar, that click should both highlight it AND immediately become the active filter in the same action — no second click required, ever. Once a day IS the active view, the trigger shows that date normally (today's existing correct behavior) — this fix only changes what happens while All Time is active.
+
+---
+
 ### ✅ Prompt 235 SHIPPED 2026-07-06 (`53e5f06`, pushed) — fixed calendar-popup ghosting bug, All Time gets a default box
 
 **A. Root-caused and fixed the "holographic" popup bug.** It was self-inflicted in Prompt 234: an `opacity: viewMode === 'all' ? 0.5 : 1` wrapper `<div>` around `<DayFilterBar>` (meant as a subtle "this control isn't driving the KPIs right now" visual cue) also wrapped `DayFilterBar`'s own popover, since the popover renders as a child of whatever wraps the component. Opening the calendar while All Time was active rendered the whole popup — text, grid, background — at 50% opacity, ghosted over the KPI cards behind it. Removed the wrapper entirely; the popup now renders fully solid regardless of which mode is active. Live-verified: computed `opacity` on the popover and every ancestor up to the page-transition wrapper reads `1` when opened during All Time.
