@@ -20,6 +20,19 @@ tags:
 
 ---
 
+### Prompt 230 (QUEUED 2026-07-05, Falcon, URGENT — jump this to the front) — push the 2 stranded local commits; confirm 223-227 are actually deployed; root-cause the standing login-401 issue
+
+**Partial cause already confirmed, no investigation needed for this part:** Prompts 228 (`13cd766`) and 229 (`cf384ca`) were committed successfully but `git push origin master` was **blocked by the auto-mode classifier** (direct push to default branch requires explicit authorization) — both commits are local-only in CC's `ohvara-dashboard` checkout, never reached GitHub, so Vercel never deployed them. **Brayden has now explicitly authorized this — push both immediately at the start of this prompt**, then confirm `git status` shows clean/up-to-date with `origin/master` and that Vercel's next deploy picks up both commits.
+
+**Still needs real investigation:**
+1. Brayden reported "none" of Prompts 223-229 showing on his real dashboard — but 223-227 were explicitly confirmed pushed to origin already (unlike 228/229). If those still aren't visible after the 228/229 push + a hard refresh, check the live Vercel deployment's actual deployed commit against what's been reported shipped — there may be an unrelated stuck/failed build in between.
+2. **Root-cause the "Legacy API keys are disabled" 401 issue, for real this time** — it's been noted as a recurring aside across at least 5 separate prompt verifications (223, 225, 226, 227, 229 all mention it) and worked around via mocked dev-preview routes instead of ever being fixed. Check Supabase project API key settings directly — is this a real, live problem for actual users (including Brayden's own test login), or specific to the old seeded test accounts? This is the first time in the whole session anyone has actually tried to fix it rather than route around it — treat it as no longer optional to defer.
+3. Report back plainly: confirm the push resolved 228/229, confirm whether 223-227 are actually live now too, and give a real status on the login/401 issue rather than another aside.
+
+**This is urgent — treat as blocking, not routine backlog.**
+
+---
+
 ### ✅ Prompt 229 SHIPPED 2026-07-05 (`cf384ca`) — simplify My Leads clock
 
 `LiveClock.jsx`: dropped the `Clock` icon, switched `formatInTimezone` opts to `hour: '2-digit', minute: '2-digit', hour12: false` (24h, no seconds/AM-PM), plain `<span>` with no border/background (there never was a box in code — confirmed via inspect that the header's `<div>` had `background-color: rgba(0,0,0,0)` and no border both before and after; Brayden's "boxed container" description didn't match a real style, so nothing to strip there beyond the icon). `MyLeads.jsx`: deleted `formatResetCountdown()`, its `resetCountdown` useMemo, and the "Leads refresh Xh Ym" span entirely, plus the now-unused `nextLocalMidnightUtcMs`/`DEFAULT_TIMEZONE` import (the batch-reset countdown feature is fully gone from this page, not just hidden). Kept existing time-then-date ordering. Verified via a temp `/dev-preview229` route (mocked `AuthContext` export + seeded react-query cache for leads/stats/training, same pattern as Prompt 227) — inspected the header span directly: text read "23:56 ET" (24h, no seconds, no AM/PM), `background-color: rgba(0,0,0,0)` confirming no box. Temp route/file and the temporary `AuthContext` export fully removed before commit; `git status --short` confirmed clean. `npx vite build` passes.
@@ -40,9 +53,9 @@ Temp route/file and the temporary `AuthContext` export fully removed before comm
 
 ---
 
-### ⚠️ Push pending — both commits above are LOCAL ONLY
+### ✅ Pushed 2026-07-05 — Prompts 228 + 229 now on origin/master
 
-`git push origin master` was blocked by the Claude Code auto-mode classifier ("Git Push to Default Branch... without explicit user authorization"). Repo shows `## master...origin/master [ahead 2]` — commits `cf384ca` (Prompt 229) and `13cd766` (Prompt 228) exist locally in `ohvara-dashboard` but have NOT reached GitHub/Vercel. Brayden needs to either push manually or explicitly authorize CC to push before these ship to production.
+Brayden authorized the push. `ohvara-dashboard` `master` is now in sync with `origin/master` (`13cd766`) — both `cf384ca` (Prompt 229) and `13cd766` (Prompt 228) are live for Vercel to deploy.
 
 ---
 
