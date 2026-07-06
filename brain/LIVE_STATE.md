@@ -18,48 +18,21 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
-*(Queue empty — nothing pending for CC.)*
+*(Queue empty — nothing pending for CC. Prompt 236 was superseded by Prompt 238 before either was built — never shipped separately.)*
 
 ---
 
-### ⚠️ Prompt 236 SUPERSEDED BY PROMPT 238 (below) — folded in, don't build separately
+### ✅ Prompt 238 SHIPPED 2026-07-06 (`c1586b6`, pushed) — My Stats' calendar swaps to the shared RangeCalendar (single day OR range)
 
-Brayden's follow-up request (queued as Prompt 238) replaces My Stats' single-day `DayFilterBar` picker with the Commissions-style `RangeCalendar` entirely, so this prompt's "no stale date while All Time is active" requirement now applies to that component instead — see Prompt 238, which restates and includes it. Original text kept below for context only, not a separate build item.
+Reversed Prompt 234's `DayFilterBar` choice: My Stats now reuses the exact same `RangeCalendar`/`useRangeCalendar` as `MyCommissions.jsx` — pick a single day (two clicks on the same day) or a contiguous range (click start, click end), identical interaction to Commissions. Folded in Prompt 236's fix against this component instead of `DayFilterBar`: no range picked falls back to All Time (mirrors Commissions' own default exactly — no more "defaults to today" from Prompt 234), the trigger shows a neutral "Custom Range" placeholder and the calendar pre-highlights nothing while All Time is active, and completing a pick immediately becomes the active filter in the same action (no stale-highlight confusion). All Time button just calls `clearRange()`. `DayFilterBar` itself (Activity Feed/My Calls) is untouched, still single-day-only per Prompt 227.
 
-### 🔲 Prompt 236 QUEUED 2026-07-06 (Eagle, UX follow-up on Prompt 235's fix) — don't show a stale date in the trigger box while All Time is active
-
-**My Stats page, the date-trigger button + calendar popup from Prompt 234/235.**
-
-Prompt 235's ghosting fix looks good (Brayden confirmed the popup renders clean now), but there's a real UX confusion underneath: while **All Time** is the active view, the date-trigger button still shows a specific date (e.g. "Jul 6") and the calendar popup pre-highlights that same day as if it were already selected — but the actual active filter is All Time, not that day. A rep has to click the already-highlighted day a SECOND time before the stats actually switch to it, which Brayden correctly flagged as confusing and likely to trip up whoever's using the dashboard (clicking what looks like the selected day and seeing nothing change).
-
-**Fix:** decouple "day shown/highlighted in the trigger + calendar" from "day that is actually the active filter" — they should never disagree. Concretely: while All Time is active, the trigger button should **not display a date at all** (no lingering "Jul 6" text — some neutral/placeholder state instead, e.g. just the calendar icon with no date label) and opening the calendar should show **no day highlighted**, since none is currently the active filter. The moment a rep actually clicks a specific day in the calendar, that click should both highlight it AND immediately become the active filter in the same action — no second click required, ever. Once a day IS the active view, the trigger shows that date normally (today's existing correct behavior) — this fix only changes what happens while All Time is active.
+`npx vite build` passes. **Live-verified with real data:** defaults to All Time (35/11/31.4%/1m20s); opening the calendar shows 0 pre-highlighted cells; picking Jul 1 twice (single day) immediately shows "Jul 1" in the trigger and KPIs recompute to 0/0/0%/0s with no extra click; clicking All Time resets the trigger to "Custom Range" and KPIs back to 35/11.
 
 ---
 
-### 🔲 Prompt 237 QUEUED 2026-07-06 (Eagle, follow-up on the shared start-day calendar marker) — retitle the tooltip, try a star-shaped marker instead of a box
+### ✅ Prompt 237 SHIPPED 2026-07-06 (`520c195`, pushed) — star-shaped start-day marker, simpler tooltip
 
-**Shared `DayFilterBar`/`useDayFilter` component (Activity Feed + My Calls), the start-day marker from Prompt 231B/232C/232D.**
-
-Brayden confirmed the marker lands on the right day (Jun 11, correctly fixed by Prompt 232C's first-graded-call query) and the amber box treatment from Prompt 232D looks good visually — two smaller follow-ups:
-
-**A. Tooltip text.** Hovering the marked day currently reads "Your first graded call" — too literal/technical. Change to something simpler like "Your first day" or "Your start day" (Brayden's own suggestion, use judgment on exact wording) — it should read as "the day you started," not reference grading at all.
-
-**B. Shape — try a star instead of the box.** Brayden asked directly whether the amber background could be shaped like a star instead of the current rounded-rectangle box behind the day number (not a revert to the old tiny floating corner icon from before Prompt 232D — this is about the shape of the marker itself). Investigate what's feasible with the existing calendar-cell layout (e.g. a star-shaped SVG/clip-path background behind the number, or a star badge overlapping the cell) and implement whichever renders cleanly — report back if a true star silhouette doesn't fit well in the small cell size and a close approximation was used instead.
-
----
-
-### 🔲 Prompt 238 QUEUED 2026-07-06 (Eagle, reverses part of Prompt 234) — My Stats' calendar should support single-day OR range selection, like Commissions
-
-**My Stats page — the date-trigger/calendar control next to the All Time button.**
-
-Brayden wants to reverse Prompt 234's specific component choice: instead of the single-day-only `DayFilterBar` (shared with Activity Feed/My Calls), **My Stats' calendar should be the same `RangeCalendar` already built for the Commissions page** (Prompt 231D/232/233) — letting a rep pick either a single day (one click) or a contiguous range of days (click start, click end), exactly like Commissions already works. Reuse that existing component, don't build a third variant.
-
-**Keep everything else from Prompts 234/236 that still applies:**
-- The standalone **All Time** button stays, sitting alongside this calendar, same as Prompt 234 shipped.
-- **Prompt 236's fix still applies, just against this component instead of `DayFilterBar`:** while All Time is the active view, the trigger should show no stale date and the calendar should pre-highlight nothing (since no specific day/range is actually active) — picking a day or range should immediately both highlight it AND activate it as the filter in one action, never requiring a second click.
-- The 4 KPI boxes (Total Dials/Booked/Booking Rate/Avg Call Duration) recompute for whichever is active: All Time (lifetime), a single picked day, or a picked range (inclusive of both endpoints) — mirroring exactly how Commissions' 3 stat boxes already work off its `RangeCalendar` selection.
-
-Not in scope: the shared `DayFilterBar` component itself (Activity Feed/My Calls) is untouched by this — it stays single-day-only per Prompt 227's deliberate design; this change is specific to My Stats only.
+Shared `DayFilterBar` calendar (Activity Feed + My Calls): swapped the amber rounded-box start-day marker (Prompt 232D) for an actual 5-point star SVG rendered behind the day number, and changed the tooltip from "Your first graded call" to "Your start day". Star only renders when the start day isn't also the currently-selected day, so it never competes with the selected-day blue background. `npx vite build` passes. Live-verified on My Calls' calendar: Jun 11 shows the star (amber `var(--warning)` fill, ~25×25px within a ~27×28px cell — reads cleanly as a star, not a rough approximation) with tooltip "Your start day".
 
 ---
 

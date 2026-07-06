@@ -64,6 +64,23 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-06 (cont. 30) — CC session: Prompts 237 + 238 shipped + pushed — star-shaped start-day marker, My Stats swaps to shared RangeCalendar
+
+**[CC | 2026-07-06 — Prompt 237: star marker + simpler tooltip on the shared DayFilterBar calendar]** — Read LIVE_STATE's queue: Prompt 236 was marked superseded by 238 (folded in, not built separately), so started with 237. Swapped the amber rounded-box start-day marker (Prompt 232D) for an actual 5-point star SVG polygon rendered behind the day number in `DayFilterBar.jsx`'s `SingleDayCalendar`, and reworded the tooltip from "Your first graded call" to "Your start day" (drop the grading-internals language per Brayden's own suggested phrasing). Star only renders when the start day isn't also the selected day (`showStar = isFirstCall && !isSelected`), preserving Prompt 232D's "must stay visually distinct from the selected-day blue" requirement. Committed `520c195`.
+
+**[CC | 2026-07-06 — Prompt 238: My Stats' calendar reverses Prompt 234, swaps to the shared RangeCalendar]** — Brayden decided the single-day-only `DayFilterBar` (Prompt 234) was the wrong component choice for My Stats after all — wants the same `RangeCalendar`/`useRangeCalendar` `MyCommissions.jsx` already uses (pick a single day via two clicks on the same day, or a contiguous range via click-start/click-end), reusing the exact popover-button pattern from Commissions rather than building a third variant. This also folded in Prompt 236's UX fix (queued right before 238, then marked superseded once 238 was written, since 238 restates the same requirement against the new component): no range picked falls back to All Time — mirroring Commissions' own default — instead of Prompt 234's "defaults to today," the trigger shows a neutral "Custom Range" placeholder with nothing pre-highlighted while All Time is active, and completing a pick (single day or range) immediately becomes the active filter in the same action, no stale-highlight confusion. All Time button now just calls the hook's `clearRange()`. Data-fetching side barely changed — this reverts to literally the same `useRepStats(profile?.id, hasCustomRange ? 'custom' : 'all', customRange)` wiring Prompt 233 originally used, since 234's single-day mode was already piggybacking on the same `'custom'` period type. `DayFilterBar` itself stays untouched on Activity Feed/My Calls, still single-day-only per Prompt 227's deliberate design. Committed `c1586b6`.
+
+`npx vite build` passes for both. **Live-verified with real data, no mocking:** My Stats defaults to All Time (35/11/31.4%/1m20s); opening the calendar shows zero pre-highlighted cells (confirmed via `getComputedStyle`/inline-style check across all 31 grid cells); picking Jul 1 twice (single-day collapse) immediately updated the trigger to "Jul 1" and the KPIs to 0/0/0%/0s with no extra click needed; clicking All Time reset the trigger to "Custom Range" and KPIs back to 35/11. Separately, navigated to My Calls to verify Prompt 237 (My Stats no longer uses `DayFilterBar`, so it had to be checked on a page that still does): Jun 11 renders the star (amber fill, ~25×25px in a ~27×28px cell, confirmed via screenshot it reads as an actual star not a rough blob) with tooltip "Your start day".
+
+Both pushed to `origin/master` per standing authorization. LIVE_STATE queue is now empty.
+
+**Lesson:** when Eagle marks a queued prompt "superseded, folded into a later one" before either is built, check the later prompt's text carefully for whether it actually restates every requirement from the superseded one (238 did explicitly call out "Prompt 236's fix still applies") rather than assuming supersession means the earlier ask was dropped — otherwise a real requirement can silently vanish between two prompt-queue edits.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompts 237 and 238 are shipped, pushed, and live-verified (ohvara-dashboard@520c195, @c1586b6). Star-shaped start-day marker + simpler tooltip on the shared DayFilterBar calendar; My Stats now uses the shared RangeCalendar (single day or range) instead of DayFilterBar, defaulting to All Time. LIVE_STATE queue is empty.`
+
+---
+
 ### 2026-07-06 (cont. 29) — CC session: Prompt 235 shipped + pushed — fixed a bug I introduced in Prompt 234 (calendar-popup ghosting) + All Time default box
 
 **[CC | 2026-07-06 — Prompt 235: root-caused the "holographic" calendar popup, gave All Time a default box]** — Read LIVE_STATE's queue (Prompt 235, Eagle's bug+style follow-up on Prompt 234), executed against `ohvara-dashboard`.
