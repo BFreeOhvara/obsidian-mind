@@ -22,23 +22,21 @@ tags:
 
 ---
 
-### 🔲 Prompt 240 QUEUED 2026-07-06 (Eagle, follow-up on Prompt 237's star marker) — add the same start-day star to the shared RangeCalendar (Commissions + My Stats)
-
-**Shared `RangeCalendar`/`useRangeCalendar` component (Commissions from Prompt 231D, My Stats from Prompt 238).**
-
-Prompt 237 added a start-day star (5-point star SVG, amber `var(--warning)` fill, "Your start day" tooltip, suppressed when that day is also the currently-selected day) to the shared `DayFilterBar` calendar used on Activity Feed and My Calls. Brayden noticed Jun 11 is missing that same star on the Commissions and My Stats calendars (`RangeCalendar`) — he wants it there too, same day, same visual treatment, on both pages since they share the component.
-
-**Fix:** wire the same "first graded call" data source `DayFilterBar` already uses (`MIN(created_at) WHERE grade IS NOT NULL`, per Prompt 232C) into `RangeCalendar`/`useRangeCalendar` as well, and render the identical star marker Prompt 237 built — same SVG, same color, same tooltip text, same suppress-when-selected rule (a range calendar has more "selected" cells than a single-day one — the star should stay suppressed on the start day if it falls anywhere inside the currently-picked range, not just on an exact single-day match). One fix to the shared component covers both Commissions and My Stats, same as Prompt 237 covered both Activity Feed and My Calls with a single change.
-
-**Confirm this is fully generic, not apex11-specific — Brayden's forward-looking ask:** when he onboards a new appointment setter and they make their first dial, that rep's own first-graded-call day should automatically show as the star on all 4 calendar pages (Activity Feed, My Calls, My Commissions, My Stats) — no manual step, no hardcoded account. This should already be true by construction (the query is scoped to the logged-in rep's own `rep_id`/session, not a fixed account), but explicitly verify and report that it's genuinely per-rep-dynamic rather than something that happened to only get tested against apex11's data, since this is exactly the kind of assumption worth confirming rather than taking for granted.
-
----
-
 ### 🔲 Prompt 241 QUEUED 2026-07-06 (Eagle, design decision confirmed with Brayden) — My Payouts becomes range-aware, matching the 3 stat boxes
 
 **Commissions page (`MyCommissions.jsx`), the My Payouts list from Prompt 231C.**
 
 Brayden flagged a real inconsistency: the 3 top stat boxes (Total Earned/Closed Deals/Avg Per Deal) already respond to the `RangeCalendar`/All-Time picker (Prompt 231D), but the My Payouts list below always shows everything regardless of the picker — so the page currently reads as filtered / not-filtered / filtered depending on section, which feels broken. **Decision (confirmed with Brayden, explicit tradeoff discussed):** the "Last 30 Days" chart stays fixed/unaffected by the picker — it's self-labeled with its own window, same precedent already approved for My Stats' "Last 7 Days" chart staying fixed while its KPI boxes above became range-aware (Prompt 233). **Only My Payouts changes:** filter the payouts list to whichever window is active — All Time (everything, current behavior), a single picked day, or a picked range (inclusive of both endpoints) — mirroring exactly how the 3 stat boxes above it already compute their own scoping. Keep Prompt 231C's 5-row scroll cap as-is; this only changes which rows are eligible to appear, not the display/scroll behavior.
+
+---
+
+### ✅ Prompt 240 SHIPPED 2026-07-06 (`92d975c`, pushed) — start-day star added to the shared RangeCalendar (Commissions + My Stats)
+
+Extracted the first-graded-call-date query out of `useDayFilter` into a standalone `useFirstGradedCallDate(repId)` hook (still `MIN(created_at) WHERE grade IS NOT NULL`, per Prompt 232C — same query, same source of truth, no duplicate copy) and wired it into `useRangeCalendar`/`RangeCalendar` too. Renders the identical star Prompt 237 built (same SVG polygon, same amber `var(--warning)` fill, same "Your start day" tooltip). Suppress rule adapted for a range picker: star hides whenever the day is `edge` (exact start/end/hover-preview point) OR `inRange` (falls anywhere inside the confirmed range or the hover-preview range while picking the end) — not just an exact single-day match, since a range calendar can highlight many cells at once.
+
+**Generic/per-rep confirmed, not apex11-specific:** both `useRangeCalendar(profile?.id)` call sites (MyCommissions.jsx, MyStats.jsx) pass the logged-in rep's own `profile.id` — same repId argument pattern already used by `useDayFilter(profile?.id)` on Activity Feed/My Calls, and the extracted hook is the exact same query object (not a copy), so all 4 calendar pages now share one code path scoped to whichever rep is logged in. No hardcoded account anywhere in the change.
+
+`npx vite build` passes. **Live-verified** in both real pages (test rep, apex11): Commissions' RangeCalendar shows the star on Jun 11 when nothing/All-Time is active; picking Jun 11 as a single point suppresses it (background flips to accent, no polygon) after React's re-render settles; picking a Jun 11–Jun 15 range keeps it suppressed the whole time Jun 11 is in-range; clearing back to All Time brings the star back. Confirmed the same star renders on My Stats' RangeCalendar (June 2026 view, Jun 11 cell). No console errors across any of it.
 
 ---
 
