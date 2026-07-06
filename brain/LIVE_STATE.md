@@ -22,15 +22,11 @@ tags:
 
 ---
 
-### 🔲 Prompt 234 QUEUED 2026-07-06 (Eagle, follow-up on Prompt 233's live result) — replace Day/Week/Month/Custom tabs with the shared single-day DayFilterBar + a standalone All Time button
+### ✅ Prompt 234 SHIPPED 2026-07-06 (`b516a28`, pushed) — single-day DayFilterBar + All Time toggle on My Stats
 
-**My Stats page (`src/pages/rep/MyStats.jsx`), the tab bar above the 4 KPI boxes.**
+Removed the Day/Week/Month/Custom tabs entirely — replaced with the same shared `DayFilterBar`/`useDayFilter` (prev/next day-step arrows + click-to-pick single-day calendar) used on Activity Feed and My Calls, defaulting to today, plus a standalone "All Time" button next to it. Only two states now: a specific day, or all-time lifetime totals. `RangeCalendar`/`useRangeCalendar` (from Prompt 233) stay in use on `MyCommissions.jsx`; My Stats no longer imports them. Reused the existing `'custom'`-style `{from,to}` bounds in `useRepStats` for single-day queries (from===to) rather than adding a third period type — today still special-cases through the `rep_today_metrics` RPC for exact parity with My Leads' "Calls Today", but only when the selected day is actually today.
 
-Brayden likes Prompt 233's result overall but wants the selector redesigned: **remove the Day, Week, Month, and Custom tabs entirely** (so the `RangeCalendar` built in Prompt 233 for the Custom tab is no longer used on this page — fine to leave it in `MyCommissions.jsx` where it's still needed, just don't wire it here anymore). **Replace them with the exact same single-day calendar control already used on Activity Feed and My Calls** — the shared `DayFilterBar`/`useDayFilter` component (prev/next day-step arrows + a date-trigger button that opens a single-click-to-pick calendar, per Prompt 223/225/227's convention). This becomes the default view, defaulting to **today** (same convention as Activity Feed/My Calls) — matches Brayden: "that's what it's on by default."
-
-**Add a standalone "All Time" button next to the day selector** (not a `DayFilterBar` mode — that component was deliberately built single-day-only with no unfiltered/all-time state per Prompt 227's explicit decision, so don't reintroduce that there; this is a My-Stats-page-specific toggle sitting alongside it). Clicking All Time switches the 4 KPI boxes (Total Dials/Booked/Booking Rate/Avg Call Duration) to lifetime aggregates, overriding whatever day is selected; clicking a day in the calendar (or the prev/next arrows) switches back to that single day's stats. Only two states needed now: **a specific day** (via the shared calendar, defaulting to today) or **All Time** (via the standalone button) — no week/month aggregate view anymore.
-
-Since this reuses the exact shared `DayFilterBar` component, the Prompt 231/232 "start day" star should come along for free (no extra work expected) — worth a quick live check that it still renders correctly on this page's calendar too.
+`npx vite build` passes. **Live-verified with real data, no mocking needed** (test-rep login confirmed working per the prior session's password fix): defaults to today ("Jul 6", 0/0/0%/0s, matches Calls Today); All Time shows 35/11 (same as Prompt 233); clicking a day switches back to day mode; picked Jun 11 (a real graded-call day) → showed 8 dials/2 booked/25% — genuine historical data pulled correctly for a non-today day; the Prompt 231/232 "start day" star rendered on this page's calendar too, confirmed for free as expected; prev-day arrow correctly stepped Jun 11 → Jun 10.
 
 ---
 

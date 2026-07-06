@@ -64,6 +64,21 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-06 (cont. 28) — CC session: Prompt 234 shipped + pushed — My Stats gets shared DayFilterBar + All Time toggle, live-verified with real data
+
+**[CC | 2026-07-06 — Prompt 234: replace My Stats' 5-tab selector with the shared single-day DayFilterBar + a standalone All Time button]** — Read LIVE_STATE's queue (Prompt 234, Eagle's follow-up on Brayden's live review of Prompt 233), executed against `ohvara-dashboard`.
+
+Removed the Day/Week/Month/Custom tabs from My Stats entirely and replaced them with the exact same shared `DayFilterBar`/`useDayFilter` component Activity Feed (Prompt 223/225) and My Calls (Prompt 227) already use — prev/next day-step arrows + a click-to-pick single-day calendar, defaulting to today. Added a standalone "All Time" button alongside it (not folded into `DayFilterBar` itself, since that component was deliberately built single-day-only with no all-time escape hatch per Prompt 227's explicit decision — kept that invariant intact). Only two states now: a specific day, or lifetime totals. `RangeCalendar`/`useRangeCalendar` (extracted in Prompt 233) stay wired into `MyCommissions.jsx` only — My Stats dropped that import since Custom is gone. Reused the existing `'custom'`-style `{from,to}` bounds in `useRepStats`/`getPeriodRange` for a single day (from === to) instead of adding a third period type — kept the existing today-special-case through the `rep_today_metrics` RPC (for exact "Total Dials" ≡ "Calls Today" parity with My Leads), but now gated on `selectedDate === todayStr` rather than a fixed `'day'` tab, so it correctly falls through to a plain scoped query for any other day.
+
+`npx vite build` passes. **Live-verified end-to-end with real data, zero mocking** (yesterday's password fix — `Test1234!` — meant genuine login worked this whole session): defaults to today ("Jul 6", 0/0/0%/0s, matches Calls Today); clicking All Time shows 35 dials/11 booked/31.4%/1m20s (same figures as Prompt 233's All Time); clicking a day switches back out of All Time automatically; picked Jun 11 (a real graded-call day per Prompt 232's investigation) and got 8 dials/2 booked/25.0% — genuine historical per-day data, not just today; the Prompt 231/232 amber "start day" star rendered correctly on this page's calendar too, exactly as expected from reusing the shared component ("should come along for free" — confirmed, no extra work needed); the prev-day arrow correctly stepped Jun 11 → Jun 10.
+
+Committed (`b516a28`) and pushed to `origin/master` per the standing push-authorization rule. LIVE_STATE queue is now empty.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 234 is shipped, pushed, and live-verified with real data (ohvara-dashboard@b516a28). My Stats now uses the shared DayFilterBar (defaults to today) + a standalone All Time toggle, replacing the old 5-tab selector. LIVE_STATE queue is empty.`
+
+---
+
 ### 2026-07-06 (cont. 27) — CC session: Prompt 233 live-verified with real data — test-rep password rotated, not broken
 
 **[CC | 2026-07-06 — closing the loop on the login flag from cont. 26]** — Brayden confirmed the test-rep password for all accounts is now `Test1234!` (not `Apex2026!` — password was rotated, not a real auth bug). Logged in as `apex11` for real (no mocking) and confirmed `POST /auth/v1/token?grant_type=password → 200`. Live-verified Prompt 233 against real Supabase data instead of the mocked harness: **All Time** and **Month** both show 35 dials / 11 booked / 31.4% / 1m20s avg (all of apex11's real calls fall within the last 30 days); **Week** (rolling 7 days) and **Custom Jul 1–6** both correctly show 0/0/0%/0s — consistent with each other, confirming the new `'all'`/`'custom'` query paths produce results that line up exactly with the pre-existing, already-trusted `'week'`/`'month'` logic. No code changes needed; this closes out the flag from the entry below.
