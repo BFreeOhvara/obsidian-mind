@@ -4209,3 +4209,12 @@ No code touched this session (Eagle/Cowork, vault-only) — Prompt 231 is queued
 
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 236 (My Stats: no stale date shown while All Time active) and Prompt 237 (shared start-day calendar marker: retitle tooltip from "Your first graded call" to something like "Your first day"/"Your start day", explore a star-shaped marker instead of the current amber box) are both queued in LIVE_STATE, in that order. Nothing else queued.`
+
+---
+
+## Session Log — 2026-07-06 (Eagle) — Prompt 238 queued: My Stats calendar becomes single-day-OR-range, supersedes Prompt 236
+
+**What happened:** Brayden asked for My Stats' calendar to support picking either a single day or a range of days, same as the Commissions page — reversing Prompt 234's specific choice to reuse the single-day-only `DayFilterBar` there. Queued as **Prompt 238** in [[LIVE_STATE]]: swap My Stats to the existing Commissions-style `RangeCalendar` component instead, keep the All Time button, and fold Prompt 236's "no stale date while All Time is active, one-click-to-activate" requirement into this new component rather than building it against `DayFilterBar` first and then throwing that work away. Marked Prompt 236 in LIVE_STATE as superseded/folded in rather than deleting it outright, so the history/reasoning stays visible. Prompt 237 (shared start-day marker on Activity Feed/My Calls) is unaffected — different page, different component. No code touched this session (Eagle/Cowork, vault-only).
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 236 is superseded/folded into Prompt 238 (both in LIVE_STATE) — don't build 236 against DayFilterBar separately. Prompt 238: swap My Stats' calendar from the single-day DayFilterBar to the existing Commissions-style RangeCalendar (single day or range selection), keep the All Time button, and make sure no stale date/pre-highlight shows while All Time is active (one click always both highlights and activates). Prompt 237 (Activity Feed/My Calls shared start-day marker: retitle tooltip, explore star shape) is still queued separately and unaffected. Nothing else queued.`
