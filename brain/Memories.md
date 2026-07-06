@@ -64,6 +64,37 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-05 (cont. 21) — CC session: Prompts 229 + 228 shipped — clock cleanup, dividers, box sizing. Queue empty.
+
+**[CC | 2026-07-05 — Prompt 229: simplify My Leads clock]** — Shipped `ohvara-dashboard@cf384ca` (local only, push blocked — see below). `LiveClock.jsx`: dropped the `Clock` icon, switched to `hour12: false` + no `second` option (24h, no seconds/AM-PM). `MyLeads.jsx`: deleted `formatResetCountdown()`/`resetCountdown`/the "Leads refresh Xh Ym" span and its now-unused `nextLocalMidnightUtcMs`/`DEFAULT_TIMEZONE` import — the batch-reset countdown feature is gone from this page entirely, not hidden. Investigated the "bordered/boxed container" Brayden described — never existed in code (the header `<div>` was always `background-color: rgba(0,0,0,0)`, no border), confirmed via `preview_inspect` both before and after; nothing to strip there beyond the icon. Verified via a temp `/dev-preview229` route (mocked `AuthContext` export + seeded react-query cache, same pattern as Prompt 227/226) — inspected header text read "23:56 ET", transparent background confirmed. Temp route/file + `AuthContext` export fully reverted before commit.
+
+**[CC | 2026-07-05 — Prompt 228: Activity Feed row dividers, My Calls empty-box sizing + trailing divider]** — Shipped `ohvara-dashboard@13cd766` (local only, push blocked). Built a parameterized temp `/dev-preview228/:page?count=N` harness to verify each sub-issue live before touching code, rather than guessing: (1) Activity Feed rows measured `border-bottom-width: 0px` — confirmed missing, fixed by adding `isLast`-conditional `borderBottom` to `FeedItem`, between-rows only (no trailing, per the literal ask). (2) My Calls "shrinks with 1-2 calls" did NOT reproduce with actual rows present — that branch already had correct `flex:1` sizing, measured 720.5px full-height at count=1 and count=2. The real bug was the **zero-calls empty state**, a separate JSX branch with plain padding and no flex sizing, measured at only 171px vs Activity Feed's own empty Card at 732px — fixed by giving it the same `flex:1/center` treatment, re-measured at 722.5px. (3) My Calls' per-row divider was conditional on `i < calls.length - 1`, skipping the last row — made unconditional; confirmed both rows in a 2-call test now show `border-bottom-width: 1px` including the last. Lesson: **don't trust a bug report's stated trigger condition at face value — reproduce it exactly as described (here, "1-2 calls") before writing the fix, since the actual root cause (the 0-calls branch) was adjacent but distinct code.** Temp route/file + `AuthContext` export fully reverted before commit.
+
+**⚠️ Push blocked both times:** `git push origin master` was denied by the Claude Code auto-mode classifier (direct push to default branch without explicit authorization). Both commits are LOCAL ONLY in `ohvara-dashboard` — repo shows `ahead 2` of `origin/master`. Neither Prompt 229 nor 228 has reached GitHub/Vercel yet. **Brayden needs to push manually (`git push origin master` from `~/ohvara-dashboard`) or explicitly tell CC to push before these are live.**
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. LIVE_STATE's Next Up for CC queue is empty. Two commits (cf384ca Prompt 229, 13cd766 Prompt 228) are local-only in ohvara-dashboard, unpushed — push blocked by the auto-mode classifier. Push manually or authorize CC to push before anything further builds on top.`
+
+---
+
+### 2026-07-05 (cont. 20) — Falcon session: simplify My Leads clock display (Prompt 229 queued)
+
+**What happened:** Brayden reviewed the shipped live clock on My Leads and wants it stripped down: drop "Leads refresh 1h 11m" entirely, drop the seconds, drop the clock icon and its box/border, drop the AM/PM suffix. Falcon's implementation call, flagged explicitly: switching to 24-hour format to drop AM/PM cleanly (e.g. "22:48 CT") rather than showing ambiguous 12-hour numbers with no AM/PM marker — noted in case Brayden actually wanted the ambiguous version. Timezone abbreviation ("CT") kept since it wasn't flagged for removal. Queued as **Prompt 229**.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 229 (simplify My Leads clock: 24-hour, no seconds, no icon/box, no refresh countdown) is queued for CC in LIVE_STATE, alongside Prompt 228 (row dividers + box sizing on Activity Feed/My Calls).`
+
+---
+
+### 2026-07-05 (cont. 19) — Falcon session: row dividers + consistent box sizing on Activity Feed/My Calls (Prompt 228 queued)
+
+**What happened:** Brayden reviewed the shipped Prompt 227 calendars live. Three visual polish items, queued as **Prompt 228**: (1) Activity Feed is missing divider lines between rows entirely (confirmed via screenshot — rows just stack with no separator); My Calls already has this working correctly, so reuse that same pattern rather than inventing a new one. (2) My Calls' box currently shrinks to fit its content on light days instead of staying a consistent fixed size — should match Activity Feed's own box, which already stays full-size even near-empty (per Prompt 225). (3) My Calls has dividers between rows but is missing a trailing divider under the very last row — wants a closing line there too, not just between rows.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 228 (Activity Feed row dividers, My Calls consistent box sizing + trailing divider under the last row) is queued for CC in LIVE_STATE.`
+
+---
+
 ### 2026-07-05 (cont. 18) — CC session: Prompt 227 shipped — single-day-only calendars everywhere, live clock, notification gating removed. Queue empty.
 
 **[CC | 2026-07-05 — Prompt 227: lock calendars to single-day-only, live clock, strip notification gating]** — Five-part prompt reversing/extending Prompts 225-226. Shipped `ohvara-dashboard@961419c`.

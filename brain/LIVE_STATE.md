@@ -20,6 +20,32 @@ tags:
 
 ---
 
+### ✅ Prompt 229 SHIPPED 2026-07-05 (`cf384ca`) — simplify My Leads clock
+
+`LiveClock.jsx`: dropped the `Clock` icon, switched `formatInTimezone` opts to `hour: '2-digit', minute: '2-digit', hour12: false` (24h, no seconds/AM-PM), plain `<span>` with no border/background (there never was a box in code — confirmed via inspect that the header's `<div>` had `background-color: rgba(0,0,0,0)` and no border both before and after; Brayden's "boxed container" description didn't match a real style, so nothing to strip there beyond the icon). `MyLeads.jsx`: deleted `formatResetCountdown()`, its `resetCountdown` useMemo, and the "Leads refresh Xh Ym" span entirely, plus the now-unused `nextLocalMidnightUtcMs`/`DEFAULT_TIMEZONE` import (the batch-reset countdown feature is fully gone from this page, not just hidden). Kept existing time-then-date ordering. Verified via a temp `/dev-preview229` route (mocked `AuthContext` export + seeded react-query cache for leads/stats/training, same pattern as Prompt 227) — inspected the header span directly: text read "23:56 ET" (24h, no seconds, no AM/PM), `background-color: rgba(0,0,0,0)` confirming no box. Temp route/file and the temporary `AuthContext` export fully removed before commit; `git status --short` confirmed clean. `npx vite build` passes.
+
+---
+
+### ✅ Prompt 228 SHIPPED 2026-07-05 (`13cd766`) — Activity Feed row dividers, My Calls empty-box sizing + trailing divider
+
+Verified all three sub-issues live before fixing (temp `/dev-preview228/:page?count=N` route, same mocked-`AuthContext`-plus-seeded-react-query-cache pattern as prior prompts, parameterized by call count to compare 0/1/2/3-row states):
+- **Activity Feed dividers (item 1):** confirmed rows had `border-bottom-width: 0px` — no separator existed. Fixed by passing `isLast` into `FeedItem` and adding `borderBottom: isLast ? 'none' : '0.5px solid var(--border)'` (between-rows only, matching My Calls' pre-existing pattern, no trailing line — Brayden only asked for "between each row" here).
+  - `src/pages/rep/ActivityFeed.jsx`
+- **My Calls box sizing (item 2):** the "shrinks with 1-2 calls" report didn't reproduce with actual call rows present (that branch already had `flex:1, minHeight:0` and measured a correct 720.5px full-height box at count=1 and count=2) — the real bug was the **zero-calls empty state**, a separate JSX branch styled with plain `padding: '40px 24px'` and no flex sizing, measured at only 171px vs Activity Feed's own empty-state Card at 732px. Fixed by giving My Calls' empty state the same `flex:1, minHeight:0, display:flex, alignItems/justifyContent:center` treatment Activity Feed's Card already uses — re-measured at 722.5px after the fix, matching the full-size box.
+  - `src/pages/rep/MyCalls.jsx`
+- **My Calls trailing divider (item 3):** the per-row `borderBottom` was conditional on `i < calls.length - 1` (skipping the last row) — changed to an unconditional `'0.5px solid var(--border)'` on every row. Confirmed via computed styles: both rows in a 2-call test showed `border-bottom-width: 1px` (0.5px rounds up in computed style), including the last.
+  - `src/pages/rep/MyCalls.jsx`
+
+Temp route/file and the temporary `AuthContext` export fully removed before commit; `git status --short` confirmed clean both before and after. `npx vite build` passes.
+
+---
+
+### ⚠️ Push pending — both commits above are LOCAL ONLY
+
+`git push origin master` was blocked by the Claude Code auto-mode classifier ("Git Push to Default Branch... without explicit user authorization"). Repo shows `## master...origin/master [ahead 2]` — commits `cf384ca` (Prompt 229) and `13cd766` (Prompt 228) exist locally in `ohvara-dashboard` but have NOT reached GitHub/Vercel. Brayden needs to either push manually or explicitly authorize CC to push before these ship to production.
+
+---
+
 ### ✅ Prompt 227 SHIPPED 2026-07-05 (`961419c`) — single-day-only calendars everywhere, live clock, notification gating removed
 
 Supersedes parts of 225/226: kills 225's "All days"/clear-X escape hatch on Activity Feed, and fully reverts 226's Notifications-toggle feature (UI + all gating) rather than adjusting it.
