@@ -22,22 +22,6 @@ tags:
 
 ---
 
-### 🔲 Prompt 239 QUEUED 2026-07-06 (Eagle, follow-up on Prompt 232E's training video lock) — anti-skip ceiling should track furthest-ever-reached, not current/rewound position
-
-**Training Center video player (`LockedVideoPlayer`, `video_positions` from Prompt 232E's migration `066_video_playback_positions.sql`).**
-
-Prompt 232E shipped exit-and-resume + an anti-skip-forward floor, and it's working well overall, but Brayden found a real gap: if a rep is watching a 10-minute video and reaches, say, the 5-minute mark, then **accidentally rewinds/scrubs backward** to 3 minutes (not exiting, just scrubbing back within the same session or after reopening), the anti-skip ceiling appears to follow wherever they currently are rather than the furthest point they've actually earned — forcing them to re-watch the 3-to-5-minute stretch they already legitimately watched, just because of an accidental rewind.
-
-**Investigate first:** confirm exactly how `video_positions` / the in-player skip-ceiling state currently work — is there only a single stored number per video (last position), which doubles as both "where resume starts" AND "how far forward you're allowed to skip"? If so, that's the root cause: rewinding changes the one number that's overloaded for both purposes.
-
-**Fix:** track **furthest-position-ever-reached** as a separate value from **current/resume position**, per video, per rep:
-- Furthest-reached only ever increases (a high-water mark) — rewinding/scrubbing backward must NOT lower it.
-- The anti-skip-forward ceiling is always the furthest-reached value, not the current playback position — so a rep who rewinds from 5:00 to 3:00 can still immediately skip/scrub forward back up to 5:00 (already earned), just not past it.
-- Resume-on-reopen keeps using **current/exit position** (Prompt 232E's existing correct behavior — pick up exactly where they left off) — this fix only changes the skip-forward ceiling logic, not where playback resumes.
-- Likely needs the `video_positions` jsonb shape to carry both values per video (e.g. `{"1": {"position": 180, "maxWatched": 300}}` instead of a bare number) — a new migration if the column needs reshaping; check whether a clean additive change is possible or a full column migration is needed, and report which.
-
----
-
 ### 🔲 Prompt 240 QUEUED 2026-07-06 (Eagle, follow-up on Prompt 237's star marker) — add the same start-day star to the shared RangeCalendar (Commissions + My Stats)
 
 **Shared `RangeCalendar`/`useRangeCalendar` component (Commissions from Prompt 231D, My Stats from Prompt 238).**
@@ -55,6 +39,18 @@ Prompt 237 added a start-day star (5-point star SVG, amber `var(--warning)` fill
 **Commissions page (`MyCommissions.jsx`), the My Payouts list from Prompt 231C.**
 
 Brayden flagged a real inconsistency: the 3 top stat boxes (Total Earned/Closed Deals/Avg Per Deal) already respond to the `RangeCalendar`/All-Time picker (Prompt 231D), but the My Payouts list below always shows everything regardless of the picker — so the page currently reads as filtered / not-filtered / filtered depending on section, which feels broken. **Decision (confirmed with Brayden, explicit tradeoff discussed):** the "Last 30 Days" chart stays fixed/unaffected by the picker — it's self-labeled with its own window, same precedent already approved for My Stats' "Last 7 Days" chart staying fixed while its KPI boxes above became range-aware (Prompt 233). **Only My Payouts changes:** filter the payouts list to whichever window is active — All Time (everything, current behavior), a single picked day, or a picked range (inclusive of both endpoints) — mirroring exactly how the 3 stat boxes above it already compute their own scoping. Keep Prompt 231C's 5-row scroll cap as-is; this only changes which rows are eligible to appear, not the display/scroll behavior.
+
+---
+
+### ✅ Prompt 239 SHIPPED 2026-07-06 (`285ddc4`, pushed) — anti-skip ceiling now tracks furthest-ever-reached, not current/rewound position
+
+**Root cause confirmed:** `video_positions` stored a single bare number per video, doing double duty as both resume-point and anti-skip-forward ceiling. `exitVideo()` saved the *live* playback position at exit — so exiting after a rewind (or resuming into a rewound spot) permanently lowered the ceiling to wherever the rep currently was, losing credit for ground already covered.
+
+**Fix:** reshaped each `video_positions` entry from a bare number to `{ position, maxWatched }` — `position` is where playback resumes (unchanged behavior), `maxWatched` is a high-water mark that only ever increases and is what `LockedVideoPlayer`'s anti-skip ceiling now seeds from (previously seeded from `startAt`/position). `exitVideo()` now reads both the live position and the in-player furthest-reached value (new `getMaxWatched()` exposed via ref alongside `getCurrentTime()`) and saves `maxWatched: Math.max(prevMaxWatched, sessionMaxWatched, exitPosition)`. Clean additive change — no new migration; `video_positions` is jsonb and the only consumer was this one component, so legacy bare-number entries normalize to `{position: n, maxWatched: n}` on read and get written back in the new shape on next save.
+
+**Confirmed generic/per-rep, not apex11-specific:** position/maxWatched are keyed by video id inside each rep's own `training_progress` row (same `rep_id`-scoped table Prompt 232E already used) — no hardcoded account, applies automatically to every rep's own furthest-reached progress.
+
+`npx vite build` passes. **Live-verified** in the real Training Center (test rep, apex11): opened a video, let it play ~4s, hit Exit — `localStorage.ohvara_training_video_positions` correctly wrote the new `{"1":{"position":23.66,"maxWatched":23.66}}` shape (and persisted to Supabase via `saveProgress`); reopened the same video — resumed from the saved position with no console errors across the full open → play → exit → reopen → exit cycle. Did not attempt to automate an actual YouTube-iframe rewind/reseek (cross-origin, not reliably scriptable) — verified the ceiling-seed logic by code inspection instead: `maxTimeRef` now seeds from `Math.max(startAt, maxWatched)` and only the "block scrubbing ahead" interval (unchanged) ever raises it further.
 
 ---
 
