@@ -32,6 +32,18 @@ Prompt 235's ghosting fix looks good (Brayden confirmed the popup renders clean 
 
 ---
 
+### 🔲 Prompt 237 QUEUED 2026-07-06 (Eagle, follow-up on the shared start-day calendar marker) — retitle the tooltip, try a star-shaped marker instead of a box
+
+**Shared `DayFilterBar`/`useDayFilter` component (Activity Feed + My Calls), the start-day marker from Prompt 231B/232C/232D.**
+
+Brayden confirmed the marker lands on the right day (Jun 11, correctly fixed by Prompt 232C's first-graded-call query) and the amber box treatment from Prompt 232D looks good visually — two smaller follow-ups:
+
+**A. Tooltip text.** Hovering the marked day currently reads "Your first graded call" — too literal/technical. Change to something simpler like "Your first day" or "Your start day" (Brayden's own suggestion, use judgment on exact wording) — it should read as "the day you started," not reference grading at all.
+
+**B. Shape — try a star instead of the box.** Brayden asked directly whether the amber background could be shaped like a star instead of the current rounded-rectangle box behind the day number (not a revert to the old tiny floating corner icon from before Prompt 232D — this is about the shape of the marker itself). Investigate what's feasible with the existing calendar-cell layout (e.g. a star-shaped SVG/clip-path background behind the number, or a star badge overlapping the cell) and implement whichever renders cleanly — report back if a true star silhouette doesn't fit well in the small cell size and a close approximation was used instead.
+
+---
+
 ### ✅ Prompt 235 SHIPPED 2026-07-06 (`53e5f06`, pushed) — fixed calendar-popup ghosting bug, All Time gets a default box
 
 **A. Root-caused and fixed the "holographic" popup bug.** It was self-inflicted in Prompt 234: an `opacity: viewMode === 'all' ? 0.5 : 1` wrapper `<div>` around `<DayFilterBar>` (meant as a subtle "this control isn't driving the KPIs right now" visual cue) also wrapped `DayFilterBar`'s own popover, since the popover renders as a child of whatever wraps the component. Opening the calendar while All Time was active rendered the whole popup — text, grid, background — at 50% opacity, ghosted over the KPI cards behind it. Removed the wrapper entirely; the popup now renders fully solid regardless of which mode is active. Live-verified: computed `opacity` on the popover and every ancestor up to the page-transition wrapper reads `1` when opened during All Time.

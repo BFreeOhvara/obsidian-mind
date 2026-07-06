@@ -4200,3 +4200,12 @@ No code touched this session (Eagle/Cowork, vault-only) — Prompt 231 is queued
 
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 236 is queued in LIVE_STATE: on My Stats, while All Time is the active view, the date-trigger button should show no date (not a lingering "Jul 6") and the calendar popup should show no day pre-highlighted, since none is actually the active filter — clicking a day should highlight + activate it in a single click, never needing a second click to actually change the stats. Nothing else queued.`
+
+---
+
+## Session Log — 2026-07-06 (Eagle) — Prompt 237 queued: retitle start-day tooltip, explore a star-shaped marker
+
+**What happened:** Brayden confirmed the start-day marker (Prompt 232C's fix) lands correctly on Jun 11 and the amber box (232D) looks good, but wants two tweaks: (A) the hover tooltip currently reads "Your first graded call" — too technical, change to something like "Your first day"/"Your start day"; (B) he asked whether the box shape itself could be a star instead of a rounded rectangle. Queued as **Prompt 237** in [[LIVE_STATE]], right after Prompt 236 in the queue (both still pending — 236 first since it was requested first). No code touched this session (Eagle/Cowork, vault-only).
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 236 (My Stats: no stale date shown while All Time active) and Prompt 237 (shared start-day calendar marker: retitle tooltip from "Your first graded call" to something like "Your first day"/"Your start day", explore a star-shaped marker instead of the current amber box) are both queued in LIVE_STATE, in that order. Nothing else queued.`
