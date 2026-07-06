@@ -22,6 +22,22 @@ tags:
 
 ---
 
+### 🔲 Prompt 239 QUEUED 2026-07-06 (Eagle, follow-up on Prompt 232E's training video lock) — anti-skip ceiling should track furthest-ever-reached, not current/rewound position
+
+**Training Center video player (`LockedVideoPlayer`, `video_positions` from Prompt 232E's migration `066_video_playback_positions.sql`).**
+
+Prompt 232E shipped exit-and-resume + an anti-skip-forward floor, and it's working well overall, but Brayden found a real gap: if a rep is watching a 10-minute video and reaches, say, the 5-minute mark, then **accidentally rewinds/scrubs backward** to 3 minutes (not exiting, just scrubbing back within the same session or after reopening), the anti-skip ceiling appears to follow wherever they currently are rather than the furthest point they've actually earned — forcing them to re-watch the 3-to-5-minute stretch they already legitimately watched, just because of an accidental rewind.
+
+**Investigate first:** confirm exactly how `video_positions` / the in-player skip-ceiling state currently work — is there only a single stored number per video (last position), which doubles as both "where resume starts" AND "how far forward you're allowed to skip"? If so, that's the root cause: rewinding changes the one number that's overloaded for both purposes.
+
+**Fix:** track **furthest-position-ever-reached** as a separate value from **current/resume position**, per video, per rep:
+- Furthest-reached only ever increases (a high-water mark) — rewinding/scrubbing backward must NOT lower it.
+- The anti-skip-forward ceiling is always the furthest-reached value, not the current playback position — so a rep who rewinds from 5:00 to 3:00 can still immediately skip/scrub forward back up to 5:00 (already earned), just not past it.
+- Resume-on-reopen keeps using **current/exit position** (Prompt 232E's existing correct behavior — pick up exactly where they left off) — this fix only changes the skip-forward ceiling logic, not where playback resumes.
+- Likely needs the `video_positions` jsonb shape to carry both values per video (e.g. `{"1": {"position": 180, "maxWatched": 300}}` instead of a bare number) — a new migration if the column needs reshaping; check whether a clean additive change is possible or a full column migration is needed, and report which.
+
+---
+
 ### ✅ Prompt 238 SHIPPED 2026-07-06 (`c1586b6`, pushed) — My Stats' calendar swaps to the shared RangeCalendar (single day OR range)
 
 Reversed Prompt 234's `DayFilterBar` choice: My Stats now reuses the exact same `RangeCalendar`/`useRangeCalendar` as `MyCommissions.jsx` — pick a single day (two clicks on the same day) or a contiguous range (click start, click end), identical interaction to Commissions. Folded in Prompt 236's fix against this component instead of `DayFilterBar`: no range picked falls back to All Time (mirrors Commissions' own default exactly — no more "defaults to today" from Prompt 234), the trigger shows a neutral "Custom Range" placeholder and the calendar pre-highlights nothing while All Time is active, and completing a pick immediately becomes the active filter in the same action (no stale-highlight confusion). All Time button just calls `clearRange()`. `DayFilterBar` itself (Activity Feed/My Calls) is untouched, still single-day-only per Prompt 227.

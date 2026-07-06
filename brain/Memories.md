@@ -4235,3 +4235,12 @@ No code touched this session (Eagle/Cowork, vault-only) — Prompt 231 is queued
 
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 236 is superseded/folded into Prompt 238 (both in LIVE_STATE) — don't build 236 against DayFilterBar separately. Prompt 238: swap My Stats' calendar from the single-day DayFilterBar to the existing Commissions-style RangeCalendar (single day or range selection), keep the All Time button, and make sure no stale date/pre-highlight shows while All Time is active (one click always both highlights and activates). Prompt 237 (Activity Feed/My Calls shared start-day marker: retitle tooltip, explore star shape) is still queued separately and unaffected. Nothing else queued.`
+
+---
+
+## Session Log — 2026-07-06 (Eagle) — Prompt 239 queued: video anti-skip ceiling should track furthest-reached, not current position
+
+**What happened:** Confirmed Prompts 237+238 both shipped + pushed (`421aa73`). Brayden found a real gap in Prompt 232E's training-video lock: the anti-skip-forward ceiling appears tied to current/last-saved position rather than the furthest point ever reached, so an accidental rewind (e.g. scrubbing from 5:00 back to 3:00) forces a rep to re-watch content they already legitimately watched, since they can't skip back forward past wherever they currently are. Queued as **Prompt 239** in [[LIVE_STATE]]: track furthest-reached as a separate, monotonically-increasing high-water mark per video/rep, use THAT as the skip-forward ceiling (not current position), while keeping resume-on-reopen tied to last exit position as Prompt 232E already does correctly. Flagged for CC to investigate the current `video_positions` jsonb shape first and report whether it needs reshaping (single number today likely doing double duty for both resume-position and skip-ceiling) before building. No code touched this session (Eagle/Cowork, vault-only).
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 239 is queued in LIVE_STATE: training video player's anti-skip-forward ceiling should be based on furthest-position-ever-reached (monotonic high-water mark, never decreases on rewind) rather than current/last-saved position, so an accidental rewind doesn't force re-watching already-earned progress. Resume-on-reopen stays tied to last exit position (Prompt 232E's existing behavior, unchanged). Investigate current video_positions jsonb shape first — likely needs a second value added per video. Nothing else queued.`
