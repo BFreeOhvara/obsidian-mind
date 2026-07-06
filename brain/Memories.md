@@ -64,6 +64,17 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-06 (cont. 27) — CC session: Prompt 233 live-verified with real data — test-rep password rotated, not broken
+
+**[CC | 2026-07-06 — closing the loop on the login flag from cont. 26]** — Brayden confirmed the test-rep password for all accounts is now `Test1234!` (not `Apex2026!` — password was rotated, not a real auth bug). Logged in as `apex11` for real (no mocking) and confirmed `POST /auth/v1/token?grant_type=password → 200`. Live-verified Prompt 233 against real Supabase data instead of the mocked harness: **All Time** and **Month** both show 35 dials / 11 booked / 31.4% / 1m20s avg (all of apex11's real calls fall within the last 30 days); **Week** (rolling 7 days) and **Custom Jul 1–6** both correctly show 0/0/0%/0s — consistent with each other, confirming the new `'all'`/`'custom'` query paths produce results that line up exactly with the pre-existing, already-trusted `'week'`/`'month'` logic. No code changes needed; this closes out the flag from the entry below.
+
+**Lesson:** update the credentials note in [[Gotchas]] or wherever `apex11`/`Test1234!` might get referenced next — Ohvara test-rep passwords have now rotated at least twice (`Apex2026!` was itself a change from something earlier); don't hardcode a specific password as "the" test credential in reference notes, since it silently goes stale.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 233 is shipped, pushed, and now live-verified with real data (ohvara-dashboard@3e73e77). Test-rep login password is Test1234! (rotated from Apex2026!) — no outstanding auth issue. LIVE_STATE queue is empty.`
+
+---
+
 ### 2026-07-06 (cont. 26) — CC session: Prompt 233 shipped + pushed — All Time + Custom tabs on My Stats
 
 **[CC | 2026-07-06 — Prompt 233: My Stats gets All Time (new default) + Custom range tabs]** — Read LIVE_STATE's queue (Prompt 233, queued by Eagle from Brayden's live review), executed against `ohvara-dashboard`.
