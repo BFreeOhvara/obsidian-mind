@@ -18,6 +18,40 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
+*(Queue empty — nothing pending for CC. Prompt 232 shipped locally, `9269997`, push pending Brayden's authorization.)*
+
+---
+
+### ✅ Prompt 232 SHIPPED 2026-07-06 (`9269997`, committed, NOT pushed — needs authorization) — 6 UI fixes from Brayden's live review of Prompt 231
+
+Brayden reviewed Prompt 231's live result (screenshots of My Leads header, My Calls incl. calendar open, My Commissions) and had 5 follow-ups + 1 new feature ask. Investigate-first items were called out explicitly.
+
+**A. LiveClock time box — filled color, not just a border (`src/components/ui/LiveClock.jsx`)**
+Prompt 231 gave the time span a plain `border: 0.5px solid var(--border)`. Brayden wants it filled with the same blue used on the "Call Now" button (find the actual color/CSS var `Call Now` uses — e.g. in `MyLeads.jsx`'s lead-row action button — and reuse it, don't hardcode a guessed hex), with white text on top. Keep the border/box shape, just change it from outline-only to a solid filled pill/box.
+
+**B. My Calls "All-Time Avg" badge — make it bigger (`src/pages/rep/MyCalls.jsx`)**
+The badge added in Prompt 231E is too small per Brayden's live review (top-right, next to the calendar trigger). Increase its font-size/padding so it reads as a real header-level stat, not a small pill — use judgment on exact sizing, no specific px given.
+
+**C. Calendar star — wrong date, investigate first (`src/components/ui/DayFilterBar.jsx` / `useDayFilter`)**
+Prompt 231B put the star on Jun 8 (`MIN(calls.created_at)` for apex11). Brayden opened My Calls' calendar live and found **no graded calls exist on Jun 8** — the first day with any graded calls is **Jun 11**. **Investigate and report first:** pull apex11's real `calls` rows around Jun 8–11 and confirm whether Jun 8's row(s) are genuine dials that just never got recorded/graded, or leftover seed/test data with no real call behind them. Brayden's stated intent: the star should mark "the day they started" in the sense of real graded-call history, and he's treating "first graded call" and "first call made" as the same thing here — **change the star's date source to the first day with a graded call** (`MIN(created_at) WHERE grade IS NOT NULL`, or whatever field genuinely represents a completed graded call) rather than the first raw `calls` row regardless of grading state, unless investigation turns up a reason apex11's specific Jun 8 data is a special case worth flagging separately.
+
+**D. Calendar star — visual style (same component as C)**
+Currently a small `lucide-react` `Star` icon floating in the corner of the day cell. Brayden wants it styled more like the existing *selected-day* highlight (the blue background box a picked day gets) — i.e. a colored background box behind the day number itself marking "start day," not a small corner badge floating above/beside it. Keep it visually distinct from the actual selected-day blue (so a user can tell "today's selection" apart from "start day marker" at a glance) — pick a different but complementary treatment (e.g. a gold/star-colored background box) rather than reusing the exact selected-day blue.
+
+**E. Training videos — allow exit with position save, no forward-skip (Training Center — investigate current player/lock implementation first)**
+New feature, not a bug fix. Currently reps appear to be locked into a training video with no way to back out without losing progress (Brayden's inference — confirm actual current behavior first, don't assume). Add an X/exit control on the video player that: (1) lets the rep back out of a video mid-watch, (2) saves their current playback position so they resume from that timestamp next time they open the same video, (3) does NOT relax the existing anti-skip-forward restriction — reps still can't scrub/skip ahead past their furthest-watched point, only exit-and-resume from wherever they stopped. Investigate how the current training gate/progress tracking is stored (per-video watched-position, if any exists at all) before building, and report what's actually there.
+
+**F. Commissions page — collapse single-day range label (`src/pages/rep/MyCommissions.jsx`, `RangeCalendar`/range-label display from Prompt 231D)**
+When the picked range is a single day (start === end, e.g. "Jul 1"), the label currently reads "Jul 1 – Jul 1". Brayden wants it to just read "Jul 1" once in that case — only show the "Start – End" dash format when start and end are actually different days.
+
+**Result — all 6 done and live-verified as apex11:**
+- **A/B/D** — straightforward style changes, verified via `preview_inspect`/`getComputedStyle` (filled `var(--accent)` box, 44px/20px badge, `var(--warning)` amber star-day box distinct from the blue selected-day box).
+- **C** — investigated first as instructed: apex11's Jun 8/9 `calls` rows are confirmed blank seed/test data (`grade`, `outcome`, `call_outcome`, both call-provider IDs all null) — not real dials. Jun 11 is the first row with a genuine `grade`/`outcome`. Fixed the query to `MIN(created_at) WHERE grade IS NOT NULL`; star now correctly renders on Jun 11, confirmed live by reopening the calendar to June.
+- **E** — investigated first: confirmed the video modal really was fully locked (no X, no backdrop close) and `training_progress` had zero per-video position tracking. Added `video_positions jsonb` column (migration `066_video_playback_positions.sql`, applied live), `LockedVideoPlayer` now `forwardRef`+`startAt`-aware (anti-skip floor seeds from the saved position, so resuming can't be abused to skip ahead), added an exit-only X button during playback. Live-verified end-to-end: exited a video at ~50s, DB showed `video_positions: {"1": 50.3}`, reopening showed `start=50` in the YouTube iframe URL. Reset apex11's `video_positions` to `{}` after verifying (was live test data on the shared seed account, not meant to persist).
+- **F** — verified live: picking Jul 1 as both start/end now shows just "Jul 1" instead of "Jul 1 – Jul 1".
+
+`npx vite build` passes. Committed to `ohvara-dashboard` master as `9269997` (includes new migration file). **Not pushed** — needs Brayden's go-ahead same as prior prompts.
+
 ---
 
 ### ✅ Prompt 231 SHIPPED 2026-07-06 (`e33c840`, pushed) — 6 UI fixes from Brayden's live review
