@@ -50,6 +50,14 @@ Prompt 237 added a start-day star (5-point star SVG, amber `var(--warning)` fill
 
 ---
 
+### 🔲 Prompt 241 QUEUED 2026-07-06 (Eagle, design decision confirmed with Brayden) — My Payouts becomes range-aware, matching the 3 stat boxes
+
+**Commissions page (`MyCommissions.jsx`), the My Payouts list from Prompt 231C.**
+
+Brayden flagged a real inconsistency: the 3 top stat boxes (Total Earned/Closed Deals/Avg Per Deal) already respond to the `RangeCalendar`/All-Time picker (Prompt 231D), but the My Payouts list below always shows everything regardless of the picker — so the page currently reads as filtered / not-filtered / filtered depending on section, which feels broken. **Decision (confirmed with Brayden, explicit tradeoff discussed):** the "Last 30 Days" chart stays fixed/unaffected by the picker — it's self-labeled with its own window, same precedent already approved for My Stats' "Last 7 Days" chart staying fixed while its KPI boxes above became range-aware (Prompt 233). **Only My Payouts changes:** filter the payouts list to whichever window is active — All Time (everything, current behavior), a single picked day, or a picked range (inclusive of both endpoints) — mirroring exactly how the 3 stat boxes above it already compute their own scoping. Keep Prompt 231C's 5-row scroll cap as-is; this only changes which rows are eligible to appear, not the display/scroll behavior.
+
+---
+
 ### ✅ Prompt 238 SHIPPED 2026-07-06 (`c1586b6`, pushed) — My Stats' calendar swaps to the shared RangeCalendar (single day OR range)
 
 Reversed Prompt 234's `DayFilterBar` choice: My Stats now reuses the exact same `RangeCalendar`/`useRangeCalendar` as `MyCommissions.jsx` — pick a single day (two clicks on the same day) or a contiguous range (click start, click end), identical interaction to Commissions. Folded in Prompt 236's fix against this component instead of `DayFilterBar`: no range picked falls back to All Time (mirrors Commissions' own default exactly — no more "defaults to today" from Prompt 234), the trigger shows a neutral "Custom Range" placeholder and the calendar pre-highlights nothing while All Time is active, and completing a pick immediately becomes the active filter in the same action (no stale-highlight confusion). All Time button just calls `clearRange()`. `DayFilterBar` itself (Activity Feed/My Calls) is untouched, still single-day-only per Prompt 227.

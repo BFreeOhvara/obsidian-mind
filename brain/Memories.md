@@ -4262,3 +4262,12 @@ No code touched this session (Eagle/Cowork, vault-only) — Prompt 231 is queued
 
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 240 (add start-day star to the shared RangeCalendar used by Commissions + My Stats) now also includes an explicit requirement to confirm the star's underlying date query is genuinely per-rep-dynamic (scoped to whichever rep is logged in) rather than something only verified against apex11's data — this matters because Brayden wants every future setter's own first-dial day to show correctly with zero manual setup. Prompt 239 (video anti-skip ceiling) is also still queued. Nothing else queued.`
+
+---
+
+## Session Log — 2026-07-06 (Eagle) — Prompt 241 queued: My Payouts becomes range-aware
+
+**What happened:** Brayden noticed My Payouts ignores the range/All-Time picker while the 3 stat boxes above it respond to it, and worried the resulting filtered/not-filtered/filtered layout would read as confusing or broken. Asked for my take before deciding scope — recommended leaving the self-labeled "Last 30 Days" chart fixed (same precedent already approved for My Stats' "Last 7 Days" chart in Prompt 233) and only making Payouts range-aware to match the stat boxes, since an unlabeled list silently ignoring the picker is the actual inconsistency, not a clearly-labeled fixed-window chart. Brayden confirmed this scope via AskUserQuestion. Queued as **Prompt 241** in [[LIVE_STATE]]. No code touched this session (Eagle/Cowork, vault-only).
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 241 is queued in LIVE_STATE: make Commissions' My Payouts list respond to the same All-Time/day/range picker as the 3 stat boxes above it (currently it always shows everything). The Last 30 Days chart stays fixed/unaffected — confirmed decision, not an oversight. Prompts 239 (video anti-skip ceiling) and 240 (start-day star on shared RangeCalendar, plus a per-rep-generic verification requirement) are also still queued. Nothing else queued.`
