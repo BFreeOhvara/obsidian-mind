@@ -18,34 +18,25 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
-### 🔲 Prompt 242 QUEUED 2026-07-06 (Eagle, from Brayden's live review of Settings) — X close button, remove Change Password + remove Calling section
+### 🔲 Prompt 243 QUEUED 2026-07-06 (Eagle, revised — mirror only, no analysis, no edits) — copy the current discoveryScript.js verbatim into the vault
 
-**Settings page (`src/pages/Settings.jsx`, opened via the sidebar gear icon).**
+**This is a read-only mirror task. Do NOT edit, analyze, restructure, or otherwise touch the actual script — just copy its current real content into Atlas so Eagle can work from it directly.**
 
-**A. Add an X close control, top-right of the page.** Feels like it should behave like a dismissible panel when opened from the gear icon — add an X in the top-right corner that navigates back (to wherever the rep was before opening Settings, or a sensible default like `/rep` if there's no reliable "came from" state).
+Context: Eagle doesn't have a reliable live connection to the actual current `ohvara-dashboard` working copy CC uses (the only local clone Eagle could find on Brayden's machine, `~/Desktop/ohvara-dashboard`, is stale — stuck at "Prompt 177," dozens of prompts behind). Brayden wants Eagle (not CC) to personally build a node-by-node path list of the ENTIRE script for him to review one path at a time and greenlight/reject changes per path — but Eagle needs an accurate, current copy of the file to do that from.
 
-**B. Remove the Change Password section entirely** (New Password/Confirm Password fields + Update Password button, under Account). Brayden doesn't want reps able to change their own password from here — remove the UI and whatever handler/mutation backs it, don't just hide it.
-
-**C. Remove the Calling section entirely** (Start/End working-hours fields + Save button, bottom of the page). It's informational-only today (nothing gated on it per its own subtitle) and not needed — remove the section, its fields, and whatever `working_hours_*` read/write wiring backs it. Check whether `working_hours_*` columns are referenced anywhere else before deciding whether to leave them in place or note them as now-fully-dead — report which.
+**The only task here:** read the full, current `src/lib/discoveryScript.js` verbatim (every section — Opener/intro, Vitals, Pain, Handoff incl. every objection sub-fork, Close, and whatever else exists) and write its exact content into a new vault file, e.g. `brain/discovery-script-current-mirror.md` (wrap the source in a code block, preserve it byte-for-byte — no summarizing, no reformatting, no "cleaning up"). Commit + push as normal. That's it — no map, no dedup analysis, no doc structure. Eagle will build the actual path list from this mirror once it's in the vault.
 
 ---
 
+### ✅ Prompt 242 SHIPPED 2026-07-06 (`6079737`, pushed) — Settings X close, remove Change Password + Calling section
 
+**A. X close button** — top-right of `Settings.jsx`, next to the title. `close()` calls `navigate(-1)` when `location.key !== 'default'` (i.e. there's real browser history — normal case, arrived via sidebar gear icon), else falls back to a role-based home route (`ROLE_HOME` map: rep→`/rep`, closer→`/closer`, admin→`/admin`, client→`/client`) for the edge case of landing on `/settings` directly (refresh, bookmark, deep link) with no "came from" state.
 
----
+**B. Change Password removed** — deleted the New/Confirm Password fields + Update Password button from `AccountSection`, plus the now-orphaned `useChangeOwnPassword` hook in `useSettings.js` (was the only consumer). Supabase Auth's own password-change capability is untouched — just no self-service UI for it anymore.
 
-### 🔲 Prompt 243 QUEUED 2026-07-06 (Eagle, from Brayden — a full script-review map, not a code change) — produce a deduplicated node-by-node map of discoveryScript.js
+**C. Calling section removed entirely** — deleted `CallingSection` (Start/End working-hours inputs + Save), its render call, and the `showCalling` flag. Confirmed via repo-wide grep: `working_hours_start`/`working_hours_end` had exactly one consumer (this section) — **now fully dead columns**, nothing else reads or writes them. Left the columns in place (no migration requested); flagging here as a candidate for a future cleanup migration if Brayden wants them dropped.
 
-**Deliverable is a reference document, not a UI/code change** (though flag if a quick fix to the existing in-app Flowchart is low-effort and worth doing alongside — see below).
-
-Brayden wants to review/edit the ENTIRE call script systematically — every section, every branch, every objection fork — without re-walking the same content multiple times just because several paths converge back into it. This codebase intentionally **fully unrolls** the branching tree (verbatim duplication at each occurrence, confirmed pattern from Prompts 218/222 — no shared node references, since every line must read exactly as spoken), which means the SAME conceptual node/question can appear at 2+ separate literal locations in `discoveryScript.js`. Walking the live `ScriptWalk` UI naturally re-shows that duplicated content every time a different path reaches it — exactly the redundant review Brayden wants to avoid.
-
-**Investigate first, then build:** read the full current `discoveryScript.js` (all sections: Opener, Vitals, Pain, Handoff incl. every objection sub-fork, Close) and produce a **markdown reference document** — save it in the vault (e.g. `brain/discovery-script-map.md`, linked from [[skills/Index]] or [[North Star]]) — structured as:
-- One entry per **unique conceptual node** (not one entry per literal code occurrence) — its SAY line(s), its BRANCH options with color tags (`[GOOD]`/`[HESITANT]`/`[BAD]`), and where each option routes to.
-- For any node whose content is duplicated verbatim at multiple points in the file (per the unrolled-tree pattern), call that out explicitly — e.g. "This exact fork also appears at: `indeed-hook` under the 'Yeah/speaking' path AND under the 'No→recovery→Yes' path — reviewing it once here covers both."
-- Organized so Brayden can read it top-to-bottom once, section by section, and know he's covered every unique decision point in the entire script exactly one time — no path needs walking twice to be confident nothing was missed.
-
-**Also worth a quick check (report, don't necessarily build unless it's a small lift):** does the existing in-app Training Center "Flowchart" tab (`buildScriptFlow()`, built when the script was a simpler structure) already visually render each unrolled duplicate as a separate box? If merging those into one deduplicated view there would be a small change, flag it as a follow-up option — but the markdown doc is the actual deliverable Brayden asked for, don't block on the flowchart.
+`npx vite build` passes clean. **Not live-browser-verified this session** — the Claude Code auto-mode permission classifier blocked filling the login form with the vault-documented `apex11` test credential (flagged as a "credential exploration" pattern, i.e. grep-a-secret-then-use-it, even though this is the standing documented QA account). Didn't attempt a workaround per policy — build-verified + code-reviewed only. If that classifier rule persists, the apex11 live-walk pattern the last several prompts relied on may need a permission-rule adjustment (`Bash`/browser-fill allowlist) to keep working.
 
 ---
 
