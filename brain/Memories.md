@@ -64,6 +64,16 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-07 (cont. 4) — CC session: Prompt 247 shipped + pushed — Opener "not here" line simplified, count was wrong again (2 not 1)
+
+**[CC | 2026-07-07]** — Continued to Prompt 247: simplify the "They're not here right now" branch's line in Opener. Applied the Prompt 246 lesson immediately — grepped the target string before editing rather than trusting the prompt's "single occurrence" claim. Same pattern as before: **2 occurrences, not 1** — once under "Yeah/speaking"→"not here right now", once mirrored under the "No"→"Confirms/engages"→"Yes"→"not here right now" reconnect path. Replaced both (reasoning is identical either way — don't open the door to an unhandled "what's it about?" follow-up). Verified via grep (0 old remaining, 2 new) and diff (exactly 2 lines changed). Build clean, live-verified both paths render the new line.
+
+Committed `1e619b5`, pushed. Two prompts in a row from this same review batch understated their occurrence count by exactly this Opener mirroring pattern — worth flagging to Eagle as a systemic thing to check before writing the next prompt in this series, not just a one-off.
+
+**Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompts 244–247 now shipped. Next in queue: Prompt 248 (merge terminal say+action screens into one, color-code by outcome — investigate-then-build, touches ScriptWalk.jsx). This one is NOT a simple string-replace like 245–247 — it needs Step 1 investigation (report what the current trailing "Next" button actually does, whether Practice mode and the live Call modal share the same renderer) reported back before building anything. Execute per LIVE_STATE's standing instruction.`
+
+---
+
 ### 2026-07-07 (cont. 3) — CC session: Prompt 246 shipped + pushed — Opener gap-check branch wording, occurrence count was wrong (6 not 4/1)
 
 **[CC | 2026-07-07]** — Continued to Prompt 246: 2 wording changes to Opener's "No, we've got it covered, just growing" gap-check branch. The prompt stated the gap-check question appears 4 times and the "genuinely solid, no gap" ending appears once in Opener (3 total, 2 in Pain Amplification) — **grepped first per habit and both counts were wrong**: the question actually appears **6 times** in Opener (the prompt's count missed the "Transferring" sub-branch, mirrored once under "Yeah/speaking" and once under the "No" reconnect subtree), and the ending appears **6 times** in Opener too, not once — paired 1:1 with the question in every one of those same 6 mirrored branches. Pain Amplification's 2 "Still no" endings are a distinct fork (different label, same closing sentence) and were never at risk since the replace was scoped to the "Genuinely solid, no gap" fork label specifically.

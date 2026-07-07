@@ -103,7 +103,7 @@ Since the reasoning behind both changes applies identically regardless of which 
 
 ---
 
-### 🔲 Prompt 247 QUEUED 2026-07-06 (Eagle, Brayden-approved wording) — discoveryScript.js: Opener "not here" line simplified
+### ✅ Prompt 247 SHIPPED 2026-07-07 (`1e619b5`, pushed) — discoveryScript.js: Opener "not here" line simplified — also 2 occurrences, not 1
 
 **Context:** continuing the path-by-path script review. Content-only edit to `src/lib/discoveryScript.js` Opener section — no logic/marker/token changes, don't touch anything else.
 
@@ -115,9 +115,9 @@ Replace with:
 ```
 "No worries — when's a better time to catch them?"
 ```
-Reasoning: offering to "leave a quick message" invites a realistic follow-up ("yeah, what's it about?") that the script has no answer prepared for. Simplifying to just a callback-time ask avoids opening that door. This is a single occurrence — only appears once in the file.
+Reasoning: offering to "leave a quick message" invites a realistic follow-up ("yeah, what's it about?") that the script has no answer prepared for. Simplifying to just a callback-time ask avoids opening that door.
 
-**Verification:** `npx vite build` clean, then live-check in Training Center → Script → Opener section, "They're not here right now" branch, that the new line renders correctly.
+**Result — same pattern as Prompt 246, checked count first this time:** grepped before touching anything, per the lesson from Prompt 246 — the prompt said this is a single occurrence, but it's actually **2**, mirrored the usual way: once under "Yeah/speaking"→"They're not here right now", once under the "No" branch's reconnect subtree ("No"→"Confirms/engages"→"Yes"→"They're not here right now"). Replaced both — verified via grep (old string: 0 remaining, new string: 2) and diff (exactly 2 lines changed, both in Opener). `npx vite build` clean. **Live-verified both**: walked "Yeah/speaking"→"not here right now" (new line renders) and "No"→"Confirms/engages"→"Yes"→"not here right now" (new line renders here too).
 
 ---
 
