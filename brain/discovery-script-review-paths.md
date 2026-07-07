@@ -74,6 +74,24 @@ Linear — confirm day/time, get their number, wrap-up line, sets status Appoint
 
 ---
 
+## Endings Index — same idea, other direction
+
+Section 1–4 collapse paths that **start** the same way. This does the same thing from the **ending** side: every path above eventually hits one of 3 outcomes (Not Interested, Follow-Up, Appointment Booked), and several paths hit the *exact same terminal wording*, not just the same status. Once you've reviewed one member of a group below, the others in that group need only a routing spot-check — not a re-review of the content.
+
+**Appointment Booked** — one true ending, reached 6 ways
+Close is linear and identical every time. Review it once via H-1 (or any of H-3/H-6/H-8/H-12/H-14) and the other five are automatically covered.
+
+**Not Interested — two distinct flavors**
+- *With a spoken exit line* ("Okay, well, that's a different story then. Okay man, well have a good day, good luck to you."): **O-4, P-3, P-6** — all three say this identically. Review once (O-4), spot-check that P-3/P-6 route there correctly.
+- *Silent — no exit line, straight to the status change*: **O-8, O-10, O-11** — all three are just "▸ Set status Not Interested," nothing spoken first. Worth a flag on its own: these three currently hang up with no polite line at all. Decide during review whether that's intentional or a gap to fix.
+
+**Follow-Up — mostly distinct, one exact triplicate**
+Most Follow-Up endings differ (different logged detail, different phrasing), so they still need individual review: O-6, H-2, H-4, H-5, H-7, H-10, H-11 are all worded or logged differently from each other. But **H-9, H-13, and H-15 are byte-for-byte identical** — same line ("No worries — I'll send some info over, and if the numbers make sense, we can find time later.") and same logged detail (pricing pushback, send info), just reached via three different objections (who-is-this, cost-okay, cost-ballpark). Review once (H-9), spot-check H-13/H-15 for routing only.
+
+**Net effect:** of the 32 listed paths, the actual amount of *distinct content* to sign off on is smaller — 1 Close, 2 Not-Interested variants, and Follow-Up minus the H-9/13/15 duplication. The path list stays the walkthrough map (so nothing gets missed); this index is the shortcut for what's actually new each time.
+
+---
+
 ## Related
 
 - [[discovery-script-current-mirror]] — the exact source this checklist was built from
