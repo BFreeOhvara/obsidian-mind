@@ -1,6 +1,6 @@
 ---
 date: 2026-07-06
-description: "Eagle-built checklist of every distinct path through discoveryScript.js, deduplicated so no path is walked twice for the same content — built from brain/discovery-script-current-mirror.md (Prompt 243). Brayden walks each path in the live ScriptWalk tool and calls out changes per path; Eagle queues confirmed changes as CC prompts."
+description: "Eagle-built checklist of every distinct full call through discoveryScript.js — start (opener) to marked outcome (Not Interested / Follow-Up / Appointment Booked), deduplicated so no shared stretch gets walked twice. Built from brain/discovery-script-current-mirror.md (Prompt 243). Brayden walks each path in the live ScriptWalk tool, screenshots anything he wants changed, and tells Eagle either 'no changes' or exactly what to change. Eagle queues confirmed changes as CC prompts — nothing gets built without sign-off."
 tags:
   - brain
   - discovery-script
@@ -9,91 +9,70 @@ tags:
 
 # Discovery Script — Path-by-Path Review Checklist
 
-> **How this works:** 32 paths below cover every fork option in the current script exactly once. Walk each one in the live ScriptWalk tool (Training Center → Practice, or a real/test call), then tell me either "no changes" or exactly what to change. I'll log each answer and queue the confirmed changes as CC prompts once you're done with a section (or the whole list) — nothing gets built without you signing off on it first, per your instruction.
+> **What a "path" is:** a full call, start to finish — from the opening line all the way to whichever outcome gets marked (Not Interested / Follow-Up / Appointment Booked). Not a section-by-section stop. If a path "lands on Vitals" that's not the end of anything — you keep tapping Next through Vitals, Pain, Handoff, Close until a real outcome gets set.
 >
-> **Why only 32, not 60+:** the Opener section's back half is duplicated wholesale in two places in the actual code (the "No" branch's "Yes" sub-path is byte-for-byte identical to the main "Yeah/speaking" path once you're past the first couple lines). Rather than making you re-walk and re-approve identical content twice, I collapsed those into one full review + a quick "does it reconnect right" spot-check. Every fork option in the file is still hit at least once — nothing is skipped, just not duplicated.
+> **Path 1 is the spine.** It's the main happy path — every other path below shares most of it and only forks off at one specific point. Each entry after Path 1 is described as: *diverges from Path 1 at [fork], picks [X], then either rejoins Path 1's remaining taps or hits its own ending.* You still have to physically tap through the shared stretch (the live tool has no skip button) — but you already reviewed that content, so nothing there needs a fresh screenshot. Only the diff is new.
+>
+> **Why 30 entries, not 60+:** every fork in the file gets exactly one entry. Path 1 itself already covers the Opener's O-1 choice, Pain's P-1 choice, and Handoff's H-1 choice in one walk, so those three don't get separate listings. The Opener's "No" branch's "Yes" sub-path (O-9) is byte-for-byte identical to the main "Yeah/speaking" subtree once you're a couple lines in — reviewed as a spot-check, not a full re-walk.
 >
 > Source: `brain/discovery-script-current-mirror.md`, mirrored from `ohvara-dashboard` commit `4be0da9`.
 
 ---
 
-## Section 1 — Opener (11 paths)
+## Path 1 — the spine (main happy path)
 
-- [ ] **O-1.** Opener → "Yeah/speaking" → "That's me" → "Yeah" (qualifier) → *lands on Vitals*
-      The core happy path. Covers the opening line, the confirm fork, the Indeed-listing hook, the "how do they respond" fork's "That's me" option, and the qualifier question's "Yeah" option.
-- [ ] **O-2.** Same as O-1 but pick **"Kind of / it's part of it"** at the qualifier fork → *lands on Vitals*
-- [ ] **O-3.** Same as O-1 but pick **"No, we've got it covered, just growing"** → then **"answers, any gap surfaces"** → *lands on Vitals*
-- [ ] **O-4.** Same as O-3 but at the gap-check, pick **"Genuinely solid, no gap"** → *Not Interested* (terminal)
-- [ ] **O-5.** Opener → "Yeah/speaking" → **"Transferring"** → (re-intro hook) → "Yeah" → *lands on Vitals*
-      Only reviewing the re-intro hook line itself here — the qualifier fork after it is identical to O-1/O-2/O-3/O-4, already covered.
-- [ ] **O-6.** Opener → "Yeah/speaking" → **"They're not here right now / I'll leave a message"** → *Follow-Up* (terminal)
-- [ ] **O-7.** Opener → "Yeah/speaking" → **"What's this about? / pushback"** → "Engages" → "Yeah" → *lands on Vitals*
-      Reviewing the disarm line + engage fork; the qualifier fork after "Engages" is identical to O-1–O-4, already covered.
-- [ ] **O-8.** Same as O-7 but pick **"Still shuts it down"** → *Not Interested* (terminal)
-- [ ] **O-9.** Opener → **"No"** → "were you hiring for [job title]?" → "Confirms/engages" → "Are you actively looking?" → **"Yes"** → *reconnects to the same hook as O-1*
-      Spot-check only — confirm it reconnects to the identical subtree already reviewed above. No need to re-walk That's me/Transferring/etc. again from here.
-- [ ] **O-10.** Opener → "No" → "were you hiring" → "Confirms" → "actively looking" → **"No, not interested"** → *Not Interested* (terminal)
-- [ ] **O-11.** Opener → "No" → **"Genuinely wrong number/business"** → *Not Interested* (terminal)
+- [ ] **Path 1.** Full call, no hesitation anywhere: *"Hey, is this [Business Name]?"* → **Yeah/speaking** → *"I saw you were hiring..."* → **That's me** → *"Are missed calls part of the reason..."* → **Yeah** → Vitals (3 questions, no fork) → Pain (*"you're leaving $[monthly]..."*) → **Engaged / "yeah we should"** → Handoff (*"we'll build you a system..."*) → **Good / shows interest** → *"does [Tuesday morning] or [Wednesday afternoon]..."* → **Picks a time** → Close (day/time confirm, get number, wrap-up) → **▸ Appointment Booked**
 
-## Section 2 — Vitals (no forks, one path)
+This is the one every other path below is described relative to.
 
-Vitals is linear — 3 questions (monthly call volume, daily misses, ticket value), always routes straight to Pain. Any Opener path above that lands on Vitals already exercises it; no separate path needed, just confirm the 3 questions read right and the two number-captures (missed calls/day, avg ticket) work.
+---
 
-## Section 3 — Pain Amplification (6 paths)
+## Opener forks (diverge early, rejoin the same tail unless noted)
 
-- [ ] **P-1.** (from Vitals) → **"Engaged / yeah we should"** → *lands on Handoff*
-- [ ] **P-2.** → **"Minimizes / we're fine"** → (the "what time do you close" trap) → "Engages" → *lands on Handoff*
-- [ ] **P-3.** Same as P-2 but **"Still no"** → *Not Interested* (terminal)
-- [ ] **P-4.** → **"Pushback, you're trying to sell me a service"** → "Re-engages" → *lands on Handoff*
-- [ ] **P-5.** Same as P-4 but **"Still cold"** → (competition-framing question) → "Engages" → *lands on Handoff*
-- [ ] **P-6.** Same as P-5 but **"Still no"** → *Not Interested* (terminal)
+Tail after each of these (unless marked terminal) = Vitals → Pain **Engaged** → Handoff **Good → picks a time** → Close → **Appointment Booked** (i.e., the rest of Path 1, unchanged).
 
-## Section 4 — Handoff & Book (15 paths)
+- [ ] **O-2.** Diverges at the qualifier fork → **"Kind of / it's part of it"** instead of "Yeah" → rejoins Path 1's tail → Appointment Booked.
+- [ ] **O-3.** Diverges at the qualifier fork → **"No, we've got it covered, just growing"** → then **"Answers, any gap surfaces"** → rejoins Path 1's tail → Appointment Booked.
+- [ ] **O-4.** Same fork as O-3 but → **"Genuinely solid, no gap"** → own ending: *"Okay, well, that's a different story then..."* → **▸ Not Interested**. (Terminal — no tail.)
+- [ ] **O-5.** Diverges one fork earlier → **"Transferring"** (different re-intro line) → then same qualifier fork as O-1, pick **"Yeah"** → rejoins Path 1's tail → Appointment Booked.
+- [ ] **O-6.** Diverges at the "How do they respond?" fork → **"They're not here right now / I'll leave a message"** → own ending: *"No worries — is there a better time..."* → **▸ Follow-Up**. (Terminal — no tail.)
+- [ ] **O-7.** Diverges at the "How do they respond?" fork → **"What's this about? / pushback"** → disarm line → **"Engages"** → then same qualifier fork, pick **"Yeah"** → rejoins Path 1's tail → Appointment Booked.
+- [ ] **O-8.** Same fork as O-7 but → **"Still shuts it down"** → own ending: **▸ Not Interested** (no spoken line — straight to status). (Terminal — no tail.)
+- [ ] **O-9.** Diverges at the very first fork → **"No"** → *"were you hiring for [job title]?"* → **"Confirms/engages"** → *"Are you actively looking?"* → **"Yes"** → reconnects to the identical "How do they respond?" subtree as O-1. Spot-check only: confirm it reconnects correctly — content from here is identical to O-1/O-5/O-7, already reviewed.
+- [ ] **O-10.** Same branch as O-9 up to "actively looking" → **"No, not interested"** → own ending: **▸ Not Interested** (no spoken line). (Terminal — no tail.)
+- [ ] **O-11.** Diverges at the very first fork → **"Genuinely wrong number/business"** → own ending: **▸ Not Interested** (no spoken line). (Terminal — no tail.)
 
-This is the one section with no shortcuts — every objection line is genuinely different wording, so each gets its own full walk.
+## Pain forks (Path 1's Opener + Vitals already reviewed — pick up from the Pain fork)
 
-- [ ] **H-1.** (from Pain) → **"Good / shows interest"** → picks a time → *lands on Close* (the main happy path)
-- [ ] **H-2.** Same as H-1 but **"Still hesitant"** → *Follow-Up* (terminal)
-- [ ] **H-3.** → **"Just send me some info"** → "Okay, fair" → picks a time → *lands on Close*
-- [ ] **H-4.** Same as H-3 but at the time-ask, **"Still hesitant"** → *Follow-Up (send info + placeholder)*
-- [ ] **H-5.** → "Just send me some info" → **"Still wants info first"** → *Follow-Up (send info + placeholder)* (direct terminal, different line from H-4)
-- [ ] **H-6.** → **"I don't have time this week"** → picks a day → *lands on Close*
-- [ ] **H-7.** Same as H-6 but **"Those don't work either"** → *Follow-Up (log the week they gave)*
-- [ ] **H-8.** → **"Who is this / what company?"** → "That's me" → picks a time → *lands on Close*
-- [ ] **H-9.** Same as H-8 but **"Still hesitant"** → *Follow-Up (log pricing pushback, send info)*
-- [ ] **H-10.** → "Who is this" → **"That's [owner]"** → "Gives a window" → *Follow-Up (log callback window)*
-- [ ] **H-11.** Same as H-10 but **"Only reachable by email"** → *Follow-Up (logged email)*
-- [ ] **H-12.** → **"How much does this cost?"** → "Okay" → picks a time → *lands on Close*
-- [ ] **H-13.** Same as H-12 but **"Still hesitant"** → *Follow-Up (log pricing pushback, send info)*
-- [ ] **H-14.** → "How much does this cost?" → **"Just need a ballpark"** → picks a time → *lands on Close*
-- [ ] **H-15.** Same as H-14 but **"Still hesitant"** → *Follow-Up (log pricing pushback, send info)*
+Tail after each of these (unless marked terminal) = Handoff **Good → picks a time** → Close → **Appointment Booked**.
 
-## Section 5 — Close (no forks, one path)
+- [ ] **P-2.** At the Pain fork, pick **"Minimizes / we're fine"** → *"what time do you close..."* trap → **"Engages"** → rejoins Handoff/Close tail → Appointment Booked.
+- [ ] **P-3.** Same fork as P-2 but → **"Still no"** → own ending: *"Okay, well, that's a different story then..."* → **▸ Not Interested**. (Terminal — no tail.)
+- [ ] **P-4.** At the Pain fork, pick **"Pushback, you're trying to sell me a service"** → **"Re-engages"** → rejoins Handoff/Close tail → Appointment Booked.
+- [ ] **P-5.** Same fork as P-4 but → **"Still cold"** → competition-framing line → **"Engages"** → rejoins Handoff/Close tail → Appointment Booked.
+- [ ] **P-6.** Same fork as P-5 but → **"Still no"** → own ending: *"Okay, well, that's a different story then..."* (same line as O-4/P-3) → **▸ Not Interested**. (Terminal — no tail.)
 
-Linear — confirm day/time, get their number, wrap-up line, sets status Appointment Booked. Any Handoff path ending "lands on Close" above (H-1, H-3, H-6, H-8, H-12, H-14) already exercises it.
+## Handoff forks (Path 1's Opener + Vitals + Pain already reviewed — pick up from the Handoff fork)
+
+- [ ] **H-2.** At the Handoff fork, **"Good/shows interest"** (same as Path 1) → then **"Still hesitant"** instead of picking a time → **▸ Follow-Up** (plain, no extra logged detail). (Terminal.)
+- [ ] **H-3.** At the Handoff fork, pick **"Just send me some info"** → **"Okay, fair"** → picks a time → Close → Appointment Booked.
+- [ ] **H-4.** Same as H-3 but at the time-ask, **"Still hesitant"** → *"I'll send it over today... 15-minute placeholder..."* → **▸ Follow-Up (send info + placeholder)**. (Terminal.)
+- [ ] **H-5.** At the Handoff fork, "Just send me some info" → **"Still wants info first"** (skips the "okay fair" step) → *"Fair enough... placeholder... if it's interesting, we're already set."* → **▸ Follow-Up (send info + placeholder)** — different line from H-4. (Terminal.)
+- [ ] **H-6.** At the Handoff fork, pick **"I don't have time this week"** → picks a day → Close → Appointment Booked.
+- [ ] **H-7.** Same as H-6 but **"Those don't work either"** → *"what's a better week for you?"* → **▸ Follow-Up (log the week they gave)**. (Terminal.)
+- [ ] **H-8.** At the Handoff fork, pick **"Who is this / what company?"** → **"That's me"** → picks a time → Close → Appointment Booked.
+- [ ] **H-9.** Same as H-8 but **"Still hesitant"** → *"I'll send some info over, and if the numbers make sense..."* → **▸ Follow-Up (log pricing pushback, send info)**. (Terminal — this exact line/action repeats verbatim at H-13 and H-15 below.)
+- [ ] **H-10.** At the Handoff fork, "Who is this" → **"That's [owner]"** → **"Gives a window"** → **▸ Follow-Up (log the callback window)**. (Terminal.)
+- [ ] **H-11.** Same as H-10 but **"Only reachable by email"** → *"what's the best email?"* → **▸ Follow-Up (logged email, thanked and exited)**. (Terminal.)
+- [ ] **H-12.** At the Handoff fork, pick **"How much does this cost?"** → **"Okay"** → picks a time → Close → Appointment Booked.
+- [ ] **H-13.** Same as H-12 but **"Still hesitant"** → identical line/action to H-9 → **▸ Follow-Up (log pricing pushback, send info)**. Spot-check routing only — content already reviewed at H-9. (Terminal.)
+- [ ] **H-14.** At the Handoff fork, "How much does this cost?" → **"Just need a ballpark"** → picks a time → Close → Appointment Booked.
+- [ ] **H-15.** Same as H-14 but **"Still hesitant"** → identical line/action to H-9/H-13 → **▸ Follow-Up (log pricing pushback, send info)**. Spot-check routing only. (Terminal.)
 
 ---
 
 ## Endings Index — same idea, other direction
 
-Section 1–4 collapse paths that **start** the same way. This does the same thing from the **ending** side: every path above eventually hits one of 3 outcomes (Not Interested, Follow-Up, Appointment Booked), and several paths hit the *exact same terminal wording*, not just the same status. Once you've reviewed one member of a group below, the others in that group need only a routing spot-check — not a re-review of the content.
+The path list above collapses stretches that **start** the same way. This is the same thing from the **ending** side: every path eventually hits one of 3 outcomes, and several hit the *exact same terminal wording*, not just the same status.
 
-**Appointment Booked** — one true ending, reached 6 ways
-Close is linear and identical every time. Review it once via H-1 (or any of H-3/H-6/H-8/H-12/H-14) and the other five are automatically covered.
-
-**Not Interested — two distinct flavors**
-- *With a spoken exit line* ("Okay, well, that's a different story then. Okay man, well have a good day, good luck to you."): **O-4, P-3, P-6** — all three say this identically. Review once (O-4), spot-check that P-3/P-6 route there correctly.
-- *Silent — no exit line, straight to the status change*: **O-8, O-10, O-11** — all three are just "▸ Set status Not Interested," nothing spoken first. Worth a flag on its own: these three currently hang up with no polite line at all. Decide during review whether that's intentional or a gap to fix.
-
-**Follow-Up — mostly distinct, one exact triplicate**
-Most Follow-Up endings differ (different logged detail, different phrasing), so they still need individual review: O-6, H-2, H-4, H-5, H-7, H-10, H-11 are all worded or logged differently from each other. But **H-9, H-13, and H-15 are byte-for-byte identical** — same line ("No worries — I'll send some info over, and if the numbers make sense, we can find time later.") and same logged detail (pricing pushback, send info), just reached via three different objections (who-is-this, cost-okay, cost-ballpark). Review once (H-9), spot-check H-13/H-15 for routing only.
-
-**Net effect:** of the 32 listed paths, the actual amount of *distinct content* to sign off on is smaller — 1 Close, 2 Not-Interested variants, and Follow-Up minus the H-9/13/15 duplication. The path list stays the walkthrough map (so nothing gets missed); this index is the shortcut for what's actually new each time.
-
----
-
-## Related
-
-- [[discovery-script-current-mirror]] — the exact source this checklist was built from
-- [[setter-script-v3-camden-style]] — the script's shipped-changes history
-- [[LIVE_STATE]] — current queue
+**Appointment Booked**
