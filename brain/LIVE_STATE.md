@@ -30,6 +30,50 @@ tags:
 
 ---
 
+### 🔲 Prompt 245 QUEUED 2026-07-06 (Eagle, Brayden-approved wording) — discoveryScript.js: Path 1 review, 3 line changes (Handoff pitch, Close number-ask, Close goodbye)
+
+**Context:** Brayden is walking `brain/discovery-script-review-paths.md` path-by-path in the live ScriptWalk tool. Path 1 (the main happy path) is reviewed — 3 wording changes confirmed. This is a **content-only edit to `src/lib/discoveryScript.js`** — exact strings below, no logic/marker changes, no new fork options, no token changes. Do not touch anything else in the file.
+
+**Change 1 — Handoff section, first line (the pitch).** Find:
+```
+"Look, I don't want to waste your time — that's $[annual] a year slipping through the cracks. So instead of filling this role, we'll build you a system made exactly for this — it catches the calls you'd otherwise miss, answers questions, and books appointments straight to your calendar. All you have to do is show up. Take 15 minutes — worst case, you see exactly what it looks like. Best case, we plug that money hole for you. How's that sound?"
+```
+Replace with:
+```
+"Look, I don't want to waste your time — like I said, that's money slipping through the cracks. So here's what I'll do for you: we'll build you a system made exactly for this — it catches the calls you'd otherwise miss, answers questions 24/7, and books straight to your calendar. All you have to do is show up. Take 15 minutes — worst case, you see exactly what it looks like. Best case, we get that money hole plugged and you're not wasting any more time. How's that sound?"
+```
+Reasoning: drops the redundant dollar-figure restatement (already stated once in Pain, right before this), adds a 24/7-availability claim, ties the best-case outcome back to the "not wasting time" theme instead of restating the money hole alone.
+
+**Change 2 — Close section, first line (the number-ask).** Find:
+```
+"[Day] at [time] — I'm going to see what I can do for you. There's nothing, you don't got to buy anything. What's the best number so I can send you a quick text right now to confirm?"
+```
+Replace with:
+```
+"[Day] at [time] — I've got you locked in for that. What's a good number to grab you at real quick to confirm?"
+```
+Reasoning: "I'm going to see what I can do for you" read as tentative/like squeezing them in — replaced with a confident "locked in" framing. Also cut "there's nothing, you don't got to buy anything" (felt unnecessary/clunky).
+
+**Change 3 — Close section, second line (the goodbye).** Find:
+```
+"Got it. Our team will have everything you told me today in front of them before the call — you won't have to re-explain anything."
+```
+Replace with:
+```
+"Got it. Our team will have everything you told me today in front of them before the call — you won't have to re-explain anything. Thank you for your time — talk soon."
+```
+Reasoning: the call currently just stops after this line with no sign-off before hanging up — added a short, more formal-leaning goodbye.
+
+**Verification:** `npx vite build` clean, then live-check in Training Center → Script → Handoff & Book and Close sections (or ScriptWalk practice) that both edited screens render the new text with tokens filling correctly ([Day], [time]). Report back; don't touch any other section.
+
+---
+
+### 💡 Idea parked (not queued) — time-of-day-aware appointment windows
+
+Brayden's idea during Path 1 review: instead of always offering the same two fixed windows ([Tuesday morning]/[Wednesday afternoon] etc.), have the ask adapt to the actual current time — e.g. offer "later this afternoon" or "tomorrow morning" depending on when the call happens. Explicitly parked, not scoped — needs actual design work (current-time-aware window selection logic) before it's a buildable prompt. Revisit when Brayden's ready to spec it out.
+
+---
+
 ### ✅ Prompt 243 SHIPPED 2026-07-06 (`a58196a`, pushed) — discoveryScript.js mirrored verbatim into the vault
 
 Read-only mirror, exactly as scoped — no analysis, no restructuring, no editing of the real script. Copied the full, current `src/lib/discoveryScript.js` (repo HEAD `4be0da9`, unchanged since — Prompt 242's edits this session touched `Settings.jsx`/`useSettings.js` only) byte-for-byte into a new vault file, [[discovery-script-current-mirror]] (`brain/discovery-script-current-mirror.md`), wrapped in a fenced code block. Verified fidelity with a `diff --strip-trailing-cr` between the extracted code block and the live source file — identical content (only difference was CRLF-vs-LF line endings, expected: the repo file is CRLF, the vault markdown is LF). No map, no dedup analysis, no doc structure — Eagle builds the actual path-by-path list from this mirror directly, per the corrected division of labor from the prior session's log entry.

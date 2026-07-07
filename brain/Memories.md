@@ -64,6 +64,24 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-06 (cont. 31) — Eagle: script review begins — Path 1 reviewed, 3 wording changes queued as Prompt 245
+
+**[Eagle | 2026-07-06]** — Restructured `brain/discovery-script-review-paths.md` from section-scoped stubs ("lands on Vitals") to full start-to-outcome paths, per Brayden's correction — a "path" means the whole call through to a marked status, not a section handoff. Path 1 (the main happy path: Opener Yeah/speaking→That's me→Yeah, Vitals, Pain Engaged, Handoff Good→picks time, Close→Appointment Booked) is the spine every other path is described as a diff against.
+
+Walked Path 1 live with Brayden against 4 screenshots (Handoff pitch, Handoff time-pick, Close number-ask, Close goodbye). Feedback, resolved through follow-up questions:
+- Handoff pitch: cut the restated dollar figure (already said once in Pain), add "answers questions 24/7", reframe "so instead of filling this role" → "so here's what I'll do for you", tie best-case back to "not wasting time" instead of just "money hole."
+- Confirmed (factual, no change needed): `[city], [state]` token already auto-fills the real lead location live — "in your area" is Practice-mode placeholder text only, per Prompt 224.
+- Close number-ask: cut "there's nothing, you don't got to buy anything"; replace "I'm going to see what I can do for you" (read as tentative/squeezing-them-in) with "I've got you locked in for that."
+- Close goodbye: currently has no sign-off before hangup — added "Thank you for your time — talk soon" (Brayden wanted something more formal than the first draft's "appreciate you, man").
+- Number-ask timing: Brayden initially floated moving it earlier (to the time-pick screen) then explicitly retracted — stays on Close, unchanged placement.
+- New idea surfaced, explicitly parked (not scoped/queued): time-of-day-aware appointment-window offering (e.g. "later this afternoon" instead of a fixed [Tuesday morning]/[Wednesday afternoon] pair) — logged as an idea in LIVE_STATE, needs real design work before it's buildable.
+
+All 3 confirmed wording changes queued as **Prompt 245** in LIVE_STATE (exact find/replace strings for `discoveryScript.js`'s Handoff and Close sections), committed locally. Next: continue the path walk with Path 2 (O-2) once Brayden's ready.
+
+**Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Discovery script path-by-path review in progress via brain/discovery-script-review-paths.md (restructured to full start-to-outcome paths). Path 1 reviewed, 3 changes queued as Prompt 245 (not yet shipped by CC). Prompt 244 (calendar UTC-vs-local-day bug) also still queued, ahead of 245 in the list. Next: walk Path 2 (O-2 — same as Path 1 but "Kind of/it's part of it" at the Opener qualifier fork) with Brayden.`
+
+---
+
 ### 2026-07-06 (cont. 30) — CC session: Prompts 237 + 238 shipped + pushed — star-shaped start-day marker, My Stats swaps to shared RangeCalendar
 
 **[CC | 2026-07-06 — Prompt 237: star marker + simpler tooltip on the shared DayFilterBar calendar]** — Read LIVE_STATE's queue: Prompt 236 was marked superseded by 238 (folded in, not built separately), so started with 237. Swapped the amber rounded-box start-day marker (Prompt 232D) for an actual 5-point star SVG polygon rendered behind the day number in `DayFilterBar.jsx`'s `SingleDayCalendar`, and reworded the tooltip from "Your first graded call" to "Your start day" (drop the grading-internals language per Brayden's own suggested phrasing). Star only renders when the start day isn't also the selected day (`showStar = isFirstCall && !isSelected`), preserving Prompt 232D's "must stay visually distinct from the selected-day blue" requirement. Committed `520c195`.

@@ -75,4 +75,19 @@ Tail after each of these (unless marked terminal) = Handoff **Good → picks a t
 
 The path list above collapses stretches that **start** the same way. This is the same thing from the **ending** side: every path eventually hits one of 3 outcomes, and several hit the *exact same terminal wording*, not just the same status.
 
-**Appointment Booked**
+**Appointment Booked** — one true ending, reached 6 ways (Path 1, O-2/O-3/O-5/O-7 via their tails, H-3/H-6/H-8/H-12/H-14). Close is identical every time — reviewed once via Path 1.
+
+**Not Interested — two flavors**
+- *With a spoken exit line* ("Okay, well, that's a different story then..."): **O-4, P-3, P-6** — identical wording all three times.
+- *Silent, straight to status*: **O-8, O-10, O-11** — no line at all before hanging up. Worth deciding during review whether that's intentional.
+
+**Follow-Up — mostly distinct, one exact triplicate**
+O-6, H-2, H-4, H-5, H-7, H-10, H-11 are all worded/logged differently — each needs its own look. But **H-9, H-13, H-15 are byte-for-byte identical** (same line, same logged detail) — review once at H-9.
+
+---
+
+## Related
+
+- [[discovery-script-current-mirror]] — the exact source this checklist was built from
+- [[setter-script-v3-camden-style]] — the script's shipped-changes history
+- [[LIVE_STATE]] — current queue
