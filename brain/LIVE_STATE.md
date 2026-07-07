@@ -96,6 +96,39 @@ Reasoning: Brayden felt "that's a different story then" was a pointless/oddly-de
 
 ---
 
+### 🔲 Prompt 247 QUEUED 2026-07-06 (Eagle, Brayden-approved wording) — discoveryScript.js: Opener "not here" line simplified
+
+**Context:** continuing the path-by-path script review. Content-only edit to `src/lib/discoveryScript.js` Opener section — no logic/marker/token changes, don't touch anything else.
+
+**Change — the "They're not here right now" branch's line.** Find:
+```
+"No worries — is there a better time to try them, or should I just leave a quick message?"
+```
+Replace with:
+```
+"No worries — when's a better time to catch them?"
+```
+Reasoning: offering to "leave a quick message" invites a realistic follow-up ("yeah, what's it about?") that the script has no answer prepared for. Simplifying to just a callback-time ask avoids opening that door. This is a single occurrence — only appears once in the file.
+
+**Verification:** `npx vite build` clean, then live-check in Training Center → Script → Opener section, "They're not here right now" branch, that the new line renders correctly.
+
+---
+
+### 🔲 Prompt 248 QUEUED 2026-07-06 (Eagle, Brayden-approved, investigate-then-build) — merge terminal say+action screens, color-code by outcome
+
+**Context:** Brayden's observation from live-walking the script in Training Center: hitting a terminal ending (e.g. Opener's "not here" branch → Follow-Up) shows the spoken line, then requires a click on a generic "Next" button that leads to a second, mostly-blank screen whose only content is the status-marking action. That extra click serves no purpose — the spoken line and the status action should render as ONE screen.
+
+**Step 1 — investigate first, don't guess.** Find and report back the component(s) that render this (likely `ScriptWalk.jsx` or similar, driving both Training Center → Script practice and possibly the live Call modal — confirm whether these share the same renderer or are separate). Report: what does the current trailing "Next" button actually do today after a terminal action step — does it just advance the walkthrough, or does it also perform any real status-marking / lead-update side effect? Does Practice mode and the live Call modal behave the same way here, or differently? This matters before touching anything, since Brayden does NOT want the button itself to become a "Mark Follow-Up" style action-trigger — actual status-marking on a real lead already happens elsewhere in the app (outside this component), so don't wire this button to newly perform that side effect if it doesn't already.
+
+**Step 2 — once reported back and confirmed, build:**
+- Merge the trailing say-line and its terminal `▸ Set status X` action into a single screen — no separate "Next"-to-blank-screen step when a say-line is immediately followed by a terminal action with no fork in between. Applies everywhere this pattern occurs in the script (every Not Interested ending, every Follow-Up variant, Appointment Booked via Close) — not just the one Brayden happened to screenshot.
+- Keep the button on that merged screen simple/generic (e.g. whatever "end of script" affordance makes sense — do NOT relabel it "Mark Follow-Up" / "Mark Not Interested" / etc., and do not have it trigger any new status-write side effect beyond whatever it already does today).
+- Color-code that merged terminal screen by outcome category, using the existing design-token system already defined in `discoveryScript.js`'s `CATEGORY_COLORS` (`good: var(--success)`, `hesitant: var(--warning)`, `bad: var(--danger)`) — map Appointment Booked → `--success`, Follow-Up → `--warning`, Not Interested → `--danger`. No hardcoded colors — pull from the same CSS custom properties everything else in the app already uses (per [[DESIGN]] rules).
+
+**Verification:** `npx vite build` clean, then live-check in Training Center → Script practice: hit at least one ending of each type (a Not Interested, a Follow-Up, and Appointment Booked via Close) and confirm each renders as one screen, color-matches its category, and the button doesn't newly trigger any status side effect it didn't already have. Report back what you found in Step 1 alongside the final result.
+
+---
+
 ### 💡 Idea parked (not queued) — time-of-day-aware appointment windows
 
 Brayden's idea during Path 1 review: instead of always offering the same two fixed windows ([Tuesday morning]/[Wednesday afternoon] etc.), have the ask adapt to the actual current time — e.g. offer "later this afternoon" or "tomorrow morning" depending on when the call happens. Explicitly parked, not scoped — needs actual design work (current-time-aware window selection logic) before it's a buildable prompt. Revisit when Brayden's ready to spec it out.

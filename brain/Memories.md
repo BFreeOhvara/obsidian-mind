@@ -64,6 +64,18 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-06 (cont. 33) — Eagle: Path O-5 (no changes) + O-6 reviewed — line simplified (Prompt 247), plus a real UX feature queued (Prompt 248): merge terminal screens + color-code by outcome
+
+**[Eagle | 2026-07-06]** — O-5 (Transferring branch) walked, no changes. O-6 ("not here right now" branch) walked — Brayden flagged that offering to "leave a quick message" invites a realistic "what's it about?" follow-up the script doesn't handle; simplified to a plain callback-time ask. Confirmed final line: *"No worries — when's a better time to catch them?"* Queued as **Prompt 247**.
+
+Bigger thread from this same screenshot: Brayden wants every terminal ending's trailing "Next"-to-blank-screen click eliminated — the spoken line and the `▸ Set status X` action should render as one screen. Iterated on the mechanic: his first framing had the button itself relabeled per outcome ("Follow-Up", "Book Appointment") and performing the mark-status action directly; he then explicitly walked that back — the button should stay generic, since real status-marking already happens elsewhere in the app (outside ScriptWalk), not through this button. He also wants the merged terminal screen **color-coded by outcome category**, reusing the existing `CATEGORY_COLORS` design-token system already in `discoveryScript.js` (good/hesitant/bad → `--success`/`--warning`/`--danger`) mapped onto Appointment Booked/Follow-Up/Not Interested respectively — no hardcoded colors, per standing [[DESIGN]] rule.
+
+Queued as **Prompt 248**, phrased as investigate-then-build (Eagle has no visibility into the actual rendering component — likely `ScriptWalk.jsx` — so CC needs to report back what "Next" currently does today, and whether Practice mode and the live Call modal share the same renderer, before touching anything). Explicit constraint carried into the prompt: don't wire the button to any new status-write side effect it doesn't already have.
+
+**Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Discovery script path-by-path review in progress via brain/discovery-script-review-paths.md. Prompts 244–248 all queued, not yet shipped by CC (244: calendar UTC bug; 245: script Path 1 wording; 246: Opener gap-check branch wording; 247: Opener "not here" line simplified; 248: merge terminal say+action screens into one, color-code by outcome — investigate-then-build, touches ScriptWalk.jsx which Eagle hasn't seen directly). Review method: full click-through table per path, "(seen)" vs 🆕 flags. O-5 and O-6 are cleared. Next: continue Opener's remaining new content — "What's this about?/pushback" disarm line + "still shuts it down" silent ending, then the "No" branch's two new lines and its reconnect spot-check — then move to Pain Amplification's remaining new content.`
+
+---
+
 ### 2026-07-06 (cont. 32) — Eagle: script review continues — Opener gap-check branch reviewed, 2 changes queued as Prompt 246; also switched review method to full-path-with-new-step-flagged
 
 **[Eagle | 2026-07-06]** — Brayden clarified the actual review goal mid-session: not "walk every full path as its own exercise" but "see every unique screen/line in the script exactly once, fastest route." Landed on a hybrid presentation: full click-through table per path (so he can navigate the live tool), but each already-reviewed step marked "(seen)" and the genuinely new step(s) flagged 🆕 — replaces both the earlier full-table-only format (Path 1/2/3) and the content-only-batch format (rest of Opener/Pain) which he found insufficient on its own (wanted the actual clickable sequence, not just the new lines in isolation).
