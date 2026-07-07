@@ -76,6 +76,8 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 **Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 244 (calendar UTC bug) now shipped. Next in queue: Prompt 245 (discoveryScript.js Path 1 wording, 3 changes), then 246 (Opener gap-check branch, 2 changes), 247 (Opener "not here" line simplified), 248 (merge terminal say+action screens into one, color-code by outcome — investigate-then-build, touches ScriptWalk.jsx). Execute top to bottom per LIVE_STATE's standing instruction.`
 
+**Addendum:** hit the vault's known stale-`.git/index.lock` issue ([[Gotchas]]) again when committing this very log entry — 0-byte lock file, no real git process running. Removed it manually and the commit went through clean (verified via `git show HEAD:<file> | grep`, not just `git status`, per that gotcha's own lesson). No new information, just another occurrence.
+
 ---
 
 ### 2026-07-06 (cont. 33) — Eagle: Path O-5 (no changes) + O-6 reviewed — line simplified (Prompt 247), plus a real UX feature queued (Prompt 248): merge terminal screens + color-code by outcome
