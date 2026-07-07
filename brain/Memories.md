@@ -4379,3 +4379,12 @@ Queue is now fully empty — Prompts 242 and 243 both shipped this session. Prom
 
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 244 is queued in LIVE_STATE: fix DayFilterBar/useDayFilter's "today" default (Activity Feed + My Calls) to use the rep's own local calendar day (profiles.timezone) instead of UTC calendar day — UTC rollover happens at 7pm Central, so "today" was flipping to tomorrow hours before the rep's actual midnight. Also audit the start-day star's date bucketing for the same UTC assumption. Nothing else queued.`
+
+---
+
+## Session Log — 2026-07-06 (Eagle) — Prompt 244 scope broadened: RangeCalendar has the same UTC bug too
+
+**What happened:** Brayden confirmed the UTC-vs-local-day bug isn't limited to My Calls' default-date display — Activity Feed has the identical symptom (same shared `DayFilterBar`, already in scope), and the RangeCalendar-based pages (Commissions, My Stats) have a related but distinct manifestation: even though those don't show a stale default date, their future-day disabling logic also computes "today" in UTC, so at 10:51 PM Central on Jul 6, Jul 7 was already selectable there too (not correctly disabled as a future day). Folded this into **Prompt 244** (still queued, not yet shipped) rather than opening a new prompt — same root cause, same fix, just needs applying to `RangeCalendar`/`useRangeCalendar` as well as `DayFilterBar`/`useDayFilter`. No code touched this session (Eagle/Cowork, vault-only).
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 244 (UTC-vs-local-day bug) now covers BOTH shared calendar components: DayFilterBar/useDayFilter (Activity Feed + My Calls — "today" default showing tomorrow's date) AND RangeCalendar/useRangeCalendar (Commissions + My Stats — future-day disabling logic also computed in UTC, letting a not-yet-arrived day be selected). Fix both using the rep's own profiles.timezone as the source of "today." Nothing else queued.`

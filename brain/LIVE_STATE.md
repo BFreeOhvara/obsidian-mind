@@ -18,13 +18,15 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
-### 🔲 Prompt 244 QUEUED 2026-07-06 (Eagle) — "today" on Activity Feed/My Calls should use the rep's own local day, not UTC
+### 🔲 Prompt 244 QUEUED 2026-07-06 (Eagle, scope broadened) — every calendar's UTC-vs-local-day bug, not just Activity Feed/My Calls
 
 **Shared `DayFilterBar`/`useDayFilter` component (Activity Feed + My Calls), the "default to today" behavior from Prompt 227.**
 
 **Bug:** at 10:51 PM Central on Jul 6, My Calls' date trigger showed **"Jul 7"** — a full day ahead of Brayden's own local calendar day. **Root cause:** Prompt 223/225/227 deliberately bucket "today" by **UTC calendar day** (matching `assign_daily_batches()`'s reset boundary, the reasoning at the time). For a Central-time rep, the UTC day rolls over at 7:00 PM local — so any time after 7 PM Central, "today" on this page silently becomes tomorrow from the rep's own point of view. This was a real design tradeoff when it shipped, but it's now **outdated**: Prompt 226 already moved the actual lead-reset cron to be **per-rep-timezone-aware** (`profiles.timezone`, `AT TIME ZONE`, real IANA zone, DST-automatic) — so "UTC day" no longer even matches the system's own real reset boundary, and it never matched what a rep visually expects "today" to mean.
 
 **Fix:** switch "today" / day-bucketing on `DayFilterBar`/`useDayFilter` (Activity Feed + My Calls) from UTC calendar day to the **rep's own local calendar day**, using `profiles.timezone` — the same source LiveClock (Prompt 227/229) and the per-rep batch reset (Prompt 226) already use. This should also apply to the **start-day star's date bucketing** (Prompt 231B/232C) for the same consistency reason — check whether that computation also assumed UTC and needs the same fix. Report what other spots (if any) still assume UTC-as-"today" while auditing this, rather than fixing only the one symptom Brayden hit.
+
+**Confirmed wider than first reported — same bug hits the RangeCalendar-based pages too, in a second way.** Brayden checked Activity Feed (same `DayFilterBar`, confirmed same symptom) and also the range calendars on Commissions/My Stats — those don't show a stale default date (they default to All Time/no selection), but their **future-day disabling logic** has the identical UTC-vs-local bug: at 10:51 PM Central on Jul 6, Jul 7 was already selectable (not disabled as "future") in those calendars too, because "today" for the future-cutoff check is also computed in UTC rather than the rep's local day. **Fix this in `RangeCalendar`/`useRangeCalendar` (Commissions + My Stats) as part of this same prompt**, not as a separate one — same root cause, same fix (rep's own `profiles.timezone` as the source of "today" everywhere a calendar needs to know what today is, including future-day disabling), just a second component to apply it to.
 
 ---
 
