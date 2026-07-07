@@ -64,6 +64,28 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-07 (cont. 5) — CC session: Prompt 248 shipped + pushed — merged terminal say+action screens in ScriptWalk, color-coded by outcome, found and worked around a pre-existing CSS bug
+
+**[CC | 2026-07-07]** — Finished the discovery-script-review batch (Prompts 244–248 all now shipped) with the biggest one: Prompt 248, an investigate-then-build task to fix Brayden's complaint that every terminal script ending (Not Interested / Follow-Up / Appointment Booked) forced an extra tap through a near-blank "action" screen before showing the actual outcome.
+
+**Step 1 investigation** (reported inline, no pause needed — findings matched the prompt's own assumptions): `ScriptWalk.jsx` is confirmed the single shared renderer for both `CallModal.jsx` (mode="live") and `TrainingCenter.jsx` (mode="practice") — one component, one `mode` prop. The trailing "Next" button on a terminal action does nothing but advance local walk state (`advance()` → in-memory index bump); it never writes to Supabase. Actual status-setting happens entirely outside `ScriptWalk`, confirmed via grep (no `supabase` calls in `ActionCard`/`advance()`/`Terminal`). Since both findings confirmed rather than contradicted the prompt's stated assumptions, proceeded straight into Step 2 in the same pass, per this vault's established investigate-then-build precedent (e.g. Prompt 232E) rather than stopping to ask.
+
+**Step 2 build:** merged the trailing say-line + its terminal `▸ Set status X` action onto one screen (new `TerminalCard` component), applied everywhere the pattern occurs. Two things surfaced during implementation that weren't in the original ask but mattered:
+1. An existing code comment said "Close's outro [is] paced one line at a time on purpose" — a full-run merge would have silently undone that. Scoped the merge to only the SINGLE line immediately before the action, so Close's first line still paces standalone and only the second merges with the outcome card.
+2. The color-coding spec pointed at `CATEGORY_COLORS`' CSS var tokens, but the codebase's existing convention for tinting from these (`color + '14'`, `` `${color}55` `` border) is invalid CSS — string-concatenating a suffix onto a `var(...)` reference silently drops the whole declaration. Confirmed via live `getComputedStyle` (background rendered fully transparent). **This exact bug already exists elsewhere in the app** (`ActionCard`'s box, `Terminal`'s icon circle, MyCalls' grade badges) — flagged, not fixed (out of scope). For the new code, used the real `--success-dim`/`--warning-dim`/`--danger-dim` custom properties instead (already correctly used by MyCalls' `GRADE_DIM`) — confirmed actually renders this time.
+
+Also refactored `flowOutcome`'s outcome-extraction regex into an exported `extractSetStatus()` in `discoveryScript.js`, and used it to color by the SPECIFIC action just reached rather than `section.outcome` (a section-wide scan that can report the wrong outcome when one section has more than one kind of ending — a real latent bug, fixed as a side effect of doing this correctly, not separately scoped work).
+
+Build clean. Live-verified end-to-end (not just source-read) for all 3 outcome colors plus the no-preceding-say case (a fork option whose body is just the action, e.g. "No, not interested") — each renders correctly tinted, one screen, "Start over" button unchanged, no new status-write side effect anywhere.
+
+Committed `dbb710b`, pushed. This closes out the whole 244–248 batch from this session.
+
+**Lesson:** don't trust an existing color/style pattern in the surrounding code just because it's already there — `color + 'NN'` on a CSS var reference reads like it should work and appears repeatedly in this file, but it's silently broken; always verify a new color requirement actually renders via `getComputedStyle`, not just code review. Related: [[Gotchas]] is a good home for this if it bites again on a future prompt touching these same components.
+
+**Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompts 244–248 all shipped this session. LIVE_STATE's "Next Up for CC" queue is now empty except the parked (not queued) time-of-day appointment-window idea. Check North Star's Current Focus for what's next, or wait for Eagle/Falcon to queue more prompts. Worth flagging to Brayden/Eagle: the color_+_suffix CSS bug found in ScriptWalk.jsx (ActionCard, Terminal) and MyCalls.jsx (grade badges) is a real pre-existing visual bug (backgrounds/borders silently not rendering) — not fixed, just discovered as a side effect of Prompt 248.`
+
+---
+
 ### 2026-07-07 (cont. 4) — CC session: Prompt 247 shipped + pushed — Opener "not here" line simplified, count was wrong again (2 not 1)
 
 **[CC | 2026-07-07]** — Continued to Prompt 247: simplify the "They're not here right now" branch's line in Opener. Applied the Prompt 246 lesson immediately — grepped the target string before editing rather than trusting the prompt's "single occurrence" claim. Same pattern as before: **2 occurrences, not 1** — once under "Yeah/speaking"→"not here right now", once mirrored under the "No"→"Confirms/engages"→"Yes"→"not here right now" reconnect path. Replaced both (reasoning is identical either way — don't open the door to an unhandled "what's it about?" follow-up). Verified via grep (0 old remaining, 2 new) and diff (exactly 2 lines changed). Build clean, live-verified both paths render the new line.
