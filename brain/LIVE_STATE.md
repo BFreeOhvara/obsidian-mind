@@ -68,6 +68,34 @@ Reasoning: the call currently just stops after this line with no sign-off before
 
 ---
 
+### 🔲 Prompt 246 QUEUED 2026-07-06 (Eagle, Brayden-approved wording) — discoveryScript.js: Opener gap-check branch, 2 line changes
+
+**Context:** continuing the path-by-path script review (`brain/discovery-script-review-paths.md`). This is Opener's "No, we've got it covered, just growing" → gap-check branch (paths O-3/O-4 in the checklist). Two confirmed changes, both content-only edits to `src/lib/discoveryScript.js` Opener section — no logic/marker/token changes, don't touch anything else.
+
+**Change 1 — the gap-check follow-up question.** Find (appears twice in the Opener section — once under "Yeah/speaking" → "That's me", once under "Yeah/speaking" → "What's this about?/pushback" → "Engages", and again twice more mirrored under the "No" branch's reconnect subtree — **4 occurrences total, all identical text, all 4 need this same replacement**):
+```
+"You're pretty on top of it, I got you — is it more that calls just aren't the bottleneck right now, or you've got someone dedicated catching every one?"
+```
+Replace with:
+```
+"I hear you — most people think that until they actually track it for a week and realize a few are slipping through. Has anyone actually counted?"
+```
+Reasoning: the old question offered a binary (bottleneck vs. dedicated person) that didn't actually probe for pain. Brayden wanted a pain-surfacing question in the same style as the later Pain Amplification traps, not a direct "why are you hiring" question (people won't openly answer that) — this plants doubt on the "we're fine" claim without asking about hiring motive directly.
+
+**Change 2 — the "genuinely solid, no gap" ending, Opener section ONLY.** Find (appears 3 times total in the file — Opener once, Pain Amplification twice — **only change the Opener occurrence, leave Pain's two instances exactly as they are**, Brayden explicitly wants those left alone):
+```
+"Okay, well, that's a different story then. Okay man, well have a good day, good luck to you."
+```
+Replace with, **in the Opener section's "Genuinely solid, no gap" branch only**:
+```
+"Okay, well — thank you for your time. Good luck with everything."
+```
+Reasoning: Brayden felt "that's a different story then" was a pointless/oddly-defensive line for this specific spot — wanted something that just thanks them and moves on. Pain Amplification's two identical-text endings are unaffected by this change.
+
+**Verification:** `npx vite build` clean, then live-check in Training Center → Script → Opener section that the new question renders (check all 4 places it appears — under "That's me", under "What's this about?→Engages", and both mirrored spots under the "No" branch reconnect) and that only the Opener's ending line changed (confirm Pain Amplification's two "different story" endings are untouched). Report back with exact grep counts before/after for both changed strings so Eagle can verify the occurrence count matched (4 for the question, 1 for the ending) — don't touch any other section.
+
+---
+
 ### 💡 Idea parked (not queued) — time-of-day-aware appointment windows
 
 Brayden's idea during Path 1 review: instead of always offering the same two fixed windows ([Tuesday morning]/[Wednesday afternoon] etc.), have the ask adapt to the actual current time — e.g. offer "later this afternoon" or "tomorrow morning" depending on when the call happens. Explicitly parked, not scoped — needs actual design work (current-time-aware window selection logic) before it's a buildable prompt. Revisit when Brayden's ready to spec it out.

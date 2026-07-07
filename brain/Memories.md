@@ -64,6 +64,22 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-06 (cont. 32) — Eagle: script review continues — Opener gap-check branch reviewed, 2 changes queued as Prompt 246; also switched review method to full-path-with-new-step-flagged
+
+**[Eagle | 2026-07-06]** — Brayden clarified the actual review goal mid-session: not "walk every full path as its own exercise" but "see every unique screen/line in the script exactly once, fastest route." Landed on a hybrid presentation: full click-through table per path (so he can navigate the live tool), but each already-reviewed step marked "(seen)" and the genuinely new step(s) flagged 🆕 — replaces both the earlier full-table-only format (Path 1/2/3) and the content-only-batch format (rest of Opener/Pain) which he found insufficient on its own (wanted the actual clickable sequence, not just the new lines in isolation).
+
+Cleared Opener's "genuinely solid, no gap" branch (O-4) using this format. Two changes confirmed after back-and-forth on wording:
+- The gap-check follow-up question ("You're pretty on top of it... bottleneck vs. dedicated person") felt like a binary that didn't surface real pain. Brayden wanted a pain-surfacing question (Pain Amplification's "what time do you close" trap style), explicitly NOT a direct "why are you hiring" question since people won't answer that honestly. Iterated through several drafted options (direct/growth-frame/soft-pain-check/gut-check/opportunity-cost/short-casual, then a second pain-specific round after he redirected away from hire-motive questions) — landed on: *"I hear you — most people think that until they actually track it for a week and realize a few are slipping through. Has anyone actually counted?"*
+- The "genuinely solid, no gap" ending line ("Okay, well, that's a different story then...") felt pointless/oddly defensive for this specific spot. Note: this exact string is used 3x in the file (Opener + Pain's P-3 + P-6) — asked Brayden whether to change all 3 or just this one; he chose **just the Opener occurrence** — Pain's two identical endings stay unchanged. New Opener-only line: *"Okay, well — thank you for your time. Good luck with everything."*
+
+Also surfaced (not yet answered): a real UX issue where a terminal say-line immediately followed by a status-marking action still requires a pointless extra "Next" click to a mostly-blank screen — asked Brayden whether to queue a fix (merge trailing say+action into one screen when there's no fork between them) or hold off. Awaiting his answer.
+
+Both confirmed wording changes queued as **Prompt 246** in LIVE_STATE — flagged that the gap-check question string appears 4 times total in Opener (both the direct "That's me"/"Engages" routes and their mirrored copies under the "No" branch reconnect) and all 4 need the same replacement, while the ending line change is Opener-only (1 of its 3 occurrences).
+
+**Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Discovery script path-by-path review in progress via brain/discovery-script-review-paths.md. Prompts 245 and 246 both queued (not yet shipped by CC), Prompt 244 (calendar UTC bug) still ahead of both. Review method: full click-through table per path, already-reviewed steps marked "(seen)", new steps flagged 🆕. Just cleared Opener's O-4 gap-check branch. Open question to Brayden not yet answered: does he want the pointless-Next-click UX issue (terminal say+action forced onto two screens) queued as a separate fix? Next: continue Opener's remaining new content (Transferring branch, "not here" branch, "what's this about" disarm+still-shuts-down, the "No" branch's two new lines) using the same flagged-full-path format, or move to Pain's remaining new content if Brayden prefers.`
+
+---
+
 ### 2026-07-06 (cont. 31) — Eagle: script review begins — Path 1 reviewed, 3 wording changes queued as Prompt 245
 
 **[Eagle | 2026-07-06]** — Restructured `brain/discovery-script-review-paths.md` from section-scoped stubs ("lands on Vitals") to full start-to-outcome paths, per Brayden's correction — a "path" means the whole call through to a marked status, not a section handoff. Path 1 (the main happy path: Opener Yeah/speaking→That's me→Yeah, Vitals, Pain Engaged, Handoff Good→picks time, Close→Appointment Booked) is the spine every other path is described as a diff against.
