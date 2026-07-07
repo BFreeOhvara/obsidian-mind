@@ -64,6 +64,18 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-07 (cont. 2) — CC session: Prompt 245 shipped + pushed — discoveryScript.js Path 1 wording (Handoff pitch, Close number-ask, Close goodbye)
+
+**[CC | 2026-07-07]** — Continued down the `LIVE_STATE` queue to Prompt 245: 3 Brayden-approved, content-only wording changes to `src/lib/discoveryScript.js`'s Handoff and Close sections, from his path-by-path script review. All 3 exact-string find/replaces applied as scoped — grepped each target string first to confirm single-occurrence uniqueness before editing, diffed after to confirm only those 3 lines changed. No logic/marker/token changes.
+
+`npx vite build` clean. Live-verified in Training Center → Script practice by walking the actual happy path (Opener → Vitals → Pain → Handoff → Close, filling real Vitals numbers to get live pain-math token substitution) rather than just reading the source: Handoff's pitch rendered the new wording verbatim, Close rendered the new number-ask then the new goodbye line on the next screen. `[Day]`/`[time]` tokens correctly render literally in Practice mode (they only resolve against a real lead via Call Now, not in the standalone walker) — noted this so it isn't mistaken for a token-substitution bug in a future check.
+
+Committed `4a11600`, pushed. Removed Prompt 245 from `LIVE_STATE`'s queue, logged as shipped.
+
+**Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompts 244 and 245 now shipped. Next in queue: Prompt 246 (Opener gap-check branch, 2 changes — one string appears 4x, one appears 1x of 3 total occurrences, don't touch the other 2), then 247 (Opener "not here" line simplified), 248 (merge terminal say+action screens into one, color-code by outcome — investigate-then-build, touches ScriptWalk.jsx, needs a report-back on current "Next" button behavior before building). Execute top to bottom per LIVE_STATE's standing instruction.`
+
+---
+
 ### 2026-07-07 — CC session: Prompt 244 shipped + pushed — every calendar's UTC-vs-local-day bug fixed
 
 **[CC | 2026-07-07]** — Worked top of the `LIVE_STATE` queue: Prompt 244, the UTC-vs-local-day bug across every calendar in the app (`DayFilterBar`/`useDayFilter` on Activity Feed + My Calls, `RangeCalendar`/`useRangeCalendar` on Commissions + My Stats). Confirmed the root cause matched Eagle's diagnosis exactly — both hooks bucketed "today" via `new Date().toISOString().slice(0,10)` (UTC calendar day), a leftover rationale from when `assign_daily_batches()` reset on UTC `CURRENT_DATE`; Prompt 226 already moved that reset to be per-rep-timezone-aware, so the calendars had been silently out of sync with the system's own real boundary since then. Reproduced the exact reported instant synthetically (machine clock was 3:43 PM Central at verification time, not near midnight): `Intl.DateTimeFormat` in UTC for 10:51 PM Central Jul 6 returns `"2026-07-07"` (the bug), the fix returns `"2026-07-06"` (correct).

@@ -33,7 +33,7 @@ tags:
 
 ---
 
-### 🔲 Prompt 245 QUEUED 2026-07-06 (Eagle, Brayden-approved wording) — discoveryScript.js: Path 1 review, 3 line changes (Handoff pitch, Close number-ask, Close goodbye)
+### ✅ Prompt 245 SHIPPED 2026-07-07 (`4a11600`, pushed) — discoveryScript.js: Path 1 review, 3 line changes (Handoff pitch, Close number-ask, Close goodbye)
 
 **Context:** Brayden is walking `brain/discovery-script-review-paths.md` path-by-path in the live ScriptWalk tool. Path 1 (the main happy path) is reviewed — 3 wording changes confirmed. This is a **content-only edit to `src/lib/discoveryScript.js`** — exact strings below, no logic/marker changes, no new fork options, no token changes. Do not touch anything else in the file.
 
@@ -67,7 +67,7 @@ Replace with:
 ```
 Reasoning: the call currently just stops after this line with no sign-off before hanging up — added a short, more formal-leaning goodbye.
 
-**Verification:** `npx vite build` clean, then live-check in Training Center → Script → Handoff & Book and Close sections (or ScriptWalk practice) that both edited screens render the new text with tokens filling correctly ([Day], [time]). Report back; don't touch any other section.
+**Result:** all 3 exact-string replacements applied, nothing else in the file touched (diff confirmed 3 lines changed, no other lines affected). `npx vite build` passes clean. **Live-verified** in Training Center → Script practice, walked the actual happy path (Opener "That's me" → "Yeah" missed calls → Vitals ($3/day, $250/job) → Pain "Engaged" → Handoff → "Good/shows interest" → "Picks a time" → Close): Handoff's SAY THIS line rendered the new pitch verbatim with the live `$[annual]`-derived pain numbers already stated earlier in Pain (not restated); Close rendered `"[Day] at [time] — I've got you locked in for that. What's a good number to grab you at real quick to confirm?"` then, on Next, the goodbye line with the new "Thank you for your time — talk soon." appended — both token placeholders (`[Day]`, `[time]`) render literally in Practice mode as expected (they fill live only on a real Call Now walk against an actual lead).
 
 ---
 
