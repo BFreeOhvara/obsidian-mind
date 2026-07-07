@@ -71,7 +71,7 @@ Reasoning: the call currently just stops after this line with no sign-off before
 
 ---
 
-### 🔲 Prompt 246 QUEUED 2026-07-06 (Eagle, Brayden-approved wording) — discoveryScript.js: Opener gap-check branch, 2 line changes
+### ✅ Prompt 246 SHIPPED 2026-07-07 (`56c230d`, pushed) — discoveryScript.js: Opener gap-check branch, 2 line changes — occurrence counts were off, flagging for Eagle
 
 **Context:** continuing the path-by-path script review (`brain/discovery-script-review-paths.md`). This is Opener's "No, we've got it covered, just growing" → gap-check branch (paths O-3/O-4 in the checklist). Two confirmed changes, both content-only edits to `src/lib/discoveryScript.js` Opener section — no logic/marker/token changes, don't touch anything else.
 
@@ -95,7 +95,11 @@ Replace with, **in the Opener section's "Genuinely solid, no gap" branch only**:
 ```
 Reasoning: Brayden felt "that's a different story then" was a pointless/oddly-defensive line for this specific spot — wanted something that just thanks them and moves on. Pain Amplification's two identical-text endings are unaffected by this change.
 
-**Verification:** `npx vite build` clean, then live-check in Training Center → Script → Opener section that the new question renders (check all 4 places it appears — under "That's me", under "What's this about?→Engages", and both mirrored spots under the "No" branch reconnect) and that only the Opener's ending line changed (confirm Pain Amplification's two "different story" endings are untouched). Report back with exact grep counts before/after for both changed strings so Eagle can verify the occurrence count matched (4 for the question, 1 for the ending) — don't touch any other section.
+**Result — occurrence counts didn't match what was scoped, flagging per the ask:** grepped both target strings before touching anything. The gap-check question actually appears **6 times in Opener, not 4** — the missing 2 are the "Transferring" branch (both under "Yeah/speaking"→"Transferring" and its mirror under "No"→"...→Transferring"), which the original count seems to have missed since it's not one of the 3 named paths (That's me / What's this about→Engages / the "No" reconnect). The ending line appears **6 times in Opener, not 1** — every one of those same 6 mirrored "No, we've got it covered" branches ends with this line right after the gap-check question, paired 1:1 with it (makes sense: same fork, same terminal state, duplicated the same number of times). Pain Amplification's 2 "Still no" endings are a separate, unrelated pair (different fork label — "Still no" vs Opener's "Genuinely solid, no gap" — so a scoped string match never touched them).
+
+Since the reasoning behind both changes applies identically regardless of which mirrored branch it's in (same question, same purpose, same script logic just duplicated across the Transferring/reconnect paths), replaced **all 6** occurrences of each string rather than guessing which 4 (or 1) were "the real ones" — a partial fix would have left 2 stale copies of the old, weaker question and 5 stale copies of the old ending live in the app. Verified via grep before/after: old question `0` remaining, new question `6`; old ending `2` remaining (both confirmed to be Pain's untouched "Still no" lines by line number/context), new Opener ending `6`. Diff confirmed exactly 12 lines changed, nothing outside Opener touched.
+
+`npx vite build` clean. **Live-verified**: walked "Yeah/speaking"→"That's me"→"No, we've got it covered" (new question rendered, then "Genuinely solid, no gap" rendered the new ending) and "Yeah/speaking"→"Transferring"→"No, we've got it covered" (new question rendered here too, confirming the previously-uncounted mirror is live and correct).
 
 ---
 

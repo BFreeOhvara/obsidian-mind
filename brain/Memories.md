@@ -64,6 +64,20 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-07 (cont. 3) — CC session: Prompt 246 shipped + pushed — Opener gap-check branch wording, occurrence count was wrong (6 not 4/1)
+
+**[CC | 2026-07-07]** — Continued to Prompt 246: 2 wording changes to Opener's "No, we've got it covered, just growing" gap-check branch. The prompt stated the gap-check question appears 4 times and the "genuinely solid, no gap" ending appears once in Opener (3 total, 2 in Pain Amplification) — **grepped first per habit and both counts were wrong**: the question actually appears **6 times** in Opener (the prompt's count missed the "Transferring" sub-branch, mirrored once under "Yeah/speaking" and once under the "No" reconnect subtree), and the ending appears **6 times** in Opener too, not once — paired 1:1 with the question in every one of those same 6 mirrored branches. Pain Amplification's 2 "Still no" endings are a distinct fork (different label, same closing sentence) and were never at risk since the replace was scoped to the "Genuinely solid, no gap" fork label specifically.
+
+Replaced all 6 of each — the reasoning behind both changes is branch-agnostic (same question serves the same purpose everywhere "No, we've got it covered" can be picked), so fixing only the named 4/1 would have shipped a script where 2 real call paths (both via Transferring) still asked the old weaker question and 5 still ended with the old defensive-sounding line. Verified with grep before/after (old strings: 0 remaining outside Pain; new strings: 6/6) and a full diff (exactly 12 lines changed, nothing else touched). Build clean, live-verified 2 of the 6 mirrored spots directly (That's me path and the previously-uncounted Transferring path) — both render correctly.
+
+Committed `56c230d`, pushed. Flagged the count discrepancy explicitly in `LIVE_STATE` for Eagle to see, since a future prompt that trusts "there are N occurrences of X" without verifying first would ship a partial fix the same way this one almost did.
+
+**Lesson:** the discovery script's branching structure duplicates identical text across every mirrored fork (a "yes/speaking" path and its "no→confirms→yes" reconnect equivalent) — when a prompt states an occurrence count for a script string, grep and verify before trusting it; the structure is easy to undercount by eye. Related: [[Gotchas]] already has a similar note about `→ Go to X` routes in this file being naive/non-DAG-aware — this is the same "the file's structure isn't obvious from a casual read" theme.
+
+**Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompts 244, 245, 246 now shipped. Next in queue: Prompt 247 (Opener "not here right now" line simplified, single occurrence), then 248 (merge terminal say+action screens into one, color-code by outcome — investigate-then-build, touches ScriptWalk.jsx, needs a report-back on current "Next" button behavior before building). Execute top to bottom per LIVE_STATE's standing instruction.`
+
+---
+
 ### 2026-07-07 (cont. 2) — CC session: Prompt 245 shipped + pushed — discoveryScript.js Path 1 wording (Handoff pitch, Close number-ask, Close goodbye)
 
 **[CC | 2026-07-07]** — Continued down the `LIVE_STATE` queue to Prompt 245: 3 Brayden-approved, content-only wording changes to `src/lib/discoveryScript.js`'s Handoff and Close sections, from his path-by-path script review. All 3 exact-string find/replaces applied as scoped — grepped each target string first to confirm single-occurrence uniqueness before editing, diffed after to confirm only those 3 lines changed. No logic/marker/token changes.
