@@ -64,6 +64,18 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-08 (cont. 2) — CC session: Prompt 251 shipped + pushed — ScriptWalk badge overflow fixed, found and worked around a dead-code sibling
+
+**[CC | 2026-07-08]** — Continued the queue, executed Prompt 251 (UI fix, not a `discoveryScript.js` content edit — next oldest unshipped, 252-255 remain queued behind it) against `ohvara-dashboard`. Found the live bug at `ScriptWalk.jsx`'s track header: a 20×20 colored badge span rendering `{section.short}` as overflowing text. Removed the text node, kept the box. While grepping for `.short` usage also found a second badge (inside a `Chooser` component) with the same pattern — investigated and confirmed it's dead code (`atChooser` hardcoded `false`, component never renders), so left it untouched rather than scope-creeping into unreachable code the prompt didn't ask about.
+
+`npx vite build` clean. Live-verified for real (apex11/Test1234!) by walking the full script practice path end to end — Opener → Vitals → Pain Amplification → Handoff & Book → Lock the Time — checking computed styles at each stop: every section's badge box renders at the correct size/color with empty text.
+
+Committed (`44ec903`) and pushed to `origin/master` per standing push authorization.
+
+**Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 251 is shipped, pushed, and live-verified (ohvara-dashboard@44ec903). Next up in the queue, in order: Prompt 252 (Handoff win-win tweak + re-engagement branch — this one's a bigger structural change, read its full spec in LIVE_STATE before starting), 253 (Handoff send-me-info line), 254 (Handoff H-4 placeholder scrapped, has a not-interested fork), 255 (Handoff H-5 sibling fix — ship with or after 254). Standing review principle still active: any open-ended ask assuming one type of answer needs an explicit not-interested branch — still-pending candidates: H-7's "better week" ask, H-9/H-13/H-15's pricing "Still hesitant" endings. Also still flagged, not yet actioned: a pre-existing invalid-CSS bug (color+'14' string concat onto var()) in ActionCard/Terminal/MyCalls grade badges, found during Prompt 248. Also noted but out of scope: a dead-code `Chooser` component in ScriptWalk.jsx (atChooser hardcoded false) — has its own overflowing-badge bug but is unreachable, not worth fixing unless it gets wired up.`
+
+---
+
 ### 2026-07-08 (cont.) — CC session: Prompt 250 shipped + pushed — Opener "No" branch, 3 line changes
 
 **[CC | 2026-07-08]** — Continued the queue, executed Prompt 250 (next oldest unshipped, 251-255 remain queued behind it) against `ohvara-dashboard`. Grepped all 3 target strings first — each confirmed single-occurrence as the prompt expected. Reworded the "No" branch's re-confirm opener, the "actively looking" follow-up, and the reconnect hook nested under this branch's own "Yes" answer — careful to touch only that nested copy and leave the byte-identical top-level "Yeah/speaking" hook alone (confirmed via indentation/context, verified 1 occurrence of the original hook remained post-edit).

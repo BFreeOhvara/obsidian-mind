@@ -130,13 +130,11 @@ Reasoning: matches the same "give it one more shot" pattern from Prompt 249, but
 
 ---
 
-### 🔲 Prompt 251 QUEUED 2026-07-07 (Eagle, Brayden-approved) — ScriptWalk section badge: remove overflowing text, keep the colored box
+### ✅ Prompt 251 SHIPPED 2026-07-08 (`44ec903`, pushed) — ScriptWalk section badge: overflowing text removed, colored box kept
 
-**Context:** Training Center → Script practice, live screenshot. Each section header (Open the Call, Vitals, Pain Amplification, Handoff & Book, Lock the Time) has a small colored icon/badge to the left of the title (colored per `section.color`/`dim`/`border` in `discoveryScript.js` — e.g. Opener/Vitals/Close use `--accent`, Pain uses `--warning`, Handoff uses `--success`). That badge currently has a short text label inside it (looks like it's rendering `section.short` — "Opener", "Vitals", "Pain", etc.) that doesn't fit the box — text overflows/looks awkward on every section, not just one.
+Found the badge in `ScriptWalk.jsx`'s track header (line ~239) — a 20×20 colored `span` rendering `{section.short}` as its text content. Removed the text node, kept the box element itself (self-closed the span). Also found a second `.short`-rendering badge at line 527 inside the `Chooser` component, but confirmed that component is dead code (`atChooser` is hardcoded `false` at line 91, never rendered) — left untouched since it's out of scope and invisible in the live app.
 
-**Fix:** find wherever this badge renders (likely near the top of `ScriptWalk.jsx`, alongside the section header/title row) and remove the text label from inside the colored box — **keep the colored box itself** (Brayden explicitly wants the box, just not the overflowing text in it). If the badge is only ever a label-holder with no other purpose, this likely just means deleting the text node/child inside it, not removing the box element. Apply consistently across all 5 sections (Opener, Vitals, Pain Amplification, Handoff & Book, Close) since it's the same badge component reused per section, not a per-section fix.
-
-**Verification:** `npx vite build` clean, live-check in Training Center → Script practice that all 5 section headers show the colored box with no text inside, and the box itself still renders (not accidentally removed) with each section's correct color.
+`npx vite build` clean. Live-verified in Training Center → Script practice by walking the full path (Opener → Vitals → Pain Amplification → Handoff & Book → Lock the Time/Close): all 5 section headers confirmed via computed styles — 20×20 box present with the correct section color (`--accent`/`--warning`/`--success` as expected per section) and empty text content in every case.
 
 ---
 
