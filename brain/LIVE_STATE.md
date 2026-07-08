@@ -176,31 +176,11 @@ Reasoning: by this point in the "No" branch, the setter has already asked "were 
 
 ---
 
-### 🔲 Prompt 249 QUEUED 2026-07-07 (Eagle, Brayden-approved wording) — discoveryScript.js: Opener "What's this about?/pushback" branch gets a second disarm attempt before Not Interested
+### ✅ Prompt 249 SHIPPED 2026-07-08 (`ea36918`, pushed) — Opener "What's this about?/pushback" gets a second disarm attempt before Not Interested
 
-**Context:** continuing the path-by-path script review. This is a **structural change**, not a pure string swap like 245-247 — adds a new nested fork, doesn't just replace existing text. Content-only in the sense that no marker/token conventions change and no other section is touched, but it does add new lines to the tree.
+Both of the 2 occurrences of `↳ IF Still shuts it down [BAD]: ▸ Set status Not Interested.` (direct "Yeah/speaking" path + mirrored "No" → "Confirms/engages" → "Yes" reconnect subtree — grep confirmed exactly 2, matching expectation) replaced with a nested second-attempt fork: a low-pressure re-engage line, then either the full duplicated "Engages" qualifier subtree (routes to Vitals) or a genuine goodbye line into the same `Not Interested` status/`TerminalCard`.
 
-**Background:** the Opener section's own `tips` field already says *"Two disarm attempts max, then let them go"* — but the actual branching under "What's this about? / pushback" → "Still shuts it down" only ever gave ONE attempt before going straight to Not Interested with no line at all. This closes that gap between the documented intent and the real branch logic — it's not a new invention, the tips field already assumed this existed.
-
-**⚠️ This branch appears in 2 places in the file, same pattern as Prompts 246/247 — apply this change in BOTH:** once under the direct `"Yeah/speaking"` → `"What's this about? / pushback"` path, and again under the `"No"` branch's reconnect subtree (`"No"` → `"Confirms/engages"` → `"Yes"` → mirrored `"What's this about? / pushback"`). Grep for `Still shuts it down` first to confirm the exact count and locations before editing — don't assume 2 without checking, per the lesson from 246/247.
-
-**Change — find this exact terminal line** (in both of its 2 locations):
-```
-↳ IF Still shuts it down [BAD]: ▸ Set status Not Interested.
-```
-
-**Replace with this new nested structure** (matching whatever indentation depth that occurrence sits at in its own location — the two occurrences will have different indentation since they're nested at different depths in the tree, keep each internally consistent with its own surrounding lines):
-```
-↳ IF Still shuts it down [BAD]: "Totally fair — I'll let you go. Just curious though, are you all catching every call that comes in, or does one ever slip through?"
-   BRANCH — Do they engage this time?
-   ↳ IF Engages [GOOD]: [same content as this branch's OWN first "Engages" option above it — "Quick question — are missed calls part of the reason you're posting for this role, or are you just growing?" plus its full qualifier-fork subtree (Yeah/Kind of/No-covered→gap-check→etc., all routing to Vitals or Not Interested exactly like the existing "Engages" option does). This file's established pattern is verbatim duplication, not shared references — duplicate the full subtree here too, don't try to reference the earlier one.]
-   ↳ IF Still shuts it down [BAD]: "All good, man — appreciate your time. Take care."
-      ▸ Set status Not Interested.
-```
-
-Net effect: "Still shuts it down" no longer ends the call immediately — it gets one more short, low-pressure attempt, and ONLY a second shutdown ends it (now with an actual goodbye line instead of silence).
-
-**Verification:** `npx vite build` clean. Live-verify all 4 resulting sub-paths at BOTH of the 2 locations (8 total walks, or at minimum both locations' "first shutdown → second attempt → engages" and "first shutdown → second attempt → shuts down again" paths): confirm the new second-attempt line renders, confirm "Engages" on the second try correctly reaches Vitals (same as the first "Engages" option), confirm "Still shuts it down" a second time renders the new goodbye line then the red Not Interested `TerminalCard` from Prompt 248. Report exact grep counts (before: how many `Still shuts it down [BAD]: ▸ Set status Not Interested.` lines existed; after: 0 remaining of the old form, confirm both new nested structures are present) so Eagle can verify nothing was missed or double-applied.
+`npx vite build` clean. Live-verified in Training Center → Script practice at BOTH locations: second-attempt line renders, "Engages" on the second try correctly reaches Vitals (same as the first "Engages" option), "Still shuts it down" a second time renders the new goodbye line then the red Not Interested terminal card from Prompt 248 (screenshot confirmed both times). Grep counts: 0 remaining of the old bare form; 2 occurrences each of the new "Do they engage this time?" fork and the new "All good, man" goodbye line — nothing missed or double-applied.
 
 ---
 

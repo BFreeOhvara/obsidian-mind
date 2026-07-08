@@ -64,6 +64,18 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-08 — CC session: Prompt 249 shipped + pushed — Opener pushback gets a second disarm attempt before Not Interested
+
+**[CC | 2026-07-08]** — Read LIVE_STATE's queue and executed the oldest unshipped item (Prompt 249; 250-255 remain queued behind it, in order) against `ohvara-dashboard`. Grepped `Still shuts it down [BAD]: ▸ Set status Not Interested.` first per the prompt's instruction — confirmed exactly 2 occurrences (direct "Yeah/speaking" → "What's this about?/pushback" path, and the mirrored "No" → "Confirms/engages" → "Yes" reconnect subtree), matching the prompt's expectation. Replaced both with a nested second-attempt fork at the correct indentation depth for each location: a low-pressure re-engage line ("are you all catching every call... or does one ever slip through?"), then either the full duplicated "Engages" qualifier subtree (verbatim copy, not a shared reference — matches this file's established pattern) routing to Vitals, or a genuine goodbye line ("All good, man — appreciate your time. Take care.") into the same `Not Interested` status/red `TerminalCard` from Prompt 248.
+
+`npx vite build` clean. Live-verified for real (logged in as `apex11`/`Test1234!`, no mocking) in Training Center → Script practice at BOTH locations: second-attempt line renders; "Engages" on the second try correctly reaches Vitals; "Still shuts it down" a second time renders the new goodbye line then the red Not Interested terminal card (screenshot-confirmed both times). Grep counts post-edit: 0 remaining of the old bare form; 2 occurrences each of the new "Do they engage this time?" fork and the new goodbye line — nothing missed or double-applied.
+
+Committed (`ea36918`) and pushed to `origin/master` per standing push authorization.
+
+**Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 249 is shipped, pushed, and live-verified (ohvara-dashboard@ea36918). Next up in the queue, in order: Prompt 250 (Opener "No" branch, 3 line changes), 251 (ScriptWalk badge overflow fix), 252 (Handoff win-win tweak + re-engagement branch), 253 (Handoff send-me-info line), 254 (Handoff H-4 placeholder scrapped, has a not-interested fork), 255 (Handoff H-5 sibling fix — ship with or after 254). Standing review principle still active: any open-ended ask assuming one type of answer needs an explicit not-interested branch — still-pending candidates: H-7's "better week" ask, H-9/H-13/H-15's pricing "Still hesitant" endings. Also still flagged, not yet actioned: a pre-existing invalid-CSS bug (color+'14' string concat onto var()) in ActionCard/Terminal/MyCalls grade badges, found during Prompt 248.`
+
+---
+
 ### 2026-07-07 (cont. 14) — Eagle: Path 18 (H-5) cleared without a fresh live walk — confirmed as the flagged sibling, queued as Prompt 255
 
 **[Eagle | 2026-07-07]** — Path 18 (H-5, "Just send me some info" → "Still wants info first") was the exact sibling occurrence flagged during Prompt 254's drafting — same placeholder mechanic, same missing not-interested fork. Brayden confirmed no fresh live walk was needed since the underlying issue and fix are identical to Path 17's; applied the same pattern (drop placeholder, ask for a callback time, fork on gives-a-time vs. not-interested), keeping this branch's own "Fair enough" opener distinct from H-4's "Yeah, 100%" since unifying the two wasn't asked for. Queued as **Prompt 255**.
