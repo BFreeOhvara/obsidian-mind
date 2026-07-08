@@ -18,6 +18,42 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
+### 🔲 Prompt 250 QUEUED 2026-07-07 (Eagle, Brayden-approved wording) — discoveryScript.js: Opener "No" branch, 3 line changes
+
+**Context:** continuing the path-by-path script review. Content-only edits to `src/lib/discoveryScript.js` Opener section — all 3 changes below are single-occurrence (this "No" branch only appears once in the file — unlike Prompts 246/247/249, don't need to hunt for a mirrored copy here, but grep to confirm before editing anyway as standard practice).
+
+**Change 1 — the "No" branch's opening line.** Find:
+```
+"Okay — were you hiring for a [job title]?"
+```
+Replace with:
+```
+"Okay — so just to be sure, you guys weren't the ones hiring for a [job title]?"
+```
+
+**Change 2 — the "actively looking" line.** Find:
+```
+"Are you actively looking to hire for that?"
+```
+Replace with:
+```
+"Are you still looking to hire for that role?"
+```
+
+**Change 3 — the reconnect line, THIS OCCURRENCE ONLY.** This exact string appears twice in the file — once as the top-level "Yeah/speaking" branch's own opening hook (leave that one completely untouched), and once here, under "No" → "Confirms/engages" → "Are you actively looking" → "Yes". Only change the second one. Find, specifically the copy nested under the "No" branch's "Yes" answer (check indentation/context to confirm you're editing the right one — it should be nested under `↳ IF Yes [GOOD]:`, not the top-level `↳ IF Yeah / speaking [GOOD]:`):
+```
+"Hey — I saw you were hiring for a [job title]. I was wondering who I should speak to about that."
+```
+Replace with (this occurrence only):
+```
+"Okay, perfect — I'm wondering who I should speak to about that."
+```
+Reasoning: by this point in the "No" branch, the setter has already asked "were you hiring for [role]?" and "are you still looking?" — repeating "I saw you were hiring for [role], wondering who I should speak to" restates what's already been established in this same conversation. The fork that follows (`BRANCH — How do they respond?` with That's me/Transferring/Not here/What's this about options, and everything nested under them) is completely unchanged — only this one lead-in line changes.
+
+**Verification:** `npx vite build` clean, then grep the original 3 strings to confirm change 1 and 2 are single-occurrence (0 remaining after edit) and change 3's reconnect copy is 0 remaining while the top-level "Yeah/speaking" copy is untouched (should still show 1 occurrence of the original hook line remaining — that's expected and correct, don't touch it). Live-verify in Training Center → Script practice by walking Opener → "No" → all 3 new lines render, then "That's me" still routes correctly into the existing qualifier fork.
+
+---
+
 ### 🔲 Prompt 249 QUEUED 2026-07-07 (Eagle, Brayden-approved wording) — discoveryScript.js: Opener "What's this about?/pushback" branch gets a second disarm attempt before Not Interested
 
 **Context:** continuing the path-by-path script review. This is a **structural change**, not a pure string swap like 245-247 — adds a new nested fork, doesn't just replace existing text. Content-only in the sense that no marker/token conventions change and no other section is touched, but it does add new lines to the tree.
