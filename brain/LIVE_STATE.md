@@ -18,6 +18,24 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
+### 🔲 Prompt 253 QUEUED 2026-07-07 (Eagle, Brayden-approved wording) — discoveryScript.js: Handoff "Just send me some info" line rewritten
+
+**Context:** continuing the path-by-path script review. Content-only edit to `src/lib/discoveryScript.js` Handoff section — single occurrence (Handoff isn't mirrored/duplicated), grep to confirm before editing.
+
+**Change — the "Just send me some info" branch's response line.** Find:
+```
+"I could send that over, but honestly — when was the last time an email did more for you than an actual conversation? Let's hop on a quick call instead, [time] tomorrow — I'll show you, there's nothing to buy."
+```
+Replace with:
+```
+"I could send that over, but honestly — when's the last time an email did more for you than an actual conversation? Let's hop on a quick call instead — our team will walk you through exactly how this can benefit your situation. All you gotta do is listen. How's that sound?"
+```
+Reasoning: kept the opening disarm hook (email vs. conversation) since Brayden liked it as-is. Replaced "I'll show you, there's nothing to buy" with "our team" framing (matches the "our team"/not-the-setter language already used in the main Handoff pitch) and a benefit-to-your-situation angle instead of a generic pitch. Dropped the hardcoded "[time] tomorrow" — it proposed a specific time here AND again right after ("does [Tuesday morning] or [Wednesday afternoon] work"), which asked twice in a row; removing it from this line avoids that. Ends on "How's that sound?" as a soft close, consistent with the other lines already updated this review.
+
+**Verification:** `npx vite build` clean, then live-check in Training Center → Script practice: Handoff → "Just send me some info" → confirm the new line renders, then "Okay, fair" still correctly asks for a time next.
+
+---
+
 ### 🔲 Prompt 252 QUEUED 2026-07-07 (Eagle, Brayden-approved wording) — discoveryScript.js: Handoff pitch win-win tweak + "Still hesitant" gets a re-engagement branch instead of a silent Follow-Up
 
 **Context:** continuing the path-by-path script review. This branch is a single occurrence — Handoff is its own top-level section with one entry point (not mirrored/duplicated the way Opener's branches were), so no mirror-hunting needed here, but grep to confirm before editing as standard practice.
