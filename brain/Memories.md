@@ -64,6 +64,16 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-07 (cont. 13) — Eagle: caught a real gap in Prompt 254, fixed before ship, established a standing review principle for the rest of Handoff
+
+**[Eagle | 2026-07-07]** — Brayden caught that Prompt 254's new "is there a better time to reach out and check back in?" line assumed a callback time always comes back — no branch for "actually, we're just not interested," even though that's a completely realistic response to an open question. Fixed in place (254 hadn't shipped yet): added a `BRANCH — Do they give a time, or say they're not interested?` fork, splitting into Follow-Up (log the window) vs. Not Interested (with a closing line), matching the same "timing thing vs. not a good fit" pattern already built into Prompt 252.
+
+Brayden explicitly generalized this: any open-ended ask in the script that implicitly assumes one type of answer needs an explicit not-interested branch alongside it, and wants this applied automatically for the rest of the review, not re-caught path by path. Scanned the remaining unreviewed Handoff content against this and flagged 3 likely candidates in Prompt 254's own reasoning note for future reference: H-5's sibling placeholder line, H-7's "what's a better week for you?" ask, and H-9/H-13/H-15's pricing-branch "Still hesitant" endings — all currently route straight to Follow-Up with no escape hatch, unconfirmed until each is actually walked. Opener and Pain don't have this issue (every fork there already had an explicit [BAD] option from the start) — this is specific to Handoff's objection branches.
+
+**Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompts 249-254 all queued, not yet shipped by CC. Discovery script path-by-path review: 17 of 28 paths cleared. 11 remain, all in Handoff (H-5 through H-15). Standing rule for the rest of this review: any open-ended ask that assumes one type of answer (a time, a day, an email) needs an explicit not-interested branch added alongside it — apply proactively, flagged candidates already noted in Prompt 254: H-5's placeholder line, H-7's "better week" ask, H-9/H-13/H-15's pricing "Still hesitant" endings. Also still flagged, not yet actioned: a pre-existing invalid-CSS bug (color+'14' string concat onto var()) in ActionCard/Terminal/MyCalls grade badges, found during Prompt 248.`
+
+---
+
 ### 2026-07-07 (cont. 12) — Eagle: Path 17 (H-4) reviewed — placeholder mechanic scrapped entirely, replaced with a callback-time ask, queued as Prompt 254; also revised H-3's line (Prompt 253) before it shipped
 
 **[Eagle | 2026-07-07]** — Path 17 (H-4, "Just send me some info" → "Okay, fair" → "Still hesitant") walked. First draft just softened the placeholder-calendar-hold line's wording; Brayden clarified he didn't want the placeholder idea AT ALL, not just better wording for it. Landed on scrapping it for a direct "is there a better time to reach out and check back in?" ask, logging whatever window they give — same pattern H-10 already uses. Queued as **Prompt 254**.
