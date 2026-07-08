@@ -68,21 +68,11 @@ Reasoning: Brayden rejected the placeholder-calendar-hold idea entirely (not jus
 
 ---
 
-### 🔲 Prompt 253 QUEUED 2026-07-07 (Eagle, Brayden-approved wording) — discoveryScript.js: Handoff "Just send me some info" line rewritten
+### ✅ Prompt 253 SHIPPED 2026-07-08 (`09c9453`, pushed) — Handoff "Just send me some info" line rewritten
 
-**Context:** continuing the path-by-path script review. Content-only edit to `src/lib/discoveryScript.js` Handoff section — single occurrence (Handoff isn't mirrored/duplicated), grep to confirm before editing.
+Grep confirmed single occurrence before editing. Swapped the "I could send that over" opener (implied a real info sheet exists — it doesn't) for "Yeah, 100%" acknowledging the ask, then the same email-vs-conversation disarm with "our team" framing matching the main Handoff pitch, dropped the hardcoded "[time] tomorrow", ends on "How's that sound?"
 
-**Change — the "Just send me some info" branch's response line.** Find:
-```
-"I could send that over, but honestly — when was the last time an email did more for you than an actual conversation? Let's hop on a quick call instead, [time] tomorrow — I'll show you, there's nothing to buy."
-```
-Replace with:
-```
-"Yeah, 100% — but honestly, when's the last time an email did more for you than an actual conversation? Let's hop on a quick call instead — our team will walk you through exactly how this can benefit your situation. All you gotta do is listen. How's that sound?"
-```
-Reasoning: **revised once more before shipping** — Brayden caught that "I could send that over" implies there's actually something to send, which isn't true (confirmed while drafting Prompt 254's H-4 fix — there's no info sheet, "our team" explains it live on the call instead). Replaced the opening with "Yeah, 100%" — acknowledge what they asked for, then pivot straight into the email-vs-conversation disarm line, no false promise of a follow-up email. Rest of the line unchanged from the first draft: "our team" framing (matches the main Handoff pitch's "our team"/not-the-setter language), benefit-to-your-situation angle, dropped the hardcoded "[time] tomorrow" (redundant with the immediate follow-up time-ask), ends on "How's that sound?"
-
-**Verification:** `npx vite build` clean, then live-check in Training Center → Script practice: Handoff → "Just send me some info" → confirm the new line renders, then "Okay, fair" still correctly asks for a time next.
+`npx vite build` clean. Live-verified in Training Center → Script practice: Handoff → "Just send me some info" → new line renders correctly → "Okay, fair" still correctly routes to the time-ask ("Does Tuesday morning or Wednesday afternoon work better for you?").
 
 ---
 
