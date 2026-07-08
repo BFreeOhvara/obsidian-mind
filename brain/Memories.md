@@ -64,6 +64,18 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-08 (cont. 7) — Eagle: CC's 7-prompt batch (249-255) confirmed clean, Path 19 (H-6) surfaced a real product gap — day-offering tokens are static, queued as Prompt 256
+
+**[Eagle | 2026-07-08]** — Pulled fresh state after "cc finished" — all 7 queued prompts (249-255) shipped and pushed with no surprises this time (unlike the 244-248 batch, no occurrence-count mismatches). Working tree matched HEAD exactly, no truncation-bug recurrence on this check.
+
+Path 19 (H-6, "I don't have time this week") walked — no content change on the objection line itself, but Brayden asked a sharp technical question about the `[Tuesday next week]`/`[Wednesday next week]` tokens: do they compute based on the actual current date, or just render as literal placeholder text? Answer, confirmed from the script's own header comment: these are explicitly documented as "in-call tokens" that "stay literal as rep guidance during the call," unlike the dynamic tokens (`[Business Name]`, `[city], [state]`, etc.) that `fillTokens()` already fills from real lead data. Same is true of `[Tuesday morning]`/`[Wednesday afternoon]` used elsewhere in Handoff.
+
+Brayden wants this fixed — reps shouldn't have to mentally compute what day "next Tuesday" actually is on a live call. Queued as **Prompt 256**, investigate-then-build since there's real date-math ambiguity to resolve first (e.g., what "Tuesday morning" should resolve to if today already is Tuesday) — asked CC to propose the exact rule and self-confirm if it's straightforward, same pattern as Prompt 248, rather than guessing at behavior from the vault. Also asked CC to timezone-correct this the same way Prompt 244 already fixed "today" elsewhere (rep's own `profiles.timezone`, not server UTC) rather than introducing a second inconsistent date source.
+
+**Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 256 queued (investigate-then-build — computes real dates for [Tuesday morning]/[Wednesday afternoon]/[Tuesday next week]/[Wednesday next week] instead of literal bracket text). Not yet shipped by CC. Discovery script path-by-path review: 19 of 28 paths cleared (H-6 done). 9 remain, all in Handoff (H-7 through H-15). Standing rule still active from Prompt 254: any open-ended ask assuming one type of answer needs a not-interested branch — flagged candidates still pending: H-7's "better week" ask, H-9/H-13/H-15's pricing "Still hesitant" endings. Also still flagged, not yet actioned: a pre-existing invalid-CSS bug (color+'14' string concat onto var()) in ActionCard/Terminal/MyCalls grade badges, found during Prompt 248.`
+
+---
+
 ### 2026-07-08 (cont. 6) — CC session: Prompt 255 shipped + pushed — Handoff H-5 sibling fix, discoveryScript.js review queue now empty
 
 **[CC | 2026-07-08]** — Continued the queue and executed Prompt 255, the last item — confirmed against `ohvara-dashboard`. Per the prompt's note, this was already the exact sibling leaf flagged by Prompt 254's "15-minute placeholder" grep (nested under "Still wants info first"), so no fresh grep-from-scratch was needed, just a confirm-then-edit. Applied the same placeholder-scrap + not-interested-fork pattern as H-4, keeping this branch's own "Fair enough" opener distinct from H-4's "Yeah, 100%" since Brayden only asked to fix the shared underlying issues, not unify the openers.
