@@ -140,39 +140,11 @@ Reasoning: matches the same "give it one more shot" pattern from Prompt 249, but
 
 ---
 
-### 🔲 Prompt 250 QUEUED 2026-07-07 (Eagle, Brayden-approved wording) — discoveryScript.js: Opener "No" branch, 3 line changes
+### ✅ Prompt 250 SHIPPED 2026-07-08 (`3835a60`, pushed) — Opener "No" branch, 3 line changes
 
-**Context:** continuing the path-by-path script review. Content-only edits to `src/lib/discoveryScript.js` Opener section — all 3 changes below are single-occurrence (this "No" branch only appears once in the file — unlike Prompts 246/247/249, don't need to hunt for a mirrored copy here, but grep to confirm before editing anyway as standard practice).
+All 3 single-occurrence edits applied to `src/lib/discoveryScript.js`'s "No" branch: the re-confirm opener, the "actively looking" follow-up, and the reconnect hook nested under this branch's own "Yes" answer only (the top-level "Yeah/speaking" hook — a byte-identical string elsewhere in the file — confirmed untouched, still 1 occurrence remaining post-edit). Grep confirmed all 3 target strings were single-occurrence before editing, and 0 remain of the old forms after (except the intentionally-preserved top-level hook).
 
-**Change 1 — the "No" branch's opening line.** Find:
-```
-"Okay — were you hiring for a [job title]?"
-```
-Replace with:
-```
-"Okay — so just to be sure, you guys weren't the ones hiring for a [job title]?"
-```
-
-**Change 2 — the "actively looking" line.** Find:
-```
-"Are you actively looking to hire for that?"
-```
-Replace with:
-```
-"Are you still looking to hire for that role?"
-```
-
-**Change 3 — the reconnect line, THIS OCCURRENCE ONLY.** This exact string appears twice in the file — once as the top-level "Yeah/speaking" branch's own opening hook (leave that one completely untouched), and once here, under "No" → "Confirms/engages" → "Are you actively looking" → "Yes". Only change the second one. Find, specifically the copy nested under the "No" branch's "Yes" answer (check indentation/context to confirm you're editing the right one — it should be nested under `↳ IF Yes [GOOD]:`, not the top-level `↳ IF Yeah / speaking [GOOD]:`):
-```
-"Hey — I saw you were hiring for a [job title]. I was wondering who I should speak to about that."
-```
-Replace with (this occurrence only):
-```
-"Okay, perfect — I'm wondering who I should speak to about that."
-```
-Reasoning: by this point in the "No" branch, the setter has already asked "were you hiring for [role]?" and "are you still looking?" — repeating "I saw you were hiring for [role], wondering who I should speak to" restates what's already been established in this same conversation. The fork that follows (`BRANCH — How do they respond?` with That's me/Transferring/Not here/What's this about options, and everything nested under them) is completely unchanged — only this one lead-in line changes.
-
-**Verification:** `npx vite build` clean, then grep the original 3 strings to confirm change 1 and 2 are single-occurrence (0 remaining after edit) and change 3's reconnect copy is 0 remaining while the top-level "Yeah/speaking" copy is untouched (should still show 1 occurrence of the original hook line remaining — that's expected and correct, don't touch it). Live-verify in Training Center → Script practice by walking Opener → "No" → all 3 new lines render, then "That's me" still routes correctly into the existing qualifier fork.
+`npx vite build` clean. Live-verified in Training Center → Script practice: walked Opener → "No" → all 3 new lines rendered in order → "Confirms/engages" → "Yes" → "That's me" still routes correctly into the unchanged qualifier fork ("Quick question — are missed calls part of the reason...").
 
 ---
 
