@@ -18,6 +18,28 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
+### 🔲 Prompt 254 QUEUED 2026-07-07 (Eagle, Brayden-approved wording) — discoveryScript.js: Handoff H-4 ending replaced — drop the placeholder mechanic, ask for a callback time instead
+
+**Context:** continuing the path-by-path script review. Content-only edit to `src/lib/discoveryScript.js` Handoff section — single occurrence, grep to confirm before editing. **Depends on Prompt 253 shipping first or in the same pass** — this edit is nested inside the same "Just send me some info" branch whose opening line 253 changes; ship 253 before 254, or in the same session, so the surrounding context matches.
+
+**Change — the "Okay, fair" → "Still hesitant" leaf's line and ending.** Find:
+```
+↳ IF Still hesitant [HESITANT]: "No worries — I'll send it over today. And I'm going to drop a 15-minute placeholder on your calendar for [day]. If you read it and it's not worth your time, just decline, no hard feelings."
+   ▸ Set status Follow-Up (send info + placeholder).
+```
+Replace with:
+```
+↳ IF Still hesitant [HESITANT]: "Honestly, I don't really have anything solid to send you — our team walks you through it more like a live presentation, tailored to your situation. How about this — is there a better time to reach out and check back in, see what's going on from there?"
+   ▸ Set status Follow-Up (log the callback window they gave).
+```
+Reasoning: Brayden rejected the placeholder-calendar-hold idea entirely (not just the wording) — there's no info sheet to send (established while drafting this same fix) and no auto-booked slot either. Replaced with a direct ask for a better time to circle back, same pattern H-10 ("who is this→that's owner→gives a window") already uses — Follow-Up now always means there's an actual callback window logged, not a placeholder nobody asked for.
+
+**⚠️ Check for a sibling occurrence before editing.** H-5 ("Just send me some info" → "Still wants info first," a sibling branch off the same parent, skips the "Okay, fair" step) has its OWN separate line with similar "send it over today... placeholder" wording — grep for "15-minute placeholder" and report back how many total matches exist before touching anything. If H-5's line also uses the placeholder mechanic, do NOT change it as part of this prompt — Eagle hasn't reviewed H-5 with Brayden yet, only H-4. Only edit the exact leaf shown above (nested under "Okay, fair" → "Still hesitant"), report the other occurrence(s) found so Eagle can queue them separately once reviewed.
+
+**Verification:** `npx vite build` clean, then live-check in Training Center → Script practice: Handoff → "Just send me some info" → "Okay, fair" → "Still hesitant" → confirm the new line renders and routes to the amber Follow-Up card (no placeholder language anywhere in this specific path).
+
+---
+
 ### 🔲 Prompt 253 QUEUED 2026-07-07 (Eagle, Brayden-approved wording) — discoveryScript.js: Handoff "Just send me some info" line rewritten
 
 **Context:** continuing the path-by-path script review. Content-only edit to `src/lib/discoveryScript.js` Handoff section — single occurrence (Handoff isn't mirrored/duplicated), grep to confirm before editing.
@@ -28,9 +50,9 @@ tags:
 ```
 Replace with:
 ```
-"I could send that over, but honestly — when's the last time an email did more for you than an actual conversation? Let's hop on a quick call instead — our team will walk you through exactly how this can benefit your situation. All you gotta do is listen. How's that sound?"
+"Yeah, 100% — but honestly, when's the last time an email did more for you than an actual conversation? Let's hop on a quick call instead — our team will walk you through exactly how this can benefit your situation. All you gotta do is listen. How's that sound?"
 ```
-Reasoning: kept the opening disarm hook (email vs. conversation) since Brayden liked it as-is. Replaced "I'll show you, there's nothing to buy" with "our team" framing (matches the "our team"/not-the-setter language already used in the main Handoff pitch) and a benefit-to-your-situation angle instead of a generic pitch. Dropped the hardcoded "[time] tomorrow" — it proposed a specific time here AND again right after ("does [Tuesday morning] or [Wednesday afternoon] work"), which asked twice in a row; removing it from this line avoids that. Ends on "How's that sound?" as a soft close, consistent with the other lines already updated this review.
+Reasoning: **revised once more before shipping** — Brayden caught that "I could send that over" implies there's actually something to send, which isn't true (confirmed while drafting Prompt 254's H-4 fix — there's no info sheet, "our team" explains it live on the call instead). Replaced the opening with "Yeah, 100%" — acknowledge what they asked for, then pivot straight into the email-vs-conversation disarm line, no false promise of a follow-up email. Rest of the line unchanged from the first draft: "our team" framing (matches the main Handoff pitch's "our team"/not-the-setter language), benefit-to-your-situation angle, dropped the hardcoded "[time] tomorrow" (redundant with the immediate follow-up time-ask), ends on "How's that sound?"
 
 **Verification:** `npx vite build` clean, then live-check in Training Center → Script practice: Handoff → "Just send me some info" → confirm the new line renders, then "Okay, fair" still correctly asks for a time next.
 

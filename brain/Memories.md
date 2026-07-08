@@ -64,6 +64,20 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-07 (cont. 12) — Eagle: Path 17 (H-4) reviewed — placeholder mechanic scrapped entirely, replaced with a callback-time ask, queued as Prompt 254; also revised H-3's line (Prompt 253) before it shipped
+
+**[Eagle | 2026-07-07]** — Path 17 (H-4, "Just send me some info" → "Okay, fair" → "Still hesitant") walked. First draft just softened the placeholder-calendar-hold line's wording; Brayden clarified he didn't want the placeholder idea AT ALL, not just better wording for it. Landed on scrapping it for a direct "is there a better time to reach out and check back in?" ask, logging whatever window they give — same pattern H-10 already uses. Queued as **Prompt 254**.
+
+While drafting 254, caught that H-3's already-queued line (Prompt 253, not yet shipped) opens with "I could send that over" — which is now inconsistent with the "there's nothing to send, our team explains it live" framing established by 254. Brayden agreed and gave the fix live: replace the opening with "Yeah, 100%" (acknowledge what they asked, then pivot into the email-vs-conversation disarm line) instead of implying a follow-up email exists. Corrected Prompt 253 in place rather than stacking a redundant third prompt on top — it hadn't shipped yet, so no reason to layer a fix over a fix.
+
+**Note on the fix method:** editing LIVE_STATE.md via the Edit tool (rather than the established git-show-HEAD python splice) hit the same stale-working-tree-truncation bug this session has seen repeatedly — the file's tail (Problems & Resolutions items 9-15, Related section) got silently cut after the edits. Caught via `git diff --stat` showing far more deletions than the edit should have produced, before committing. Reconstructed both changes from `HEAD` via the safe splice pattern instead of trusting the Edit tool's post-edit working-tree state. **Lesson reinforced: always verify with `git diff` before committing, regardless of which tool made the edit** — the truncation bug isn't specific to the python splice workflow, it can hit any tool that touches these two files.
+
+Also flagged forward: H-5 (a sibling of H-4, not yet reviewed with Brayden) may have its own copy of the placeholder-calendar-hold line — Prompt 254 explicitly tells CC to check and report back rather than assuming, since Eagle hasn't reviewed that branch yet.
+
+**Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompts 249-254 all queued, not yet shipped by CC (254 depends on 253 shipping first or in the same pass — both touch the same "Just send me some info" branch). Discovery script path-by-path review: 17 of 28 paths cleared. 11 remain, all in Handoff (H-5 through H-15) — watch for H-5 possibly sharing H-4's old placeholder line, per 254's flag. Also still flagged, not yet actioned: a pre-existing invalid-CSS bug (color+'14' string concat onto var()) in ActionCard/Terminal/MyCalls grade badges, found during Prompt 248.`
+
+---
+
 ### 2026-07-07 (cont. 11) — Eagle: Path 16 (H-3) reviewed — "Just send me some info" line rewritten, queued as Prompt 253
 
 **[Eagle | 2026-07-07]** — Path 16 (H-3, Handoff's "Just send me some info" branch) walked. Brayden liked the opening disarm hook (email vs. actual conversation) but wanted the close rewritten — iterated through a couple drafts: first pass framed it as the prospect explaining their own situation, which he rejected; landed on "our team" doing the explaining instead (matches the main Handoff pitch's established "our team"/not-the-setter framing), ending on "All you gotta do is listen. How's that sound?" — trimmed an "and if it makes sense, great" tail he didn't want on the final pass. Also dropped the old line's hardcoded "[time] tomorrow" since it proposed a specific time here and then asked again right after via the "does [Tuesday morning] or [Wednesday afternoon]" follow-up — redundant, removed from this line only. Queued as **Prompt 253**.
