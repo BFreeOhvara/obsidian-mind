@@ -18,30 +18,13 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
-### 🔲 Prompt 255 QUEUED 2026-07-07 (Eagle, Brayden-approved wording) — discoveryScript.js: Handoff H-5 ("Still wants info first") gets the same placeholder-scrap + not-interested fork as H-4
+*(Nothing queued right now — Prompts 249–255 all shipped 2026-07-08, clearing the discoveryScript.js path-by-path review queue that had been running since Prompt 244. See [[North Star]] Current Focus for what's next, or [[Memories]] for the full shipped trail below.)*
 
-**Context:** continuing the path-by-path script review. Sibling of Prompt 254 — same underlying issues (placeholder mechanic Brayden rejected, no not-interested escape on an open-ended ask), same fix pattern, different branch. Single occurrence, content-only edit to `src/lib/discoveryScript.js` Handoff section. **Ship after or alongside Prompt 254** — same parent branch, want the surrounding context consistent.
+### ✅ Prompt 255 SHIPPED 2026-07-08 (`41c62f7`, pushed) — Handoff H-5 sibling fix, same placeholder-scrap + not-interested fork as H-4
 
-**⚠️ This may already be the sibling occurrence flagged in Prompt 254's grep check.** If Prompt 254 was executed first and its grep for "15-minute placeholder" already surfaced this exact line, don't re-grep from scratch — just confirm it's this leaf (nested under `↳ IF Still wants info first [HESITANT]:`) before editing.
+Confirmed this was the exact sibling leaf flagged in Prompt 254's grep check (nested under "Still wants info first"), no re-grep needed. Applied the analogous fix: dropped the placeholder mechanic, replaced with a direct callback-time ask forked on Gives-a-time vs. Not-interested. Kept this branch's own "Fair enough" opener distinct from H-4's "Yeah, 100%" per the prompt's instruction.
 
-**Change — the "Still wants info first" branch's line and ending.** Find:
-```
-↳ IF Still wants info first [HESITANT]: "Fair enough — I'll send it over today. And I'm going to drop a 15-minute placeholder on your calendar for [day]. If you read it and it's not worth your time, just decline, no hard feelings. If it's interesting, we're already set."
-   ▸ Set status Follow-Up (send info + placeholder).
-```
-Replace with:
-```
-↳ IF Still wants info first [HESITANT]: "Fair enough — honestly, I don't really have anything solid to send you. Our team walks you through it more like a live presentation, tailored to your situation. Is there a better time to reach out and check back in, see what's going on from there?"
-   BRANCH — Do they give a time, or say they're not interested?
-   ↳ IF Gives a time [HESITANT]: ▸ Set status Follow-Up (log the callback window they gave).
-   ↳ IF Not interested [BAD]: "All good, man — appreciate your time. Take care."
-      ▸ Set status Not Interested.
-```
-Reasoning: same as Prompt 254 — no info sheet actually exists to send, and an open "is there a better time" question needs an explicit not-interested branch, not an assumed callback window. Kept this branch's own "Fair enough" opener (distinct from H-4's "Yeah, 100%") since Brayden hasn't asked to unify the two openers, just fix the shared underlying issues.
-
-**Verification:** `npx vite build` clean, then live-check in Training Center → Script practice: Handoff → "Just send me some info" → "Still wants info first" → confirm the new line renders and both fork outcomes (amber Follow-Up, red Not Interested) work.
-
----
+`npx vite build` clean. Live-verified in Training Center → Script practice: Handoff → "Just send me some info" → "Still wants info first" → new line rendered → "Gives a time" reached the amber Follow-Up card (`rgb(245,158,11)`) → "Not interested" reached the red Not Interested card (`rgb(239,68,68)`). This was the last item in the queue — LIVE_STATE's "Next Up for CC" is now empty.
 
 ### ✅ Prompt 254 SHIPPED 2026-07-08 (`b49db03`, pushed) — Handoff H-4 ending replaced — placeholder mechanic dropped, callback-time fork added
 
