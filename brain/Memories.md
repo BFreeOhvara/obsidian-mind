@@ -64,6 +64,22 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-07 (cont. 10) — Eagle: Paths 10-14 cleared (Pain fully reviewed), Path 15 (H-2) surfaced a real design gap — Handoff's "Still hesitant" gets a re-engagement branch + smarter Follow-Up/Not-Interested split, queued as Prompt 252
+
+**[Eagle | 2026-07-07]** — Paths 10-14 (P-2 through P-6, all of Pain Amplification) walked, no changes on any of them — confirmed 28 total paths in this checklist, 14 cleared at this point.
+
+Path 15 (H-2, Handoff's "Good/shows interest → Still hesitant") surfaced the same pattern as the Opener fix (Prompt 249): one soft "no" was ending the call immediately with zero re-engagement attempt, straight to a bare `Set status Follow-Up.` with no logged reason. Brayden pushed further than the Opener fix though — he questioned whether "Follow-Up" was even the right status for unspecified hesitation, since he thinks of Follow-Up as implying a real date/reason to circle back (a specific callback window, a decision-maker being out of town, etc.), not just vague "still thinking about it."
+
+Resolution, after a few rounds of drafting: added a full re-engagement branch under "Still hesitant" — (1) a reassurance line referencing the pitch's own "just 15 minutes" framing (deliberately NOT re-presenting the two time slots in the same breath, per Brayden's explicit correction on my first draft), (2) if they engage, re-ask for a time ("Okay, perfect — does [Tuesday morning] or [Wednesday afternoon]..."), (3) if hesitant again (either right after the reassurance, or after the second time-ask fails) — a NEW clarifying fork: "is it more of a timing thing, or is this just not a good fit right now?" splitting into a real Follow-Up (only when there's an actual callback window to log) vs. an honest Not Interested (when it's genuine disinterest, not parked as a fake follow-up).
+
+Also picked up a smaller win-win reframe for the Handoff pitch's closing line (already shipped once by Prompt 245 — this edits the post-245 text, not the original): *"...you're not wasting any more time. Sounds like a win-win to me — what do you think?"*
+
+Queued as **Prompt 252** — single occurrence (Handoff isn't mirrored/duplicated the way Opener's branches were), but structurally the biggest single prompt in this review series so far (adds a 2-level-deep new subtree, duplicated verbatim across 2 exit points per the file's established convention). Caught and fixed a copy-paste error in my own first draft of the prompt before committing — a verification note referenced "H-2's" bare Follow-Up line as something to protect from the edit, when H-2 IS the line being changed.
+
+**Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompts 249, 250, 251, 252 all queued, not yet shipped by CC. Discovery script path-by-path review: Opener + Pain fully cleared (Paths 1-14), Path 15 (H-2) done, 13 paths remain — all in Handoff (H-3 through H-15). Handoff has no shortcuts (every objection line is distinct wording) but does share Path 1's Close ending once a time gets picked. Also still flagged, not yet actioned: a pre-existing invalid-CSS bug (color+'14' string concat onto var()) in ActionCard/Terminal/MyCalls grade badges, found during Prompt 248.`
+
+---
+
 ### 2026-07-07 (cont. 9) — Eagle: quick UI fix queued (Prompt 251) — section badge text overflow
 
 **[Eagle | 2026-07-07]** — Brayden flagged a small UI polish issue between path reviews: the colored icon badge next to each section title in ScriptWalk (Opener/Vitals/Pain/Handoff/Close) has a text label inside it that doesn't fit the box, on every section, not just one. Wants the colored box kept, just the text removed. Queued as **Prompt 251** — quick, low-risk, no investigation needed.

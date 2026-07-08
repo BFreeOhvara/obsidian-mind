@@ -18,6 +18,50 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
+### 🔲 Prompt 252 QUEUED 2026-07-07 (Eagle, Brayden-approved wording) — discoveryScript.js: Handoff pitch win-win tweak + "Still hesitant" gets a re-engagement branch instead of a silent Follow-Up
+
+**Context:** continuing the path-by-path script review. This branch is a single occurrence — Handoff is its own top-level section with one entry point (not mirrored/duplicated the way Opener's branches were), so no mirror-hunting needed here, but grep to confirm before editing as standard practice.
+
+**Change A — Handoff pitch, tail only.** This line was already updated once by Prompt 245 — edit the CURRENT (post-245) version, not the original. Find:
+```
+"Look, I don't want to waste your time — like I said, that's money slipping through the cracks. So here's what I'll do for you: we'll build you a system made exactly for this — it catches the calls you'd otherwise miss, answers questions 24/7, and books straight to your calendar. All you have to do is show up. Take 15 minutes — worst case, you see exactly what it looks like. Best case, we get that money hole plugged and you're not wasting any more time. How's that sound?"
+```
+Replace with (only the last sentence changes):
+```
+"Look, I don't want to waste your time — like I said, that's money slipping through the cracks. So here's what I'll do for you: we'll build you a system made exactly for this — it catches the calls you'd otherwise miss, answers questions 24/7, and books straight to your calendar. All you have to do is show up. Take 15 minutes — worst case, you see exactly what it looks like. Best case, we get that money hole plugged and you're not wasting any more time. Sounds like a win-win to me — what do you think?"
+```
+
+**Change B/C/D — the "Good / shows interest" fork's "Still hesitant" leaf gets a full re-engagement branch instead of silently marking Follow-Up.** Find this exact leaf (nested under `↳ IF Good / shows interest [GOOD]:` → `BRANCH — Do they pick a time?`):
+```
+↳ IF Still hesitant [HESITANT]: ▸ Set status Follow-Up.
+```
+Replace with this nested structure (match indentation to context — this replaces one line with a much deeper subtree):
+```
+↳ IF Still hesitant [HESITANT]: "No worries — like I was saying, it's just 15 minutes. They'll show you exactly how the system works and how it'd actually help your situation. Just hear them out — how's that sound?"
+   BRANCH — Do they engage this time?
+   ↳ IF Engages [GOOD]: "Okay, perfect — does [Tuesday morning] or [Wednesday afternoon] work better for you?"
+      BRANCH — Do they pick a time?
+      ↳ IF Picks a time [GOOD]: → Go to Close
+      ↳ IF Still hesitant [HESITANT]: "No worries — is it more of a timing thing, or is this just not a good fit right now?"
+         BRANCH — Which is it?
+         ↳ IF Timing thing [HESITANT]: "Got it — what's a better time to check back in?"
+            ▸ Set status Follow-Up (log the callback window they gave).
+         ↳ IF Not a good fit [BAD]: "All good, man — appreciate your time. Take care."
+            ▸ Set status Not Interested.
+   ↳ IF Still hesitant [HESITANT]: "No worries — is it more of a timing thing, or is this just not a good fit right now?"
+      BRANCH — Which is it?
+      ↳ IF Timing thing [HESITANT]: "Got it — what's a better time to check back in?"
+         ▸ Set status Follow-Up (log the callback window they gave).
+      ↳ IF Not a good fit [BAD]: "All good, man — appreciate your time. Take care."
+         ▸ Set status Not Interested.
+```
+
+Reasoning: matches the same "give it one more shot" pattern from Prompt 249, but adds a second refinement Brayden specifically wanted here — the old behavior silently marked Follow-Up on any hesitation with no date/reason attached, which gives whoever picks up the follow-up nothing to act on. The new "timing thing vs. not a good fit" fork only uses Follow-Up when there's an actual callback window to log (matching the pattern H-10 already uses), and marks genuine disinterest as Not Interested instead of parking it as a fake follow-up. Both exit points ("Still hesitant" on the reassurance itself, and "Still hesitant" again after re-asking for a time) duplicate the same timing/not-a-good-fit sub-fork verbatim — this file's established pattern, not a shortcut worth taking.
+
+**Verification:** `npx vite build` clean, then live-verify all resulting sub-paths in Training Center → Script practice: (1) the pitch's new "win-win" tail renders, (2) Handoff → Good/shows interest → Still hesitant → the new reassurance line renders → Engages → "Okay, perfect" + time-ask → picks a time → Close, (3) same path but still hesitant on the time-ask → the timing/not-a-good-fit fork renders → both its own two endings (amber Follow-Up card, red Not Interested card), (4) Still hesitant on the very first reassurance (skip Engages) → same timing/not-a-good-fit fork → both endings again. Report exact grep count for the old bare `▸ Set status Follow-Up.` line (no parenthetical detail) — this is the only occurrence of that exact bare form in Handoff (every other Follow-Up ending already has a parenthetical, e.g. "(log the week they gave)"), so it should be 0 remaining after the edit. If grep finds more than one match before editing, stop and report back rather than guessing which one is the target.
+
+---
+
 ### 🔲 Prompt 251 QUEUED 2026-07-07 (Eagle, Brayden-approved) — ScriptWalk section badge: remove overflowing text, keep the colored box
 
 **Context:** Training Center → Script practice, live screenshot. Each section header (Open the Call, Vitals, Pain Amplification, Handoff & Book, Lock the Time) has a small colored icon/badge to the left of the title (colored per `section.color`/`dim`/`border` in `discoveryScript.js` — e.g. Opener/Vitals/Close use `--accent`, Pain uses `--warning`, Handoff uses `--success`). That badge currently has a short text label inside it (looks like it's rendering `section.short` — "Opener", "Vitals", "Pain", etc.) that doesn't fit the box — text overflows/looks awkward on every section, not just one.
@@ -2748,6 +2792,4 @@ Non-CC sessions (Manager chats, no filesystem) re-ground from the most recent pa
 ## Related
 
 - [[Memories]] — append-only historical log (the source this file distills)
-- [[North Star]] — who we are, packages, pricing, goals, hard rules
-- [[session-flow]] — reload/handoff chain, context alarm, artifact + auto-log rules
-- [[ohvara-dashboard]] — dashboard architecture brain doc
+- [[North Star]] — who we are, packages, pricing, 
