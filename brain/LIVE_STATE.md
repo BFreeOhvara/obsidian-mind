@@ -18,6 +18,34 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
+### 🔲 Prompt 249 QUEUED 2026-07-07 (Eagle, Brayden-approved wording) — discoveryScript.js: Opener "What's this about?/pushback" branch gets a second disarm attempt before Not Interested
+
+**Context:** continuing the path-by-path script review. This is a **structural change**, not a pure string swap like 245-247 — adds a new nested fork, doesn't just replace existing text. Content-only in the sense that no marker/token conventions change and no other section is touched, but it does add new lines to the tree.
+
+**Background:** the Opener section's own `tips` field already says *"Two disarm attempts max, then let them go"* — but the actual branching under "What's this about? / pushback" → "Still shuts it down" only ever gave ONE attempt before going straight to Not Interested with no line at all. This closes that gap between the documented intent and the real branch logic — it's not a new invention, the tips field already assumed this existed.
+
+**⚠️ This branch appears in 2 places in the file, same pattern as Prompts 246/247 — apply this change in BOTH:** once under the direct `"Yeah/speaking"` → `"What's this about? / pushback"` path, and again under the `"No"` branch's reconnect subtree (`"No"` → `"Confirms/engages"` → `"Yes"` → mirrored `"What's this about? / pushback"`). Grep for `Still shuts it down` first to confirm the exact count and locations before editing — don't assume 2 without checking, per the lesson from 246/247.
+
+**Change — find this exact terminal line** (in both of its 2 locations):
+```
+↳ IF Still shuts it down [BAD]: ▸ Set status Not Interested.
+```
+
+**Replace with this new nested structure** (matching whatever indentation depth that occurrence sits at in its own location — the two occurrences will have different indentation since they're nested at different depths in the tree, keep each internally consistent with its own surrounding lines):
+```
+↳ IF Still shuts it down [BAD]: "Totally fair — I'll let you go. Just curious though, are you all catching every call that comes in, or does one ever slip through?"
+   BRANCH — Do they engage this time?
+   ↳ IF Engages [GOOD]: [same content as this branch's OWN first "Engages" option above it — "Quick question — are missed calls part of the reason you're posting for this role, or are you just growing?" plus its full qualifier-fork subtree (Yeah/Kind of/No-covered→gap-check→etc., all routing to Vitals or Not Interested exactly like the existing "Engages" option does). This file's established pattern is verbatim duplication, not shared references — duplicate the full subtree here too, don't try to reference the earlier one.]
+   ↳ IF Still shuts it down [BAD]: "All good, man — appreciate your time. Take care."
+      ▸ Set status Not Interested.
+```
+
+Net effect: "Still shuts it down" no longer ends the call immediately — it gets one more short, low-pressure attempt, and ONLY a second shutdown ends it (now with an actual goodbye line instead of silence).
+
+**Verification:** `npx vite build` clean. Live-verify all 4 resulting sub-paths at BOTH of the 2 locations (8 total walks, or at minimum both locations' "first shutdown → second attempt → engages" and "first shutdown → second attempt → shuts down again" paths): confirm the new second-attempt line renders, confirm "Engages" on the second try correctly reaches Vitals (same as the first "Engages" option), confirm "Still shuts it down" a second time renders the new goodbye line then the red Not Interested `TerminalCard` from Prompt 248. Report exact grep counts (before: how many `Still shuts it down [BAD]: ▸ Set status Not Interested.` lines existed; after: 0 remaining of the old form, confirm both new nested structures are present) so Eagle can verify nothing was missed or double-applied.
+
+---
+
 ### ✅ Prompt 244 SHIPPED 2026-07-07 (`793a114`, pushed) — every calendar's UTC-vs-local-day bug fixed
 
 **Root cause confirmed as suspected:** `DayFilterBar`/`useDayFilter` (Activity Feed, My Calls) and `RangeCalendar`/`useRangeCalendar` (Commissions, My Stats) all bucketed "today" — default date, rollover, future-day disabling, initial visible month — by **UTC calendar day**, a rationale Prompt 226 already moved off of when the actual `assign_daily_batches()` reset went per-rep-timezone-aware. Reproduced the exact reported symptom in isolation: `new Date(...).toISOString().slice(0,10)` (old logic) for 10:51 PM Central on Jul 6 returns `"2026-07-07"` — a day ahead — while `Intl.DateTimeFormat('en-CA', {timeZone: 'America/Chicago'})` (new logic) correctly returns `"2026-07-06"`.

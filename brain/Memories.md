@@ -64,6 +64,20 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-07 (cont. 7) — Eagle: Paths 7-8 reviewed (no changes / one gap found), new second-disarm-attempt branch queued as Prompt 249
+
+**[Eagle | 2026-07-07]** — Path 7 (O-7, "What's this about?→Engages") walked, no changes. Path 8 (O-8, "Still shuts it down") walked — live screenshot confirmed Prompt 248's merged `TerminalCard` renders correctly (red card, "Not Interested", clean single screen), but Brayden flagged the branch itself has no closing line before the silent status change — same category of gap as O-4 had before Prompt 246.
+
+Bigger than a line swap this time: Brayden wants a second attempt before giving up entirely — "if they shut that one down... we give it one more shot after that one." Checked the Opener section's own `tips` field for context: it already says *"Two disarm attempts max, then let them go"* — but the real branch logic only ever implemented one attempt. This confirms the ask closes a real gap between documented intent and actual behavior, not a net-new invention.
+
+Iterated on wording: second-attempt line options offered, Brayden picked *"Totally fair — I'll let you go. Just curious though, are you all catching every call that comes in, or does one ever slip through?"* Closing line (for if the second attempt also fails) started from his liked "All good — appreciate your time" and expanded per his "give it a little more" note to: *"All good, man — appreciate your time. Take care."*
+
+Queued as **Prompt 249** — flagged upfront (before CC even starts) that this branch, like the last two, exists in 2 places in the file (direct + the "No" branch's reconnect mirror), and that this is a structural addition (new nested fork) rather than a pure string find/replace, so CC needs to duplicate the existing "Engages" subtree verbatim under the new second fork rather than trying to reference it (confirmed via the mirror file: this codebase's parser only works on flat, literally-duplicated text, no shared node references exist anywhere in the file).
+
+**Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 249 queued (structural — adds a second disarm attempt to Opener's "What's this about?/pushback→Still shuts it down" branch before Not Interested, in both of its 2 locations in the file). Not yet shipped by CC. Discovery script path-by-path review: Opener O-1 through O-8 all cleared with Brayden. Remaining: the "No" branch's two new lines (the "were you hiring"/"actively looking" pair) + its reconnect spot-check, then Pain Amplification's remaining new content, then all of Handoff. Also still flagged, not yet actioned: a pre-existing invalid-CSS bug (color+'14' string concat onto var()) in ActionCard/Terminal/MyCalls grade badges, found during Prompt 248.`
+
+---
+
 ### 2026-07-07 (cont. 6) — Eagle: confirmed CC shipped all 5 queued prompts (244-248), corrected understanding of the Opener's mirror count, restored 2 truncated vault files
 
 **[Eagle | 2026-07-07]** — Brayden said "cc finished"; pulled fresh state. All 5 queued prompts shipped + pushed: 244 (calendar UTC-vs-local-day, live-verified across all 4 calendars), 245 (Path 1's 3 wording changes), 246 (Opener gap-check branch), 247 (Opener "not here" line), 248 (merged terminal say+action screens, color-coded by outcome).
