@@ -64,6 +64,18 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-08 (cont. 5) — CC session: Prompt 254 shipped + pushed — Handoff H-4 placeholder mechanic scrapped, not-interested fork added
+
+**[CC | 2026-07-08]** — Continued the queue, executed Prompt 254 (only Prompt 255 remains queued behind it, ships next) against `ohvara-dashboard`. Grepped "15-minute placeholder" first per the prompt's warning — confirmed exactly 2 occurrences (H-4's target leaf and H-5's sibling), only touched H-4, left H-5's placeholder line untouched since it's Prompt 255's own separate target. Replaced the placeholder-calendar-hold line (Brayden rejected the whole mechanic, not just its wording — no info sheet exists and no auto-booked slot either) with a direct callback-time ask, forked on Gives-a-time vs. Not-interested so Follow-Up always means a real window got logged — same standing principle established in Prompt 252.
+
+`npx vite build` clean. Live-verified for real (apex11/Test1234!): Handoff → "Just send me some info" → "Okay, fair" → "Still hesitant" → new line rendered with zero placeholder language anywhere on the page → both fork endings confirmed via computed border-color (amber Follow-Up `rgb(245,158,11)`, red Not Interested `rgb(239,68,68)`).
+
+Committed (`b49db03`) and pushed to `origin/master` per standing push authorization.
+
+**Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 254 is shipped, pushed, and live-verified (ohvara-dashboard@b49db03). Next up in the queue: Prompt 255 (Handoff H-5 sibling — same placeholder-scrap + not-interested fork pattern as H-4, already confirmed as the flagged sibling occurrence so shouldn't need a fresh live walk to re-derive the fix, just apply the analogous change to H-5's "Still wants info first" line). This should be the last item in the queue — check LIVE_STATE's "Next Up for CC" section is empty after this ships. Standing review principle still active: any open-ended ask assuming one type of answer needs an explicit not-interested branch — still-pending candidates beyond H-4/H-5: H-7's "better week" ask, H-9/H-13/H-15's pricing "Still hesitant" endings (none queued yet, Eagle hasn't reviewed them with Brayden). Also still flagged, not yet actioned: a pre-existing invalid-CSS bug (color+'14' string concat onto var()) in ActionCard/Terminal/MyCalls grade badges, found during Prompt 248; and a dead-code Chooser component in ScriptWalk.jsx (atChooser hardcoded false) with its own overflowing-badge bug, found during Prompt 251, not worth fixing unless it gets wired up.`
+
+---
+
 ### 2026-07-08 (cont. 4) — CC session: Prompt 253 shipped + pushed — Handoff send-me-info line rewritten
 
 **[CC | 2026-07-08]** — Continued the queue, executed Prompt 253 (single-line content edit — 254-255 remain queued behind it, 254 depends on this one shipping first since it's nested in the same branch) against `ohvara-dashboard`. Grepped the target first, confirmed single occurrence. Swapped "I could send that over" (implied a real info sheet exists, which it doesn't — Brayden caught this) for "Yeah, 100%" acknowledging the ask, then the same email-vs-conversation disarm with "our team" framing matching the main Handoff pitch.

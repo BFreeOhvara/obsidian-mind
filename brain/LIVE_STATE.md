@@ -43,28 +43,11 @@ Reasoning: same as Prompt 254 — no info sheet actually exists to send, and an 
 
 ---
 
-### 🔲 Prompt 254 QUEUED 2026-07-07 (Eagle, Brayden-approved wording) — discoveryScript.js: Handoff H-4 ending replaced — drop the placeholder mechanic, ask for a callback time instead
+### ✅ Prompt 254 SHIPPED 2026-07-08 (`b49db03`, pushed) — Handoff H-4 ending replaced — placeholder mechanic dropped, callback-time fork added
 
-**Context:** continuing the path-by-path script review. Content-only edit to `src/lib/discoveryScript.js` Handoff section — single occurrence, grep to confirm before editing. **Depends on Prompt 253 shipping first or in the same pass** — this edit is nested inside the same "Just send me some info" branch whose opening line 253 changes; ship 253 before 254, or in the same session, so the surrounding context matches.
+Grep for "15-minute placeholder" confirmed exactly 2 occurrences (H-4 target + H-5 sibling) before editing, matching expectation — only the H-4 leaf (nested under "Okay, fair" → "Still hesitant") was changed; H-5's sibling line (Prompt 255's target) confirmed untouched. Replaced the placeholder-calendar-hold line with a direct ask for a better callback time, forked explicitly on Gives-a-time vs. Not-interested so Follow-Up always means a real window is logged.
 
-**Change — the "Okay, fair" → "Still hesitant" leaf's line and ending.** Find:
-```
-↳ IF Still hesitant [HESITANT]: "No worries — I'll send it over today. And I'm going to drop a 15-minute placeholder on your calendar for [day]. If you read it and it's not worth your time, just decline, no hard feelings."
-   ▸ Set status Follow-Up (send info + placeholder).
-```
-Replace with:
-```
-↳ IF Still hesitant [HESITANT]: "Honestly, I don't really have anything solid to send you — our team walks you through it more like a live presentation, tailored to your situation. How about this — is there a better time to reach out and check back in, see what's going on from there?"
-   BRANCH — Do they give a time, or say they're not interested?
-   ↳ IF Gives a time [HESITANT]: ▸ Set status Follow-Up (log the callback window they gave).
-   ↳ IF Not interested [BAD]: "All good, man — appreciate your time. Take care."
-      ▸ Set status Not Interested.
-```
-Reasoning: Brayden rejected the placeholder-calendar-hold idea entirely (not just the wording) — there's no info sheet to send (established while drafting this same fix) and no auto-booked slot either. Replaced with a direct ask for a better time to circle back, same pattern H-10 ("who is this→that's owner→gives a window") already uses. **Revised once more before shipping:** an open "is there a better time" question doesn't guarantee a time comes back — they could just say they're not interested. Added an explicit fork so that outcome, not just an assumed callback window, and Follow-Up now always means there's a real window logged. This is now a standing principle for the rest of this review, not a one-off: any open-ended ask that implicitly assumes one type of answer needs an explicit not-interested branch alongside it — flag and fix wherever else it shows up in the remaining Handoff paths (H-5's sibling placeholder line, H-7's "better week" ask, H-9/H-13/H-15's pricing "Still hesitant" endings all look like likely candidates, unconfirmed until each is actually reviewed).
-
-**⚠️ Check for a sibling occurrence before editing.** H-5 ("Just send me some info" → "Still wants info first," a sibling branch off the same parent, skips the "Okay, fair" step) has its OWN separate line with similar "send it over today... placeholder" wording — grep for "15-minute placeholder" and report back how many total matches exist before touching anything. If H-5's line also uses the placeholder mechanic, do NOT change it as part of this prompt — Eagle hasn't reviewed H-5 with Brayden yet, only H-4. Only edit the exact leaf shown above (nested under "Okay, fair" → "Still hesitant"), report the other occurrence(s) found so Eagle can queue them separately once reviewed.
-
-**Verification:** `npx vite build` clean, then live-check in Training Center → Script practice: Handoff → "Just send me some info" → "Okay, fair" → "Still hesitant" → confirm the new line renders and routes to the amber Follow-Up card (no placeholder language anywhere in this specific path).
+`npx vite build` clean. Live-verified in Training Center → Script practice: Handoff → "Just send me some info" → "Okay, fair" → "Still hesitant" → new line rendered with no placeholder language anywhere on the page → "Gives a time" reached the amber Follow-Up card (`rgb(245,158,11)`) → "Not interested" reached the red Not Interested card (`rgb(239,68,68)`).
 
 ---
 
