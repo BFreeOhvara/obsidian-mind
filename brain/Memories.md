@@ -64,6 +64,14 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-07 (cont. 9) — Eagle: quick UI fix queued (Prompt 251) — section badge text overflow
+
+**[Eagle | 2026-07-07]** — Brayden flagged a small UI polish issue between path reviews: the colored icon badge next to each section title in ScriptWalk (Opener/Vitals/Pain/Handoff/Close) has a text label inside it that doesn't fit the box, on every section, not just one. Wants the colored box kept, just the text removed. Queued as **Prompt 251** — quick, low-risk, no investigation needed.
+
+**Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompts 249, 250, 251 all queued, not yet shipped by CC. Discovery script path-by-path review: Opener fully cleared, Vitals confirmed no-fork, now mid-Pain — just gave Brayden Path 10 (P-2, the "Minimizes/we're fine" branch) but he paused to flag the badge UI issue before responding to it. Come back to Path 10 next.`
+
+---
+
 ### 2026-07-07 (cont. 8) — Eagle: Path 9 (O-9, "No" branch) reviewed — 3 line changes queued as Prompt 250
 
 **[Eagle | 2026-07-07]** — Walked O-9 (Opener's "No" branch: "were you hiring" → "actively looking" → "Yes" reconnect). Three screenshots, three pieces of feedback:

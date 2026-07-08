@@ -18,6 +18,16 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
+### 🔲 Prompt 251 QUEUED 2026-07-07 (Eagle, Brayden-approved) — ScriptWalk section badge: remove overflowing text, keep the colored box
+
+**Context:** Training Center → Script practice, live screenshot. Each section header (Open the Call, Vitals, Pain Amplification, Handoff & Book, Lock the Time) has a small colored icon/badge to the left of the title (colored per `section.color`/`dim`/`border` in `discoveryScript.js` — e.g. Opener/Vitals/Close use `--accent`, Pain uses `--warning`, Handoff uses `--success`). That badge currently has a short text label inside it (looks like it's rendering `section.short` — "Opener", "Vitals", "Pain", etc.) that doesn't fit the box — text overflows/looks awkward on every section, not just one.
+
+**Fix:** find wherever this badge renders (likely near the top of `ScriptWalk.jsx`, alongside the section header/title row) and remove the text label from inside the colored box — **keep the colored box itself** (Brayden explicitly wants the box, just not the overflowing text in it). If the badge is only ever a label-holder with no other purpose, this likely just means deleting the text node/child inside it, not removing the box element. Apply consistently across all 5 sections (Opener, Vitals, Pain Amplification, Handoff & Book, Close) since it's the same badge component reused per section, not a per-section fix.
+
+**Verification:** `npx vite build` clean, live-check in Training Center → Script practice that all 5 section headers show the colored box with no text inside, and the box itself still renders (not accidentally removed) with each section's correct color.
+
+---
+
 ### 🔲 Prompt 250 QUEUED 2026-07-07 (Eagle, Brayden-approved wording) — discoveryScript.js: Opener "No" branch, 3 line changes
 
 **Context:** continuing the path-by-path script review. Content-only edits to `src/lib/discoveryScript.js` Opener section — all 3 changes below are single-occurrence (this "No" branch only appears once in the file — unlike Prompts 246/247/249, don't need to hunt for a mirrored copy here, but grep to confirm before editing anyway as standard practice).
