@@ -18,6 +18,24 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
+### 🔲 Prompt 258 QUEUED 2026-07-08 (Eagle, Brayden-approved wording) — discoveryScript.js: Handoff H-8 "Who is this" response rewritten to actually answer the question
+
+**Context:** continuing the path-by-path script review. Content-only edit to `src/lib/discoveryScript.js` Handoff section — single occurrence, grep to confirm before editing.
+
+**Change — the "Who is this / what company?" branch's response line.** Find:
+```
+"Who would be responsible for looking at any possible hidden gaps in your call flow system that could be causing you guys to miss out on thousands of dollars every month? Is that you?"
+```
+Replace with:
+```
+"Oh — this is [Rep Name] with Ohvara. We build systems that help businesses just like yours stop missing calls and losing money because of it. I mean, we haven't spoken for very long, but you don't strike me as the type of person that wants to lose money, right?"
+```
+Reasoning: the old line completely dodged the question — asking who's calling and getting redirected into an unrelated "is that you?" question doesn't land, especially this deep into the call (Handoff pitch has already run, this is pushback on that, not a cold-open identity check). New line actually answers who's calling (uses the existing `[Rep Name]` token, already filled from the real rep — no new plumbing needed) and states the company plainly, then closes with an open-ended, hard-to-disagree-with line that keeps the decision-maker check implicit rather than a separate disconnected question. Went through several drafts live with Brayden — this is the final locked version.
+
+**Verification:** `npx vite build` clean, then live-check in Training Center → Script practice: Handoff → "Who is this / what company?" → confirm the new line renders with `[Rep Name]` filling correctly (Practice mode shows the literal token; a real Call Now walk against an actual lead/rep would show the real name).
+
+---
+
 *(Nothing queued right now — Prompts 249–255 all shipped 2026-07-08, clearing the discoveryScript.js path-by-path review queue that had been running since Prompt 244. See [[North Star]] Current Focus for what's next, or [[Memories]] for the full shipped trail below.)*
 
 ### 🔲 Prompt 257 QUEUED 2026-07-08 (Eagle, Brayden-approved wording) — discoveryScript.js: Handoff H-7 gets the not-interested fork
