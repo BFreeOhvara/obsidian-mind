@@ -18,7 +18,7 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
-*(Empty — Prompt 256 shipped 2026-07-08, clearing the queue. Check [[North Star]] Current Focus for what's next, or [[Memories]] for the shipped trail.)*
+*(Empty — Prompt 259 shipped 2026-07-08, clearing the queue. Check [[North Star]] Current Focus for what's next, or [[Memories]] for the shipped trail.)*
 
 ### ✅ Prompt 255 SHIPPED 2026-07-08 (`41c62f7`, pushed) — Handoff H-5 sibling fix, same placeholder-scrap + not-interested fork as H-4
 
