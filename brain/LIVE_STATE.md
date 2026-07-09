@@ -18,29 +18,6 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
-### 🔲 Prompt 257 QUEUED 2026-07-08 (Eagle, Brayden-approved wording) — discoveryScript.js: Handoff H-7 gets the not-interested fork
-
-**Context:** continuing the path-by-path script review. Content-only edit to `src/lib/discoveryScript.js` Handoff section — single occurrence, grep to confirm before editing. This is one of the 3 candidates flagged during Prompt 254's drafting as likely needing the same standing fix (open-ended ask, no not-interested branch).
-
-**Change — the "Those don't work either" leaf.** Find:
-```
-↳ IF Those don't work either [BAD]: "Got it — what's a better week for you?"
-   ▸ Set status Follow-Up (log the week they gave).
-```
-Replace with:
-```
-↳ IF Those don't work either [BAD]: "Okay, yeah, no worries — what's a good time for ya?"
-   BRANCH — Do they give a time, or say they're not interested?
-   ↳ IF Gives a time [HESITANT]: ▸ Set status Follow-Up (log the week they gave).
-   ↳ IF Not interested [BAD]: "All good, man — appreciate your time. Take care."
-      ▸ Set status Not Interested.
-```
-Reasoning: same standing principle as Prompts 254/255 — an open-ended "what's a good time" ask needs an explicit not-interested branch, not an assumed Follow-Up. Also lightly reworded the line itself per Brayden's direction ("Got it" → "Okay, yeah, no worries").
-
-**Verification:** `npx vite build` clean, then live-check in Training Center → Script practice: Handoff → "I don't have time this week" → "Those don't work either" → confirm the new line renders and both fork outcomes work.
-
----
-
 ### 🔲 Prompt 256 QUEUED 2026-07-08 (Eagle, Brayden-approved, investigate-then-build) — compute real dates for the script's day-offering tokens instead of literal brackets
 
 **Context:** Brayden noticed live in Training Center that `[Tuesday morning]`, `[Wednesday afternoon]`, `[Tuesday next week]`, `[Wednesday next week]` all render as literal bracketed text on screen — per `discoveryScript.js`'s own header comment, these are "in-call tokens" that "stay literal as rep guidance during the call," unlike the dynamic tokens (`[Business Name]`, `[city], [state]`, `[job title]`, etc.) which `fillTokens()` already fills from the real lead. He doesn't want reps mentally doing day-of-week math on a live call — wants these computed from the actual current date and rendered as real day references, same as the dynamic tokens already work.

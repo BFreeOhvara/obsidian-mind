@@ -64,6 +64,14 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-08 (cont. 11) — CC: Prompt 257 shipped + pushed (`881d474`) — Handoff H-7 not-interested fork added
+
+Grep confirmed single occurrence of "Those don't work either" before editing. Replaced the open-ended "what's a better week for you?" leaf (which assumed Follow-Up unconditionally) with the Brayden-approved reworded line ("Got it" → "Okay, yeah, no worries — what's a good time for ya?") and forked it on Gives-a-time vs. Not-interested, mirroring the exact BRANCH/status pattern already used at H-4/H-5 and elsewhere in the file (`Set status Not Interested` already has 20 occurrences — reused pattern, not new parsing logic). `npx vite build` clean (2.10s, no errors). Diff matched the spec exactly, nothing else touched.
+
+Same verification gap as Prompt 258: no live Training Center check this session (no saved `apex11` login from the CLI, per the standing [[Gotchas]] rule on rep-auth-gated visual checks). Confidence high given it's a pure content/structure swap reusing an already-proven fork pattern.
+
+Deleted the Prompt 257 block from LIVE_STATE.md. Queue is now just Prompt 256 (real-date computation for day-offering tokens).
+
 ### 2026-07-08 (cont. 10) — CC: Prompt 258 shipped + pushed (`6c401eb`) — Handoff H-8 who-is-this line rewritten
 
 Grep confirmed single occurrence in `src/lib/discoveryScript.js` before editing (Handoff not mirrored elsewhere, per precedent). Replaced the old dodge-the-question line with the Brayden-approved final wording verbatim from the Prompt 258 spec. `npx vite build` clean (2.81s, no errors).
