@@ -18,7 +18,37 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
-*(Empty — Prompt 260 shipped 2026-07-09, clearing the queue. Check [[North Star]] Current Focus for what's next, or [[Memories]] for the shipped trail.)*
+*(Empty — Prompt 263 shipped 2026-07-09, clearing the queue. Check [[North Star]] Current Focus for what's next, or [[Memories]] for the shipped trail.)*
+
+### ✅ Prompt 263 SHIPPED 2026-07-09 (investigation only, no code change) — appointment double-booking gap: CONFIRMED, no check exists anywhere; findings + 2 proposed approaches below
+
+**Confirmed against the real (non-stale) repo:** the only place `appointments.scheduled_at` is ever written is the `handle_lead_pipeline()` trigger function (`supabase/migrations/044_keep_batch_date_intraday.sql`, unchanged through 066 — current live version), fired on `leads` UPDATE when `status = 'Appointment Booked'` and `appointment_at` is set/changed. It unconditionally does `insert into appointments (...)` or `update appointments set scheduled_at = new.appointment_at ...` with **zero conflict/overlap read-check** against any existing appointment for that closer. No application-level check either — grepped `CallModal.jsx` (the only frontend write path, via `patch.appointment_at = zonedTimeToUtcIso(...)` at line 341) and there's no availability query before submit. Matches Eagle's DB-level finding exactly (only PK + non-unique `closer_id` index, confirmed still true through migration 066 — no exclusion constraint was ever added).
+
+**Extra finding beyond Eagle's ask:** `closer_id` is NOT set by this trigger at insert — only `rep_id`. Appointments are born with `closer_id = null` and get claimed later via the separate closer-pool mechanism (`leads.assigned_closer_id` / `request_closer_leads()` RPC, migrations 054/056). This doesn't remove the double-booking risk, just shifts *when* it can bite — two reps can still each trigger an insert/update for the same closer+timestamp the moment `assigned_closer_id` is already set on both leads.
+
+**Two proposed approaches (Brayden's call, nothing built):**
+1. **DB-level exclusion constraint** — `alter table appointments add constraint no_overlap exclude using gist (closer_id with =, tstzrange(scheduled_at, scheduled_at + interval '30 min') with &&) where (status = 'pending')`. Needs `btree_gist` extension + a defined appointment duration (30min assumed above — Brayden should confirm real call length). Airtight, DB enforces it even against races. Would need to handle the insert/update inside `handle_lead_pipeline()` failing gracefully (catch + surface a "slot taken" error back to the rep) since it currently runs silently inside a trigger with no error-handling path back to the UI.
+2. **Frontend pre-confirm read-check** — before `CallModal.jsx` submits `appointment_at`, query `appointments` for that closer within a buffer window (e.g. ±30min) and warn/block if one exists. Softer — race-condition possible if two reps submit within the same round-trip — but no migration risk and gives the rep an in-the-moment message instead of a silent trigger failure.
+
+Recommend (1) as the real fix with (2) as a nice-to-have UX warning layered on top, but this is Brayden's call — not built, no migration written. Separately-flagged Close-screen flow redesign (morning/afternoon + current-time-of-day narrowing) still on hold per the original prompt, now unblocked since this investigation is done.
+
+---
+
+### ✅ Prompt 262 SHIPPED 2026-07-09 (`8eac8c7`, pushed) — discoveryScript.js: Handoff H-12 pricing response line now ends on a closing question
+
+Appended "Does that sound fair?" to the "How much does this cost?" response line, single occurrence confirmed by grep before editing. Rest of the line and the fork below it ("Do they push for a ballpark?" → "Okay" / "Just need a ballpark") unchanged.
+
+`npx vite build` clean. Live-verified in Training Center → Script practice: walked Opener → Vitals → Pain → Handoff → "How much does this cost?" → confirmed new line renders ending on "Does that sound fair?" with the "Okay"/"Just need a ballpark" fork intact below it.
+
+---
+
+### ✅ Prompt 261 SHIPPED 2026-07-09 (`3533b44`, pushed) — discoveryScript.js: Handoff H-9 "still hesitant" branch fully rebuilt
+
+Replaced the entire "Still hesitant" leaf (Prompt 260's line + its old "Gives a time"/"Not interested" fork) with: new opener ("what's kind of holding you back?", no "commit to" framing) → Fork 1 (Opens up / Not interested) → Opens up leads to a real save-attempt line ("just 15 minutes... no pressure, no commitment") → Fork 2 (Engages / Still hesitant) → Engages routes to the standard time-offer line then Close; Still hesitant asks for a better callback time and sets Follow-Up (same pattern as Prompts 254/255, no placeholder/send-info language). Not interested (either fork) reaches the standard goodbye line + Not Interested status.
+
+`npx vite build` clean. Live-verified in Training Center → Script practice: walked Opener → Vitals → Pain → Handoff → "Who is this / what company?" → "Still hesitant" → confirmed new opener line renders with "Opens up"/"Not interested" fork → "Opens up" → confirmed save-attempt line renders → "Engages" → reached the computed time-offer line → Close → appointment-lock terminal card (green `var(--success)`). Reset and re-walked: "Opens up" → "Still hesitant" (Fork 2) → reached "is there a better time for me to check back in?" → Follow-Up card (amber `var(--warning)`), zero placeholder/send-info language. Reset and re-walked: "Not interested" (Fork 1, direct) → "All good, man — appreciate your time. Take care." → Not Interested card (red `var(--danger)`). All three terminal paths confirmed.
+
+---
 
 ### ✅ Prompt 255 SHIPPED 2026-07-08 (`41c62f7`, pushed) — Handoff H-5 sibling fix, same placeholder-scrap + not-interested fork as H-4
 

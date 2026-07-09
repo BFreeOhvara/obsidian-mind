@@ -64,6 +64,40 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-09 — Eagle: Path 22 (H-9) rebuilt a second time — real save-attempt added before Follow-Up, Not Interested no longer a default fallback, queued as Prompt 261
+
+Brayden live-reviewed Prompt 260's shipped line/fork and caught two problems: the "is it just feeling like a bit much to commit to right now?" framing doesn't fit (nothing's being bought at this stage, it's just a discovery call), and the "Gives a time"/"Not interested" fork below it didn't match anything the line actually asked (never asked for a time). Bigger point Brayden made explicitly: the goal is the appointment, not a quick Follow-Up callback — the rep should genuinely try to save/close before falling back, and "not interested" shouldn't be an easy default landing spot.
+
+Rebuilt as a two-layer structure: (1) open diagnostic question ("if you don't mind me asking, what's kind of holding you back?") forking into "Opens up" vs "Not interested" (only reached if they actually say that), (2) a real save-attempt line ("it's really just 15 minutes... no pressure, no commitment") only shown after "Opens up," forking into "Engages" (→ time-ask → Close → Appointment Booked) vs "Still hesitant" (→ reuses the callback-time-ask line from Prompt 259/260 → Follow-Up). Queued as **Prompt 261**, replacing Prompt 260's leaf entirely (not layered on top).
+
+Path 22 (H-9) fully reviewed once this ships — third pass was the charm. Next: Path 25 (H-12).
+
+### 2026-07-09 (cont.) — Eagle: Path 25 (H-12) reviewed — pricing response line now ends on a closing question, queued as Prompt 262
+
+Brayden liked the content of the "How much does this cost?" → "Okay" pricing response but flagged it trails off as a flat statement instead of ending on a question. Standing principle going forward: close lines on a question wherever possible, to keep the rep driving the conversation rather than leaving a silent beat. Appended "Does that sound fair?" to the existing line — no other changes, the "Okay"/"Just need a ballpark" fork below it stays as-is since the new closer naturally invites either response. Queued as **Prompt 262**.
+
+Path 25 (H-12) done. Next: Path 26 (H-13, "Still hesitant" off the pricing question — flagged earlier this session as needing the not-interested-fork check, and per the H-9 rebuild, likely also needs the same "real save attempt before Follow-Up" treatment rather than a flat fallback).
+
+### 2026-07-09 (cont. 2) — Eagle: real double-booking gap surfaced during the H-12 date-token question, queued as Prompt 263 (investigate only) — new task opened, separate from the script review
+
+While answering Brayden's question about how the day-offering tokens compute real dates (Prompt 256), he raised a bigger issue: with multiple setters offering appointment times, what stops two setters from double-booking the same closer at the same time? Checked directly via Supabase MCP against the live project (`jjextitmbptoaolacocs`) rather than guessing — the `appointments` table has no unique/exclusion constraint on `(closer_id, scheduled_at)`, only a plain non-unique index on `closer_id`. Nothing at the DB level currently prevents an overlapping double-booking.
+
+Could not check whether an application-level check exists (Close screen confirm handler, edge function) — the local OneDrive-synced `ohvara-dashboard` clone Eagle has file access to is confirmed stale (missing Prompts 258-262 entirely, no date computation in `fillTokens()` at all), not reliable for "what does the live app actually do." Queued **Prompt 263** for CC to investigate the real repo and report back — explicitly recon-only, no code/migration changes yet. Also captured but held: Brayden's separate idea to redesign the Close-screen time-offer flow (morning/afternoon preference first, then narrow by current time-of-day) instead of always offering two fixed named slots — noted in the prompt as related but secondary, pending the availability-check investigation.
+
+Opened as a new tracked task, separate from the discoveryScript.js path-by-path review (which continues independently — next up is Path 26/H-13 once 261/262 ship).
+
+### [CC | 2026-07-09 — Prompts 261-263 shipped, queue cleared] — H-9 rebuilt, H-12 closing question added, double-booking gap investigated
+
+**Prompt 261 (`3533b44`, pushed):** replaced the entire H-9 "Still hesitant" leaf with the two-layer structure Eagle specced — new opener drops the "commit to" framing, forks Opens-up/Not-interested; "Opens up" leads to a real save-attempt line, forks Engages/Still-hesitant; "Engages" routes to the standard time-offer line then Close, "Still hesitant" asks for a better callback time and sets Follow-Up. `npx vite build` clean. Live-verified all three terminal outcomes via preview browser (walked Opener→Vitals→Pain→Handoff each time): Engages → time-offer → Close → appointment-lock card (`var(--success)` green); Opens up→Still hesitant → Follow-Up card (`var(--warning)` amber), zero placeholder/send-info language; Not interested (direct) → goodbye line → Not Interested card (`var(--danger)` red).
+
+**Prompt 262 (`8eac8c7`, pushed):** appended "Does that sound fair?" to the H-12 pricing response line, single occurrence confirmed by grep. `npx vite build` clean, live-verified the line renders correctly with the "Okay"/"Just need a ballpark" fork unchanged below it.
+
+**Prompt 263 (investigation only, no commit):** confirmed Eagle's DB-level finding still holds through migration 066 (no exclusion constraint ever added). Found the actual write site — `handle_lead_pipeline()` trigger (current form in `044_keep_batch_date_intraday.sql`), fired on `leads` UPDATE when status becomes 'Appointment Booked' — does an unconditional insert/update of `appointments.scheduled_at` with **zero conflict-check** against existing appointments for that closer. Checked the frontend write path too (`CallModal.jsx:341`, `patch.appointment_at = ...`) — no availability query there either, confirming Eagle's suspicion with certainty rather than a guess. Extra finding beyond the original ask: the trigger never sets `closer_id` on insert (only `rep_id`) — appointments are born unassigned and get a closer via the separate `request_closer_leads()` claim flow, which shifts *when* the collision risk applies but doesn't remove it. Wrote up two concrete approaches (DB exclusion constraint via `tstzrange`+`btree_gist`, vs. a frontend pre-confirm read-check) with tradeoffs in [[LIVE_STATE]] for Brayden to decide — did not write any migration or code change, per the prompt's explicit recon-only scope.
+
+Full detail in [[LIVE_STATE]]. LIVE_STATE queue is now empty — path-by-path script review continues at Path 26 (H-13) whenever Eagle queues it next.
+
+**Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompts 261-263 are shipped/reported (261 @ 3533b44, 262 @ 8eac8c7, both pushed; 263 was investigation-only, findings written to LIVE_STATE, no code change). LIVE_STATE queue is empty — next up is Path 26/H-13 of the discoveryScript.js review whenever Eagle queues it, or Brayden's call on the double-booking approach from Prompt 263.`
+
 ### [CC | 2026-07-09 — Prompt 260 shipped] — Handoff H-9 "still hesitant" line reworded to a diagnostic question (`6c9c12d`, pushed)
 
 Grep confirmed single occurrence before editing. Swapped the Prompt 259 callback-time ask ("is there a better time for me to check back in?") for a diagnostic line per Brayden's review of the shipped version in Training Center: "No worries — what's kind of holding you back? Is it just feeling like a bit much to commit to right now?" Wording-only — the fork immediately below (Gives a time / Not interested → Follow-Up / Not Interested) is untouched, exactly as the prompt specified. `npx vite build` clean. Same live-verification gap as the rest of this session (no `apex11` browser session from this CLI) — flagged rather than claimed.
