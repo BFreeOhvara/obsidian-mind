@@ -64,6 +64,14 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-08 (cont. 8) — Eagle: Path 20 (H-7) reviewed — not-interested fork confirmed and applied, queued as Prompt 257
+
+**[Eagle | 2026-07-08]** — Path 20 (H-7, "Those don't work either") walked. Brayden confirmed the flagged not-interested-fork fix and gave the exact wording: "Okay, yeah, no worries — what's a good time for ya?" splitting into Follow-Up (log the week) vs. Not Interested. Queued as **Prompt 257**, ahead of Prompt 256 in the queue.
+
+**Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompts 256 and 257 both queued, not yet shipped by CC. Discovery script path-by-path review: 20 of 28 paths cleared. 8 remain, all in Handoff (H-8 through H-15). Standing rule still active: flagged candidates still pending for the not-interested-fork treatment: H-9/H-13/H-15's pricing "Still hesitant" endings. Also still flagged, not yet actioned: a pre-existing invalid-CSS bug (color+'14' string concat onto var()) in ActionCard/Terminal/MyCalls grade badges, found during Prompt 248.`
+
+---
+
 ### 2026-07-08 (cont. 7) — Eagle: CC's 7-prompt batch (249-255) confirmed clean, Path 19 (H-6) surfaced a real product gap — day-offering tokens are static, queued as Prompt 256
 
 **[Eagle | 2026-07-08]** — Pulled fresh state after "cc finished" — all 7 queued prompts (249-255) shipped and pushed with no surprises this time (unlike the 244-248 batch, no occurrence-count mismatches). Working tree matched HEAD exactly, no truncation-bug recurrence on this check.
