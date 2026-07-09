@@ -18,7 +18,23 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
-*(Empty — Prompt 265 shipped 2026-07-09, clearing the queue. Check [[North Star]] Current Focus for what's next, or [[Memories]] for the shipped trail.)*
+*(Empty — Prompt 267 shipped 2026-07-09, clearing the queue. Check [[North Star]] Current Focus for what's next, or [[Memories]] for the shipped trail.)*
+
+### ✅ Prompt 267 SHIPPED 2026-07-09 (`6f9c924`, pushed) — before-5pm afternoon offer reworded for consistency
+
+Replaced `"Are you free later today?"` with `"Does later this afternoon work for you?"` inside the `[afternoon offer]` token's before-5pm resolution in `fillTokens()`. Single source, single edit — no per-site duplication to worry about here since this one genuinely does live in one place. No change to the before/at-or-after-5pm branching logic itself.
+
+`npx vite build` clean, grep for the old phrase returns 0 matches. Live-verified the pricing/ballpark site Brayden reviewed: real current time (before 5pm) now renders "Does later this afternoon work for you?"; patched `Date.now()` to 6pm Central (same forced-remount technique from Prompt 264 — navigate away from Training and back to pick up the patched clock) and confirmed the after-5pm branch still reads "Does tomorrow afternoon work for you?", untouched.
+
+### ✅ Prompt 266 SHIPPED 2026-07-09 (`f5a0f2a`, pushed) — "So —" transition added to the morning/afternoon offer line, with a correction to Eagle's framing
+
+**Flagging a factual gap in how this prompt described the codebase:** Prompt 266 assumed Step 1 ("Do mornings or afternoons work better for you?") lives *inside* the shared `timeOfDayOfferFlow()` generator function from Prompt 264. It doesn't — only Steps 2+3 (the BRANCH + Mornings/Afternoon arms) live in that shared function. Step 1 is embedded inline in each site's own lead-in line, because the lead-in text differs per site (e.g. "Good — looks like you're in [city], [state]." vs a bare "Do mornings..." with no lead-in at all) — Prompt 264's report should have been clearer about this split. Functionally this doesn't change the outcome (all sites still needed the same fix), just correcting the record since Eagle's "do not hand-edit each site individually" instruction assumed a single source that doesn't literally exist for Step 1.
+
+**Editorial call made while applying the fix:** grepped and found 8 raw occurrences of the phrase across 8 leaf sites (7 from Prompt 264 + 1 more added by Prompt 265's H-13 rebuild) — but they split into two distinct patterns: 5 sites where "Do mornings..." starts a new sentence cold (capital D, either right after a period or standing alone as its own line — this is the "blocky, disconnected" symptom Brayden actually described), and 3 sites where it already reads as one continuous sentence via an existing "Okay, perfect — do mornings..." bridge (lowercase d). Applied "So — " only to the 5 cold-start sites via one `replace_all` on the exact substring; left the 3 already-bridged sites untouched, since prepending another transition there would read as "Okay, perfect — So — do mornings..." — redundant, not a fix. If Brayden wants "So —" on those 3 too (e.g. replacing "Okay, perfect —" rather than sitting alongside it), that's a follow-up, not what was asked here.
+
+`npx vite build` clean. Live-verified the 2 required sites: pricing/ballpark (the one Brayden reviewed) now reads "...they'll give you a real number based on what you just told me." "So — do mornings or afternoons work better for you?"; main Handoff pitch tail now reads "Good — looks like you guys are out in [city], [state]. So — do mornings or afternoons work better for you?"
+
+---
 
 ### ✅ Prompt 265 SHIPPED 2026-07-09 (`bdcc2e3`, pushed) — Handoff H-13 ("How much" → "Just need a ballpark" → "Still hesitant") rebuilt to reuse the exact Prompt 261 (H-9) structure verbatim
 

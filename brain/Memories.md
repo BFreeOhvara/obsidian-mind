@@ -64,6 +64,10 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-09 (cont. 6) — Eagle: two wording fixes on the shared morning/afternoon offer flow, queued as Prompts 266 and 267
+
+Brayden reviewed the Prompt 264 flow live and caught two issues, both on shared code (fixing once covers all 7 sites): (1) the pricing response line and "Do mornings or afternoons work better for you?" read as two blocky sentences — added a "So —" connector, queued as **Prompt 266**. (2) the before-5pm afternoon-offer resolution ("Are you free later today?") sounded off ("like we're asking him out on a date") and was inconsistent with the other two branches' "Does [X] work for you?" pattern — reworded to "Does later this afternoon work for you?", queued as **Prompt 267**. Brayden explicitly confirmed applying both fixes everywhere the lines appear, not just the one site he was looking at.
+
 ### 2026-07-09 (cont. 3) — Eagle: worked out the full morning/afternoon time-offer flow with Brayden, queued as Prompt 264
 
 Continuing off the double-booking conversation, Brayden circled back to disliking the offer line naming a specific weekday+date out loud ("Does Tuesday morning, July 14th..."). Worked through the replacement flow live: step 1 always asks "do mornings or afternoons work better for you?"; step 2 branches — mornings always offers tomorrow morning (no time-of-day logic), afternoon offers "later today" if it's before 5pm local or "tomorrow afternoon" if it's 5pm or later; step 3 always asks for a specific time, then continues into the existing Close flow unchanged. Confirmed no weekend-skipping — "tomorrow" is always the literal next calendar day.
@@ -101,6 +105,20 @@ While answering Brayden's question about how the day-offering tokens compute rea
 Could not check whether an application-level check exists (Close screen confirm handler, edge function) — the local OneDrive-synced `ohvara-dashboard` clone Eagle has file access to is confirmed stale (missing Prompts 258-262 entirely, no date computation in `fillTokens()` at all), not reliable for "what does the live app actually do." Queued **Prompt 263** for CC to investigate the real repo and report back — explicitly recon-only, no code/migration changes yet. Also captured but held: Brayden's separate idea to redesign the Close-screen time-offer flow (morning/afternoon preference first, then narrow by current time-of-day) instead of always offering two fixed named slots — noted in the prompt as related but secondary, pending the availability-check investigation.
 
 Opened as a new tracked task, separate from the discoveryScript.js path-by-path review (which continues independently — next up is Path 26/H-13 once 261/262 ship).
+
+### [CC | 2026-07-09 — Prompts 266-267 shipped, queue cleared] — "So —" transition added, before-5pm afternoon wording fixed, one framing correction flagged
+
+**Prompt 266 (`f5a0f2a`, pushed):** flagged a factual gap in the prompt's own framing first — Eagle described Step 1 ("Do mornings or afternoons work better for you?") as living inside the shared `timeOfDayOfferFlow()` function from Prompt 264, but it doesn't; only Steps 2+3 live there, Step 1 is embedded per-site since each site's lead-in text differs. My Prompt 264 report should have made that split clearer. Corrected the record in [[LIVE_STATE]] rather than silently going along with the wrong premise.
+
+Made an editorial call applying the actual fix: of 8 raw occurrences (7 from Prompt 264 + 1 more from Prompt 265's H-13 rebuild), 5 start the offer line cold (the real "blocky, disconnected" symptom Brayden described) and 3 already open with "Okay, perfect —" as a natural bridge. Applied "So — " via one `replace_all` only to the 5 cold-start sites; left the 3 already-bridged ones alone since stacking "Okay, perfect — So — do mornings..." would read worse, not better. Flagged this as a judgment call in case Brayden wants those 3 touched too (different treatment, not this prompt's ask).
+
+**Prompt 267 (`6f9c924`, pushed):** simple, single-source fix this time — reworded the before-5pm `[afternoon offer]` token resolution from "Are you free later today?" to "Does later this afternoon work for you?", matching the "Does [X] work for you?" pattern the other two branches already use. No branching-logic change, no per-site duplication to manage.
+
+`npx vite build` clean on both. Live-verified 266 at the 2 required sites (pricing/ballpark reviewed by Brayden + main Handoff pitch tail) and 267's before-5pm branch at the same pricing/ballpark site — after-5pm branch re-confirmed untouched via the same `Date.now()`-patch-and-remount technique established in Prompt 264.
+
+Full detail in [[LIVE_STATE]]. LIVE_STATE queue is empty.
+
+**Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompts 266-267 are shipped and pushed (266 @ f5a0f2a, 267 @ 6f9c924). Note: Prompt 266's fix only touched the 5 sites where the offer line starts cold, not the 3 sites that already had an "Okay, perfect —" bridge — flag this to Brayden if he wants those touched too. LIVE_STATE queue is empty.`
 
 ### [CC | 2026-07-09 — Prompts 264-265 shipped, queue cleared] — shared morning/afternoon time-offer flow built at all 7 sites, H-13 rebuilt reusing Prompt 261 verbatim
 
