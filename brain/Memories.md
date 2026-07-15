@@ -64,6 +64,21 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-15 (cont. 9) — CC: Prompt 277 shipped — script reference panel now shows during AI Roleplay calls; queue is empty (Prompt 270 excepted, blocked on sign-off)
+
+**Corrected the prompt's own component/file attribution before building:** it described the panel as living in `CallModal.jsx` as `AIScriptPanel`; actually `CallModal.jsx` uses a different component (`ScriptWalk`, click-through guided flow) and `AIScriptPanel` (static bulleted reference — the thing the prompt's wording actually described) only exists on the closer's `CallLeads.jsx` page. Also found Training Center's own Script tab had already solved the "no real lead" problem this feature needed (Prompt 209: `buildScriptFlow({ business_name: 'the business', ... }, null)` + `ScriptWalk mode="practice"`) — `fillTokens()` already falls back gracefully on missing fields, so zero changes needed to `discoveryScript.js`.
+
+**Checked in before building, per the prompt's own instruction:** asked Brayden (1) which component to reuse — he chose `ScriptWalk` (click-through) over `AIScriptPanel` (bullets), despite the prompt's own wording matching bullets more closely, and (2) layout — always-visible side column during the call, not a toggle. Built exactly that: `AIRoleplay` now renders the same generic `scriptFlow` as the Script tab in a two-column layout (call card+transcript left, `ScriptWalk` right, heights matched to ~427px, wraps to stacked on narrow viewports).
+
+**Verification method worth remembering:** couldn't log in as apex11 (same hard credential-entry block as Prompt 276), so built a temporary **unauthenticated QA route** (`/qa-harness-277` in `App.jsx`, deleted before committing) rendering the real components with fake transcript data — same "isolated harness" technique [[Gotchas]] documents from Prompt 200. Confirmed via `getBoundingClientRect()` that the two columns don't overlap at 1280px and wrap cleanly at 900px. This is a reusable pattern for verifying any rep-auth-gated layout change CC can't log in to see directly: add a throwaway unauthenticated route + component, screenshot/measure, delete both before commit.
+
+**Commits:** `488b847` (Prompt 276, previous entry) and `8aeb4f4` (Prompt 277), both pushed to `ohvara-dashboard` master. LIVE_STATE's "Next Up for CC" queue is now empty except Prompt 270, which is explicitly parked awaiting Brayden/Eagle sign-off — not something to build unprompted.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompts 276 and 277 both shipped and pushed. Queue is empty except Prompt 270 (investigation complete, waiting on Brayden/Eagle sign-off before any build — don't start it without that). Recommend a live click-through of AI Roleplay (Start Practice Call + glancing at the new script panel) since CC can't log in to verify itself. Otherwise check North Star's Current Focus for what's next.`
+
+---
+
 ### 2026-07-15 (cont. 7) — Falcon: caught a real bug blocking Brayden's AI Roleplay test — "Pass the Final Exam" gate firing despite it being passed — queued as Prompt 276 (urgent) + 277 (script-during-roleplay feature)
 
 **What happened:** Brayden went to do the live mic-call verification from Prompt 272/274 and got blocked — Training Center → AI Roleplay shows a "Pass the Final Exam before starting AI Roleplay" toast for apex11, even though the page also shows "Last grade B+ Passed" right above it. Queried `training_progress` directly before assuming anything: `quiz_passed_at` IS set (2026-06-11, unchanged from when checked earlier this session), same for `roleplay_passed_at`/`unlocked_at`. Confirmed this is a genuine frontend bug, not stale/missing data — whatever `examPassed` logic `TrainingCenter.jsx` uses isn't reflecting the real DB state. Flagged Prompt 272 (which touched this same file area) as the likely regression point worth checking first, but scoped it as investigate-don't-guess since I can't read the actual component code from here.
