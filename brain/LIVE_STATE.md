@@ -18,7 +18,47 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
-*(Queue empty — Prompt 268 shipped 2026-07-14, `54e6a9c`, pushed. Check [[North Star]] Current Focus for anything else, or [[Memories]] for the shipped trail.)*
+### ✅ Prompt 271 SHIPPED 2026-07-15 (native CC cleanup, no code commit — vault-only) — orphaned `.git` lock files removed + Cowork git-limitation documented
+
+Deleted 100+ orphaned lock artifacts (`.dead.*`/`.old.*`/`.bak*` suffixes on `index.lock`/`HEAD.lock`/`ORIG_HEAD.lock`) from `obsidian-mind/.git/` after confirming `git status`/`git log` ran cleanly first. Documented the root cause + workflow rule in [[Gotchas]] and added [[North Star]] Rule 18. Full writeup in [[Memories]].
+
+---
+
+### 🔲 Prompt 269 — silent Not-Interested endings get a spoken exit line (O-8, O-10, O-11)
+
+**Context:** Brayden reviewed the "Genuinely wrong number/business" ending (O-11) live in Training Center → Script practice and found it jumps straight to the "Not Interested" status card with nothing for the rep to actually say — a dead silent hang-up. This was already flagged as an open question during the original path-by-path review (see [[discovery-script-review-paths]] Endings Index: "Silent, straight to status: O-8, O-10, O-11 — no line at all before hanging up. Worth deciding during review whether that's intentional.") — Brayden has now decided: not intentional, add a real line to all three, not just the one he screenshotted. Content-only edit to `src/lib/discoveryScript.js` — no logic/marker/token changes.
+
+**Exact changes — grep each old node first to confirm it's still the single silent-ending leaf before editing, since these are 3 separate spots in 3 separate branches:**
+
+- **O-8** (Opener → "What's this about?/pushback" → "Still shuts it down"): add → *"No worries — appreciate your time, take care."* → then Not Interested.
+- **O-10** (Opener → "No" → "were you hiring" → confirms/engages → "actively looking?" → "No, not interested"): add → *"Got it — appreciate your time, have a good one."* → then Not Interested.
+- **O-11** (Opener → very first fork → "Genuinely wrong number/business"): add → *"My apologies for the mix-up — have a good one."* → then Not Interested. (This is the one Brayden screenshotted and described as "my apologies, goodbye or something.")
+
+These three lines are drafted per-context (wrong number needs an apology, a flat decline doesn't) — flag to Brayden as an editorial judgment call if any read wrong once he sees them live, same as prior wording passes in this review.
+
+`npx vite build` clean, then live-verify all 3 in Training Center → Script practice: confirm each renders its new SAY THIS line before landing on the red Not Interested card, and that no other branch's wording changed.
+
+---
+
+### 🔲 Prompt 270 — AI Roleplay overhaul: response variety, no hard-declines, randomized-but-realistic vitals, difficulty-weighted grading (INVESTIGATE FIRST, report back before building)
+
+**Context:** Brayden wants the Training Center's AI Roleplay (Retell voice agent "Mike - HVAC Owner", `create-roleplay-call` → live voice call → `score-roleplay` Claude-based post-call grading, 5 axes/12-point scale, currently `DEMO_MODE=true` so scoring is stubbed/deterministic, not live) reworked on four fronts. **This is bigger and more architecturally uncertain than a typical content prompt — investigate the real current implementation first and report back a concrete plan before writing any code.** Specifically need answers to:
+
+1. Is "Mike - HVAC Owner" a single static agent configured in the Retell dashboard, or is the agent/prompt built dynamically per call by `create-roleplay-call` (check the edge function source)? This determines whether "3 phrasing variants per response" and "never hard-decline" are achievable via a system-prompt/persona rewrite, dynamic variables passed per call, or require actual Retell dashboard changes Brayden would have to make himself.
+2. What does `score-roleplay`'s current 5-axis/12-point rubric actually measure (read the edge function/prompt)? Report the current axes before proposing changes.
+
+**Requirements to design toward, once the above is understood — confirmed with Brayden, do not re-litigate these, just find the right implementation:**
+
+- **Response variety:** wherever the script's real discoveryScript.js branches offer more than one way for a prospect to give an affirmative/continuing answer (e.g., Opener "Yeah/speaking," "That's me," "Kind of/it's part of it," Pain "Engaged," etc. — every non-terminal fork), the simulated prospect should be able to express that same intent through roughly 3 different realistic phrasings across different practice calls, not the identical line every time. Scope this to whatever's actually achievable per the investigation above (e.g., a randomized-persona-instruction pool fed into the agent's dynamic variables per call, if the agent is built dynamically).
+- **Never hard-decline:** confirmed with Brayden — the simulated prospect should never pick an outright immediate hard-decline path (wrong number, flat not-interested, instant hang-up). It should always continue the conversation toward either a genuine Follow-Up or an Appointment Booked outcome, giving the rep real objection-handling reps every time rather than a coin-flip dead call.
+- **Randomized-but-realistic vitals:** the numbers the simulated prospect gives during Vitals (calls/month, missed calls/day) should vary call-to-call rather than being static, but stay within realistic bounds (no absurd numbers). Propose sensible default ranges in the investigation report for Brayden to confirm before building (e.g., something like 15–60 calls/month, 1–6 missed/day, but don't build against a guessed range without flagging it).
+- **Difficulty-weighted grading (the big one) — confirmed with Brayden:** grading should NOT be primarily driven by the final outcome (Booked > Follow-Up > Not Interested). It should reflect how well the rep navigated whatever objections the simulated prospect actually threw at them during that specific call. A rep who fights through real objections into a Follow-Up should be able to out-score a rep who sailed through an all-easy-yes call straight into a Booking. Brayden also wants this same difficulty-weighted philosophy applied to **real call grading** (My Calls, not just roleplay practice) eventually — flag that as a related-but-separate follow-up, don't scope it into this prompt's build.
+
+**Report back, do not build yet:** current architecture findings for both questions above, a concrete proposed mechanism for each of the 4 requirements, and any real constraints/tradeoffs (e.g., if Retell agent prompts can't be varied per-call without dashboard access, say so plainly rather than building a partial version). Eagle/Brayden will confirm the plan before it becomes a build prompt.
+
+---
+
+*(Prompts 269–270 queued above. Check [[North Star]] Current Focus for anything else, or [[Memories]] for the shipped trail.)*
 
 ### ✅ Prompt 268 SHIPPED 2026-07-14 (`54e6a9c`, pushed) — H-14 pricing-ballpark lead-in reworded, value-justification framing dropped
 

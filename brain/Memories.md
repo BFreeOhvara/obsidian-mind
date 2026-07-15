@@ -64,6 +64,33 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-15 — CC: Prompt 271 shipped — orphaned `.git` lock cleanup + Cowork git-limitation documented
+
+Ran the native-only cleanup Prompt 271 called for. **Task 1:** found 100+ orphaned lock artifacts in `obsidian-mind/.git/` (`.dead.*`, `.old.*`, `.bak*` suffixes on `index.lock`/`HEAD.lock`/`ORIG_HEAD.lock`, going back to at least 2026-06-26, accumulated across dozens of past Cowork sessions) — confirmed `git status`/`git log` both ran cleanly first (so no genuine in-progress process), deleted all suffixed files in one pass, re-confirmed git still works cleanly after. Also caught the exact scenario this prompt warned about in the wild: `git status` showed no new commits, but a `git diff` turned up real uncommitted content in `LIVE_STATE.md`/`Memories.md` (Falcon's Prompts 269/270/271 queue entries, sitting on disk since the FUSE bridge blocked Falcon's own commit) — proceeded per the new rule and committed that content forward rather than assuming "no new commit" meant "no new vault changes."
+
+**Task 2:** documented the root cause in [[Gotchas]] (new bullet, linked from the existing OneDrive-lock gotcha) — Cowork's FUSE bridge blocks file *deletion*, so git's temp `index.lock` can't clean itself up after a Cowork commit, orphaning a lock that blocks every later git command from that session. Added [[North Star]] Rule 18: Cowork sessions write content only (Read/Write/Edit), never attempt vault git ops — CC's native sessions own all `obsidian-mind` git operations and must `git pull` + diff-check LIVE_STATE/Memories at the start of every run rather than trusting `git log` alone.
+
+**Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 271 (git lock cleanup + Cowork git-limitation docs) is shipped. Two prompts remain queued: Prompt 269 (quick content fix — spoken exit lines for O-8/O-10/O-11 silent Not-Interested endings) and Prompt 270 (AI Roleplay overhaul — investigate-first, report back before building).`
+
+---
+
+### 2026-07-15 — Falcon: AI Roleplay overhaul scoped with Brayden — queued as Prompts 269 (quick) and 270 (investigate-then-build)
+
+**What happened:** With the discovery script path review fully closed (28/28) and Prompt 268 shipped, Brayden opened a new thread on the Training Center's AI Roleplay tool. Two items came out of it:
+
+**Prompt 269 (quick, content-only):** Brayden screenshotted the "Genuinely wrong number/business" ending (O-11) showing a silent Not Interested card with no spoken line — wants a real exit line. This was already flagged as an open question at the end of the original path review (O-8/O-10/O-11 all silent, "worth deciding whether that's intentional") — now decided: not intentional, fix all 3, not just the one he saw. Drafted 3 context-specific exit lines (apology for wrong-number, plain appreciation for the two flat declines) and queued as **Prompt 269**.
+
+**Prompt 270 (big, investigate-then-build):** Brayden wants the AI Roleplay reworked on 4 fronts: (1) prospect responses should vary across 3ish realistic phrasings per fork instead of the same line every time, (2) the simulated prospect should never hard-decline immediately — always continue toward either Follow-Up or Booked so reps always get real objection-handling practice, (3) the vitals numbers the prospect gives (calls/month, missed calls/day) should be randomized-but-realistic instead of static, (4) grading should be difficulty-weighted — reward how well the rep navigated whatever objections they actually got, not just the final outcome (a hard-fought Follow-Up should be able to outscore an easy walk-in Booking). Confirmed items 2 and 4's framing directly with Brayden before drafting (both "yes, that's right").
+
+Pulled real architecture context from [[LIVE_STATE]] before drafting the prompt: AI Roleplay is a live **Retell voice agent** ("Mike - HVAC Owner"), not a click-through branch-picker like the Script tool — so "3 phrasing variants" isn't a simple text-swap, it depends on whether the agent is a static Retell-dashboard agent or built dynamically per call by `create-roleplay-call`. Grading is `score-roleplay`, Claude-based, 5 axes/12-point scale, currently stubbed under `DEMO_MODE=true`. Given this real uncertainty, scoped Prompt 270 as investigate-first — CC reports back the actual architecture + a concrete proposed mechanism for each of the 4 requirements before any code gets written, rather than guessing at a build that might not fit how Retell agents actually work here.
+
+**Push note carried over from the prior session:** flagging again — Prompt 268's LIVE_STATE entry shows shipped/pushed (`54e6a9c`) now, so CC clearly picked up and pushed cleanly since. This session's own LIVE_STATE/Memories edits (269, 270, this entry) should follow the same path once CC's next run picks them up.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Two prompts queued: Prompt 269 (quick, content-only — add spoken exit lines to O-8/O-10/O-11's silent Not-Interested endings in discoveryScript.js, exact wording drafted in LIVE_STATE) and Prompt 270 (AI Roleplay overhaul — investigate current Retell agent architecture + score-roleplay grading rubric FIRST and report back before building; 4 requirements: response phrasing variety, never hard-decline, randomized-but-realistic vitals numbers, difficulty-weighted grading that rewards skill over outcome). Discovery script path-by-path review is fully closed (28/28, Prompt 268 shipped). Nothing else queued.`
+
+---
+
 ### [CC | 2026-07-15 — Prompt 268 session close] — confirming full capture, no further work this chain
 
 Session already fully logged in the entry directly below (Prompt 268 shipped `54e6a9c`, vault log pushed `766707b`). This entry exists only to satisfy the Atlas logging gate on session end — no additional code or vault changes occurred between the prior log entry and this one; `git status` on both `ohvara-dashboard` and `obsidian-mind` is clean. LIVE_STATE queue remains empty.
