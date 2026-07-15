@@ -18,6 +18,28 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
+### ✅ Prompt 276 SHIPPED 2026-07-15 (`488b847`, pushed) — Final Exam gate now reads DB truth, not a localStorage flag that never synced
+
+**Root cause confirmed, not guessed:** `TrainingCenter.jsx`'s `finalQuizPassed` state (gates `AIRoleplay`'s `examPassed` prop) was `useState(() => localStorage.getItem('ohvara_final_quiz_passed') === '1')` — set **only** in the browser that took the Final Exam, and `handleFinalQuizPassed()` never called `saveProgress(...)` to persist it. `training_progress.quiz_passed_at` (which apex11 has set) is a **different, older quiz** (`QuizTab`, the 20-question mini quiz from before Prompt 174 added the separate Final Exam) — the two were never the same gate, so reading `quiz_passed_at` wouldn't have fixed it either. This traces to Prompt 174 (2026-06-30, `56cbf13`), not Prompt 272 as originally suspected — the code comment even flagged it at the time ("Falcon to add migration if server-side persistence is needed later").
+
+**Fix:**
+1. Migration `add_final_exam_passed_at_to_training_progress` — added `training_progress.final_exam_passed_at timestamptz`, backfilled `coalesce(roleplay_passed_at, quiz_passed_at)` for any rep with `roleplay_passed_at` already set (they couldn't have gotten there without passing the gate at the time — this unblocks apex11 immediately without a retake). Confirmed apex11's row now has `final_exam_passed_at = 2026-06-11 23:50:46+00`.
+2. `TrainingCenter.jsx`: `finalQuizPassed` is now `finalQuizPassedLocal || !!progress?.final_exam_passed_at` — DB is the source of truth, localStorage is only an optimistic layer for the instant right after passing (before the query refetches). `handleFinalQuizPassed()` now calls `saveProgress({ final_exam_passed_at: new Date().toISOString() })`.
+
+**Verification:** `npx vite build` clean, grepped for stale `setFinalQuizPassed`/`finalQuizPassed` references — all consistent. **Could not live-verify via login** — entering apex11's password into the login field is a hard-blocked action for CC (credential entry is prohibited regardless of it being a test account), so this needs a live check from Brayden directly, or via the Falcon/Desktop-Chrome-extension path noted in [[Gotchas]] for rep-auth-gated visual checks.
+
+---
+
+### 🔲 Prompt 277 — feature: show the discovery script during AI Roleplay calls, same pattern as the live Call Now script panel
+
+**Context:** Brayden wants the actual discovery script visible/referenceable during an AI Roleplay practice call — the same kind of popup/panel that already shows during a real call from My Leads (the `AIScriptPanel`/script-panel shown in `CallModal.jsx` per past builds — opener/problem/solution/objections/close as bulleted reference text). Right now AI Roleplay is voice-only with no visual script reference, so a rep practicing can't glance at the script while talking to the simulated prospect the way they could on a real call.
+
+**Investigate first:** confirm whether `TrainingCenter.jsx`'s AI Roleplay tab can render a side-by-side or overlay panel during an active practice call (check the existing call-UI layout — pulsing avatar, timer, transcript, per Prompt 199's roleplay redesign) without crowding out the live transcript/avatar UI that's already there. Reuse the existing script-panel component/content (same script source, `discoveryScript.js` derived) rather than building a second copy — confirm whether `AIScriptPanel` as built for `CallModal.jsx` can be reused directly or needs adapting for this context (voice roleplay has no lead-specific token-filled values like a real call does, so it may need to render the generic/token-literal version rather than a lead-personalized one).
+
+**Report back proposed approach before building if the reuse isn't straightforward** — this is a UI layout decision (where the panel sits, whether it's toggleable/collapsible so it doesn't dominate the screen) that's worth a quick check-in rather than guessing, same standard as other layout-affecting prompts in this project.
+
+---
+
 ### ✅ Prompt 275 SHIPPED 2026-07-15 (`a023426`, pushed) — real Ohvara logo replaces the placeholder icon everywhere it appears
 
 **Corrected the source file's stats before using it:** the prompt described `brain/media/new ohvara pfp.png` as 503×795 with unconfirmed transparency — actual file is **478×479 (near-perfect square)**, fully opaque, solid navy `rgb(10,31,68)` background baked in. Since it's already square, no crop was needed for aspect ratio (point 5 in the original spec turned out moot).

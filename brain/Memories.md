@@ -64,6 +64,32 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-15 (cont. 7) — Falcon: caught a real bug blocking Brayden's AI Roleplay test — "Pass the Final Exam" gate firing despite it being passed — queued as Prompt 276 (urgent) + 277 (script-during-roleplay feature)
+
+**What happened:** Brayden went to do the live mic-call verification from Prompt 272/274 and got blocked — Training Center → AI Roleplay shows a "Pass the Final Exam before starting AI Roleplay" toast for apex11, even though the page also shows "Last grade B+ Passed" right above it. Queried `training_progress` directly before assuming anything: `quiz_passed_at` IS set (2026-06-11, unchanged from when checked earlier this session), same for `roleplay_passed_at`/`unlocked_at`. Confirmed this is a genuine frontend bug, not stale/missing data — whatever `examPassed` logic `TrainingCenter.jsx` uses isn't reflecting the real DB state. Flagged Prompt 272 (which touched this same file area) as the likely regression point worth checking first, but scoped it as investigate-don't-guess since I can't read the actual component code from here.
+
+Also folded in Brayden's second ask from the same message: he wants the discovery script visible during AI Roleplay calls, same pattern as the script panel already shown during real calls from My Leads. Queued as **Prompt 277**, sequenced after the bug fix since it's a real feature build, not a blocker — Brayden literally cannot test anything until 276 ships.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 276 is queued and URGENT: AI Roleplay shows "Pass the Final Exam" toast for apex11 despite training_progress.quiz_passed_at being genuinely set (verified directly in DB, not a data issue) — investigate TrainingCenter.jsx's examPassed logic, Prompt 272 is the likely regression point since it touched this same file. This blocks Brayden's live verification of Prompts 272/274 entirely. Prompt 277 (show discovery script during AI Roleplay calls, reuse the CallModal script-panel pattern) is queued right after, lower priority. Nothing else queued.`
+
+---
+
+### 2026-07-15 (cont. 8) — CC: Prompt 276 shipped — Final Exam pass now persists to the DB instead of only localStorage
+
+**Traced root cause instead of trusting Falcon's regression guess:** git blame showed the localStorage-only `finalQuizPassed` state dates to Prompt 174 (`56cbf13`, 2026-06-30), not Prompt 272 as Falcon suspected. Also discovered `training_progress.quiz_passed_at` (which apex11 has set) is a **different, older quiz** — the 20-question `QuizTab` mini quiz that predates Prompt 174's separate "Final Exam" (`FinalQuizTab`). The two were never wired together, so pointing the gate at `quiz_passed_at` would have been the wrong fix even though the symptom made it look plausible. The actual defect: `handleFinalQuizPassed()` set `localStorage` and local React state but never called `saveProgress(...)`, so the pass never reached Supabase — any new browser/session reads a false `finalQuizPassed` regardless of real progress. The code's own comment had flagged this exact gap in advance ("Falcon to add migration if server-side persistence is needed later").
+
+**Fix:** added `training_progress.final_exam_passed_at` (migration `add_final_exam_passed_at_to_training_progress`), backfilled it to `coalesce(roleplay_passed_at, quiz_passed_at)` for any rep with `roleplay_passed_at` already set — reasoning: passing roleplay was only reachable by clearing this same gate at the time, so backfilling unblocks existing reps like apex11 without forcing a pointless retake. `TrainingCenter.jsx` now derives `finalQuizPassed = finalQuizPassedLocal || !!progress?.final_exam_passed_at`, and `handleFinalQuizPassed()` persists via `saveProgress`. Confirmed apex11's row now shows `final_exam_passed_at` set to the same timestamp as `roleplay_passed_at`.
+
+**Migration required an explicit go-ahead:** CC's auto-mode classifier blocked the first `apply_migration` call as an unreviewed production DB schema change — asked Brayden which of (apply migration + backfill / column only, no backfill / code-only, no DB touch) he wanted; he chose the full migration + backfill. Applied cleanly, `npx vite build` clean, committed `488b847` and pushed to `master`.
+
+**Verification gap, flagged honestly:** could not log in as apex11 to visually confirm the toast is gone — entering any password (even a test account's) is a hard-blocked action for CC regardless of internal-tool context. Verified via code trace + direct DB read instead. **Brayden or Falcon (via the Desktop/Chrome-extension path in [[Gotchas]]) should do one live click-through of Start Practice Call before trusting this fully closed.** Prompt 277 (script panel during AI Roleplay) is next in queue, unaffected by this fix.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 276 (Final Exam gate reading localStorage instead of DB) shipped (488b847, pushed) — needs one live click-through as apex11 to confirm the "Pass the Final Exam" toast is actually gone (CC couldn't log in itself — password entry is hard-blocked). Prompt 277 (show discovery script during AI Roleplay, reuse CallModal's script-panel pattern) is next in queue — investigate reuse feasibility and report back before building per its own note.`
+
+---
+
 ### 2026-07-15 (cont. 6) — CC: Prompt 275 shipped — real Ohvara logo replaces the placeholder Zap-icon badge everywhere
 
 Corrected the source file's stats before building against them: Falcon's prompt described `brain/media/new ohvara pfp.png` as 503×795 with unconfirmed transparency; actual file (checked via Pillow) is 478×479 — nearly perfectly square — and fully opaque with a solid navy `rgb(10,31,68)` background. No cropping needed for aspect ratio.
