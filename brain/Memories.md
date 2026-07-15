@@ -64,6 +64,35 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-15 (cont. 13) — CC: Prompt 279 investigation complete — email infra confirmed absent (Resend setup is the blocker), custom invite-token flow recommended, plaintext rep_credentials conflict flagged
+
+**Findings, all from reading actual source (edge functions + frontend), not assumption:**
+- **No email provider exists anywhere.** Grepped every edge function for Resend/SendGrid/Postmark/Mailgun/SMTP — zero hits; `fetch-secrets`' capability list has no email key. Supabase's built-in mailer is dev-only. **Blocker for Brayden: create a Resend account (free tier covers current scale), verify the sending domain via DNS, put the API key in Supabase secrets.** Resend's first-party Supabase SMTP integration powers both native auth emails (password reset) and custom sends with one setup.
+- **Recommended mechanism: custom invite-token table + public signup page (option b)** over `admin.inviteUserByEmail()` (option a) — (a) requires admin to know/type the rep's email up-front (email IS the invite channel), contradicting the confirmed "admin only sets role" flow, and needs the same SMTP setup anyway. (b): admin picks role → shareable link/code (invite itself needs no email at all — text it, Slack it, whatever) → rep fills name/real email/phone/own password → edge function validates token, creates account. ~1 migration + 1 edge function + 1 public page. Email infra still required for the forgot-password half either way.
+- **New conflict found:** `rep_credentials` (migration 041) stores **plaintext** username+password for admin lookup — incompatible with "admin never sees the password." New-flow signups must skip it; Brayden should decide whether it survives for legacy accounts or gets dropped. Standing security liability regardless.
+- **No migration needed for existing reps** (apex11 etc. keep the synthetic-email login path), but the login form needs to accept real emails too (input contains `@` → use as-is, else append `@ohvara.internal`) — flagged as a build detail.
+- North Star's "150 leads in 60 seconds" onboarding line changes when this ships — update deferred until then, per the prompt.
+
+**No build, no code commits** — LIVE_STATE's Prompt 279 entry rewritten as INVESTIGATION COMPLETE with the full report, same holding pattern as Prompt 270. Prompts 280 (payout password re-confirm) and 281 (dark/light toggle + Settings expansion) are next in queue and NOT blocked by 279's decision.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 279's investigation is filed in LIVE_STATE (awaiting Brayden: Resend setup + mechanism pick + rep_credentials decision — don't build it without those). Next actionable: Prompt 280 (password re-confirm before "Manage payout account" in Payouts), then Prompt 281 (dark/light mode toggle + expanded Settings — investigate theming scope honestly before promising a full light theme). Prompt 270 still parked on sign-off.`
+
+---
+
+### 2026-07-15 (cont. 12) — Falcon: rep account model overhaul scoped — admin sets role only, rep self-registers with real email/password — queued as Prompts 279-281
+
+**What happened:** Brayden, looking at the Settings page, wanted the account model changed so reps set their own password (Ohvara never sees it) and provide their own real name/email/phone, with admin only controlling role assignment. Investigated the actual current mechanism before assuming anything — read `admin-create-user`'s real source via Supabase MCP: admin currently picks BOTH username and password directly in one call, and the "email" on file is a synthetic `${username}@ohvara.internal` placeholder that was never meant to be reachable (explains why apex11's Settings page shows that fake address). This is a bigger change than it first sounded — real email collection means a real password-reset-via-email flow becomes possible (and expected), which needs actual email-sending infrastructure. Grepped the vault for any prior Resend/SMTP setup — found nothing, confirming this is a genuine infra gap, not something to assume already exists.
+
+Queued **Prompt 279** as investigate-first (same pattern as Prompt 270's Retell investigation) rather than a build — the email-infra question and the invite-mechanism choice (Supabase's built-in `inviteUserByEmail` vs. a custom invite-token + signup page, given this app already has a fully custom auth UI) both need real answers before committing to a build. Confirmed with Brayden: existing accounts (apex11 etc.) don't need migration, this only applies going forward; and flagged that North Star's documented "60-second onboarding" flow will need updating once the real signup step exists — not done yet, waiting on the actual flow being confirmed working first.
+
+Also queued from the same conversation: **Prompt 280** (Payouts' "Manage payout account" button requires a password re-confirm first — scoped to just that action, not the whole section, per Brayden's direct confirmation) and **Prompt 281** (dark/light mode toggle + Settings expansion — flagged for CC to check what was deliberately removed from Settings before, e.g. Notifications, before re-adding anything, and to report the real scope of a full light-mode token audit before assuming it's a one-prompt build).
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Three prompts queued: Prompt 279 (rep self-registration overhaul — admin sets role only, rep provides real name/email/phone/password themselves — INVESTIGATE the email-sending infra gap and invite mechanism first, report back, do not build yet), Prompt 280 (Payouts "Manage payout account" needs a password re-confirm), Prompt 281 (dark/light mode toggle + Settings expansion, investigate real theming scope first). Brayden is also still mid-way through live-testing the AI Roleplay changes from Prompts 272/274/276/277/278 — not yet confirmed complete, that verification is still outstanding. Prompt 273 (difficulty-weighted grading) remains blocked on that. Nothing else queued.`
+
+---
+
 ### 2026-07-15 (cont. 11) — CC: Prompt 278 shipped — traced a single-option fork bug to Prompt 264's shared time-offer refactor, verified the fix with the real parser (not eyeballing), swept the whole script clean
 
 **Root cause, confirmed not guessed:** used `git show` on Prompt 264's own diff (`07f2381`) to find the exact regression — it introduced the shared `timeOfDayOfferFlow(indent)` helper across the file and correctly indented it one level deeper than its parent option at every call site EXCEPT this one (Handoff's `Good/shows interest → Still hesitant → Do they engage this time?` node), where it left the call at the SAME indent as the parent `Engages` option. `discoveryScript.js`'s tree parser (`parseSteps` in `src/lib/discoveryScript.js`) requires child content strictly deeper than its parent option — landing at equal depth breaks the fork's sibling-scan silently (no error, no crash), which is exactly why it read as "missing an option" rather than throwing anything visible in dev.

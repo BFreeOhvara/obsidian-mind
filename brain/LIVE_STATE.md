@@ -18,6 +18,46 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
+### 🔲 Prompt 279 — INVESTIGATION COMPLETE 2026-07-15, awaiting Brayden's email-provider setup + mechanism pick before any build
+
+**1. Email infra: confirmed absent — this is the hard dependency.** No email provider exists anywhere: grepped every edge function for Resend/SendGrid/Postmark/Mailgun/SMTP — zero hits (the only "email" matches are the synthetic `@ohvara.internal` strings). `fetch-secrets`' capability list knows about anthropic/retell/twilio/stripe/google-maps/indeed — no email key of any kind. Supabase's built-in auth mailer is dev-only (rate-limited to a handful of emails/hour, unbranded sender) — fine for testing the flow, not for real reps. **What Brayden needs to set up himself before this ships: a Resend account (free tier = 100 emails/day, plenty for invites + password resets at current scale), verify the sending domain (a few DNS records), and drop the API key into Supabase.** Resend has a first-party Supabase SMTP integration, so one setup powers BOTH Supabase's native auth emails (password reset) and any custom sends.
+
+**2. Mechanism recommendation: custom invite-token table + custom signup page (option b), with Supabase's native `resetPasswordForEmail` for forgot-password.** Tradeoffs, honestly stated:
+- **(a) `admin.inviteUserByEmail()`** — less code, but the admin must know and type the rep's real email up-front (the email IS the invite channel), which contradicts the confirmed flow ("admin only sets role"). Also creates the auth user before the rep has consented/filled anything, sends Supabase's own templated email, and still requires the same SMTP setup for production anyway.
+- **(b) Custom invite table + public signup page** — admin picks role only → gets a shareable link/code he can send however he wants (text, Slack, in person — the invite itself needs NO email infra). Rep opens the link, enters name/real email/phone/their own password; an edge function validates the token and creates the account with the real email. More code (1 migration, 1 edge function, 1 public page) but matches the confirmed flow exactly and fits the app's existing fully-custom auth UI. Email infra is then only needed for the forgot-password half — which is still a real dependency, so Resend setup is required either way before this goes live.
+
+**3. New conflict found — the plaintext-credentials table:** `admin-create-user` currently upserts the rep's username + password **in plaintext** into `rep_credentials` (migration 041) so admin can look them up; `provision-client` generates and hands around plaintext passwords the same way. "Admin never sees the password" is incompatible with continuing that for invited users — new-flow signups must skip `rep_credentials` entirely, and Brayden should decide whether the table stays for legacy accounts only or gets dropped. Flagging regardless: a plaintext password table is a standing security liability worth killing as soon as the new flow makes it unnecessary.
+
+**4. Existing accounts: no migration needed, but the login page needs one tweak in the build.** `useAuth.jsx` maps username → `${username}@ohvara.internal` before `signInWithPassword`, so apex11 etc. keep working untouched. New reps will have REAL emails though, so the login form must accept either (trivial: input contains `@` → use as-is, else append the synthetic domain). Flagged as a build detail so it doesn't get missed.
+
+**5. North Star flag (deferred, per the prompt):** "admin creates account → rep logs in → 150 leads in 60 seconds" becomes "admin sends invite → rep self-registers → logs in" — update [[North Star]] only after the real flow ships and is verified.
+
+**Not built — awaiting: (1) Brayden sets up Resend (account + domain DNS + API key into Supabase secrets), (2) confirms option (b) or overrides, (3) decides rep_credentials' fate. Then this becomes a build prompt.**
+
+---
+
+### 🔲 Prompt 280 — Payouts: "Manage payout account" requires a password re-confirm first
+
+**Context:** Brayden wants a step-up auth check before anything sensitive in Payouts is actionable — confirmed scope: just the **"Manage payout account"** button/action, not the whole section (the "Not Connected" status badge itself stays visible as today).
+
+**Build:** clicking "Manage payout account" opens a password-confirm prompt (re-enter current password) before proceeding to whatever the actual payout-management flow is (Stripe Connect onboarding per `stripe-connect-onboard` edge function, per existing infra). Use Supabase's standard reauthentication pattern (re-verify via `signInWithPassword` against the current session's email, or whatever the idiomatic Supabase-JS approach is — investigate the cleanest fit rather than hand-rolling something). Failed re-entry shows an inline error, doesn't proceed. This is independent of Prompt 279 — works the same whether the account has a real or synthetic email, since it's just re-checking the CURRENT password, not sending anything anywhere.
+
+**Verification:** live-verify the re-confirm modal appears on click, wrong password is rejected with a clear error, correct password proceeds to the existing payout flow unchanged.
+
+---
+
+### 🔲 Prompt 281 — dark/light mode toggle + expanded Settings
+
+**Context:** Brayden wants a light/dark mode toggle added to Settings, plus general interest in "more useful settings" without a specific list beyond that — use judgment on what else genuinely belongs here (check what's already been deliberately REMOVED from Settings before re-adding anything — e.g. Notifications was explicitly ripped out in a past prompt, don't resurrect it without checking why first) and propose/build what's clearly useful, flagging anything you're unsure belongs here rather than guessing.
+
+**Build:**
+1. Light/dark mode toggle in a new "Appearance" section of Settings. This is a real theming lift, not a toggle-and-done — the whole app currently uses a fixed dark palette via CSS custom properties (per [[DESIGN]]). Investigate scope honestly: does a full light-mode token set need defining for every `--bg-*`/`--text-*`/etc. variable, or can this be scoped to something smaller first (e.g. a documented "dark only for now, toggle is UI groundwork" state)? Report the real scope before assuming a full light theme ships in one prompt — this could reasonably split into "add the toggle + persist the preference" now and "build out full light-mode tokens" as a separate follow-up if the token audit turns out large.
+2. Persist the preference (localStorage is fine, doesn't need a DB round-trip) and respect it on load without a flash of the wrong theme if reasonably achievable.
+
+**Verification:** live-verify the toggle switches themes visibly and persists across a reload.
+
+---
+
 ### ✅ Prompt 278 SHIPPED 2026-07-15 (`d614ee5`, pushed) — missing Still-hesitant option restored; full-script audit found no other single-option forks
 
 **Root cause confirmed via git blame + the actual parser, not guessed:** Prompt 264 (`07f2381`, the shared `timeOfDayOfferFlow` refactor) is exactly the regression Falcon suspected. At this one spot (Handoff's `Good/shows interest → Still hesitant → Do they engage this time?` node), it replaced the old inline "pick a time" block with `...timeOfDayOfferFlow('      ')` (6 spaces) — the SAME indent as its parent `Engages` option, instead of one level deeper (9 spaces, the pattern Prompt 264 got right at every other call site in the file). `discoveryScript.js`'s indent-based tree parser (`parseSteps`) requires child content to sit strictly deeper than its parent option; landing at the same depth broke the fork's sibling-scan immediately after `Engages`, so the following `Still hesitant` line (and its whole timing/not-a-good-fit sub-fork) never attached — it just silently fell out of the tree instead of crashing, which is why it read as "only one option" rather than an error.
