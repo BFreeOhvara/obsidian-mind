@@ -64,6 +64,34 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-15 (cont. 15) — CC: Prompt 282 shipped — invite-token self-registration built, deployed, and live-verified end-to-end; only email delivery waits on Resend
+
+**Built all five pieces** (`246b1de`, pushed; migration + edge function deployed after Brayden's explicit approval via in-session question — the auto-mode classifier blocks prod DB/function deploys on queue-inferred intent alone, same as Prompt 276, so plan on one approval round-trip for any future prompt that touches prod infra): migration 067 `rep_invites` (CSPRNG token, role, 7-day expiry, single-use, admin-only RLS via existing `public.is_admin()`); `claim-invite` edge function (**deployed `verify_jwt: false`** — the signup page is pre-auth and the project's `sb_publishable_*` key is not a JWT, so JWT verification can't gate public endpoints here; the twilio webhooks already set this precedent; the token itself is the credential); Invite Link panel in admin Users.jsx (generate/copy/revoke, legacy New User form untouched); Login accepts username OR email (@ detection, legacy synthetic-email path byte-identical); forgot-password via `resetPasswordForEmail` + new `/reset-password` recovery page.
+
+**Key facts worth remembering:**
+- New-flow accounts write **nothing** to `rep_credentials` (Brayden's decision: table is legacy/client-only now) and have `username = null` — the `handle_new_user` trigger builds their profile from metadata, and Users.jsx already renders null usernames fine.
+- **Live verification pattern for auth-gated flows CC can't log into:** inserted the QA invite via service-role SQL (stand-in for the admin click), drove the PUBLIC pages fully in the browser (form fill → account creation → auto-login → rep dashboard with training gate at 0/3), verified everything in the DB (role from invite, real email/phone, 0 cred rows, invite consumed, used link dead), then deleted the QA account + invite (confirmed 0 rows). The one thing not human-verified: the admin panel's own click path and apex11's real-credential login — both flagged for Brayden's next live pass.
+- Supabase's built-in mailer rejects reserved domains (`example.com`) with "Email address is invalid" — surfaced cleanly inline, which doubles as proof the reset error path renders. Actual delivery is the ONLY remaining gap, blocked solely on Brayden's Resend setup (account → domain DNS → Supabase SMTP config).
+- [[North Star]] onboarding line update deferred until Brayden runs one real invite himself, per Prompt 279's instruction.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 282 (invite self-registration) shipped, deployed, live-verified — email delivery for password resets is the only non-functional piece, blocked on Brayden's Resend setup. Next in queue: Prompt 280 (password re-confirm before "Manage payout account" in Payouts), then Prompt 281 (dark/light toggle + expanded Settings — investigate theming scope honestly first). Prompt 270 still parked on sign-off. Brayden should live-test one real invite + apex11 login when convenient.`
+
+---
+
+### 2026-07-15 (cont. 14) — Falcon: both Prompt 279 decisions confirmed with Brayden, queued the real build as Prompt 282
+
+**What happened:** Reviewed Prompt 279's investigation with Brayden. Confirmed both open decisions, going with CC's own recommendations on both: (1) `rep_credentials` (the plaintext password table CC flagged as a security liability) stays for legacy/client flows only — `provision-client` untouched, out of scope — but new self-registered rep accounts must never be written into it; (2) invite mechanism is the custom invite-token table + custom signup page, not Supabase's built-in `inviteUserByEmail()`, since that's the only option that actually satisfies "admin only sets role."
+
+Queued **Prompt 282** as the real build. Flagged clearly that Resend still isn't set up (external account-creation step only Brayden can do — not something CC or I can do on his behalf) and told CC not to block the whole build on it: build everything, but the invite-link generation itself doesn't need email (admin can copy/paste the link manually), so most of the flow should be testable even before Resend exists — only real email delivery (invite notifications, password-reset emails) stays non-functional until then.
+
+**Resend setup itself is still on Brayden** — account creation, domain DNS verification, API key into Supabase — nobody else can do this step.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 282 is queued and build-ready: rep self-registration via invite-token (both of Prompt 279's open decisions confirmed — rep_credentials stays legacy-only, custom invite-token mechanism). Resend is NOT yet set up by Brayden — build should proceed anyway, most of the flow is testable without it (invite links can be copy-pasted manually), only real email delivery stays blocked until Resend exists. Prompts 280 (Payouts password re-confirm) and 281 (dark/light mode) are also still queued, unbuilt — CC only got to 279's investigation last run. Brayden is also still mid-way through live-testing the AI Roleplay changes from Prompts 272/274/276/277/278 — not yet confirmed complete. Nothing else queued beyond these.`
+
+---
+
 ### 2026-07-15 (cont. 13) — CC: Prompt 279 investigation complete — email infra confirmed absent (Resend setup is the blocker), custom invite-token flow recommended, plaintext rep_credentials conflict flagged
 
 **Findings, all from reading actual source (edge functions + frontend), not assumption:**

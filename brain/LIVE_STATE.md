@@ -36,6 +36,23 @@ tags:
 
 ---
 
+### ✅ Prompt 282 SHIPPED 2026-07-15 (`246b1de`, pushed; migration + edge function deployed with Brayden's explicit approval) — rep self-registration via admin invite links, full loop live-verified
+
+**What shipped, all five build items:**
+1. **Migration 067 `rep_invites`** (applied to prod): token (32-byte CSPRNG hex, unique), role, created_by, 7-day `expires_at`, `used_at`/`used_by`. RLS is admin-only via the existing `public.is_admin()` helper — no anon policy, so tokens are unreadable from the browser; the edge function reads them via service role.
+2. **`claim-invite` edge function** (deployed `verify_jwt: false` — required: the page is pre-auth and this project's `sb_publishable_*` key is not a JWT; same pattern as the twilio webhooks/grade-call). Two actions: `check` (returns only valid+role — leaks nothing else) and `claim` (re-validates, creates the auth user with the REAL email via `auth.admin.createUser`, sets `profiles.phone`, marks the invite consumed). **Writes nothing to `rep_credentials`** per Brayden's decision. The existing `handle_new_user` trigger builds the profiles row; `username` stays null for real-email accounts (Users.jsx already renders that case).
+3. **Admin UI (Users.jsx):** new "Invite Link" button beside New User → role picker → Generate & Copy (token minted client-side from `crypto.getRandomValues`, inserted under admin RLS) + a pending-invites strip (role, days left, copy, revoke). The legacy New User form stays untouched.
+4. **Login:** field is now "Username or Email" — input containing `@` is used as-is, otherwise the synthetic `@ohvara.internal` mapping runs byte-identical to before (`useAuth.jsx`).
+5. **Forgot-password:** "Forgot password?" on Login → `resetPasswordForEmail` (redirect to new `/reset-password` page, which handles the recovery session via `updateUser({ password })`, plus a dead-link state for no-session visits).
+
+**Live-verified end-to-end** (dev server against the real prod DB/function): inserted a QA invite via SQL (stand-in for the admin click — CC can't log into an admin account), opened `/join/<token>` fresh → "You've been invited as a Rep" + form; invalid token → dead-link state; completed signup with throwaway QA data → account created, auto-signed-in, landed on `/rep` with the training gate correctly showing 0/3 for a brand-new rep. DB checks: role from invite, real email + phone stored, `username` null, **`rep_credentials` rows: 0**, invite marked consumed; re-opening the used link → correctly dead (single-use enforced). Legacy regression: fake bare username → "Invalid login credentials" straight from Supabase auth, proving the non-@ path still routes through the synthetic email unchanged (apex11-with-real-password click-through still worth one human pass). QA account + invite fully deleted after verification (confirmed 0 rows remaining).
+
+**Still non-functional until Resend is configured (known, flagged dependency — everything else works now):** actual email delivery for password resets. The reset FLOW is wired and the UI states all render; Supabase's built-in mailer even rejected the reserved `example.com` QA address with a clean inline error, which is the error path working as designed. Invite links never needed email at all — admin copies the link and sends it however he wants. **Brayden's Resend setup (account → domain DNS → SMTP config in Supabase auth settings) is the only missing piece for resets to actually deliver.**
+
+**Deferred, intentionally:** the [[North Star]] onboarding-flow line ("admin creates account → rep logs in") should be updated to the invite flow once Brayden has done one real invite himself and confirmed it feels right — per Prompt 279's own instruction to update North Star only after the flow is confirmed working in practice.
+
+---
+
 ### 🔲 Prompt 280 — Payouts: "Manage payout account" requires a password re-confirm first
 
 **Context:** Brayden wants a step-up auth check before anything sensitive in Payouts is actionable — confirmed scope: just the **"Manage payout account"** button/action, not the whole section (the "Not Connected" status badge itself stays visible as today).
