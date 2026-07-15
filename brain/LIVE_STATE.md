@@ -24,19 +24,20 @@ Deleted 100+ orphaned lock artifacts (`.dead.*`/`.old.*`/`.bak*` suffixes on `in
 
 ---
 
-### 🔲 Prompt 269 — silent Not-Interested endings get a spoken exit line (O-8, O-10, O-11)
+### ✅ Prompt 269 SHIPPED 2026-07-15 (`9159b03` + `2a1f5c3`, pushed) — silent endings audited across the whole file, 5 total found and fixed (not just the 3 assumed)
 
-**Context:** Brayden reviewed the "Genuinely wrong number/business" ending (O-11) live in Training Center → Script practice and found it jumps straight to the "Not Interested" status card with nothing for the rep to actually say — a dead silent hang-up. This was already flagged as an open question during the original path-by-path review (see [[discovery-script-review-paths]] Endings Index: "Silent, straight to status: O-8, O-10, O-11 — no line at all before hanging up. Worth deciding during review whether that's intentional.") — Brayden has now decided: not intentional, add a real line to all three, not just the one he screenshotted. Content-only edit to `src/lib/discoveryScript.js` — no logic/marker/token changes.
+**O-8 finding — the original 3-leaf assumption was stale:** grepped O-8's actual node (Opener → "What's this about?/pushback" → "Still shuts it down") before editing per the prompt's own instruction, and it was **already non-silent** — it already ends on `"All good, man — appreciate your time. Take care."` before Not Interested (fixed by some earlier, unrelated prompt without this checklist doc being updated). Live-verified this directly rather than assuming. No edit made to O-8 — editing an already-correct node would've been a no-op at best, a duplicate line at worst.
 
-**Exact changes — grep each old node first to confirm it's still the single silent-ending leaf before editing, since these are 3 separate spots in 3 separate branches:**
+**O-10 and O-11 — genuinely silent, fixed as drafted:** both nodes matched exactly (`↳ IF ... [BAD]: ▸ Set status Not Interested.` with zero spoken text). Added *"Got it — appreciate your time, have a good one."* (O-10) and *"My apologies for the mix-up — have a good one."* (O-11), single occurrence each confirmed by grep.
 
-- **O-8** (Opener → "What's this about?/pushback" → "Still shuts it down"): add → *"No worries — appreciate your time, take care."* → then Not Interested.
-- **O-10** (Opener → "No" → "were you hiring" → confirms/engages → "actively looking?" → "No, not interested"): add → *"Got it — appreciate your time, have a good one."* → then Not Interested.
-- **O-11** (Opener → very first fork → "Genuinely wrong number/business"): add → *"My apologies for the mix-up — have a good one."* → then Not Interested. (This is the one Brayden screenshotted and described as "my apologies, goodbye or something.")
+**Full-file audit (per Brayden's added audit step):** wrote a script to check every one of the 33 `▸ Set status` nodes in the file for a preceding quoted SAY-THIS line. Found **3 more silent endings beyond O-8/O-10/O-11** — all Follow-Up, not Not-Interested, so the original "3 silent endings" scope was incomplete on two counts: O-8 didn't need it, and 3 different Follow-Up nodes did:
+- Handoff "Just send me some info" → "Okay, fair" → "Still hesitant" → "Gives a time" → added *"Perfect — I'll follow up with you then."*
+- Sibling "Still wants info first" → "Gives a time" → added *"Perfect — I'll follow up with you then."*
+- Handoff "I don't have time this week" → "Those don't work either" → "Gives a time" → added *"Got it — I'll follow up with you then."*
 
-These three lines are drafted per-context (wrong number needs an apology, a flat decline doesn't) — flag to Brayden as an editorial judgment call if any read wrong once he sees them live, same as prior wording passes in this review.
+**Final count: 5 silent endings existed total (O-10, O-11, + 3 Follow-Up nodes above); 0 remain.** Re-ran the audit script after all edits — 33/33 terminal-status nodes now have a spoken line before them.
 
-`npx vite build` clean, then live-verify all 3 in Training Center → Script practice: confirm each renders its new SAY THIS line before landing on the red Not Interested card, and that no other branch's wording changed.
+`npx vite build` clean both times. Live-verified all 5 fixes in Training Center → Script practice (`apex11` login): each new line renders correctly before its status card, and O-8's pre-existing exit line was confirmed unchanged. Two commits: `9159b03` (O-10/O-11 + build/verify), `2a1f5c3` (the 3 audit-caught Follow-Up fixes).
 
 ---
 

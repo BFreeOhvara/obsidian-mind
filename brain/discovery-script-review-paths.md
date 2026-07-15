@@ -37,10 +37,10 @@ Tail after each of these (unless marked terminal) = Vitals → Pain **Engaged** 
 - [ ] **O-5.** Diverges one fork earlier → **"Transferring"** (different re-intro line) → then same qualifier fork as O-1, pick **"Yeah"** → rejoins Path 1's tail → Appointment Booked.
 - [ ] **O-6.** Diverges at the "How do they respond?" fork → **"They're not here right now / I'll leave a message"** → own ending: *"No worries — is there a better time..."* → **▸ Follow-Up**. (Terminal — no tail.)
 - [ ] **O-7.** Diverges at the "How do they respond?" fork → **"What's this about? / pushback"** → disarm line → **"Engages"** → then same qualifier fork, pick **"Yeah"** → rejoins Path 1's tail → Appointment Booked.
-- [ ] **O-8.** Same fork as O-7 but → **"Still shuts it down"** → own ending: **▸ Not Interested** (no spoken line — straight to status). (Terminal — no tail.)
-- [ ] **O-9.** Diverges at the very first fork → **"No"** → *"were you hiring for [job title]?"* → **"Confirms/engages"** → *"Are you actively looking?"* → **"Yes"** → reconnects to the identical "How do they respond?" subtree as O-1. Spot-check only: confirm it reconnects correctly — content from here is identical to O-1/O-5/O-7, already reviewed.
-- [ ] **O-10.** Same branch as O-9 up to "actively looking" → **"No, not interested"** → own ending: **▸ Not Interested** (no spoken line). (Terminal — no tail.)
-- [ ] **O-11.** Diverges at the very first fork → **"Genuinely wrong number/business"** → own ending: **▸ Not Interested** (no spoken line). (Terminal — no tail.)
+- [x] **O-8.** Same fork as O-7 but → **"Still shuts it down"** → own ending: **▸ Not Interested**. *(Re-checked 2026-07-15 (Prompt 269) — this doc's "no spoken line" note was stale; the live node already ends on "All good, man — appreciate your time. Take care." before status, fixed by an earlier unrelated prompt. No edit needed.)*
+- [x] **O-9.** Diverges at the very first fork → **"No"** → *"were you hiring for [job title]?"* → **"Confirms/engages"** → *"Are you actively looking?"* → **"Yes"** → reconnects to the identical "How do they respond?" subtree as O-1. Spot-check only: confirm it reconnects correctly — content from here is identical to O-1/O-5/O-7, already reviewed.
+- [x] **O-10.** Same branch as O-9 up to "actively looking" → **"No, not interested"** → own ending: **▸ Not Interested**. *(Fixed 2026-07-15, Prompt 269, `9159b03` — added "Got it — appreciate your time, have a good one.")*
+- [x] **O-11.** Diverges at the very first fork → **"Genuinely wrong number/business"** → own ending: **▸ Not Interested**. *(Fixed 2026-07-15, Prompt 269, `9159b03` — added "My apologies for the mix-up — have a good one.")*
 
 ## Pain forks (Path 1's Opener + Vitals already reviewed — pick up from the Pain fork)
 
@@ -56,10 +56,10 @@ Tail after each of these (unless marked terminal) = Handoff **Good → picks a t
 
 - [ ] **H-2.** At the Handoff fork, **"Good/shows interest"** (same as Path 1) → then **"Still hesitant"** instead of picking a time → **▸ Follow-Up** (plain, no extra logged detail). (Terminal.)
 - [ ] **H-3.** At the Handoff fork, pick **"Just send me some info"** → **"Okay, fair"** → picks a time → Close → Appointment Booked.
-- [ ] **H-4.** Same as H-3 but at the time-ask, **"Still hesitant"** → *"I'll send it over today... 15-minute placeholder..."* → **▸ Follow-Up (send info + placeholder)**. (Terminal.)
-- [ ] **H-5.** At the Handoff fork, "Just send me some info" → **"Still wants info first"** (skips the "okay fair" step) → *"Fair enough... placeholder... if it's interesting, we're already set."* → **▸ Follow-Up (send info + placeholder)** — different line from H-4. (Terminal.)
+- [x] **H-4.** Same as H-3 but at the time-ask, **"Still hesitant"** → **"Gives a time"** → **▸ Follow-Up (log the callback window)**. *(Description here was stale — the "15-minute placeholder" wording was replaced by Prompts 254/255 with a Gives-a-time/Not-interested fork. That fork's "Gives a time" leaf was itself found silent during Prompt 269's audit and fixed 2026-07-15, `9159b03` — added "Perfect — I'll follow up with you then.")*
+- [x] **H-5.** At the Handoff fork, "Just send me some info" → **"Still wants info first"** (skips the "okay fair" step) → **"Gives a time"** → **▸ Follow-Up (log the callback window)** — same fork shape as H-4, own line. *(Same stale-description note as H-4; this "Gives a time" leaf was also found silent and fixed 2026-07-15, `2a1f5c3` — added "Perfect — I'll follow up with you then.")*
 - [ ] **H-6.** At the Handoff fork, pick **"I don't have time this week"** → picks a day → Close → Appointment Booked.
-- [ ] **H-7.** Same as H-6 but **"Those don't work either"** → *"what's a better week for you?"* → **▸ Follow-Up (log the week they gave)**. (Terminal.)
+- [x] **H-7.** Same as H-6 but **"Those don't work either"** → **"Gives a time"** → **▸ Follow-Up (log the week they gave)**. *(This "Gives a time" leaf was found silent during Prompt 269's audit and fixed 2026-07-15, `2a1f5c3` — added "Got it — I'll follow up with you then.")*
 - [ ] **H-8.** At the Handoff fork, pick **"Who is this / what company?"** → **"That's me"** → picks a time → Close → Appointment Booked.
 - [ ] **H-9.** Same as H-8 but **"Still hesitant"** → *"I'll send some info over, and if the numbers make sense..."* → **▸ Follow-Up (log pricing pushback, send info)**. (Terminal — this exact line/action repeats verbatim at H-13 and H-15 below.)
 - [ ] **H-10.** At the Handoff fork, "Who is this" → **"That's [owner]"** → **"Gives a window"** → **▸ Follow-Up (log the callback window)**. (Terminal.)
@@ -79,10 +79,10 @@ The path list above collapses stretches that **start** the same way. This is the
 
 **Not Interested — two flavors**
 - *With a spoken exit line* ("Okay, well, that's a different story then..."): **O-4, P-3, P-6** — identical wording all three times.
-- *Silent, straight to status*: **O-8, O-10, O-11** — no line at all before hanging up. Worth deciding during review whether that's intentional.
+- *Was silent, now fixed*: **O-10, O-11** — fixed 2026-07-15 (Prompt 269, `9159b03`). **O-8 was already non-silent** when checked (an earlier prompt had already added its exit line; this index's original note was stale).
 
 **Follow-Up — mostly distinct, one exact triplicate**
-O-6, H-2, H-4, H-5, H-7, H-10, H-11 are all worded/logged differently — each needs its own look. But **H-9, H-13, H-15 are byte-for-byte identical** (same line, same logged detail) — review once at H-9.
+O-6, H-2, H-4, H-5, H-7, H-10, H-11 are all worded/logged differently — each needs its own look. But **H-9, H-13, H-15 are byte-for-byte identical** (same line, same logged detail) — review once at H-9. **A full silent-ending audit (Prompt 269, 2026-07-15) found H-4, H-5, and H-7's "Gives a time" leaves were silent too** (not just the O-8/O-10/O-11 set originally suspected) — all fixed, see H-4/H-5/H-7 above.
 
 ---
 

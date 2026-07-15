@@ -64,6 +64,22 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-15 (cont.) — CC: Prompt 269 shipped — full silent-ending audit found 5 total (not 3), all fixed
+
+Shipped Prompt 269 from LIVE_STATE, but the scope changed mid-flight: while re-reading LIVE_STATE to log Prompt 271, found Falcon had added a new "Audit step" directly to disk (uncommitted, same FUSE-bridge limitation just documented in Prompt 271) asking for a full sweep of every terminal-status node in `discoveryScript.js`, not just the 3 originally assumed (O-8/O-10/O-11).
+
+Grepped O-8's actual node before touching it, per the prompt's own instruction — **it was already non-silent**, already ending on "All good, man — appreciate your time. Take care." before Not Interested (fixed by some earlier prompt without the review-paths checklist being updated to reflect it). Skipped editing it; live-verified this directly rather than trusting the doc. O-10 and O-11 matched the silent pattern exactly and got the drafted lines ("Got it — appreciate your time, have a good one." / "My apologies for the mix-up — have a good one.").
+
+Then ran the actual audit: wrote a small script checking all 33 `▸ Set status` nodes in the file for a preceding spoken line. Found **3 more silent endings Brayden's/Falcon's manual review had missed** — all Follow-Up type, not Not-Interested: two "Gives a time" leaves under Handoff's "Just send me some info" fork (both got "Perfect — I'll follow up with you then.") and one under "I don't have time this week" → "Those don't work either" (got "Got it — I'll follow up with you then."). **Total: 5 silent endings existed, all 5 now fixed, 0 remain** — re-ran the audit script post-edit to confirm 33/33 clean.
+
+`npx vite build` clean on both commits. Live-verified all 5 fixes in Training Center → Script practice (`apex11` login), plus confirmed O-8's pre-existing exit line still renders unchanged. Two commits: `9159b03` (O-10/O-11), `2a1f5c3` (the 3 audit-caught Follow-Up fixes).
+
+**Lesson for future path-review work:** a manual eyeball pass over a large branching script (like the original discovery-script-review-paths checklist) will miss some silent/dead-end nodes — a scripted grep-and-check sweep catches what eyeballing doesn't, and it's cheap to run before calling a "fix the silent endings" task done. Worth applying the same audit-script technique proactively next time a similar completeness claim is made about this file.
+
+**Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 269 (silent-ending audit, 5 fixed) and Prompt 271 (git lock cleanup) are both shipped. One item remains queued: Prompt 270 (AI Roleplay overhaul — investigate current Retell agent architecture + score-roleplay grading rubric FIRST, report back before building; do not build yet).`
+
+---
+
 ### 2026-07-15 — CC: Prompt 271 shipped — orphaned `.git` lock cleanup + Cowork git-limitation documented
 
 Ran the native-only cleanup Prompt 271 called for. **Task 1:** found 100+ orphaned lock artifacts in `obsidian-mind/.git/` (`.dead.*`, `.old.*`, `.bak*` suffixes on `index.lock`/`HEAD.lock`/`ORIG_HEAD.lock`, going back to at least 2026-06-26, accumulated across dozens of past Cowork sessions) — confirmed `git status`/`git log` both ran cleanly first (so no genuine in-progress process), deleted all suffixed files in one pass, re-confirmed git still works cleanly after. Also caught the exact scenario this prompt warned about in the wild: `git status` showed no new commits, but a `git diff` turned up real uncommitted content in `LIVE_STATE.md`/`Memories.md` (Falcon's Prompts 269/270/271 queue entries, sitting on disk since the FUSE bridge blocked Falcon's own commit) — proceeded per the new rule and committed that content forward rather than assuming "no new commit" meant "no new vault changes."
