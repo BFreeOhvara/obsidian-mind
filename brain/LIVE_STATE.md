@@ -18,6 +18,23 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
+### 🔲 Prompt 275 — replace dashboard branding with the real Ohvara logo
+
+**Context:** Brayden's actual brand logo (a two-shape teal/white bird-sail mark on a navy `#0B1E3D`-ish square background) has been sitting in the vault as a placeholder icon this whole build — the dashboard sidebar currently shows a generic icon (looked like a lucide-react icon, e.g. `Zap`, in a colored square next to the "Ohvara" wordmark, per the Training Center screenshots in recent sessions) rather than the real logo. Brayden supplied the actual file this session.
+
+**Source file (in the vault, use this exact file — do not regenerate/redraw it):** `brain/media/new ohvara pfp.png` (503×795 PNG, transparent-background NOT confirmed — has a solid navy square background baked in, check whether that clashes with the sidebar's actual background color before deciding whether to use as-is or crop/matte it).
+
+**Task:**
+1. Copy the file into the dashboard repo's static assets (`public/` or `src/assets/`, whichever this codebase's existing convention uses — check how other static images/icons are currently served).
+2. Grep the whole repo for the current logo/icon usage — likely `Sidebar.jsx` (the icon next to "Ohvara" / "Setter Portal" / "Manager Portal" / whatever the per-role subtitle is) — and swap it for an `<img>` of the new file. Check ALL roles' sidebars (rep/closer/admin/client if a client portal shares this component), not just one.
+3. Also check and update, if they currently use the same generic icon: the browser tab favicon, the login/auth page (if it shows a logo), and any other spot branding appears (email templates, PDF exports, etc. — search broadly, don't assume it's sidebar-only).
+4. **Background compatibility check:** the source file has a navy square background. If the sidebar's own background is a close/matching navy, it may look fine as-is (blends in, reads as an icon). If not, or if it should render as a clean icon without a visible background box, consider whether cropping/mattting out the navy square (transparent PNG) reads better — use your judgment, but flag which approach you took and why in the ship log rather than silently picking one.
+5. Keep the sizing reasonable for a small sidebar icon (the source is a tall 503×795 aspect ratio — decide whether to crop to a tighter square/circle crop around just the bird-sail mark, or scale the whole rectangle down, whichever renders cleanest at icon size — flag your choice).
+
+**Verification:** live-verify in the dashboard (any role) that the new logo renders correctly in the sidebar at normal size, doesn't look stretched/cropped oddly, and the favicon (if updated) shows correctly in the browser tab. Screenshot and compare to the source file before calling this done, per the standing self-verification rule.
+
+---
+
 ### ✅ Prompt 271 SHIPPED 2026-07-15 (native CC cleanup, no code commit — vault-only) — orphaned `.git` lock files removed + Cowork git-limitation documented
 
 Deleted 100+ orphaned lock artifacts (`.dead.*`/`.old.*`/`.bak*` suffixes on `index.lock`/`HEAD.lock`/`ORIG_HEAD.lock`) from `obsidian-mind/.git/` after confirming `git status`/`git log` ran cleanly first. Documented the root cause + workflow rule in [[Gotchas]] and added [[North Star]] Rule 18. Full writeup in [[Memories]].

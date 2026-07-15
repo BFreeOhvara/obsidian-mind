@@ -64,6 +64,19 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-15 (cont. 5) — Falcon: got Brayden's real Ohvara logo file into the vault, queued as Prompt 275
+
+**What happened:** Brayden shared his actual brand logo (teal/white bird-sail mark on navy background) and wanted it set as the dashboard's logo. Couldn't get the file directly — a pasted image has no backing file I can access, and a OneDrive share link only resolves to a client-rendered preview page (web_fetch returned nothing useful). Brayden then screenshotted File Explorer showing it at `Pictures\Saved Pictures\new ohvara pfp.png` — outside any folder I can reach directly. Used computer-use (File Explorer, granted access) to copy it myself: copy on the source file → navigate to `obsidian-mind\media` via the address-bar history dropdown (not by typing the path — typing used a clipboard fast-path that silently clobbered the copied file the first attempt, had to redo it) → paste. Confirmed identical via Read. File now lives at `brain/media/new ohvara pfp.png`, 503×795 PNG.
+
+Queued **Prompt 275**: swap the dashboard's current placeholder icon (looked like a generic lucide icon in the sidebar next to "Ohvara") for this real file — sidebar for all roles, favicon, login page, anywhere else branding shows. Flagged two open judgment calls for CC rather than deciding myself: whether the logo's baked-in navy square background clashes with the sidebar's actual background (crop to transparent if so), and how to crop the tall 503×795 source down to icon size (tight crop around just the mark vs. scaling the whole rectangle).
+
+**Process note for future sessions:** if a user shares a file via screenshot/File-Explorer-location instead of a real upload, computer-use + File Explorer copy/paste is a reliable path to get it into the vault — just navigate via clicking (breadcrumb dropdown history, or folder double-clicks) rather than typing paths into the address bar, since typing can silently eat the clipboard if something was just copied.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 275 is queued: replace the dashboard's placeholder branding with the real logo file at brain/media/new ohvara pfp.png (copied in this session, verified accurate). Covers sidebar (all roles), favicon, login page, anywhere else branding appears. Two judgment calls flagged for CC to make and report on: navy-background crop/matte decision, and how to crop the 503x795 source to icon size. Prompt 274 (Supabase secrets CLI) should be checked — may have shipped already, verify. Nothing else queued beyond these.`
+
+---
+
 ### [CC | 2026-07-15 — session close] — confirming full capture, no further work this chain
 
 Session already fully logged in the entry directly below (Prompt 274 shipped — both Supabase secrets set and verified via live invocation, `75efd38`). This entry exists only to satisfy the Atlas logging gate on session end — `git status` on both `ohvara-dashboard` and `obsidian-mind` is clean, no additional changes since the last commit. LIVE_STATE queue is empty except the live mic-call verification still waiting on Brayden.
