@@ -64,6 +64,19 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-15 (cont. 4) — Falcon: corrected Prompt 272's "Brayden must use the dashboard" claim — queued as Prompt 274
+
+**What happened:** Prompt 272 shipped the code but told Brayden the 2 remaining secret changes (`RETELL_ROLEPLAY_AGENT_ID` clear, `DEMO_MODE=false`) needed the Supabase Dashboard because "no CC tool reaches Supabase secrets." Brayden asked whether CC could just do it — checked the vault history and found this claim doesn't hold: CC has set secrets via the Supabase CLI (`npx supabase secrets set KEY=value --project-ref jjextitmbptoaolacocs`) many times on this exact project, including the original `DEMO_MODE=true` (Prompt 25) and the Deepgram/Twilio keys. This was likely CC either not thinking to reach for the CLI, or the auto-mode permission classifier flagging it as sensitive and wanting explicit confirmation first (same pattern as the git-push-to-master block from a few sessions back) — either way, not a genuine capability gap.
+
+Also checked whether *this* Cowork session could do it directly via its own Supabase MCP connection (Brayden had just granted full/always-allow access) — confirmed it can't: the connected MCP toolset has schema/query/deploy/logs tools but no secrets-management endpoint at all, so no permission level unlocks it. Separately, even if it could, this is the kind of production security/config change (a live voice AI's cached prompt, an API-gating flag) better left to CC's normal deploy flow than something Cowork does unilaterally.
+
+Queued **Prompt 274**: run both `supabase secrets` commands via CC's CLI, with Brayden's go-ahead pre-confirmed in the prompt so it doesn't stall waiting to ask again. Live mic-call verification (phrasing variety, vitals, outcome, real score) still stays with Brayden — only the secret-setting mechanics were the actual blocker.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 274 is queued: run 'npx supabase secrets unset RETELL_ROLEPLAY_AGENT_ID --project-ref jjextitmbptoaolacocs' and 'npx supabase secrets set DEMO_MODE=false --project-ref jjextitmbptoaolacocs' (Brayden's go-ahead already confirmed, don't re-ask), then verify via one create-roleplay-call invocation that a fresh agent_id gets created. This finishes Prompt 272's remaining gap — CC's original claim that this needed the Supabase Dashboard was incorrect, corrected in LIVE_STATE. After 274 ships, Brayden still needs to do the live mic-call verification himself. Prompt 273 (difficulty-weighted grading) remains blocked until all of this is verified live. Nothing else queued.`
+
+---
+
 ### 2026-07-15 (cont. 3) — CC: Prompt 272 built + deployed — 2 dashboard-only actions handed off to Brayden
 
 Built the code for Prompt 272 (parts 1-3 of the AI Roleplay overhaul) in `create-roleplay-call/index.ts`: templated `ROLEPLAY_AGENT_PROMPT` with `{{var}}` placeholders, added 5 arrays of 3 phrasing variants each (opener, Indeed mention, objection, engage-to-book, pushback-on-pitch) selected via a `pick()` helper, added `randInt()` for the calls/month (15-60) and missed/day (1-6) vitals, wired all of it into a `dynamicVariables` object passed as `retell_llm_dynamic_variables` on `create-web-call`. Replaced the hard hang-up instruction (#8) with an always-resolves-to-Follow-Up-or-Booked rule, and stripped the dead "AT END OF CALL... SCORE:..." self-grading recitation that the frontend never parsed anyway.

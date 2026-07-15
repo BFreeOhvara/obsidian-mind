@@ -65,6 +65,18 @@ Deleted 100+ orphaned lock artifacts (`.dead.*`/`.old.*`/`.bak*` suffixes on `in
 
 ---
 
+### 🔲 Prompt 274 — finish Prompt 272: set both Supabase secrets via CLI (correction — this does NOT need Brayden/the dashboard)
+
+**Context:** Prompt 272 below claimed "no CC tool reaches Supabase secrets" and handed both remaining steps to Brayden to do manually in the Supabase Dashboard. That's wrong — CC has set secrets via the Supabase CLI many times before on this exact project (`npx supabase secrets set KEY=value --project-ref jjextitmbptoaolacocs`), including the original `DEMO_MODE=true` (Prompt 25) and the Deepgram/Twilio keys. There's no dashboard-only requirement here. **Brayden has explicitly confirmed go-ahead for both commands below — do not re-ask, just run them** (same as the deploy confirmation already given for Prompt 272 itself).
+
+**Run both:**
+1. `npx supabase secrets unset RETELL_ROLEPLAY_AGENT_ID --project-ref jjextitmbptoaolacocs` (clearing it, not setting a new value — confirm `unset` is the right subcommand for removing a secret entirely; if the CLI doesn't support `unset` for this, check `supabase secrets list` first for the exact current mechanism, e.g. some versions require setting it to an empty string instead). This forces `create-roleplay-call`'s existing `if (!agentId)` branch to rebuild the agent+LLM fresh from the new template on its next invocation — no other code change needed.
+2. `npx supabase secrets set DEMO_MODE=false --project-ref jjextitmbptoaolacocs` — flips `score-roleplay` (and the other DEMO_MODE-gated functions: `recommend-stack`, `generate-ai-script`) to real Claude calls instead of the stubbed response. Worth a quick `ANTHROPIC_API_KEY` presence check first (`supabase secrets list`) — if it's missing, `score-roleplay` already degrades gracefully per Prompt 272's own note, so this is safe to flip either way.
+
+**Verification:** trigger one `create-roleplay-call` invocation (any way that's easiest from CC's side — doesn't need to be a full live mic call, just needs to hit the endpoint once) and confirm via `get_logs`/`get_edge_function` that a fresh agent got created (new `agent_id`, not the old cached one). Report both secrets' new state back in the ship log. **Brayden still needs to do the actual live mic-call verification from Prompt 272** (phrasing variety, vitals range, outcome, real score) — that part remains his to do, only the two secret-setting steps were the actual CC-blocker.
+
+---
+
 ### ⚠️ Prompt 272 — CODE SHIPPED + DEPLOYED 2026-07-15 (`6630710`, pushed; Supabase `create-roleplay-call` v15, ACTIVE) — 2 dashboard-only actions still needed from Brayden before it's live
 
 **What's done:** `create-roleplay-call/index.ts` now templates `ROLEPLAY_AGENT_PROMPT` with `{{var}}` placeholders and picks one of 3 phrasing variants per non-terminal fork (opener, Indeed mention, objection line, engage-to-book, pushback-on-pitch) plus randomized `{{calls_per_month}}`/`{{missed_per_day}}` (15–60/1–6) server-side via `Math.random()`, passed per call through `retell_llm_dynamic_variables`. Instruction #8 (hard hang-up) replaced with an always-resolves-to-Follow-Up-or-Booked rule. The dead in-call self-grading recitation ("AT END OF CALL... SCORE:...") is stripped. Deployed live to Supabase (asked Brayden for explicit go-ahead first — the auto-mode classifier correctly blocked the first attempt as an unconfirmed production deploy, re-ran after confirmation).
