@@ -66,8 +66,8 @@ Tail after each of these (unless marked terminal) = Handoff **Good → picks a t
 - [ ] **H-11.** Same as H-10 but **"Only reachable by email"** → *"what's the best email?"* → **▸ Follow-Up (logged email, thanked and exited)**. (Terminal.)
 - [ ] **H-12.** At the Handoff fork, pick **"How much does this cost?"** → **"Okay"** → picks a time → Close → Appointment Booked.
 - [ ] **H-13.** Same as H-12 but **"Still hesitant"** → identical line/action to H-9 → **▸ Follow-Up (log pricing pushback, send info)**. Spot-check routing only — content already reviewed at H-9. (Terminal.)
-- [ ] **H-14.** At the Handoff fork, "How much does this cost?" → **"Just need a ballpark"** → picks a time → Close → Appointment Booked.
-- [ ] **H-15.** Same as H-14 but **"Still hesitant"** → identical line/action to H-9/H-13 → **▸ Follow-Up (log pricing pushback, send info)**. Spot-check routing only. (Terminal.)
+- [x] **H-14.** At the Handoff fork, "How much does this cost?" → **"Just need a ballpark"** → picks a time → Close → Appointment Booked. *(Reviewed 2026-07-14 — lead-in line flagged, reworded, shipped as Prompt 268, `54e6a9c`.)*
+- [x] **H-15.** Same as H-14 but **"Still hesitant"** → identical line/action to H-9/H-13 → **▸ Follow-Up (log pricing pushback, send info)**. Spot-check routing only. (Terminal.) *(Confirmed 2026-07-14 — no changes needed.)*
 
 ---
 

@@ -64,6 +64,38 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-14 (cont. 2) — CC: Prompt 268 shipped — H-14 lead-in reworded, discovery script path-by-path review fully closed out (28/28)
+
+Shipped the queued Prompt 268 from [[LIVE_STATE]]: reworded the H-14 "Just need a ballpark" lead-in line in `src/lib/discoveryScript.js` to drop the value-justification framing ("worth 15 minutes") in favor of a low-commitment ask, per Brayden's live review. Grep confirmed single occurrence before editing; `npx vite build` clean; live-verified in Training Center → Script practice (`apex11` login) by walking the full Opener→Vitals→Pain→Handoff→pricing path to the H-14 screen and confirming the new line renders with the mornings/afternoons fork unchanged below it. Committed and pushed as `54e6a9c`.
+
+This was the last open item on the discoveryScript.js path-by-path review — with Path 28 (H-15) already confirmed no-changes by Falcon's prior session (below), **all 28 paths are now reviewed and shipped.** Nothing remains queued on this project. Also confirmed on pull that commit `8bcad97` (Falcon's LIVE_STATE queue entry) was already on origin — no stranded local commit to push.
+
+**Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. The discoveryScript.js path-by-path review is fully complete (28/28 paths reviewed, Prompt 268 shipped 54e6a9c). LIVE_STATE queue is empty — check North Star Current Focus for what's next.`
+
+---
+
+### 2026-07-14 (cont.) — Falcon: Path 28 (H-15) confirmed no changes — discovery script path-by-path review fully closed out (28/28)
+
+**What happened:** Brayden walked Path 28 (H-15 — pricing-ballpark "Still hesitant" ending, spot-check only since it's byte-for-byte identical to the already-approved H-9/H-13 line) live and confirmed it looks good, no changes needed. This was the last unreviewed path in [[discovery-script-review-paths]] — **the full 28-path discoveryScript.js review is now complete**, pending only Prompt 268 (Path 27/H-14 wording, queued in [[LIVE_STATE]], not yet shipped by CC).
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Discovery script path-by-path review is fully done — all 28 paths reviewed and approved. Only remaining item: Prompt 268 (H-14 pricing-ballpark lead-in reworded) is queued in LIVE_STATE, not yet shipped by CC. IMPORTANT: check whether commit 8bcad97 (LIVE_STATE Prompt 268 queue entry) made it to origin — it was committed locally from a sandbox with no GitHub push credentials and may still need pushing; also check whether the Memories.md log entries from 2026-07-14 made it into a real commit, since that same session hit a persistent .git/index.lock unlink bug on this vault's mount that silently no-ops git add/commit. Once Prompt 268 ships, the entire script review project is closed — nothing else queued on it.`
+
+---
+
+### 2026-07-14 — Falcon: Path 27 (H-14) walked — pricing-ballpark lead-in reworded, queued as Prompt 268
+
+**What happened:** Brayden resumed the discoveryScript.js path-by-path review at Path 27 (H-14), walking it live in Training Center → Script practice. Flagged the lead-in line before the mornings/afternoons offer ("...which is exactly why the call is worth 15 minutes...") as reading like a value-justification pitch rather than a low-commitment ask. Worked out the replacement wording with him over two rounds: "The range is wide depending on what you need — just set aside 15 minutes, hear the team out, and they'll give you an accurate number based on your exact situation. You can decide from there." Confirmed scoped to this one screen only — similar "15 minutes" language elsewhere in the main Handoff pitch is explicitly NOT in scope for this change. Queued as **Prompt 268** in [[LIVE_STATE]].
+
+**Push note:** this session's sandbox has no GitHub credentials (same recurring limitation as before) — the LIVE_STATE edit is committed locally (`8bcad97`) but NOT pushed to origin. CC needs to `git pull` with awareness this local commit may not be visible remotely yet, or the next session with push access needs to push `8bcad97` before/alongside shipping Prompt 268.
+
+Path 27 done once 268 ships. Path 28 (H-15) still remains — spot-check only, identical wording to H-9/H-13, already reviewed.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 268 is queued in LIVE_STATE (H-14 pricing-ballpark lead-in reworded, content-only edit to discoveryScript.js). IMPORTANT: check whether commit 8bcad97 (the LIVE_STATE queue edit) made it to origin — it was committed locally from a sandbox with no GitHub push credentials and may still need pushing. Discovery script path-by-path review: Path 27 (H-14) done once 268 ships. Path 28 (H-15) remains — spot-check only, identical wording to H-9/H-13. Nothing else queued.`
+
+---
+
 ### 2026-07-09 (cont. 6) — Eagle: two wording fixes on the shared morning/afternoon offer flow, queued as Prompts 266 and 267
 
 Brayden reviewed the Prompt 264 flow live and caught two issues, both on shared code (fixing once covers all 7 sites): (1) the pricing response line and "Do mornings or afternoons work better for you?" read as two blocky sentences — added a "So —" connector, queued as **Prompt 266**. (2) the before-5pm afternoon-offer resolution ("Are you free later today?") sounded off ("like we're asking him out on a date") and was inconsistent with the other two branches' "Does [X] work for you?" pattern — reworded to "Does later this afternoon work for you?", queued as **Prompt 267**. Brayden explicitly confirmed applying both fixes everywhere the lines appear, not just the one site he was looking at.
