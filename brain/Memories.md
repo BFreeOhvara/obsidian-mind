@@ -64,6 +64,24 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-15 (cont. 6) — CC: Prompt 275 shipped — real Ohvara logo replaces the placeholder Zap-icon badge everywhere
+
+Corrected the source file's stats before building against them: Falcon's prompt described `brain/media/new ohvara pfp.png` as 503×795 with unconfirmed transparency; actual file (checked via Pillow) is 478×479 — nearly perfectly square — and fully opaque with a solid navy `rgb(10,31,68)` background. No cropping needed for aspect ratio.
+
+Grepped the whole `ohvara-dashboard` repo for the `Zap`-icon-in-a-colored-square pattern rather than trusting "probably Sidebar.jsx" — found exactly 3 real branding spots (`Sidebar.jsx` 28×28 shared across every role, `Login.jsx` 48×48, `ClientOnboarding.jsx`'s `Brand` component 44×44) plus 2 unrelated legitimate `Zap` feature-icon uses that were correctly left alone (`ClientAutomations.jsx`, `ClientOverview.jsx` — those represent the actual "Automations" concept, not branding). Confirmed no separate `ohvara-client-portal` repo exists locally, so nothing else needed touching. Replaced all 3 spots with `<img>` tags of the real logo at matching size/radius, removed the now-dead `Zap` imports from the two files where it was branding-only.
+
+**Judgment call on the navy background (flagged per the prompt's own instruction):** kept it as-is rather than cropping to transparent. The sidebar's actual background computed to `rgba(8,8,16,0.75)` (near-black glass), which doesn't match the logo's navy — but the navy square reads fine as a colored icon badge, matching the exact visual pattern the OLD purple-accent-square used. Cropping risked ugly anti-aliasing on the angular sail shapes for no real gain.
+
+Replaced the favicon too (`index.html` now points at a new `public/ohvara-favicon.png` instead of the old abstract purple `favicon.svg`) — left the old SVG file in place since deleting an asset that might be cached somewhere wasn't necessary for this task.
+
+**Verification gap, flagged honestly rather than papered over:** `computer` screenshot capture was broken all session (timed out on every attempt, no clear cause). Verified via direct DOM/computed-style inspection instead — logged in as `apex11`, confirmed the sidebar and login-page images both load successfully at the correct dimensions/border-radius, confirmed the favicon serves 200/image-png. `ClientOnboarding.jsx`'s identical-pattern change wasn't independently live-tested (no client-role test account handy this session) but the build compiled clean.
+
+Shipped as `a023426`, pushed.
+
+**Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 275 (real logo replacing the placeholder Zap badge) is shipped (a023426) — sidebar, login, client onboarding, and favicon all updated. Verified via DOM inspection since screenshot capture was broken this session; worth a quick visual screenshot check next session once that tool issue clears, and Brayden should glance at it live to confirm the navy-badge look reads well. Nothing else queued — still waiting on Brayden's live mic-call verification of the AI Roleplay work (Prompts 272/274) before Prompt 273 can be scoped.`
+
+---
+
 ### 2026-07-15 (cont. 5) — Falcon: got Brayden's real Ohvara logo file into the vault, queued as Prompt 275
 
 **What happened:** Brayden shared his actual brand logo (teal/white bird-sail mark on navy background) and wanted it set as the dashboard's logo. Couldn't get the file directly — a pasted image has no backing file I can access, and a OneDrive share link only resolves to a client-rendered preview page (web_fetch returned nothing useful). Brayden then screenshotted File Explorer showing it at `Pictures\Saved Pictures\new ohvara pfp.png` — outside any folder I can reach directly. Used computer-use (File Explorer, granted access) to copy it myself: copy on the source file → navigate to `obsidian-mind\media` via the address-bar history dropdown (not by typing the path — typing used a clipboard fast-path that silently clobbered the copied file the first attempt, had to redo it) → paste. Confirmed identical via Read. File now lives at `brain/media/new ohvara pfp.png`, 503×795 PNG.
