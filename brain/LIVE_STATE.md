@@ -18,6 +18,16 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
+### ✅ Prompt 278 SHIPPED 2026-07-15 (`d614ee5`, pushed) — missing Still-hesitant option restored; full-script audit found no other single-option forks
+
+**Root cause confirmed via git blame + the actual parser, not guessed:** Prompt 264 (`07f2381`, the shared `timeOfDayOfferFlow` refactor) is exactly the regression Falcon suspected. At this one spot (Handoff's `Good/shows interest → Still hesitant → Do they engage this time?` node), it replaced the old inline "pick a time" block with `...timeOfDayOfferFlow('      ')` (6 spaces) — the SAME indent as its parent `Engages` option, instead of one level deeper (9 spaces, the pattern Prompt 264 got right at every other call site in the file). `discoveryScript.js`'s indent-based tree parser (`parseSteps`) requires child content to sit strictly deeper than its parent option; landing at the same depth broke the fork's sibling-scan immediately after `Engages`, so the following `Still hesitant` line (and its whole timing/not-a-good-fit sub-fork) never attached — it just silently fell out of the tree instead of crashing, which is why it read as "only one option" rather than an error.
+
+**Fix:** bumped exactly 2 lines by one indent level (`timeOfDayOfferFlow('      ')` → `'         '`, and the `Still hesitant` line beneath it 6→9 spaces) so the offer-flow and its own nested timing fallback properly nest under `Engages`, restoring the original Prompt 252 structure. No new copy needed — the fallback wording already existed in the file, just orphaned by the indent bug.
+
+**Verified with the real parser, not eyeballing:** built a temporary unauthenticated QA route (`/qa-harness-278`, same disposable-harness pattern as Prompt 277, deleted before commit) that calls the actual `buildScriptFlow()` and walks every fork in all 5 sections. Post-fix: **52 total forks, 0 single-option forks, 0 garbled/mis-parsed text** anywhere in the script — confirms this was the only instance of the bug and nothing else regressed. The other 3 "Do they engage this time?"/"Do they engage?" occurrences in the file were already correctly indented (double-checked via the same tool before assuming they needed the same fix).
+
+---
+
 ### ✅ Prompt 276 SHIPPED 2026-07-15 (`488b847`, pushed) — Final Exam gate now reads DB truth, not a localStorage flag that never synced
 
 **Root cause confirmed, not guessed:** `TrainingCenter.jsx`'s `finalQuizPassed` state (gates `AIRoleplay`'s `examPassed` prop) was `useState(() => localStorage.getItem('ohvara_final_quiz_passed') === '1')` — set **only** in the browser that took the Final Exam, and `handleFinalQuizPassed()` never called `saveProgress(...)` to persist it. `training_progress.quiz_passed_at` (which apex11 has set) is a **different, older quiz** (`QuizTab`, the 20-question mini quiz from before Prompt 174 added the separate Final Exam) — the two were never the same gate, so reading `quiz_passed_at` wouldn't have fixed it either. This traces to Prompt 174 (2026-06-30, `56cbf13`), not Prompt 272 as originally suspected — the code comment even flagged it at the time ("Falcon to add migration if server-side persistence is needed later").

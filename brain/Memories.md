@@ -64,6 +64,32 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-15 (cont. 11) — CC: Prompt 278 shipped — traced a single-option fork bug to Prompt 264's shared time-offer refactor, verified the fix with the real parser (not eyeballing), swept the whole script clean
+
+**Root cause, confirmed not guessed:** used `git show` on Prompt 264's own diff (`07f2381`) to find the exact regression — it introduced the shared `timeOfDayOfferFlow(indent)` helper across the file and correctly indented it one level deeper than its parent option at every call site EXCEPT this one (Handoff's `Good/shows interest → Still hesitant → Do they engage this time?` node), where it left the call at the SAME indent as the parent `Engages` option. `discoveryScript.js`'s tree parser (`parseSteps` in `src/lib/discoveryScript.js`) requires child content strictly deeper than its parent option — landing at equal depth breaks the fork's sibling-scan silently (no error, no crash), which is exactly why it read as "missing an option" rather than throwing anything visible in dev.
+
+**Fix was 2 lines** (`src/lib/discoveryScript.js`): bumped the misindented `timeOfDayOfferFlow` call and the `Still hesitant` line beneath it from 6→9 spaces, restoring the original Prompt 252 structure. No new copy needed.
+
+**Verification method — worth repeating:** rather than trust a manual trace of the indent-based parser (easy to get subtly wrong), built a temporary QA route calling the REAL `buildScriptFlow()` and walking every fork's actual parsed option list, same disposable-harness pattern as [[Memories]] cont. 9 (Prompt 277). Confirmed post-fix: 52 total forks across all 5 sections (opener/vitals/pain/handoff/close), **0 single-option forks, 0 garbled text** — this doubles as the audit sweep the prompt asked for (checked the OTHER 3 "Do they engage(-this-time)?" occurrences too; all 3 were already correctly indented, only this one spot was broken). Harness deleted before commit, final diff is exactly 2 lines.
+
+**Commit:** `d614ee5`, pushed to `ohvara-dashboard` master. Queue is empty again except Prompt 270 (still parked on Brayden/Eagle sign-off).
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompts 276, 277, and 278 all shipped and pushed this session. Queue is empty except Prompt 270 (investigation complete, waiting on Brayden/Eagle sign-off before any build — don't start it without that). Recommend Brayden do one real live pass through Training Center (Final Exam gate, AI Roleplay script panel, Handoff re-engagement fork) since CC verified all three via code/parser/harness but couldn't log in as apex11 itself. Otherwise check North Star's Current Focus for what's next.`
+
+---
+
+### 2026-07-15 (cont. 10) — Falcon: Brayden caught a real single-option-fork gap while live-testing 276/277 — queued as Prompt 278
+
+**What happened:** Prompt 276's exam-gate fix worked (confirmed via screenshot — no more red banner), but a stale-deploy chunk error briefly blocked AI Roleplay (explained to Brayden as a stale-tab issue, told him to hard-refresh, not a real bug — offered to queue a robustness fix for that class of error, no answer yet on whether he wants it). While clicking through the Script tab in the meantime, Brayden caught the Handoff & Book re-engagement retry leaf ("No worries — like I was saying, it's just 15 minutes...") only offering ONE selectable option — "Engages" — with no fallback for still-hesitant/no-again. Traced this to likely being Prompt 252's re-engagement fork (2026-07-08), which per its own ship notes was supposed to have an Engages/Still-hesitant split with Still-hesitant routing to a timing-vs-not-a-good-fit sub-fork — flagged Prompt 264 (which touched every "Engages" tail in the file for the morning/afternoon rework) as a plausible place this got accidentally collapsed, but scoped as investigate-don't-guess for CC.
+
+Also added a sweep instruction (same pattern as Prompt 269's silent-endings audit) — check the whole file for any other single-option "fork" that isn't really a fork, not just this one flagged spot.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 278 is queued: the Handoff re-engagement retry's "Do they engage this time?" fork only has one option (Engages), missing a Still-hesitant fallback that Prompt 252's ship notes describe but doesn't currently exist live — investigate whether Prompt 264 accidentally dropped it, then fix + sweep the whole file for other single-option forks (same audit pattern as Prompt 269). Brayden is still mid-way through live-testing Prompts 272/274/276/277 (AI Roleplay phrasing/vitals/grading verification) — not yet confirmed complete. Also unresolved: whether Brayden wants a small robustness fix for the "failed to fetch dynamically imported module" stale-deploy error class (auto-reload instead of showing a raw error) — offered, no answer yet, not queued. Prompt 273 (difficulty-weighted grading) remains blocked until the roleplay verification above is confirmed done.`
+
+---
+
 ### 2026-07-15 (cont. 9) — CC: Prompt 277 shipped — script reference panel now shows during AI Roleplay calls; queue is empty (Prompt 270 excepted, blocked on sign-off)
 
 **Corrected the prompt's own component/file attribution before building:** it described the panel as living in `CallModal.jsx` as `AIScriptPanel`; actually `CallModal.jsx` uses a different component (`ScriptWalk`, click-through guided flow) and `AIScriptPanel` (static bulleted reference — the thing the prompt's wording actually described) only exists on the closer's `CallLeads.jsx` page. Also found Training Center's own Script tab had already solved the "no real lead" problem this feature needed (Prompt 209: `buildScriptFlow({ business_name: 'the business', ... }, null)` + `ScriptWalk mode="practice"`) — `fillTokens()` already falls back gracefully on missing fields, so zero changes needed to `discoveryScript.js`.
