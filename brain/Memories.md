@@ -64,6 +64,22 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-15 (cont. 2) — CC: Prompt 270 investigated, no code written — report delivered to LIVE_STATE
+
+Investigated (did not build) the AI Roleplay overhaul per the prompt's own instruction. Read `supabase/functions/create-roleplay-call/index.ts` and `supabase/functions/score-roleplay/index.ts` plus their frontend caller (`src/pages/rep/TrainingCenter.jsx`'s `AIRoleplay` component).
+
+**Core finding:** "Mike - HVAC Owner" is created dynamically only on the very first call ever — after that, the agent ID is cached in the `RETELL_ROLEPLAY_AGENT_ID` secret and reused forever, so it behaves as a static agent today. Confirmed via a live web search of Retell's own docs that `create-web-call` supports `retell_llm_dynamic_variables` (per-call `{{var}}` template injection) — meaning all 4 of Brayden's requirements are achievable purely from this edge function's code, no Retell dashboard access needed. The catch: editing the prompt string in source alone does nothing until the cached agent/LLM is either recreated (clear the secret) or patched via Retell's `update-retell-llm` API — flagged as an open question for Brayden/Eagle on which path to take.
+
+Grading (`score-roleplay`) is a separate Claude call (`claude-sonnet-4-6`, despite a stale "claude-haiku" comment in the frontend) scoring the transcript against a fixed 5-axis/12-point rubric with zero outcome/difficulty awareness — unsurprising, since today there's only ever one possible objection difficulty (always one of 2 hardcoded lines). Also found: `score-roleplay` is gated behind `DEMO_MODE=true` returning a canned 9/12 with no real Claude call at all right now, while the separate `grade-call` (real-call grading) function calls `ANTHROPIC_API_KEY` directly with no such gate — suggesting the key is likely already live and flipping `DEMO_MODE` off may be a one-line unblock worth asking about. Also flagged (not required): the Retell persona's own in-call "SCORE: X/12" self-grading instruction is dead code from the app's perspective — never parsed by the frontend.
+
+Wrote up a proposed mechanism for each of the 4 requirements in LIVE_STATE, including the one real scope surprise: difficulty-weighted grading can't work until response variety ships first (objection difficulty has to actually vary before it can be weighted), and it needs new plumbing across 3 files (create-roleplay-call must return which difficulty got assigned, the frontend must thread it through, score-roleplay's prompt must consume it) — not a simple prompt edit like the other 3. Also flagged a units mismatch: the current hardcoded vitals are per-week ("30 calls/week, miss 8-10") while Brayden's proposed randomization range in the original prompt was per-month/per-day — recommended switching to match `discoveryScript.js`'s own calls/month + missed/day convention for consistency between Script and Roleplay practice, and asking Brayden to re-confirm his proposed ranges against that unit switch.
+
+**No code was written or committed for this prompt** — per its own instructions, this is report-only, awaiting Brayden/Eagle sign-off before it becomes an actual build prompt.
+
+**Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 270's investigation is done and written up in LIVE_STATE (Retell agent is static-in-practice but dynamic_variables can achieve all 4 asks purely from edge-function code; grading rubric has zero outcome-awareness today). Nothing has been built yet — waiting on Brayden/Eagle to confirm: (a) agent-recreation vs update-llm path for the cached Retell LLM, (b) calls/month + missed/day units and exact ranges for randomized vitals, (c) whether to flip score-roleplay's DEMO_MODE off as part of this work. Once confirmed, this becomes a real build prompt. LIVE_STATE queue is otherwise empty — Prompts 268, 269, 271 are all shipped.`
+
+---
+
 ### 2026-07-15 (cont.) — CC: Prompt 269 shipped — full silent-ending audit found 5 total (not 3), all fixed
 
 Shipped Prompt 269 from LIVE_STATE, but the scope changed mid-flight: while re-reading LIVE_STATE to log Prompt 271, found Falcon had added a new "Audit step" directly to disk (uncommitted, same FUSE-bridge limitation just documented in Prompt 271) asking for a full sweep of every terminal-status node in `discoveryScript.js`, not just the 3 originally assumed (O-8/O-10/O-11).
