@@ -64,6 +64,24 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-15 (cont. 3) — CC: Prompt 272 built + deployed — 2 dashboard-only actions handed off to Brayden
+
+Built the code for Prompt 272 (parts 1-3 of the AI Roleplay overhaul) in `create-roleplay-call/index.ts`: templated `ROLEPLAY_AGENT_PROMPT` with `{{var}}` placeholders, added 5 arrays of 3 phrasing variants each (opener, Indeed mention, objection, engage-to-book, pushback-on-pitch) selected via a `pick()` helper, added `randInt()` for the calls/month (15-60) and missed/day (1-6) vitals, wired all of it into a `dynamicVariables` object passed as `retell_llm_dynamic_variables` on `create-web-call`. Replaced the hard hang-up instruction (#8) with an always-resolves-to-Follow-Up-or-Booked rule, and stripped the dead "AT END OF CALL... SCORE:..." self-grading recitation that the frontend never parsed anyway.
+
+**Caught and fixed a real bug before shipping:** the first draft had `'Yeah, we're hiring. You know somebody?'` — a single-quoted string with an unescaped apostrophe, which is a syntax error. Caught it by running `node --check` (failed on unrelated TS syntax it doesn't understand) then `npx esbuild` (which does understand TS) — esbuild's compiled output confirmed the string resolved correctly after switching to double quotes.
+
+**Production deploy required explicit confirmation:** attempted to deploy via the Supabase MCP's `deploy_edge_function` tool and the auto-mode classifier correctly blocked it — "no explicit user message naming this production deploy target and operation as authorized." Stopped, committed the code to git first (`6630710`, safe/reversible), explained the block to Brayden via `AskUserQuestion`, got explicit confirmation ("Yes, deploy it"), then redeployed successfully — Supabase `create-roleplay-call` is now v15, ACTIVE.
+
+**What's NOT done — 2 actions only Brayden can do, no CC tool reaches Supabase Edge Function secrets:**
+1. Clear the `RETELL_ROLEPLAY_AGENT_ID` secret (Supabase Dashboard → Edge Functions → Secrets) so the cached agent rebuilds from the new template on its next invocation. Until this happens the new code is live but inert — the old static prompt keeps being used.
+2. Flip `score-roleplay`'s `DEMO_MODE` secret to `false` so grading is real instead of the canned 9/12 stub.
+
+Also can't personally live-verify a voice/mic roleplay call (per a prior session's note: headless preview has no mic) — that verification pass is Brayden's to run once both secrets are changed.
+
+**Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 272's code is shipped and deployed (create-roleplay-call v15, ACTIVE, commit 6630710). Two things are blocking it from actually being live: (1) Brayden needs to clear the RETELL_ROLEPLAY_AGENT_ID secret in Supabase so the agent rebuilds from the new template, (2) Brayden needs to flip score-roleplay's DEMO_MODE secret to false. Once both are done, Brayden should run a live AI Roleplay call and report back so it can be verified and logged. Prompt 273 (difficulty-weighted grading) remains explicitly blocked until 272 is verified live. Discovery script review closed (28/28), Prompt 269's silent-ending audit closed (5/5 fixed).`
+
+---
+
 ### 2026-07-15 (cont.) — Falcon: reviewed Prompt 270's investigation with Brayden, all 3 open questions decided, queued as Prompt 272 (build) + Prompt 273 (blocked follow-up)
 
 **What happened:** CC finished Prompts 271 (git cleanup, native), 269 (silent-endings audit — found 5 real gaps, not the assumed 3: O-8 was already fixed by an earlier untracked prompt, O-10/O-11 fixed as planned, plus 3 more silent Follow-Up endings the manual review had missed entirely), and 270 (investigation-only, no code, per its own scope). Reviewed 270's findings with Brayden and got all 3 open decisions confirmed: (1) clear the cached `RETELL_ROLEPLAY_AGENT_ID` secret rather than patch via `update-retell-llm` — simpler, matches the function's original design; (2) switch Roleplay's vitals to calls/month + missed/day (matching discoveryScript.js's own convention) at 15–60/1–6; (3) flip `score-roleplay`'s `DEMO_MODE` off so grading is actually live.

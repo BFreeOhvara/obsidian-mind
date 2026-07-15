@@ -65,7 +65,17 @@ Deleted 100+ orphaned lock artifacts (`.dead.*`/`.old.*`/`.bak*` suffixes on `in
 
 ---
 
-### 🔲 Prompt 272 — AI Roleplay build, part 1: response variety, no hard-declines, randomized vitals, real grading (BUILD NOW — all 3 open questions from Prompt 270's investigation are decided)
+### ⚠️ Prompt 272 — CODE SHIPPED + DEPLOYED 2026-07-15 (`6630710`, pushed; Supabase `create-roleplay-call` v15, ACTIVE) — 2 dashboard-only actions still needed from Brayden before it's live
+
+**What's done:** `create-roleplay-call/index.ts` now templates `ROLEPLAY_AGENT_PROMPT` with `{{var}}` placeholders and picks one of 3 phrasing variants per non-terminal fork (opener, Indeed mention, objection line, engage-to-book, pushback-on-pitch) plus randomized `{{calls_per_month}}`/`{{missed_per_day}}` (15–60/1–6) server-side via `Math.random()`, passed per call through `retell_llm_dynamic_variables`. Instruction #8 (hard hang-up) replaced with an always-resolves-to-Follow-Up-or-Booked rule. The dead in-call self-grading recitation ("AT END OF CALL... SCORE:...") is stripped. Deployed live to Supabase (asked Brayden for explicit go-ahead first — the auto-mode classifier correctly blocked the first attempt as an unconfirmed production deploy, re-ran after confirmation).
+
+**⚠️ Not live yet — 2 actions only Brayden can do (no CC tool reaches Supabase secrets):**
+1. **Clear the `RETELL_ROLEPLAY_AGENT_ID` secret** in Supabase Dashboard → Edge Functions → Secrets. Until this happens, the cached agent keeps using the OLD static prompt — the new template sits deployed but inert. The next `create-roleplay-call` invocation after clearing will naturally rebuild the agent+LLM from the new template (existing `if (!agentId)` code path, no further action needed after that).
+2. **Flip `score-roleplay`'s `DEMO_MODE` secret to `false`** (same Secrets page) so grading is real Claude scoring instead of the canned 9/12 stub. Worth first confirming `ANTHROPIC_API_KEY` is actually set for this function (likely already is, since `grade-call` uses it unconditionally) — if it's missing, `score-roleplay`'s code already has a graceful fallback (returns a "not scored" default), so flipping DEMO_MODE off is safe to try either way.
+
+**Verification still needed (Brayden, live mic call — headless preview has no mic per prior sessions' notes):** after both secret changes, run a real AI Roleplay call in Training Center as `apex11` and confirm (a) at least 2 different phrasings heard across repeat calls at the same fork, (b) vitals numbers land in range and are phrased as calls/month + missed/day, (c) the call resolves to Follow-Up or Booked, never a hard decline, (d) `score-roleplay` returns a real non-9/12-canned score. Report back so this can be logged as verified — CC cannot drive a live voice/mic session itself.
+
+**Original build spec kept below for reference:**
 
 **Context:** Prompt 270's investigation (report above, kept for reference) found this is fully buildable from `create-roleplay-call`/`score-roleplay` alone, no Retell dashboard access needed. Brayden confirmed all 3 open questions:
 
