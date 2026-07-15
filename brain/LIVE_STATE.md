@@ -65,7 +65,33 @@ Deleted 100+ orphaned lock artifacts (`.dead.*`/`.old.*`/`.bak*` suffixes on `in
 
 ---
 
-*(Prompt 270 investigation complete, awaiting sign-off — see above. Check [[North Star]] Current Focus for anything else, or [[Memories]] for the shipped trail.)*
+### 🔲 Prompt 272 — AI Roleplay build, part 1: response variety, no hard-declines, randomized vitals, real grading (BUILD NOW — all 3 open questions from Prompt 270's investigation are decided)
+
+**Context:** Prompt 270's investigation (report above, kept for reference) found this is fully buildable from `create-roleplay-call`/`score-roleplay` alone, no Retell dashboard access needed. Brayden confirmed all 3 open questions:
+
+1. **Agent update path:** clear the `RETELL_ROLEPLAY_AGENT_ID` secret so `create-roleplay-call`'s existing `if (!agentId)` branch naturally rebuilds the agent+LLM fresh from the updated `ROLEPLAY_AGENT_PROMPT` template on the next call. Do this AFTER the template edits below are in source, not before (avoid rebuilding twice).
+2. **Vitals units + range:** switch from the current calls/week phrasing to **calls/month + missed/day**, matching `discoveryScript.js`'s own Vitals convention. Range: **15–60 calls/month, 1–6 missed/day**, randomized per call via `retell_llm_dynamic_variables`, computed server-side in `create-roleplay-call` before the call starts.
+3. **DEMO_MODE:** flip `score-roleplay`'s `DEMO_MODE` check off (real Claude sonnet-4-6 grading, not the stubbed canned 9/12) — confirm `ANTHROPIC_API_KEY` is actually set for this function (the investigation noted `grade-call` already calls it directly with no gate, suggesting the key exists, but verify rather than assume before flipping).
+
+**Build scope for this prompt (parts 1-3 of the original 4 requirements, NOT part 4/difficulty-weighted grading — that's Prompt 273, sequenced after this ships and gets verified, since it depends on real difficulty tiers existing first):**
+
+- **Response variety:** template `ROLEPLAY_AGENT_PROMPT` with placeholders for the prospect's response style at each of the script's real non-terminal forks (Opener yes/kind-of, "that's me," pushback-disarm engages, Pain engaged/minimizes-then-engages, etc.) — 3 realistic phrasing variants each, picked randomly per call via `retell_llm_dynamic_variables`, not the identical line every time.
+- **Never hard-decline:** remove the current instruction #8 ("stay skeptical but hang up after 2 minutes") from the prompt entirely. Replace with an instruction that the simulated prospect always resolves to either a booked appointment or a genuine "check back at a better time" (Follow-Up) — never an outright hang-up/wrong-number/flat-no. This matches the discovery script's own real objection-handling branches, not a coin-flip dead call.
+- **Randomized vitals:** per decision 2 above — compute `{{calls_per_month}}`/`{{missed_per_day}}` server-side in `create-roleplay-call` within the confirmed range, pass as dynamic variables, update the prompt template to reference them in calls/month + missed/day phrasing (not the current calls/week wording).
+- **Dead self-grading cleanup (small, bundle it in):** strip the persona's "AT END OF CALL... SCORE:... TOTAL: X/12" self-grading instruction from the prompt — confirmed dead (frontend never parses it, only `score-roleplay`'s separate Claude call feeds the UI), and reps currently sometimes hear Mike recite a meaningless score out loud.
+- **DEMO_MODE flip:** per decision 3 above.
+
+**Verification:** after clearing the cached agent secret and confirming the next `create-roleplay-call` invocation rebuilds cleanly, live-verify in Training Center → AI Roleplay (real mic/voice call, `apex11`): confirm at least 2 different phrasing variants heard across repeat calls at the same fork (can't guarantee which 1-of-3 lands, but confirm it's not always identical), confirm the vitals numbers given are within range and phrased as calls/month + missed/day, confirm a full call resolves to either Follow-Up or Booked never a hard decline, and confirm `score-roleplay` now returns a real (non-9/12-canned) score reflecting actual transcript content.
+
+---
+
+### ⏸️ Prompt 273 — difficulty-weighted grading (DO NOT START — blocked on Prompt 272 shipping + verification first)
+
+The 4th original requirement: grading should reward how well the rep navigated whatever objection difficulty they actually got, not just the final outcome. Per Prompt 270's investigation, this needs real new plumbing across 3 files — `create-roleplay-call` must pick and *return* which difficulty tier/phrasing variant got assigned, `TrainingCenter.jsx` must thread that metadata through to `score-roleplay` alongside the transcript (currently only `{ transcript }` is sent), and `score-roleplay`'s Claude prompt needs the added context to weight accordingly (e.g. "this call's objection was tier 2/harder — weight objectionHandling and a strong Follow-Up outcome comparably to an easy tier-1 call reaching Booking"). This is impossible to build meaningfully until Prompt 272's response-variety work actually exists to create real difficulty variation — placeholder only, do not convert to a build prompt until 272 is shipped and live-verified. Also note: Brayden wants this same difficulty-weighted philosophy eventually applied to real call grading (`grade-call`, My Calls) too — separate future follow-up, not in scope here.
+
+---
+
+### ✅ Prompt 270 — INVESTIGATION COMPLETE 2026-07-15, superseded by Prompt 272's build spec above (kept below for reference — architecture/rubric findings still accurate)
 
 ### ✅ Prompt 268 SHIPPED 2026-07-14 (`54e6a9c`, pushed) — H-14 pricing-ballpark lead-in reworded, value-justification framing dropped
 
