@@ -18,7 +18,25 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
-*(Empty — Prompt 267 shipped 2026-07-09, clearing the queue. Check [[North Star]] Current Focus for what's next, or [[Memories]] for the shipped trail.)*
+### 🔲 Prompt 268 — H-14 pricing-ballpark lead-in reworded (drop "worth 15 minutes" value-justification framing)
+
+**Context:** continuing the discoveryScript.js path-by-path review — this is Path 27 (H-14: Handoff fork → "How much does this cost?" → "Just need a ballpark"). Brayden reviewed this screen live in Training Center → Script practice and flagged the lead-in line as reading like a value-justification pitch ("the call is worth 15 minutes") rather than a low-commitment ask. Content-only edit to `src/lib/discoveryScript.js`'s H-14 leaf — no logic/marker/token changes, don't touch anything else. Scoped to this one screen only (Brayden confirmed — do NOT touch the similar "15 minutes" language in the main Handoff pitch elsewhere in the file).
+
+**Exact change:**
+
+Find (the SAY THIS line currently rendered on the H-14 "Just need a ballpark" screen, immediately before the shared `timeOfDayOfferFlow()` splice):
+> "The range is wide depending on what you need, which is exactly why the call is worth 15 minutes — they'll give you a real number based on what you just told me."
+
+Replace with:
+> "The range is wide depending on what you need — just set aside 15 minutes, hear the team out, and they'll give you an accurate number based on your exact situation. You can decide from there."
+
+The following line ("So — do mornings or afternoons work better for you?" → shared `timeOfDayOfferFlow()`) is untouched.
+
+Grep the exact old string first to confirm it's single-occurrence (expected: only on H-14) before editing. `npx vite build` clean, then live-verify in Training Center → Script practice: Opener→Vitals→Pain→Handoff → "How much does this cost?" → "Just need a ballpark" → confirm new line renders, old "worth 15 minutes" phrase gone, flow into mornings/afternoons unchanged. This closes out Path 27 of the discovery script review — Path 28 (H-15, spot-check only, identical wording to H-9/H-13) still remains after this.
+
+---
+
+*(Prompt 268 queued above. Check [[North Star]] Current Focus for anything else, or [[Memories]] for the shipped trail.)*
 
 ### ✅ Prompt 267 SHIPPED 2026-07-09 (`6f9c924`, pushed) — before-5pm afternoon offer reworded for consistency
 
