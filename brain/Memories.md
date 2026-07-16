@@ -64,7 +64,7 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
-[CC | 2026-07-16 — Prompt 296 shipped] — Built and shipped Prompt 296 (dashboard commit `5c21bfd`, pushed): Settings section reorder, Mobile App modal T-chart/toggle, My Leads padlock-cutout icon + copy fix. Full detail below (cont. 10). No blockers; Android's real install-button path still unverified outside a genuine install-eligible session. Nothing else queued.
+[CC | 2026-07-16 — Prompt 296 shipped + vault log commit] — Built and shipped Prompt 296 (dashboard commit `5c21bfd`, pushed): Settings section reorder, Mobile App modal T-chart/toggle, My Leads padlock-cutout icon + copy fix. Full detail below (cont. 10). Vault itself committed/pushed as `b0630ee` (log entry + Prompt 296 screenshots). No blockers; Android's real install-button path still unverified outside a genuine install-eligible session. LIVE_STATE's "Next Up for CC" queue is now empty — nothing else queued.
 
 ### 2026-07-16 (cont. 10) — CC (Eagle): Prompt 296 shipped — Settings reorder, Mobile App modal T-chart/toggle, My Leads lock cutout + copy fix
 
