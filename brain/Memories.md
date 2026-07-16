@@ -64,7 +64,7 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
-[CC | 2026-07-16 — Prompt 297 shipped] — Built and shipped Prompt 297 (dashboard commit `30f1f62`, pushed): My Leads lock cutout resized from icon-scale (~56px) to a full-area veil matching Brayden's Paint mockup. Full detail below (cont. 12). No blockers. Prompt 298 (closer/admin mobile audit) remains queued, not started this session.
+[CC | 2026-07-16 — Prompt 297 shipped + vault log commit] — Built and shipped Prompt 297 (dashboard commit `30f1f62`, pushed): My Leads lock cutout resized from icon-scale (~56px) to a full-area veil matching Brayden's Paint mockup. Full detail below (cont. 12). Vault itself committed/pushed as `d9575d0` (log entry + Prompt 297 screenshots). No blockers. Prompt 298 (closer/admin mobile audit) remains queued, not started this session.
 
 ### 2026-07-16 (cont. 12) — CC (Eagle): Prompt 297 shipped — My Leads lock cutout resized from icon to full-area veil
 
