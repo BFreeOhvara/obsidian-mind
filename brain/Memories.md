@@ -5410,3 +5410,5 @@ Did a code-level severity read of each of the 6 requested screens (couldn't live
 
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 289 shipped + pushed (e6b1249): CallPrepModal.jsx (the shared box for CallModal/ScriptWalk AND the closer's AppointmentCard) now stacks single-column below md — verified via harness, desktop pixel-identical to before. This is the SECOND piece of Prompt 287's mobile-responsiveness fix (after Prompt 288's sidebar drawer). Still open: My Leads (fixed-width table columns — needs a real table→card redesign, the bigger remaining piece), AI Roleplay (oversized column minWidths), Training (minmax(240px,...) card grid), My Commissions (no-wrap KPI row). My Leads recommended next. Waiting on Brayden to confirm or redirect. Nothing else queued.`
+
+[CC | 2026-07-16 — vault log committed + pushed] — The Prompt 289 log entry above and LIVE_STATE.md's Prompt 287/289 update are committed (`509e51c`) and pushed to origin/main. Both repos clean and pushed: `ohvara-dashboard` @ `e6b1249`, `obsidian-mind` @ `509e51c`.
