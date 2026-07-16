@@ -5289,3 +5289,5 @@ Queue is now fully empty — Prompts 242 and 243 both shipped this session. Prom
 
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 285 shipped + pushed (9c7a147): MyCommissions empty-box sizing fixed, light theme fully reverted (dark-only, Change Password kept), ScriptWalk Start Over/Back history bug fixed at root. Only Prompt 286 remains queued, and it's an investigate-first prompt (Mobile App install box + QR code) — report back on PWA manifest/service-worker status and the iOS beforeinstallprompt gap before building anything, per its own instructions.`
+
+[CC | 2026-07-16 — vault log committed + pushed] — The Prompt 285 log entry above and the matching LIVE_STATE.md update were committed (`470bd8b`) and pushed to `obsidian-mind` origin/main. Both repos (`ohvara-dashboard` @ `9c7a147`, `obsidian-mind` @ `470bd8b`) clean and pushed — nothing left uncommitted from this session.
