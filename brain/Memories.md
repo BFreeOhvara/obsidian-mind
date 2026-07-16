@@ -64,6 +64,19 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-15 (cont. 17) — CC: Prompt 281 shipped — full light theme + Change Password; honest scope audit turned "maybe groundwork-only" into a same-day full ship
+
+**Scope finding worth remembering:** the raw grep said ~470 hardcoded colors across 46 files — sounded like a multi-prompt refactor. Classifying them changed the answer: only dark panel hexes + white-alpha hairlines actually break on light; status hues, text-on-colored-buttons, shadows, backdrops, and video chrome are theme-independent. Brayden approved full-theme-now on that report (plus Change Password as the one Settings addition — Notifications checked and left dead per migration 065). Lesson: classify hardcoded values by ROLE before sizing a theming job; the raw count wildly overstates it.
+
+**Shipped (`b258c7b`):** `:root[data-theme="light"]` token overrides + un-layered structural overrides (glass/sidebar/scrollbar/orbs — un-layered beats `@layer`, that's the specificity trick) + pre-paint boot script in `index.html` (no wrong-theme flash) + new `--bg-inset` token replacing the `#0A0A12`/`#0C0C16` panel hexes + chart hairlines to `var(--border)` + Appearance toggle + portaled Change Password modal (step-up verify → `updateUser`). ClientPreview deliberately fixed-dark (logged-out share-link page, no preference to read).
+
+**Verified** with a self-provisioned invite-flow QA account (the 282-unlocked pattern, second use): toggle live both directions, persistence across reload, computed styles confirm every token resolves (screenshots broken again — same tool timeout as Prompt 275; computed-style verification is the reliable fallback on this machine), wrong-current-password rejected, new password proven by an actual re-login with it. QA account deleted. Flagged for Brayden: one human eyeball pass of light mode on busy screens — tokens resolving ≠ everything looking right.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompts 282, 280, 281 all shipped and pushed today. Queue is empty except Prompt 270 (parked on Brayden/Eagle sign-off — don't build without it). Outstanding human items: Resend setup (unblocks password-reset emails), one real invite click-through as admin, and an eyeball pass of light mode. Check North Star's Current Focus if nothing new is queued.`
+
+---
+
 ### 2026-07-15 (cont. 16) — CC: Prompt 280 shipped — payout step-up auth live-verified with a self-provisioned test account (new verification capability unlocked by 282)
 
 **Build** (`dfb21b8`, pushed — frontend only, no DB/infra): `Settings.jsx` Payouts section's "Manage payout account" now opens a portaled `PasswordConfirmModal` before navigating to the payout flow. Re-verify is `signInWithPassword` against the session's own email — chose it over `supabase.auth.reauthenticate()` deliberately (that one emails a nonce, useless until Resend exists). Wrong password → inline error, stays put; correct → proceeds to `/rep/commissions` unchanged. Badge stays visible outside the gate per confirmed scope. Modal portaled to `document.body` per the standing Prompt 185 gotcha.

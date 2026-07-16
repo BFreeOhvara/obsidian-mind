@@ -63,15 +63,18 @@ tags:
 
 ---
 
-### 🔲 Prompt 281 — dark/light mode toggle + expanded Settings
+### ✅ Prompt 281 SHIPPED 2026-07-15 (`b258c7b`, pushed) — full light theme (not a stub toggle) + self-service Change Password, all live-verified
 
-**Context:** Brayden wants a light/dark mode toggle added to Settings, plus general interest in "more useful settings" without a specific list beyond that — use judgment on what else genuinely belongs here (check what's already been deliberately REMOVED from Settings before re-adding anything — e.g. Notifications was explicitly ripped out in a past prompt, don't resurrect it without checking why first) and propose/build what's clearly useful, flagging anything you're unsure belongs here rather than guessing.
+**Scope was investigated and reported before building, per the prompt's own instruction — and it came back smaller than feared:** the token layer is ~25 color variables in one `:root` block, and of ~470 hardcoded color instances repo-wide, only a small subset actually breaks in light mode (dark panel hexes + white-alpha chart hairlines/cell borders) — the rest are status hues (green/red/amber) and theme-independent values (text-on-colored-buttons, shadows, modal backdrops, video-player chrome) that read fine on both themes. Brayden picked **full light theme now** over toggle-groundwork-only, and approved **Change Password** as the one Settings addition (Notifications stayed dead per migration 065 — checked before proposing).
 
-**Build:**
-1. Light/dark mode toggle in a new "Appearance" section of Settings. This is a real theming lift, not a toggle-and-done — the whole app currently uses a fixed dark palette via CSS custom properties (per [[DESIGN]]). Investigate scope honestly: does a full light-mode token set need defining for every `--bg-*`/`--text-*`/etc. variable, or can this be scoped to something smaller first (e.g. a documented "dark only for now, toggle is UI groundwork" state)? Report the real scope before assuming a full light theme ships in one prompt — this could reasonably split into "add the toggle + persist the preference" now and "build out full light-mode tokens" as a separate follow-up if the token audit turns out large.
-2. Persist the preference (localStorage is fine, doesn't need a DB round-trip) and respect it on load without a flash of the wrong theme if reasonably achievable.
+**What shipped:**
+1. **Light token set** — `:root[data-theme="light"]` overrides for every color token (bg/border/text/accent/status; status hues darkened slightly for contrast on light) + structural overrides for `.glass`/`.glass-accent`/`.sidebar-glass`/scrollbar/orbs (un-layered so they beat the `@layer` originals) + `color-scheme: light`.
+2. **No-flash boot** — inline script in `index.html` reads `localStorage('ohvara_theme')` and stamps `data-theme` on `<html>` before first paint. Dark is the default (no attribute).
+3. **Token migration** — new `--bg-inset` token for the recessed script panels (ScriptWalk footer `#0C0C16`, ScriptWalk shells `#0A0A12` in TrainingCenter ×2 + CloserScript); chart grid strokes/cursors and heatmap cell borders in Overview/MyCommissions/MyStats moved from `rgba(255,255,255,…)` to `var(--border)`/`var(--bg-surface)`/`var(--border-hover)`. **ClientPreview deliberately stays fixed-dark** — clients open it logged-out via share link (no session, no preference to read); documented in the CSS comment.
+4. **Settings → Appearance** — Dark/Light segmented toggle (Moon/Sun), applies live + persists.
+5. **Settings → Account → Change password** — one portaled modal: current password (step-up verify via `signInWithPassword`) → new + confirm → `updateUser`. This is the only self-service password path invite-flow reps have until Resend enables email resets.
 
-**Verification:** live-verify the toggle switches themes visibly and persists across a reload.
+**Live-verified with a throwaway invite-flow rep account** (same self-provisioned-QA pattern as Prompt 280): toggle flips the whole app live (body `#080810`→`#F5F5F9`, sidebar glass white, tokens all resolve light — confirmed via computed styles; screenshot capture was broken again this session, same tool timeout as Prompt 275, so verification is computed-style-based); **persists across reload** with the pre-paint boot (no dark flash); migrated inset panels resolve `#EBEBF2` on light; wrong current password rejected inline; correct → success state → **signed out and back in with the NEW password successfully**; toggled back to dark → byte-identical original values (regression clean). Only console noise was expected stale-refresh-token errors from the deliberate password change/sign-out. QA account + invite deleted (0 rows). **Worth one human eyeball pass over light mode on the busiest screens** (My Leads, My Stats charts, Training Center) — computed styles prove tokens resolve, not that everything *looks* right.
 
 ---
 
