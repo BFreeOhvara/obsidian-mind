@@ -26,18 +26,21 @@ tags:
 
 ---
 
-### 🔲 Prompt 287 — mobile-responsiveness audit (investigate first, report back before building) — BLOCKS Prompt 286's install-box work
+### 🔲 Prompt 287 — mobile-responsiveness audit — INVESTIGATED, awaiting Brayden's call on which fix to scope first
 
-**Context:** Brayden's call on Prompt 286: "this build means the mobile version needs to look just as nice as the desktop version." Installing the dashboard to a phone home screen is pointless if the layout underneath doesn't actually work on a phone screen. Checked DESIGN.md and North Star for any prior responsive-design decision — zero mentions of "responsive," "mobile," "breakpoint," or "viewport" anywhere. Every screenshot Brayden has shared all session shows a persistent left-sidebar, wide-table, chart-heavy desktop layout. Working assumption: this has never been built or audited for phone screens. Confirm or refute that before scoping any fix.
+**Investigation done 2026-07-16 (CC) — root cause confirmed, nothing built:** No responsive design has ever existed — `tailwind.config.js` has zero custom breakpoints, repo-wide grep for `sm:`/`md:`/`lg:`/`useMediaQuery`/`window.innerWidth` turns up only 2 incidental `md:grid-cols` tweaks (My Stats, My Goals) and one `hidden lg:flex` on Messages' contact panel — nothing resembling mobile-first design anywhere. **Root cause confirmed by live measurement** (harness-rendered the real `Sidebar` + `DashboardLayout` at a 375px viewport, no auth needed — those components mount without a session): `Sidebar` is `position: fixed; width: 240px`, `DashboardLayout`'s main content has hardcoded `margin-left: 240px` (`ml-[240px]`) — **usable content width on a 375px phone is 135px (36% of the screen).** This one fixed-sidebar pattern is shared by every authenticated page, so it's one root cause, not six separate problems.
 
-**Investigate first — report scope, don't build yet:**
-1. Load the live dashboard at a phone-width viewport (375px, iPhone-standard) for each main authenticated screen a rep actually uses: My Leads, Script Walk / Call Now, AI Roleplay, Training (videos/flashcards/quiz), My Commissions, Settings. Screenshot each. Does the sidebar collapse/hide or does it eat the screen? Do tables scroll/reflow or overflow off-screen? Are any buttons/modals unreachable or unreadably small?
-2. Check `tailwind.config.js` for any breakpoint customization, and grep the codebase for existing responsive utility classes (`sm:`, `md:`, `lg:` prefixes, `useMediaQuery`, `window.innerWidth` checks) to see whether ANY component was ever built mobile-aware, even partially.
-3. Report back: which screens are usable on phone today, which are broken, and a rough size/complexity estimate for making the broken ones work (this could range from "a few Tailwind breakpoint classes" to "the sidebar needs a real hamburger/drawer pattern" — report honestly, don't guess low to make it sound easy).
+**Per-screen severity (code-level read, not live screenshots — same rep-auth constraint as every other prompt this session):**
+- **My Leads** — broken. Row layout is `flex` with fixed-width columns (120/100/130/110px+) summing 400px+, no horizontal-scroll wrapper.
+- **Script Walk / Call Now** — broken. `CallModal`/`ScriptWalk` panels are fixed-width desktop boxes, no stacking logic.
+- **AI Roleplay** (live call) — broken but less badly. Two-column layout does have `flexWrap: 'wrap'` (genuinely stacks), but each column still has `minWidth: 320`/`300` — wider than any phone even stacked.
+- **Training** (videos/flashcards) — broken. Card grid is `minmax(240px, 1fr)`, cards won't shrink below 240px.
+- **My Commissions** — broken. 3 KPI cards are a `flex` row with **no `flexWrap`** — will squeeze/overflow, not stack. The chart itself is fine (`ResponsiveContainer` genuinely adapts).
+- **Settings** — least broken. Mostly stacked rows, narrow-friendly by accident.
 
-**Do not build the responsive fixes yet.** Report findings, then this becomes a scoped build prompt (likely per-screen, in priority order — My Leads and Script Walk/Call Now matter most since those are what a rep would actually use on a phone during a shift).
+**Complexity estimate, reported honestly (not lowballed):** not a few Tailwind classes. The sidebar needs a real collapse-to-drawer/hamburger pattern first — every page inherits whatever the shell does, so nothing else matters until that's fixed. Per-page fixes after that are real rework, not prefix classes: My Leads needs a card-based mobile layout (not a sideways-scrolled table), the two-column call/training layouts need genuine single-column stacking below a real breakpoint, KPI/card grids need `flexWrap`/smaller minmax values. Sidebar-to-drawer is one contained job; the 5 page-level fixes are separate pieces of work, My Leads and Script Walk/Call Now matter most since those are what a rep touches mid-shift.
 
-**Sequencing note:** Prompt 286 (install box + QR) is confirmed and clear to build on its own — the QR/manifest/service-worker work doesn't depend on this. But shipping 286 before this audit reports back risks putting a working install button in front of a broken mobile layout. Do this investigation first, or at minimum don't tell Brayden the mobile-app feature is "done" until both are confirmed together.
+Reported to Brayden in chat. **Stays 🔲 — waiting on his call for which fix to scope first as an actual build prompt** (sidebar drawer is the logical first piece since everything else is gated behind it, per CC's own recommendation in chat).
 
 ---
 
