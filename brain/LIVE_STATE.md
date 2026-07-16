@@ -26,7 +26,7 @@ tags:
 
 ---
 
-### 🔲 Prompt 296 — 3 small fixes from live desktop screenshots: Settings section order, Mobile App modal layout, My Leads lock treatment + copy fix
+### ✅ Prompt 296 SHIPPED 2026-07-16 (`5c21bfd`, pushed) — 3 small fixes from live desktop screenshots: Settings section order, Mobile App modal layout, My Leads lock treatment + copy fix
 
 **Context:** Brayden sent 3 live screenshots (desktop browser, `ohvara-dashboard.vercel.app`, logged in as apex11/John Scott test accounts) with specific feedback on each.
 
