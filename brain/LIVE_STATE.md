@@ -26,7 +26,24 @@ tags:
 
 ---
 
-### 🔲 Prompt 298 — closer + admin side: apply the same mobile audit/redesign treatment as the rep side (investigate scope first, then build)
+### 🔲 Prompt 299 — browser tab title → "Ohvara Portal" + "rep" terminology rename to "setter" (investigate scope first — do NOT blind find-and-replace)
+
+**Context:** Brayden, from a live screenshot: (1) the browser tab/bookmark title just says "Ohvara" — wants "Ohvara Portal". (2) the URL path for the rep dashboard is `/rep` (visible in the address bar, screenshot shows `ohvara-dashboard.vercel.app/rep`) and he wants every occurrence of the term "rep"/"Rep" as a role name replaced with "setter"/"Setter" — noting the sidebar already correctly says "Setter Portal" (screenshot confirms this), so the app is already inconsistent: some places call the role "Setter," others (the URL, and likely other spots) still say "Rep."
+
+**Part A — page title, trivial, build directly:** Change the `<title>` in `index.html` (and any dynamic `document.title` set in code, if one exists) from "Ohvara" to "Ohvara Portal."
+
+**Part B — terminology rename, investigate first, then build. Read this warning before touching anything:** "rep" is a common English substring — `report`, `represent`, `prepare`, `repeat`, etc. all contain it. **A literal find-and-replace on the string "rep" will corrupt unrelated words and code.** This must be scoped only to actual instances of "rep" used as the role name.
+
+1. **Catalog every user-visible occurrence**, not just the URL: the React Router path (`/rep`, plus every hardcoded `navigate('/rep')`/`<Link to="/rep">`/redirect reference to it), any place that renders a role as raw text instead of a mapped label (e.g., if the admin's invite-role picker or the signup page's "You've been invited as a Rep" messaging reads `profile.role`/`invite.role` directly rather than through a display-label function), and any other page/component with visible "Rep" text Brayden hasn't screenshotted yet — do a real search, don't assume the URL is the only spot.
+2. **Recommend, don't just execute, the mechanism:** the safer fix is almost certainly a role→display-label mapping (e.g. `{ rep: 'Setter', closer: 'Closer', admin: 'Admin' }`) used everywhere a role is shown as text, leaving the actual stored/coded value (`role = 'rep'` in the DB, `rep_invites`, `rep_id` columns, internal variable names) untouched — renaming those risks breaking role-check logic (`role === 'rep'`) scattered through the codebase for a change that's purely cosmetic to the user. Only propose renaming an actual stored/internal identifier if there's a concrete reason a label-mapping approach can't cover it.
+3. **The URL route is the one exception that's genuinely visible and worth changing directly:** `/rep` → `/setter` as an actual route rename (update the `Route path`, every internal navigation reference, and check whether `claim-invite`/any edge function constructs a post-signup redirect URL that also needs updating). Confirm existing bookmarks/links to `/rep` won't hard-break rep accounts mid-session — a redirect from the old path is cheap insurance if easy to add.
+4. **Amended by Brayden, second pass — one spot gets the role REMOVED, not renamed:** the `/join/<token>` signup page's live text currently reads **“You’ve been invited as a Rep”** (confirmed live in Prompt 282's original ship log). Brayden's explicit call: don't change this to “Setter” like everywhere else in this prompt — take the role mention out entirely. His own words: “it can still say [Setter] everywhere else, but when I invite them, I don't think it should say what role I invite them to — even though it goes without saying, I still don't like that it says it.” Reword to something role-agnostic, e.g. “You've been invited to join Ohvara” — the signup form itself is unaffected (still creates the account with whatever role the invite token carries), only this one line of copy drops the role name. This is a deliberate, scoped exception — don't extend it to any other “Rep”→“Setter” spot found during the catalog in point 1, those still get renamed as planned.
+
+**Report the full catalog + recommended mechanism before executing broadly** (same investigate-first standard as Prompt 287) — this prompt touches routing and potentially many files, worth confirming scope isn't bigger than expected before a wide edit.
+
+---
+
+### ✅ Prompt 298 SHIPPED 2026-07-16 (`0f9459a`, pushed) — closer + admin side: mobile audit/redesign treatment matching the rep side
 
 **Context:** Brayden: "make sure the mobile changes are made, like the design changes, and the touch-up for the mobile pages is also made on the closer and admin side as well." Every mobile prompt this session (287-296) was scoped to rep-facing pages (My Leads, My Commissions, Training Center, Settings) plus a few genuinely shared components (`Sidebar`, `CallPrepModal` — which Prompt 289's own log confirms is already shared between the rep's `CallModal` and the closer's `AppointmentCard`, so that piece already benefits both sides — and the Mobile App modal, which isn't role-specific). Nobody has audited the closer or admin sides specifically.
 
@@ -3208,4 +3225,4 @@ Non-CC sessions (Manager chats, no filesystem) re-ground from the most recent pa
 ## Related
 
 - [[Memories]] — append-only historical log (the source this file distills)
-- [[North Star]] — who we are, packages, pricing, 
+- [[North Star]] — who we are, packages, pricing,          
