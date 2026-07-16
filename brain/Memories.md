@@ -64,6 +64,37 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+[CC | 2026-07-16 — Prompt 297 shipped] — Built and shipped Prompt 297 (dashboard commit `30f1f62`, pushed): My Leads lock cutout resized from icon-scale (~56px) to a full-area veil matching Brayden's Paint mockup. Full detail below (cont. 12). No blockers. Prompt 298 (closer/admin mobile audit) remains queued, not started this session.
+
+### 2026-07-16 (cont. 12) — CC (Eagle): Prompt 297 shipped — My Leads lock cutout resized from icon to full-area veil
+
+**What happened:** Executed the queued Prompt 297 — a direct correction to Prompt 296's lock-cutout scale, based on Brayden's hand-drawn Paint mockup (a large translucent black rectangle standing in for the whole locked content area, with a big padlock hollowed out in the middle; his own words confirmed the shade mechanism was right — "the black is transparent, it's not pitch black" — only the scale was wrong).
+
+**Built:** Renamed/rescoped `LockedCutoutIcon` → `LockedVeil` in `src/pages/rep/MyLeads.jsx`. Kept the exact SVG-mask mechanism from 296 unchanged (white full-canvas rect = visible shade, lucide's own Lock body-rect + shackle-stroke painted black inside the mask = punched-out hole) — only the sizing/positioning changed:
+- Old: a standalone 56×56 `<svg viewBox="0 0 24 24">`, rendered inline above the text, roughly 1:1 icon scale.
+- New: `<svg viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice" style={{position:'absolute', inset:0, width:'100%', height:'100%'}}>` — fills the entire empty-state box (the same `position:'relative'` container that already held the centered text), with the lock geometry scaled up via `<g transform="translate(131,58) scale(6)">` around the same body-rect/shackle-path numbers. `preserveAspectRatio="xMidYMid slice"` was the key choice — it scales the fixed 400×260 design canvas to *cover* the real box at whatever aspect ratio it actually renders at (wide desktop table vs. narrower mobile card), keeping the lock centered and proportionally large without hand-tuning per breakpoint.
+- Text (heading, corrected copy, "Go to Training Center" link) is unchanged in position/content — just gained `position:'relative', zIndex:1` so it layers on top of the now-absolutely-positioned veil instead of stacking above it in normal flow.
+
+**Verification:** Third throwaway Playwright harness this session (`src/pages/QaHarness297.jsx`, same pattern as 295/296/292 — mocked auth + seeded react-query cache with `training_completed: false` so the locked branch renders). Captured at both a 1280px desktop viewport and `devices['iPhone 13']`. Confirmed visually at both sizes: the lock now reads clearly as a large padlock shape (body + rounded shackle, unmistakable at a glance, not a small watermark lost in the box), the shade visibly spans the full box the old message sat inside, and the shade is genuinely translucent (the surrounding page's subtle background glow is still faintly visible through it) rather than a flat opaque black rectangle. Harness fully reverted before commit — confirmed zero residual diff on `App.jsx`/`useAuth.jsx`. `npx vite build` clean both before and after cleanup.
+
+Committed `30f1f62` and pushed to `origin/master`.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 297 (lock cutout resized to a full-area veil matching Brayden's mockup) shipped and pushed (30f1f62) — screenshots at work/active/prompt-297-screenshots/. Prompt 298 queued next: investigate mobile-responsiveness state of closer- and admin-facing pages (never audited, unlike the rep side which got Prompts 287-297), report per-page severity, then build fixes using Prompt 295's standard (mobile can diverge structurally, screenshots mandatory). Prompts 285-297 all shipped. Prompt 283's real end-to-end verification and Android's real install-button path still outstanding on Brayden's end (both need a genuine device/session, not a harness).`
+
+---
+
+### 2026-07-16 (cont. 11, Falcon) — lock cutout was scaled wrong (icon-sized, not a veil), plus mobile work needs to extend to closer + admin sides — queued Prompt 297 and 298
+
+**What happened:** Brayden approved Prompt 295's redesign screenshots ("those changes look way better") but rejected Prompt 296's lock-cutout implementation after seeing it live — it rendered as a small icon-sized element, not what he pictured. He hand-drew a reference in MS Paint: a large black rectangle standing in for the full locked content area, with a padlock hollowed out large in the middle, and clarified explicitly that the shade itself should stay translucent ("the black is transparent, it's not pitch black") — confirming Prompt 296's actual masking *mechanism* (SVG mask, see-through cutout) was right, only the *scale* was wrong (icon-sized instead of full-area veil). Queued **Prompt 297** to keep the existing technique and just resize/reposition it to cover the full locked area as a real veil rather than a small icon.
+
+Separately, Brayden asked for the mobile design work to extend to the closer and admin sides — everything shipped in Prompts 287-296 was scoped to rep-facing pages only (plus a few genuinely shared components: Sidebar, CallPrepModal, Mobile App modal). Nobody has looked at closer- or admin-specific pages yet. Queued **Prompt 298** as investigate-first, matching Prompt 287's original pattern — enumerate closer/admin pages, check which already inherit fixes for free via shared components vs. need dedicated work, report severity, then build using Prompt 295's same standard (mobile can diverge structurally, screenshots mandatory for verification).
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 297 queued: My Leads lock cutout needs to be resized from icon-scale to a full-area veil (large lock cutout in a translucent black shade covering the whole locked content region) — Brayden confirmed the underlying SVG-mask technique from Prompt 296 is correct, only the scale is wrong, and provided a hand-drawn Paint mockup as reference. Prompt 298 queued: investigate mobile-responsiveness state of closer- and admin-facing pages (never audited, unlike the rep side which got Prompts 287-296), report per-page severity, then build fixes using Prompt 295's standard. Prompts 285-296 all shipped and approved except the lock-cutout scale issue being fixed in 297. Prompt 283's real end-to-end verification and Android's real install-button path still outstanding on Brayden's end. Nothing else queued.`
+
+---
+
 [CC | 2026-07-16 — Prompt 296 shipped + vault log commit] — Built and shipped Prompt 296 (dashboard commit `5c21bfd`, pushed): Settings section reorder, Mobile App modal T-chart/toggle, My Leads padlock-cutout icon + copy fix. Full detail below (cont. 10). Vault itself committed/pushed as `b0630ee` (log entry + Prompt 296 screenshots). No blockers; Android's real install-button path still unverified outside a genuine install-eligible session. LIVE_STATE's "Next Up for CC" queue is now empty — nothing else queued.
 
 ### 2026-07-16 (cont. 10) — CC (Eagle): Prompt 296 shipped — Settings reorder, Mobile App modal T-chart/toggle, My Leads lock cutout + copy fix

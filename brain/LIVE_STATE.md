@@ -26,6 +26,29 @@ tags:
 
 ---
 
+### 🔲 Prompt 298 — closer + admin side: apply the same mobile audit/redesign treatment as the rep side (investigate scope first, then build)
+
+**Context:** Brayden: "make sure the mobile changes are made, like the design changes, and the touch-up for the mobile pages is also made on the closer and admin side as well." Every mobile prompt this session (287-296) was scoped to rep-facing pages (My Leads, My Commissions, Training Center, Settings) plus a few genuinely shared components (`Sidebar`, `CallPrepModal` — which Prompt 289's own log confirms is already shared between the rep's `CallModal` and the closer's `AppointmentCard`, so that piece already benefits both sides — and the Mobile App modal, which isn't role-specific). Nobody has audited the closer or admin sides specifically.
+
+**Investigate first — don't assume scope, report it:**
+1. Enumerate the closer-facing pages (likely `src/pages/closer/*` or similar) and admin-facing pages (`src/pages/admin/*` — Users/invites is one, there may be others: any admin dashboard/stats/lead-management views). For each, note whether it renders inside the same `DashboardLayout`/`Sidebar` shell already fixed in Prompt 288 (meaning the drawer fix already applies) or has its own separate layout shell that was never touched.
+2. For each closer/admin page, do the same kind of check Prompt 287 did originally: fixed-width columns, no-wrap KPI/stat rows, grids with oversized `minmax()` values, anything that would collide or overflow at a 375px viewport — same failure patterns already found and fixed on the rep side (My Leads/My Commissions/Training), likely present here too since these pages were built around the same era with the same non-responsive conventions.
+3. Report per-page severity (broken / cramped / fine) same format as Prompt 287's original per-screen findings, plus which pages already inherit fixes for free via shared components vs. which need dedicated work.
+
+**Then build**, applying Prompt 295's standard (mobile is authorized to structurally diverge from desktop, same information must remain, real visual polish not just anti-overflow) to whatever's found broken — same screenshot-mandatory verification approach as 295/296 (computed-style checks alone already proved insufficient once this session).
+
+---
+
+### ✅ Prompt 297 SHIPPED 2026-07-16 (`30f1f62`, pushed) — My Leads lock cutout: resized from icon-scale to a full-area veil with a large lock cutout
+
+**Context:** Prompt 296 built the lock-cutout treatment (semi-transparent black shade with an SVG-masked padlock hole) but built it at icon scale (~40-60px, small and centered) — Brayden confirmed via screenshot this isn't what he pictured. He then hand-drew a reference in Paint: a large black rectangle representing the full locked content area ("use the black box as the screen"), with a padlock shape hollowed out in the middle, large enough to read clearly as a lock window into whatever's behind it. His own clarification on the shade itself: **"the black is transparent, it's not pitch black"** — i.e. the translucent-black approach Prompt 296 already built is correct and should stay, only the scale/coverage is wrong.
+
+**Build:** Keep the existing SVG-mask cutout technique from Prompt 296 (`LockedCutoutIcon` in `src/pages/rep/MyLeads.jsx`) — the mechanism (translucent black shade + masked-out lock shape = see-through hole) is correct and confirmed fine by Brayden. Change the scale: instead of a small icon-sized element, the shade should cover the full locked content area (the empty space below the tabs where the table would normally render — same footprint the old "Complete training to unlock your leads" message currently sits inside), with the lock cutout sized proportionally large within that shade — a genuine watermark, not a small icon. Text ("Complete training to unlock your leads" / corrected copy / "Go to Training Center" link) stays positioned as it is today, just now sitting on top of a much larger veil-with-cutout instead of next to a small icon.
+
+**Verification:** screenshot the result at both desktop and mobile widths (same mandatory-screenshot standard as 295/296) — confirm the shade now spans the locked area, confirm the lock cutout reads clearly as a large lock shape (not a tiny watermark lost in a big dark rectangle), confirm the shade is genuinely translucent (not opaque) so it's visually distinct from a plain black box.
+
+---
+
 ### ✅ Prompt 296 SHIPPED 2026-07-16 (`5c21bfd`, pushed) — 3 small fixes from live desktop screenshots: Settings section order, Mobile App modal layout, My Leads lock treatment + copy fix
 
 **Context:** Brayden sent 3 live screenshots (desktop browser, `ohvara-dashboard.vercel.app`, logged in as apex11/John Scott test accounts) with specific feedback on each.
