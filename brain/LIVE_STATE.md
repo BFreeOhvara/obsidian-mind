@@ -18,7 +18,7 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
-### 🔲 Prompt 279 — INVESTIGATION COMPLETE 2026-07-15, awaiting Brayden's email-provider setup + mechanism pick before any build
+### ✅ Prompt 279 — RESOLVED: decisions confirmed → built and shipped as Prompt 282 (`246b1de`). Only leftover: **Brayden's Resend setup** (account → domain DNS → Supabase SMTP config) so password-reset emails actually deliver. Original investigation kept below for reference.
 
 **1. Email infra: confirmed absent — this is the hard dependency.** No email provider exists anywhere: grepped every edge function for Resend/SendGrid/Postmark/Mailgun/SMTP — zero hits (the only "email" matches are the synthetic `@ohvara.internal` strings). `fetch-secrets`' capability list knows about anthropic/retell/twilio/stripe/google-maps/indeed — no email key of any kind. Supabase's built-in auth mailer is dev-only (rate-limited to a handful of emails/hour, unbranded sender) — fine for testing the flow, not for real reps. **What Brayden needs to set up himself before this ships: a Resend account (free tier = 100 emails/day, plenty for invites + password resets at current scale), verify the sending domain (a few DNS records), and drop the API key into Supabase.** Resend has a first-party Supabase SMTP integration, so one setup powers BOTH Supabase's native auth emails (password reset) and any custom sends.
 
@@ -53,13 +53,13 @@ tags:
 
 ---
 
-### 🔲 Prompt 280 — Payouts: "Manage payout account" requires a password re-confirm first
+### ✅ Prompt 280 SHIPPED 2026-07-15 (`dfb21b8`, pushed) — password re-confirm now gates "Manage payout account", live-verified all three paths
 
-**Context:** Brayden wants a step-up auth check before anything sensitive in Payouts is actionable — confirmed scope: just the **"Manage payout account"** button/action, not the whole section (the "Not Connected" status badge itself stays visible as today).
+**Build:** `Settings.jsx`'s Payouts section — clicking "Manage payout account" now opens a `PasswordConfirmModal` (portaled to `document.body` per the Prompt 185 fixed-position gotcha) instead of navigating directly. Re-verify is `signInWithPassword` against the session's own email — the idiomatic Supabase-JS step-up for password accounts (`supabase.auth.reauthenticate()` was considered and rejected: it's email-nonce-based, dead until Resend exists). Works identically for legacy synthetic-email and invite-flow real-email accounts. The Not Connected/Connected badge stays visible outside the gate, per the confirmed scope.
 
-**Build:** clicking "Manage payout account" opens a password-confirm prompt (re-enter current password) before proceeding to whatever the actual payout-management flow is (Stripe Connect onboarding per `stripe-connect-onboard` edge function, per existing infra). Use Supabase's standard reauthentication pattern (re-verify via `signInWithPassword` against the current session's email, or whatever the idiomatic Supabase-JS approach is — investigate the cleanest fit rather than hand-rolling something). Failed re-entry shows an inline error, doesn't proceed. This is independent of Prompt 279 — works the same whether the account has a real or synthetic email, since it's just re-checking the CURRENT password, not sending anything anywhere.
+**Live-verified end-to-end with a throwaway invite-flow rep account** (the Prompt 282 invite flow now lets CC self-provision test credentials — no more "can't verify auth-gated UI" gap): modal appears on click with the badge still visible; wrong password → "Incorrect password — try again." inline, modal stays, no navigation; correct password → lands on `/rep/commissions` (My Commissions, where the rep Stripe Connect flow lives). No console errors. QA account + invite deleted after (confirmed 0 rows).
 
-**Verification:** live-verify the re-confirm modal appears on click, wrong password is rejected with a clear error, correct password proceeds to the existing payout flow unchanged.
+**Minor cosmetic note (not fixed, not worth churn):** registering via invite and opening Settings within seconds can show an empty Phone field on first load — the claim function's `profiles.phone` write races the immediate post-signup profile fetch. The DB value is always correct (verified) and any later load shows it.
 
 ---
 

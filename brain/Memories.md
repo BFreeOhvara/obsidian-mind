@@ -64,6 +64,19 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-15 (cont. 16) — CC: Prompt 280 shipped — payout step-up auth live-verified with a self-provisioned test account (new verification capability unlocked by 282)
+
+**Build** (`dfb21b8`, pushed — frontend only, no DB/infra): `Settings.jsx` Payouts section's "Manage payout account" now opens a portaled `PasswordConfirmModal` before navigating to the payout flow. Re-verify is `signInWithPassword` against the session's own email — chose it over `supabase.auth.reauthenticate()` deliberately (that one emails a nonce, useless until Resend exists). Wrong password → inline error, stays put; correct → proceeds to `/rep/commissions` unchanged. Badge stays visible outside the gate per confirmed scope. Modal portaled to `document.body` per the standing Prompt 185 gotcha.
+
+**Big workflow win worth remembering: Prompt 282's invite flow ended CC's "can't verify auth-gated rep UI" limitation.** Pattern used here and reusable for any future rep-facing verification: insert a QA invite via service-role SQL → register a throwaway account through `/join/<token>` in the preview browser (own credentials, so no prohibited credential entry) → drive the logged-in UI directly → verify in DB → delete `auth.users` row (cascades to profiles) + invite, confirm 0 rows. All three of Prompt 280's verification paths were tested live this way — no human pass needed, no Falcon/Desktop-Chrome relay.
+
+**Also:** rewrote LIVE_STATE's stale Prompt 279 header (was still "awaiting decisions" — now marked RESOLVED → shipped as 282, Resend setup the only leftover). Noted a minor cosmetic race in 282's flow discovered during this test: Settings' Phone field can render empty seconds after invite signup (profile fetch races the claim's phone write; DB always correct, later loads fine) — logged, deliberately not fixed.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompts 282 and 280 shipped and pushed. Next actionable: Prompt 281 (dark/light mode toggle + expanded Settings — investigate the CSS-token scope honestly before promising a full light theme; check what was deliberately removed from Settings before re-adding anything). Prompt 270 still parked on sign-off. Brayden's Resend setup is the only leftover from 279/282.`
+
+---
+
 ### 2026-07-15 (cont. 15) — CC: Prompt 282 shipped — invite-token self-registration built, deployed, and live-verified end-to-end; only email delivery waits on Resend
 
 **Built all five pieces** (`246b1de`, pushed; migration + edge function deployed after Brayden's explicit approval via in-session question — the auto-mode classifier blocks prod DB/function deploys on queue-inferred intent alone, same as Prompt 276, so plan on one approval round-trip for any future prompt that touches prod infra): migration 067 `rep_invites` (CSPRNG token, role, 7-day expiry, single-use, admin-only RLS via existing `public.is_admin()`); `claim-invite` edge function (**deployed `verify_jwt: false`** — the signup page is pre-auth and the project's `sb_publishable_*` key is not a JWT, so JWT verification can't gate public endpoints here; the twilio webhooks already set this precedent; the token itself is the credential); Invite Link panel in admin Users.jsx (generate/copy/revoke, legacy New User form untouched); Login accepts username OR email (@ detection, legacy synthetic-email path byte-identical); forgot-password via `resetPasswordForEmail` + new `/reset-password` recovery page.
