@@ -26,7 +26,17 @@ tags:
 
 ---
 
-### 🔲 Prompt 287 — mobile-responsiveness audit — INVESTIGATED, awaiting Brayden's call on which fix to scope first
+### ✅ Prompt 288 SHIPPED 2026-07-16 (`7e5f490`, pushed) — sidebar is now an off-canvas drawer below `md`, desktop unchanged
+
+**Built exactly to spec.** `Sidebar.jsx`: takes `open`/`onClose` props, className now includes `md:translate-x-0` (always visible at `md`+, matching desktop pixel-for-pixel) plus a conditional `translate-x-0`/`-translate-x-full` (drawer open/closed below `md`), 200ms transform transition, backdrop (`rgba(0,0,0,0.5)`, `md:hidden`, click-to-close) rendered only when open. Both nav links (main nav + Settings icon) call `onClose` on click so navigating closes the drawer. `DashboardLayout.jsx`: owns `navOpen` state, closes it automatically on every route change (`useEffect` on `pathname`), renders a new mobile-only fixed top bar (`md:hidden`, 52px, hamburger + "Ohvara" label) that toggles the drawer; `main`'s margin is now `md:ml-[240px]` (0 below `md`, exactly as before at `md`+) with `pt-[52px] md:pt-0` to clear the new top bar on mobile only.
+
+**Verified via the same unauthenticated harness pattern as Prompts 283-287** (`/qa-harness-287`, deleted before commit): at 375px — content width went from 135px to 327px with the drawer closed by default; clicking the hamburger opens the drawer (confirmed via a temporary debug marker + the underlying `--tw-translate-x` custom property resolving to `0px` instantly — the visible `transform` looked stuck mid-animation in the automated tab only because this headless test browser doesn't paint continuously between discrete calls, confirmed by disabling the CSS transition and re-reading, which resolved instantly to `matrix(1,0,0,1,0,0)`; this is a test-tooling artifact, not a real bug, real browsers paint continuously); backdrop click correctly closes it (confirmed via the debug marker flipping back). At 1280px desktop — sidebar sits at `left: 0`, main content has `margin-left: 240px`, byte-identical to pre-fix behavior; no hamburger/backdrop rendered. Harness file + debug marker both removed before commit, confirmed gone from final diff (`git status` showed only the 2 intended source files).
+
+**Still open — this alone doesn't make every page usable.** Per Prompt 287's per-screen findings, the following are unaddressed: My Leads' fixed-width table columns, Script Walk/Call Now's fixed-width panels, AI Roleplay's oversized column minWidths, Training's `minmax(240px,...)` card grid, My Commissions' no-wrap KPI row. Recommend My Leads or Script Walk/Call Now next (highest priority — what a rep touches mid-shift) but this needs Brayden's call on ordering.
+
+---
+
+### 🔲 Prompt 287 — mobile-responsiveness audit — INVESTIGATED, root-cause fix (sidebar drawer) SHIPPED as Prompt 288, 5 per-page fixes still open
 
 **Investigation done 2026-07-16 (CC) — root cause confirmed, nothing built:** No responsive design has ever existed — `tailwind.config.js` has zero custom breakpoints, repo-wide grep for `sm:`/`md:`/`lg:`/`useMediaQuery`/`window.innerWidth` turns up only 2 incidental `md:grid-cols` tweaks (My Stats, My Goals) and one `hidden lg:flex` on Messages' contact panel — nothing resembling mobile-first design anywhere. **Root cause confirmed by live measurement** (harness-rendered the real `Sidebar` + `DashboardLayout` at a 375px viewport, no auth needed — those components mount without a session): `Sidebar` is `position: fixed; width: 240px`, `DashboardLayout`'s main content has hardcoded `margin-left: 240px` (`ml-[240px]`) — **usable content width on a 375px phone is 135px (36% of the screen).** This one fixed-sidebar pattern is shared by every authenticated page, so it's one root cause, not six separate problems.
 
@@ -40,7 +50,7 @@ tags:
 
 **Complexity estimate, reported honestly (not lowballed):** not a few Tailwind classes. The sidebar needs a real collapse-to-drawer/hamburger pattern first — every page inherits whatever the shell does, so nothing else matters until that's fixed. Per-page fixes after that are real rework, not prefix classes: My Leads needs a card-based mobile layout (not a sideways-scrolled table), the two-column call/training layouts need genuine single-column stacking below a real breakpoint, KPI/card grids need `flexWrap`/smaller minmax values. Sidebar-to-drawer is one contained job; the 5 page-level fixes are separate pieces of work, My Leads and Script Walk/Call Now matter most since those are what a rep touches mid-shift.
 
-Reported to Brayden in chat. **Stays 🔲 — waiting on his call for which fix to scope first as an actual build prompt** (sidebar drawer is the logical first piece since everything else is gated behind it, per CC's own recommendation in chat).
+**Sidebar drawer shipped as Prompt 288 above (`7e5f490`).** Stays 🔲 — the 5 per-page fixes (My Leads, Script Walk/Call Now, AI Roleplay, Training, My Commissions) are still open and unscoped. Waiting on Brayden to pick which to scope next; My Leads and Script Walk/Call Now recommended first since those are what a rep touches mid-shift.
 
 ---
 
