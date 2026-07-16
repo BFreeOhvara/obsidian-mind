@@ -26,6 +26,18 @@ tags:
 
 ---
 
+### ✅ Prompt 289 SHIPPED 2026-07-16 (`e6b1249`, pushed) — CallPrepModal (Call Now/Script Walk) stacks single-column below `md`, desktop unchanged
+
+**Found the actual shared component first** — `CallModal`/`ScriptWalk` don't have their own fixed-width layout; the two-column structure lives in `src/components/shared/CallPrepModal.jsx` (the box both the rep's `CallModal` and the closer's `AppointmentCard` render into, per its own doc comment — "guarantees pixel-identical output" across both call sites). Fixed it there once, benefiting both consumers, rather than duplicating a fix per call site.
+
+**Built:** body row (`flex: 1, display: 'flex'`) gained `className="flex flex-col md:flex-row"` — stacks below `md`, unchanged row layout at `md`+. LEFT column's hard `flex: '0 0 340px'` (immovable 340px, no shrink) became `className="w-full md:w-[340px] md:flex-shrink-0"` — full width when stacked, exactly 340px + no-shrink at `md`+ (pixel-identical to before). Its `borderRight` became `border-b-[0.5px] md:border-b-0 md:border-r-[0.5px] border-[color:var(--border)]` — border moves from right (column layout) to bottom (stacked layout) so it still reads as a section divider either way. Added `overflow-y-auto md:overflow-y-visible` on the body row as a safety net for stacked content exceeding the modal's `maxHeight: 88vh` (harmless at `md`+, each column already scrolls independently there as before).
+
+**Verified via harness** (`/qa-harness-289`, deleted before commit): rendered the real `CallPrepModal` + `ScriptWalk` with mock props. At 375px — `flexDirection: column` confirmed via computed style, both columns measured at 333px width (full available width minus the 20px backdrop padding × 2), correctly stacked vertically (info/notes column top, script column below), zero horizontal overflow (`document.body.scrollWidth === 375`). At 1280px — `flexDirection: row`, left column exactly 340px, border-right present, border-bottom `0px`, right column fills remaining space (618px) — matches pre-fix layout exactly. `npx vite build` clean. AI Roleplay and all other pages untouched, per scope.
+
+**Next:** My Leads (table→card redesign) is the other high-priority page fix from Prompt 287, still open and unscoped — real design work (deciding which columns show on a card, in what order), not a quick className pass like this one was.
+
+---
+
 ### ✅ Prompt 288 SHIPPED 2026-07-16 (`7e5f490`, pushed) — sidebar is now an off-canvas drawer below `md`, desktop unchanged
 
 **Built exactly to spec.** `Sidebar.jsx`: takes `open`/`onClose` props, className now includes `md:translate-x-0` (always visible at `md`+, matching desktop pixel-for-pixel) plus a conditional `translate-x-0`/`-translate-x-full` (drawer open/closed below `md`), 200ms transform transition, backdrop (`rgba(0,0,0,0.5)`, `md:hidden`, click-to-close) rendered only when open. Both nav links (main nav + Settings icon) call `onClose` on click so navigating closes the drawer. `DashboardLayout.jsx`: owns `navOpen` state, closes it automatically on every route change (`useEffect` on `pathname`), renders a new mobile-only fixed top bar (`md:hidden`, 52px, hamburger + "Ohvara" label) that toggles the drawer; `main`'s margin is now `md:ml-[240px]` (0 below `md`, exactly as before at `md`+) with `pt-[52px] md:pt-0` to clear the new top bar on mobile only.
@@ -50,7 +62,7 @@ tags:
 
 **Complexity estimate, reported honestly (not lowballed):** not a few Tailwind classes. The sidebar needs a real collapse-to-drawer/hamburger pattern first — every page inherits whatever the shell does, so nothing else matters until that's fixed. Per-page fixes after that are real rework, not prefix classes: My Leads needs a card-based mobile layout (not a sideways-scrolled table), the two-column call/training layouts need genuine single-column stacking below a real breakpoint, KPI/card grids need `flexWrap`/smaller minmax values. Sidebar-to-drawer is one contained job; the 5 page-level fixes are separate pieces of work, My Leads and Script Walk/Call Now matter most since those are what a rep touches mid-shift.
 
-**Sidebar drawer shipped as Prompt 288 above (`7e5f490`).** Stays 🔲 — the 5 per-page fixes (My Leads, Script Walk/Call Now, AI Roleplay, Training, My Commissions) are still open and unscoped. Waiting on Brayden to pick which to scope next; My Leads and Script Walk/Call Now recommended first since those are what a rep touches mid-shift.
+**Sidebar drawer shipped as Prompt 288 (`7e5f490`). Script Walk/Call Now shipped as Prompt 289 (`e6b1249`).** Stays 🔲 — 4 per-page fixes still open and unscoped: My Leads, AI Roleplay, Training, My Commissions. My Leads recommended next (the other highest-priority page, per this audit's own ranking) — it's real design work (table→card redesign), not a quick className pass like 289 was.
 
 ---
 
