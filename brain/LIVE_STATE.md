@@ -51,15 +51,22 @@ tags:
 
 ---
 
-### 🔲 Prompt 292 — mobile visual-polish screenshot audit (investigate/report only, do NOT redesign blind)
+### ✅ Prompt 292 DELIVERED 2026-07-16 — mobile visual-polish screenshot audit (screenshots + notes only, no code shipped)
 
-**Context:** Brayden's blanket feedback: "the mobile version needs some massive work, and it needs to look well put together — right now, it just does not look that good and needs some work." This is real signal but too vague to turn into a build spec directly — could mean spacing, font sizes, touch-target sizing, color contrast, alignment, anything. CC has been verifying Prompts 288-290 via computed-style assertions in a harness, not actual visual screenshots, so nobody — including CC — has actually LOOKED at what these pages look like on a phone yet.
+**Context:** Brayden's blanket feedback: "the mobile version needs some massive work... right now, it just does not look that good." Too vague to build against directly — this prompt was investigate/report only, to turn it into a concrete list.
 
-**Do this first, before touching any more layout code:** using whatever headless-browser screenshot capability is available (Puppeteer/Playwright, same stack the harness pattern implies), render each main rep page at a real phone viewport (375×812, iPhone-standard) — Login, My Leads (now cards), Script Walk/Call Now (now stacked), AI Roleplay, Training (videos/flashcards/quiz), My Commissions, Settings, and the Mobile App modal (both the QR view and an instructions view) — and save actual PNG screenshots (mock/seeded data is fine, same unauthenticated-harness data used in Prompts 283-290). Do not fix anything found — just capture and report.
+**Delivered:** 12 real Playwright screenshots (iPhone 13 viewport, 390×844, plus one deliberate 1280px capture for the Mobile App modal's desktop-only QR branch) at `work/active/prompt-292-screenshots/` in the vault, plus a full write-up with embedded images and a ranked punch list at [[Prompt 292 Mobile Screenshot Audit]]. Covered: Login, My Leads, all 5 Training Center tabs, My Commissions, Settings, both Mobile App modal branches, and the Call Now/Script Walk modal.
 
-**Deliver:** the screenshot files themselves (saved somewhere Brayden/Eagle can pull into the vault — flag the exact path in the ship log) plus a short per-page note on anything CC notices that looks visually off even without being told what to look for (cramped spacing, inconsistent margins, tiny tap targets, low-contrast text, awkward line-wrapping, etc.). This turns "doesn't look good" into a concrete list Brayden can point at ("this," "that") instead of guessing at a redesign blind.
+**Headline findings** (full detail + images in the note):
+1. **My Commissions KPI row** — genuinely broken, not just cramped: "$1,450" and "3" render directly adjacent with no separation, reading as "$1,4503". Confirms the already-known "needs flexWrap" gap from Prompt 290's log, now with visual proof.
+2. **My Leads KPI row + filter/search row** — new finding, never in scope for Prompts 288-290: KPI card text wraps 3-4 lines each, filter tabs get clipped fighting a fixed-width search box for space.
+3. **Mobile App modal** — both of Prompt 291's already-queued issues confirmed visually (translucent surface, QR-only desktop view with no instructions), plus one small new finding (an inline icon breaking a sentence across 3 lines in the iOS instructions).
+4. Smaller polish items: Settings' Change Password button text-wraps to 2 lines, Email input clips its own value; Training Center's tab bar leaves dead space once wrapped; a video thumbnail crops its own overlay text.
+5. **AI Roleplay tab genuinely unverified** — rendered its "Coming Soon" placeholder in the harness (no capability flag set, and a live voice call can't be exercised statically anyway) — still needs a real device/session check, separate from any code fix.
 
-**Stays 🔲 until screenshots + notes are delivered — no visual/styling changes get built off this prompt alone.** Once Brayden reviews the real images, specific fixes get queued as their own prompts.
+**Verification method:** built a throwaway Playwright-driven harness — real page components (`MyLeads`, `TrainingCenter`, `MyCommissions`, `Settings`, `MobileAppModal`, `CallModal`) mounted with a mocked auth context (temporary `AuthContext` export, reverted) and pre-seeded react-query cache, since credential entry is still hard-blocked for CC. All harness scaffolding fully reverted before writing this log — `git status` on `ohvara-dashboard` is clean, nothing shipped from this prompt (by design, per its own scope).
+
+**Next:** awaiting Brayden's review of the punch list to decide which findings become their own build prompts (Prompt 291 already covers 2 of them).
 
 ---
 

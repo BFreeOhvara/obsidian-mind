@@ -114,6 +114,26 @@ While verifying, caught a real follow-on bug: the admin invite-list display in `
 
 ---
 
+### 2026-07-16 (cont. 10) — CC: Prompt 292 delivered — mobile screenshot audit, 12 real screenshots + ranked punch list, zero code shipped
+
+**What happened:** This was the first genuinely large build-out this session — an investigate-only prompt asking for real visual screenshots of every main rep page at phone width, something CC hadn't actually done before (Prompts 288-290 were verified via `getComputedStyle` assertions in a harness, never an actual rendered image). Found `playwright` already a dev dependency in `ohvara-dashboard` with Chromium pre-installed, so no new tooling was needed.
+
+Built a throwaway harness to get real production page components rendering without a login: temporarily exported `AuthContext` from `useAuth.jsx` (reverted after), wrote `QaHarness292.jsx` mounting `MyLeads`/`TrainingCenter`/`MyCommissions`/`Settings`/`MobileAppModal`/`CallModal` inside a mocked auth value + a fresh `QueryClient` with react-query cache pre-seeded per page's actual query keys (`['leads','my',id]`, `['training',id]`, `['commissions',id]`, etc. — read each hook's source first to get the keys and shapes right rather than guessing). Wrote a Playwright script (`scratch-shoot-292.cjs`, never committed) using the `iPhone 13` device preset for a real mobile viewport+UA, plus one deliberate desktop-width (1280px) capture for the Mobile App modal's QR branch, since that branch only exists when `isMobileDevice()` is false — it literally cannot be captured at phone width, so the "all screenshots at 375×812" instruction got one intentional exception, explained in the note.
+
+Caught and fixed my own test bug mid-run: the first pass through Training Center's 5 tabs produced *identical* screenshots for 2 different tabs — turned out `getByText('Videos')` matched the page's subtitle paragraph ("Videos, flashcards...") before it ever reached the actual tab button, so the click landed on inert text. Fixed by scoping the locator to `button` elements with `.filter({ hasText })` — a reminder that a "nothing changed" result from a test script is worth treating as a script bug, not the app's, until proven otherwise.
+
+**Real findings surfaced** (full detail + all 12 images in the new vault note [[Prompt 292 Mobile Screenshot Audit]] at `work/active/`, screenshots at `work/active/prompt-292-screenshots/`):
+- My Commissions' KPI row doesn't just look cramped — "$1,450" and "3" render directly adjacent with zero separation, an actual legibility bug. This confirms the already-known "needs flexWrap" gap from Prompt 290's log, now with photographic proof instead of just a suspicion.
+- My Leads' KPI row + filter/search row is a **new** finding — never in scope for Prompts 288, 289, or 290, since those touched the sidebar, the CallModal, and the lead rows themselves respectively, not the header area above the lead list.
+- Mobile App modal: both of Prompt 291's already-queued issues confirmed visually with real images, plus one small new one (an inline Share-icon breaking a sentence across 3 lines).
+- AI Roleplay tab rendered its "Coming Soon" placeholder in the harness (no capability flag set) — flagged explicitly as unverified rather than silently treated as fine, since a live voice-call flow can't be exercised in a static screenshot harness regardless.
+
+**Cleanup discipline:** deleted the harness component, the Playwright script, the temporary `AuthContext` export, and the `App.jsx` route before writing anything — confirmed via `git status` that `ohvara-dashboard`'s working tree is fully clean, so this investigate-only prompt shipped exactly zero code, matching its own instruction ("no visual/styling changes get built off this prompt alone").
+
+**Next up:** Prompt 291 (Mobile App modal fix) is next in LIVE_STATE's queue and is now partly pre-validated by this audit's images. Beyond that, the queue is otherwise empty — new fixes from this audit's punch list need Brayden's review before becoming their own prompts.
+
+---
+
 ---
 
 ### 2026-07-16 (cont. 5) — Falcon: Prompt 290 shipped, 3 fresh mobile-UX complaints from Brayden — queued Prompt 291 (Mobile App modal fixes) and Prompt 292 (screenshot audit, investigate-only)
