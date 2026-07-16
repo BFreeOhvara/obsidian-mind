@@ -26,6 +26,18 @@ tags:
 
 ---
 
+### ✅ Prompt 290 SHIPPED 2026-07-16 (`f172c9e`, pushed) — My Leads card layout below `md` (last of the 2 originally-flagged priority pages)
+
+**Built:** `LeadRow` in `src/pages/rep/MyLeads.jsx` now renders two trees, toggled via Tailwind `hidden md:flex` / `flex md:hidden` — desktop keeps the exact pre-existing fixed-width flex-row layout (120/100/130/110/120px columns, pixel-identical), below `md` each lead is a stacked card: business name anchors it (14px, topmost), status badge sits top-right next to it (immediately visible, plus the appointment/follow-up line same as before), niche+city sit in a muted 2-column mini-grid with phone spanning the row below, Call Now is a full-width tap target at the bottom. The table header row is also `hidden md:flex` now — cards are self-labeling, no header needed below `md`. Same follow-up-countdown and contact-name logic reused via a shared `followUpOrContactLine`/`appointmentLine` const instead of duplicating the JSX conditionals per tree.
+
+**Verified via a temporary unauthenticated harness** (`/qa-harness-290` + a temporary `export` on `LeadRow`, both reverted before commit — same pattern as Prompts 283-289): rendered 4 mock leads covering New/Follow-Up/Appointment Booked/Not Interested. At 375px — `flexDirection: column` confirmed on all 4 cards, width 325px (full available width), zero horizontal overflow (`document.body.scrollWidth === window.innerWidth === 375`), desktop tree computed `display: none` / mobile tree `display: flex`. At 1280px — inverse (mobile `none`, desktop `flex`), first row's 6 column widths measured 650/120/100/130/110/120px — matches the original spec exactly, confirming pixel-identical desktop. All fields (business, contact/follow-up, niche, city, phone, status, appointment time, Call Now) present in both trees, nothing dropped. `npx vite build` clean. **Could not verify through a real rep login** — same hard-blocked-credential constraint as Prompts 276/277/283/284/285.
+
+**Field-priority mapping used:** primary = business name (anchor) + status badge (top-right, always visible) — mirrors desktop's leftmost/first-column priority. Secondary = niche + city (2-col mini-grid) + phone (spans below) — desktop's middle columns. Action = Call Now, full-width bottom button, same as desktop's rightmost column.
+
+**Remaining:** AI Roleplay (oversized `minWidth` on already-stacking columns — likely a quick fix, similar shape to Prompt 289), Training (`minmax(240px,...)` card grid), My Commissions (KPI row needs `flexWrap`) — all still open, unscoped.
+
+---
+
 ### ✅ Prompt 289 SHIPPED 2026-07-16 (`e6b1249`, pushed) — CallPrepModal (Call Now/Script Walk) stacks single-column below `md`, desktop unchanged
 
 **Found the actual shared component first** — `CallModal`/`ScriptWalk` don't have their own fixed-width layout; the two-column structure lives in `src/components/shared/CallPrepModal.jsx` (the box both the rep's `CallModal` and the closer's `AppointmentCard` render into, per its own doc comment — "guarantees pixel-identical output" across both call sites). Fixed it there once, benefiting both consumers, rather than duplicating a fix per call site.

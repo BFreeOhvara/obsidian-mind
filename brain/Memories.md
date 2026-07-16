@@ -64,6 +64,27 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-16 (cont. 4) — Falcon: Prompt 289 shipped (one shared component, both call sites fixed), queued Prompt 290 (My Leads card layout)
+
+**What happened:** CC's Prompt 289 turned out simpler than expected — `CallModal` and `AppointmentCard` both render into a shared `CallPrepModal` component, so fixing the stacking there (`flex-col` below `md`, 340px left column goes full-width, divider border moves from right to bottom) covered both the rep and closer call flows in one fix. Shipped `e6b1249`, verified via harness, desktop pixel-identical.
+
+That leaves 4 open from Prompt 287's original audit: My Leads, AI Roleplay, Training, My Commissions. Brayden said keep going — queued **Prompt 290** for My Leads next (the other originally-flagged priority page, real table→card redesign this time, not a quick fix). Since this needs actual design judgment (which fields become primary vs. secondary on a card) and Brayden isn't in the loop picking exact fields, wrote the prompt to have CC mirror the desktop table's own column order/hierarchy as the signal rather than inventing a new priority from scratch, and report back the final field mapping for a sanity-check rather than silently deciding and moving on.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 290 queued: My Leads card layout below md, mirroring desktop table column order as the field-priority signal, CC reports final mapping back for a sanity check. Prompt 289 (Script Walk/Call Now, via shared CallPrepModal) already shipped (e6b1249). After 290, remaining open Prompt 287 items: AI Roleplay (oversized minWidth, likely quick), Training (minmax(240px) card grid), My Commissions (KPI row needs flexWrap) — none scoped yet. Prompt 284 (signup form: username + drop phone) still queued, unbuilt. Prompt 283's real end-to-end verification still outstanding on Brayden's end. Nothing else queued.`
+
+---
+
+### 2026-07-16 (cont. 5) — CC: Prompt 290 shipped — My Leads card layout below `md`
+
+**What happened:** Built the My Leads table→card redesign per the queued spec. `LeadRow` in `src/pages/rep/MyLeads.jsx` now renders two trees toggled by Tailwind `hidden md:flex` / `flex md:hidden` (same dual-tree technique as Prompt 289, but here the mobile version needed genuine reordering — business+status up top, secondary fields in a muted grid, action button full-width — not just a direction flip, so a linear className-only stack wasn't enough). Desktop tree is the untouched original JSX, byte-identical columns (120/100/130/110/120px). Mobile card: business name anchors it (14px), status badge top-right (immediately visible, same follow-up-countdown/appointment-time sub-lines as desktop), niche+city in a 2-col mini-grid, phone spanning below, Call Now full-width at the bottom. Table header row also hidden below `md` since cards self-label.
+
+**Verified via harness** (`/qa-harness-290` + temporary `LeadRow` export, both reverted before commit — same throwaway pattern as 283-289): 4 mock leads (New/Follow-Up/Booked/Not-Interested) confirmed correct tree toggling by breakpoint via `getComputedStyle` (not screenshot — the screenshot tool timed out repeatedly this session for unrelated reasons, computed-style + `read_page` text checks substituted fine). 375px: cards `flexDirection: column`, zero horizontal overflow. 1280px: desktop columns measured 650/120/100/130/110/120px, exact match to pre-existing spec. `npx vite build` clean. Shipped `f172c9e`, pushed. Same rep-login verification gap as every prior mobile-responsive prompt (283-289) — credential entry is hard-blocked for CC.
+
+**Next up:** LIVE_STATE's "Next Up for CC" queue is now empty again — remaining Prompt 287 items (AI Roleplay, Training, My Commissions) are flagged but not yet written as queued prompts; Prompt 284 (signup form) still queued/unbuilt; Prompt 283 real-login verification still outstanding on Brayden's end.
+
+---
+
 ### 2026-07-16 (cont. 3) — Falcon: Prompt 288 (sidebar drawer) shipped, queued Prompt 289 (Script Walk/Call Now stacking) as the easier of the 2 priority page fixes
 
 **What happened:** CC shipped Prompt 288 (`7e5f490`) — sidebar is now a real off-canvas drawer below `md`, desktop pixel-identical, content width on a 375px phone went from 135px to 327px. 5 per-page fixes from Prompt 287 remain open (My Leads, Script Walk/Call Now, AI Roleplay, Training, My Commissions); CC recommended My Leads or Script Walk/Call Now next since those are what a rep touches mid-shift.
