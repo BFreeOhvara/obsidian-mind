@@ -26,6 +26,60 @@ tags:
 
 ---
 
+### ✅ Prompt 294 Part A SHIPPED 2026-07-16 (`132a2f2`, pushed) — 🔲 Part B investigated, reported, BLOCKED on Brayden's go-ahead
+
+**Context:** Brayden finds the admin invite link "super long and ugly" and wants it shortened, plus a "picture icon attached to it" — a rich link-preview card when the link is pasted into iMessage/Slack/WhatsApp/etc.
+
+**Part A shipped:** Added static OG + Twitter-card meta tags (`og:title`, `og:description`, `og:image` → `public/ohvara-favicon.png`) to `index.html`. Confirmed with a raw `curl` (no JS) against `/join/<token>` on the dev server that the tags render pre-hydration — the Vercel `vercel.json` rewrite (`/(.*) → /index.html`) means every route including `/join/<token>` serves this exact same static file, so unfurl bots see the preview card without executing JS. No prerendering/personalization needed, matches what the prompt anticipated.
+
+**Part B investigated and reported, build BLOCKED:** CC's edit to the token generator (`src/hooks/useProfiles.js` `useCreateInvite`, changing 32-byte hex → 12-char URL-safe ID) was **denied by CC's own permission classifier** as security-sensitive credential-generation code — CC surfaced this in chat and is waiting on an explicit yes from Brayden rather than retrying. Findings, so the go/no-go is a quick read:
+1. **No rate-limiting exists** — read the full `claim-invite` source, grepped all of `supabase/functions/` for any rate-limit pattern: nothing anywhere. Deployed `--no-verify-jwt`; only Supabase's generic project-wide abuse protection applies (not endpoint-specific).
+2. **Entropy at candidate lengths** (URL-safe 64-char alphabet, 6 bits/char; current = 64 hex chars = 256 bits): 8 chars=48 bits, 10 chars=60 bits, **12 chars=72 bits**, 16 chars=96 bits. Even a sustained unthrottled 10k req/sec guess rate would take ~3.6M years to exhaust 60 bits; 12 chars gives a large extra margin, further bounded by the existing 7-day expiry.
+3. **Recommendation:** 12-char URL-safe random ID via `crypto.getRandomValues` (no nanoid dependency needed) replacing the 64-char hex generator.
+4. **Confirmed no migration needed** — `rep_invites.token` is `text not null unique`, no length constraint (migration 067); `claim-invite` validates by equality not format, so existing unclaimed 64-char links keep working untouched.
+
+**Next:** if Brayden says go, the edit is: `src/hooks/useProfiles.js` lines ~121-125, swap the 32-byte hex generation for the 12-char alphabet version (drafted, just needs the actual `Edit` call re-approved).
+
+---
+
+### 🔲 Prompt 293 — Settings > Account: remove phone number field entirely
+
+**Context:** Brayden: "there's a phone number option still in the settings... I think it should just be removed since we're not using it. Account: full name, username, and email should be there." This mirrors Prompt 284's decision to drop phone from signup (still queued, unbuilt) — extending the same call to the Settings page's Account section, which currently has an editable phone field left over from before that decision.
+
+**Build:** In Settings' Account section, remove the phone field entirely (input, label, any save/validation logic tied to it). Account section ends up showing exactly: Full Name, Username, Email. Leave `profiles.phone` as a column (no migration — same reasoning as Prompt 284, don't drop data that might still exist on legacy accounts, just stop exposing it in the UI). Note: for accounts created before Prompt 284 ships, `username` may currently be blank/null — that's expected and not a bug in this prompt's scope, just show whatever value exists (or blank) the same way Full Name/Email already render.
+
+**Verification:** harness-render the Settings page, confirm phone field is gone from the DOM, confirm Full Name/Username/Email still render and remain editable exactly as before.
+
+---
+
+### 🔲 Prompt 292 — mobile visual-polish screenshot audit (investigate/report only, do NOT redesign blind)
+
+**Context:** Brayden's blanket feedback: "the mobile version needs some massive work, and it needs to look well put together — right now, it just does not look that good and needs some work." This is real signal but too vague to turn into a build spec directly — could mean spacing, font sizes, touch-target sizing, color contrast, alignment, anything. CC has been verifying Prompts 288-290 via computed-style assertions in a harness, not actual visual screenshots, so nobody — including CC — has actually LOOKED at what these pages look like on a phone yet.
+
+**Do this first, before touching any more layout code:** using whatever headless-browser screenshot capability is available (Puppeteer/Playwright, same stack the harness pattern implies), render each main rep page at a real phone viewport (375×812, iPhone-standard) — Login, My Leads (now cards), Script Walk/Call Now (now stacked), AI Roleplay, Training (videos/flashcards/quiz), My Commissions, Settings, and the Mobile App modal (both the QR view and an instructions view) — and save actual PNG screenshots (mock/seeded data is fine, same unauthenticated-harness data used in Prompts 283-290). Do not fix anything found — just capture and report.
+
+**Deliver:** the screenshot files themselves (saved somewhere Brayden/Eagle can pull into the vault — flag the exact path in the ship log) plus a short per-page note on anything CC notices that looks visually off even without being told what to look for (cramped spacing, inconsistent margins, tiny tap targets, low-contrast text, awkward line-wrapping, etc.). This turns "doesn't look good" into a concrete list Brayden can point at ("this," "that") instead of guessing at a redesign blind.
+
+**Stays 🔲 until screenshots + notes are delivered — no visual/styling changes get built off this prompt alone.** Once Brayden reviews the real images, specific fixes get queued as their own prompts.
+
+---
+
+### 🔲 Prompt 291 — Mobile App modal: solid background + readable text, add install instructions next to the desktop QR code
+
+**Context:** Two concrete fixes to Prompt 286's Mobile App modal, called out directly by Brayden:
+
+1. **Modal isn't solid — text is hard to read.** The modal box itself needs a fully opaque background (an actual solid design-token surface color, not a translucent/low-alpha fill) so the text sitting on it reads clearly. The page *behind* the modal can keep whatever dim/blur backdrop treatment it already has — this is about the box itself, not the backdrop.
+2. **Desktop QR view shows a QR code with no instructions.** Today a rep scans it, lands on the URL, and then has to independently go dig through their phone's browser settings to figure out how to actually add it to their home screen. Fix: show the install instructions directly alongside the QR code in the desktop modal, not gated behind a separate on-mobile-only path. Since desktop can't know which OS the scanning phone runs, show both: "iPhone: after scanning, tap Share → Add to Home Screen" and "Android: after scanning, tap Install when prompted" (reuse the exact instruction copy Prompt 286 already wrote for the on-mobile iOS fallback — don't rewrite it from scratch, just surface it earlier).
+
+**Build:**
+1. Find the Mobile App modal (Prompt 286, `Sidebar.jsx` + whatever modal component it renders). Fix the background: solid opaque color from the existing design-token set (check [[DESIGN]] / whatever token the rest of the app's modals already use for solid surfaces — reuse an existing pattern, don't invent a new color), applied to the modal container specifically, not the backdrop.
+2. In the desktop/QR branch: add a combined iOS+Android instructions block below or beside the QR code, reusing Prompt 286's existing instruction copy for both platforms.
+3. Don't touch the on-mobile branches (Android real-install button, iOS-only instructions) — those already work per Prompt 286's verification, this is additive to the desktop view only.
+
+**Verification:** harness-render the modal (same pattern as Prompts 283-290). Confirm the modal's computed background has alpha 1 (fully opaque), confirm text contrast reads clearly against it, confirm the desktop/QR branch's DOM includes both iOS and Android instruction text alongside the QR image.
+
+---
+
 ### ✅ Prompt 290 SHIPPED 2026-07-16 (`f172c9e`, pushed) — My Leads card layout below `md` (last of the 2 originally-flagged priority pages)
 
 **Built:** `LeadRow` in `src/pages/rep/MyLeads.jsx` now renders two trees, toggled via Tailwind `hidden md:flex` / `flex md:hidden` — desktop keeps the exact pre-existing fixed-width flex-row layout (120/100/130/110/120px columns, pixel-identical), below `md` each lead is a stacked card: business name anchors it (14px, topmost), status badge sits top-right next to it (immediately visible, plus the appointment/follow-up line same as before), niche+city sit in a muted 2-column mini-grid with phone spanning the row below, Call Now is a full-width tap target at the bottom. The table header row is also `hidden md:flex` now — cards are self-labeling, no header needed below `md`. Same follow-up-countdown and contact-name logic reused via a shared `followUpOrContactLine`/`appointmentLine` const instead of duplicating the JSX conditionals per tree.
