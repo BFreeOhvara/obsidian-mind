@@ -37,6 +37,14 @@ tags:
 
 **Report back the real scope/limitations (especially the iOS gap) before building** — same standard as other infra-dependent prompts in this project. Once reported, this becomes a real build prompt covering: the manifest/service-worker/icon setup if missing, the sidebar box in the specified position, the modal with QR (desktop/non-installable-context) vs. direct-install-or-instructions (mobile), sized and positioned to match the reference screenshot's box.
 
+**Investigation done 2026-07-16 (CC), awaiting Brayden's call — nothing built yet:**
+1. **Confirmed zero PWA infra exists.** No `manifest.json` anywhere, no service worker, no `vite-plugin-pwa` (or any PWA plugin) in `vite.config.js`, no manifest link in `index.html`. `vercel.json` is a plain SPA rewrite with no PWA-aware headers. Icon source is usable though: `public/ohvara-favicon.png` (the Prompt 275 logo) is 478×479, enough to generate 192/512 manifest icons without new art.
+2. **iOS gap confirmed as real, no way around it** — `beforeinstallprompt` is Chrome/Android-only; iOS Safari has zero programmatic install API. Any build needs a genuine fork: Android gets a real "tap to install" button, iOS gets manual Share → Add to Home Screen instructions.
+3. **QR library confirmed absent** — grepped `package.json`/`package-lock.json`, zero `qrcode` hits, needs adding as a new dependency.
+4. **Sidebar insertion point confirmed**: `src/components/layout/Sidebar.jsx` — right above the "User + sign out" block starting at the `borderTop` div (line 155 as of `9c7a147`).
+
+Reported to Brayden in chat; open question for him: is the iOS "just show instructions" fallback acceptable, or does the Android-only real-install path change whether this is worth building given the actual rep phone mix? Stays 🔲 until he responds — do not build without that answer.
+
 ---
 
 ### 🔲 Prompt 284 — signup form: drop phone, add a self-chosen username alongside email
