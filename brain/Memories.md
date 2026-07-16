@@ -104,6 +104,16 @@ While verifying, caught a real follow-on bug: the admin invite-list display in `
 
 ---
 
+### 2026-07-16 (cont. 9) — CC: Prompt 293 shipped — Settings Account: phone removed, Username added
+
+**What happened:** Straightforward swap in `AccountSection` (`src/pages/Settings.jsx`) — replaced `phone` with `username` in form state, the input grid, and the dirty-check. Worth noting: `profiles.username` already existed (migration 005, used for login since early on) but had genuinely never been surfaced on the Settings page before — this wasn't just deleting a field, it was also the first time a user could see/edit their own username post-signup.
+
+**Verified via harness** (`/qa-harness-293`, reverted before commit, same throwaway pattern as 283-290/294): confirmed exactly 3 textboxes render (no phone anywhere in the DOM), confirmed Username is actually editable — typed into it and confirmed the value updated live and Save's disabled state flipped correctly. `npx vite build` clean. Shipped `419d829`, pushed. Same real-session verification gap as always (can't test the actual Supabase save round-trip without an authenticated login).
+
+**Next up:** Prompt 292 (mobile screenshot audit — investigate/report only, do NOT build fixes off it) and Prompt 291 (Mobile App modal solid bg + desktop QR instructions) still open in LIVE_STATE, unbuilt, in that order.
+
+---
+
 ---
 
 ### 2026-07-16 (cont. 5) — Falcon: Prompt 290 shipped, 3 fresh mobile-UX complaints from Brayden — queued Prompt 291 (Mobile App modal fixes) and Prompt 292 (screenshot audit, investigate-only)

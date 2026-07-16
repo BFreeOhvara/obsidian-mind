@@ -43,13 +43,11 @@ tags:
 
 ---
 
-### 🔲 Prompt 293 — Settings > Account: remove phone number field entirely
+### ✅ Prompt 293 SHIPPED 2026-07-16 (`419d829`, pushed) — Settings Account: phone removed, Username added
 
-**Context:** Brayden: "there's a phone number option still in the settings... I think it should just be removed since we're not using it. Account: full name, username, and email should be there." This mirrors Prompt 284's decision to drop phone from signup (still queued, unbuilt) — extending the same call to the Settings page's Account section, which currently has an editable phone field left over from before that decision.
+**Built:** `AccountSection` in `src/pages/Settings.jsx` — form state, grid inputs, and the `dirty` check all swapped `phone` for `username`. Account section now shows exactly Full Name, Username, Email (2x2 grid: row 1 = Full Name/Username, row 2 = Email/Save). `profiles.phone` column untouched, just no longer exposed here (same reasoning as Prompt 284: don't drop data, stop exposing it). `profiles.username` already existed as a column (migration 005, used for login) but had never been surfaced on this page — this is the first place a user can see/edit their own username post-signup.
 
-**Build:** In Settings' Account section, remove the phone field entirely (input, label, any save/validation logic tied to it). Account section ends up showing exactly: Full Name, Username, Email. Leave `profiles.phone` as a column (no migration — same reasoning as Prompt 284, don't drop data that might still exist on legacy accounts, just stop exposing it in the UI). Note: for accounts created before Prompt 284 ships, `username` may currently be blank/null — that's expected and not a bug in this prompt's scope, just show whatever value exists (or blank) the same way Full Name/Email already render.
-
-**Verification:** harness-render the Settings page, confirm phone field is gone from the DOM, confirm Full Name/Username/Email still render and remain editable exactly as before.
+**Verified via a temporary unauthenticated harness** (`/qa-harness-293` + a temporary `export` on `AccountSection`, both reverted before commit — same pattern as 283-290/294): confirmed via `read_page` that exactly 3 textboxes render (Full Name, Username, Email) plus Save/Change password buttons, no phone field anywhere in the DOM. Confirmed the Username field is genuinely editable — typed into it, confirmed the value updated and Save's `disabled` flipped to `false` (dirty-check fires correctly). `npx vite build` clean. **Could not verify the real save round-trip against Supabase** (would need an authenticated session) — same constraint as every prior Settings-adjacent prompt.
 
 ---
 
