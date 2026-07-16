@@ -126,7 +126,7 @@ tags:
 
 **Complexity estimate, reported honestly (not lowballed):** not a few Tailwind classes. The sidebar needs a real collapse-to-drawer/hamburger pattern first — every page inherits whatever the shell does, so nothing else matters until that's fixed. Per-page fixes after that are real rework, not prefix classes: My Leads needs a card-based mobile layout (not a sideways-scrolled table), the two-column call/training layouts need genuine single-column stacking below a real breakpoint, KPI/card grids need `flexWrap`/smaller minmax values. Sidebar-to-drawer is one contained job; the 5 page-level fixes are separate pieces of work, My Leads and Script Walk/Call Now matter most since those are what a rep touches mid-shift.
 
-**Sidebar drawer shipped as Prompt 288 (`7e5f490`). Script Walk/Call Now shipped as Prompt 289 (`e6b1249`).** Stays 🔲 — 4 per-page fixes still open and unscoped: My Leads, AI Roleplay, Training, My Commissions. My Leads recommended next (the other highest-priority page, per this audit's own ranking) — it's real design work (table→card redesign), not a quick className pass like 289 was.
+**Sidebar drawer shipped as Prompt 288 (`7e5f490`). Script Walk/Call Now shipped as Prompt 289 (`e6b1249`). My Leads shipped as Prompt 290 (`f172c9e`).** Stays 🔲 — 2 per-page fixes still open and unscoped: AI Roleplay, Training. My Commissions' KPI-row overlap is now confirmed as a real bug (not just cramped) via Prompt 292's screenshot audit — see [[Prompt 292 Mobile Screenshot Audit]] for photographic proof; none of these 3 are written as concrete build prompts yet, awaiting Brayden's review of the audit's punch list.
 
 ---
 
