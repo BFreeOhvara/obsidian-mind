@@ -26,19 +26,20 @@ tags:
 
 ---
 
-### ✅ Prompt 294 Part A SHIPPED 2026-07-16 (`132a2f2`, pushed) — 🔲 Part B investigated, reported, BLOCKED on Brayden's go-ahead
+### ✅ Prompt 294 SHIPPED 2026-07-16 (Part A `132a2f2`, Part B `4d81e6f`, both pushed) — invite link OG preview + shortened token
 
 **Context:** Brayden finds the admin invite link "super long and ugly" and wants it shortened, plus a "picture icon attached to it" — a rich link-preview card when the link is pasted into iMessage/Slack/WhatsApp/etc.
 
-**Part A shipped:** Added static OG + Twitter-card meta tags (`og:title`, `og:description`, `og:image` → `public/ohvara-favicon.png`) to `index.html`. Confirmed with a raw `curl` (no JS) against `/join/<token>` on the dev server that the tags render pre-hydration — the Vercel `vercel.json` rewrite (`/(.*) → /index.html`) means every route including `/join/<token>` serves this exact same static file, so unfurl bots see the preview card without executing JS. No prerendering/personalization needed, matches what the prompt anticipated.
+**Part A shipped:** Added static OG + Twitter-card meta tags (`og:title`, `og:description`, `og:image` → `public/ohvara-favicon.png`) to `index.html`. Confirmed with a raw `curl` (no JS) against `/join/<token>` on the dev server that the tags render pre-hydration — the Vercel `vercel.json` rewrite (`/(.*) → /index.html`) means every route including `/join/<token>` serves this exact same static file, so unfurl bots see the preview card without executing JS.
 
-**Part B investigated and reported, build BLOCKED:** CC's edit to the token generator (`src/hooks/useProfiles.js` `useCreateInvite`, changing 32-byte hex → 12-char URL-safe ID) was **denied by CC's own permission classifier** as security-sensitive credential-generation code — CC surfaced this in chat and is waiting on an explicit yes from Brayden rather than retrying. Findings, so the go/no-go is a quick read:
-1. **No rate-limiting exists** — read the full `claim-invite` source, grepped all of `supabase/functions/` for any rate-limit pattern: nothing anywhere. Deployed `--no-verify-jwt`; only Supabase's generic project-wide abuse protection applies (not endpoint-specific).
-2. **Entropy at candidate lengths** (URL-safe 64-char alphabet, 6 bits/char; current = 64 hex chars = 256 bits): 8 chars=48 bits, 10 chars=60 bits, **12 chars=72 bits**, 16 chars=96 bits. Even a sustained unthrottled 10k req/sec guess rate would take ~3.6M years to exhaust 60 bits; 12 chars gives a large extra margin, further bounded by the existing 7-day expiry.
-3. **Recommendation:** 12-char URL-safe random ID via `crypto.getRandomValues` (no nanoid dependency needed) replacing the 64-char hex generator.
-4. **Confirmed no migration needed** — `rep_invites.token` is `text not null unique`, no length constraint (migration 067); `claim-invite` validates by equality not format, so existing unclaimed 64-char links keep working untouched.
+**Part B — investigated, reported, then built after Brayden's explicit go-ahead:** the token generator edit is security-sensitive credential-generation code, so CC's permission classifier denied the first attempt; CC reported the full investigation in chat instead of retrying, Brayden said "yes go ahead," then it shipped:
+1. **No rate-limiting exists** on `claim-invite` — confirmed by reading the full source and grepping all of `supabase/functions/`, nothing anywhere.
+2. **Entropy math:** old token = 64 hex chars = 256 bits (overkill). New = 12-char URL-safe alphabet = 72 bits — even a sustained unthrottled 10k req/sec guess rate would take millions of years to exhaust that space, further bounded by the existing 7-day expiry.
+3. **Built:** `useCreateInvite` in `src/hooks/useProfiles.js` now generates 12 chars from a 64-symbol URL-safe alphabet via `crypto.getRandomValues` (`byte % 64` is unbiased since 256 divides evenly by 64 — no new dependency needed). Verified in Node: 100,000/100,000 generated tokens unique, all 12 chars, all valid alphabet.
+4. **No migration needed** — `rep_invites.token` has no length constraint; existing unclaimed 64-char links keep working untouched (validated by equality, not format).
+5. **Follow-on fix caught during verification:** the admin invite-list display (`src/pages/admin/Users.jsx`) was truncating to `…/join/{token.slice(0,12)}…` — with the new 12-char tokens that showed the *entire* token wrapped in misleading ellipsis (looks like more is hidden when it isn't). Changed to display the raw token; the existing `truncate` CSS class still ellipsizes gracefully if a legacy long token is ever still pending. Confirmed via harness: new-format token renders in full (no overflow), a mock legacy 64-char token still gets CSS-truncated correctly.
 
-**Next:** if Brayden says go, the edit is: `src/hooks/useProfiles.js` lines ~121-125, swap the 32-byte hex generation for the 12-char alphabet version (drafted, just needs the actual `Edit` call re-approved).
+**Could not verify the real admin flow end-to-end** (creating a live invite requires an authenticated admin session — same rep-login constraint as every prior prompt) — verification was the token-generator's own correctness (Node script) + the display-line fix (isolated harness), both throwaway/reverted before commit.
 
 ---
 

@@ -92,6 +92,20 @@ For Part B, worked out the entropy math at candidate lengths (URL-safe 64-char a
 
 ---
 
+### 2026-07-16 (cont. 8) — CC: Prompt 294 Part B shipped after Brayden's go-ahead, caught a follow-on display bug
+
+**What happened:** Brayden replied "yes go ahead" to the blocked Part B edit. Made the change: `useCreateInvite` in `src/hooks/useProfiles.js` now generates a 12-char token from a 64-symbol URL-safe alphabet via `crypto.getRandomValues` (`byte % 64`, unbiased since 256/64 divides evenly — no nanoid dependency needed). Verified the algorithm in isolation with a Node script: 100,000/100,000 generated tokens were unique, all exactly 12 chars, all valid alphabet characters — confirms no off-by-one or encoding bug before trusting it in the app.
+
+While verifying, caught a real follow-on bug: the admin invite-list display in `src/pages/admin/Users.jsx` was hardcoded to `…/join/{token.slice(0,12)}…` — designed for the old 64-char tokens, so with the new 12-char format it was showing the *entire* token still wrapped in ellipsis on both sides, implying truncation that wasn't happening. Fixed by displaying the raw token and relying on the existing CSS `truncate` class, which still ellipsizes correctly if any legacy 64-char token is ever still pending (confirmed both cases via a throwaway harness — new tokens render in full with zero overflow, a mock old-format token still gets CSS-truncated). Shipped `4d81e6f`, pushed.
+
+**Could not verify the real admin invite-creation flow end-to-end** — requires an authenticated admin session, same rep/admin-login constraint as every prior mobile-responsive prompt this week. Verification here was algorithmic (Node) + isolated-component (harness), not a live click-through.
+
+**Next up:** LIVE_STATE queue continues with Prompt 293 (remove phone from Settings Account section), Prompt 292 (mobile screenshot audit, investigate/report only), Prompt 291 (Mobile App modal fix) — all still open, unbuilt, in that order.
+
+---
+
+---
+
 ### 2026-07-16 (cont. 5) — Falcon: Prompt 290 shipped, 3 fresh mobile-UX complaints from Brayden — queued Prompt 291 (Mobile App modal fixes) and Prompt 292 (screenshot audit, investigate-only)
 
 **What happened:** CC's Prompt 290 shipped (`f172c9e`) — My Leads is a real stacked card layout below `md`, business name + status badge anchor each card, niche/city in a mini-grid, phone below, Call Now full-width at the bottom, desktop pixel-identical. Both originally-flagged priority pages (My Leads, Script Walk/Call Now) are now done.
