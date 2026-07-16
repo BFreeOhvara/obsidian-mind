@@ -114,6 +114,26 @@ While verifying, caught a real follow-on bug: the admin invite-list display in `
 
 ---
 
+### 2026-07-16 (cont. 12) — CC: Prompt 284 shipped — signup drops phone/adds username, login-resolution RPC applied + claim-invite redeployed live, with Brayden's explicit go-ahead
+
+**What happened:** Built all 3 spec items — `Join.jsx` (phone removed, username field added with the same `[a-z0-9_-]+` rule `admin-create-user` uses, password gets a shared show/hide eye toggle for both password fields), `claim-invite` (accepts/validates username via the existing `handle_new_user` metadata path, plus an explicit uniqueness pre-check the original spec didn't call out but is genuinely needed — invite-flow accounts' auth email is real, not username-derived, so a duplicate username would otherwise fail opaquely deep inside the DB trigger instead of surfacing a clean error), and `useAuth.signIn` (bare-username login now tries a new `resolve_login_email` RPC before falling back to the legacy synthetic-email pattern).
+
+**Verification went further than the prompt anticipated.** Its own text assumed CC would be blocked from live login/account-creation (same constraint as Prompts 283/284's original queuing) — that didn't hold this session. Confirmed the actual `/join/<token>` route (not just a mock harness) renders the right fields via a Playwright screenshot with network intercepted at the `page.route` level; confirmed the username-format error fires with real browser interaction (typed "Jordan Smith", got the exact validation message back); confirmed the eye-toggle flips both password inputs' `type` live.
+
+**Production changes, done only after asking first:** this prompt required a new migration (069, `resolve_login_email` RPC) and a `claim-invite` redeploy to actually work — both touch live Supabase infrastructure, so surfaced the exact two actions needed and asked Brayden explicitly rather than assuming permission from the code-build context alone. Got "yes, do both now." Applied migration 069 via Supabase MCP, redeployed `claim-invite` (now v2, `verify_jwt: false` matching its original config). Sanity-checked both directly against production: `resolve_login_email('brayden11')` returned `brayden11@ohvara.internal`, matching a direct `profiles` query exactly, and a nonexistent username correctly returned `null`; a live `curl` against the redeployed function's `check` action returned the correct `{valid: false}` for a bogus token.
+
+**Not done:** a real human clicking through an actual invite link end-to-end (create account → land on a real dashboard). Every piece downstream of that is now verified individually and live in production — only the full human loop is unconfirmed.
+
+---
+
+### 2026-07-16 (cont. 11) — CC: Prompt 291 shipped — Mobile App modal solid background + desktop install instructions
+
+**What happened:** Straightforward build against Prompt 292's own screenshots — the modal's `.glass-accent` fill was only 6%-alpha, overridden with an inline `#0E0E1A` (the same opaque color `CallPrepModal`/`CallModal` already use elsewhere, reused rather than inventing a new token) while keeping the existing accent border/glow. Extracted `IOSSteps`/`AndroidSteps` components so the new desktop-QR combined-instructions block and the pre-existing mobile-only branches share one copy of the actual instruction text, rather than risking two copies drifting apart later.
+
+**Verified via a throwaway Playwright script** (not the MCP browser pane's screenshot tool, which kept timing out this session for unrelated reasons): confirmed computed `background-color` is `rgb(14, 14, 26)` with no alpha on both a 1280px and an iPhone-13-emulated render. Confirmed via `document.body.innerText` that both iPhone and Android instruction blocks render alongside the QR code on desktop — caught and diagnosed my own false-negative here too: the check initially failed because the CSS `text-transform: uppercase` on the section labels makes Chromium's `innerText` (which is layout-aware, unlike `textContent`) return "IPHONE"/"ANDROID" instead of "iPhone"/"Android" — confirmed by dumping the raw rendered text rather than assuming the app was broken. Deliberately left alone a small pre-existing wrapping quirk in the iOS instructions (an inline Share icon breaking onto its own line) that Prompt 292's audit had flagged — out of this prompt's explicit scope ("don't touch the on-mobile branches").
+
+---
+
 ### 2026-07-16 (cont. 10) — CC: Prompt 292 delivered — mobile screenshot audit, 12 real screenshots + ranked punch list, zero code shipped
 
 **What happened:** This was the first genuinely large build-out this session — an investigate-only prompt asking for real visual screenshots of every main rep page at phone width, something CC hadn't actually done before (Prompts 288-290 were verified via `getComputedStyle` assertions in a harness, never an actual rendered image). Found `playwright` already a dev dependency in `ohvara-dashboard` with Chromium pre-installed, so no new tooling was needed.
