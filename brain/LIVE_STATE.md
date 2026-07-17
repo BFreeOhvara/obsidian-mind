@@ -44,7 +44,7 @@ tags:
 
 ---
 
-### 🔲 Prompt 299 — Part A SHIPPED (`ae8ba1a`); Part B GO-AHEAD CONFIRMED 2026-07-16 — build exactly per CC's own investigation + recommendation (see [[Memories]] cont. 17)
+### ✅ Prompt 299 SHIPPED 2026-07-16 — Part A (`ae8ba1a`) + Part B (`40443f7`, both pushed) — rep→setter rename built exactly per CC's own investigation + recommendation (see [[Memories]] cont. 17, 20)
 
 **Context:** Brayden, from a live screenshot: (1) the browser tab/bookmark title just says "Ohvara" — wants "Ohvara Portal". (2) the URL path for the rep dashboard is `/rep` (visible in the address bar, screenshot shows `ohvara-dashboard.vercel.app/rep`) and he wants every occurrence of the term "rep"/"Rep" as a role name replaced with "setter"/"Setter" — noting the sidebar already correctly says "Setter Portal" (screenshot confirms this), so the app is already inconsistent: some places call the role "Setter," others (the URL, and likely other spots) still say "Rep."
 
