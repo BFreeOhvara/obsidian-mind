@@ -26,6 +26,14 @@ tags:
 
 ---
 
+### ✅ Prompt 301 SHIPPED 2026-07-16 (`3be5a94`, pushed) — My Leads lock veil restored to full-area coverage, keeping Prompt 300's fixed lock geometry
+
+**What shipped:** `LockedVeil` (`src/pages/rep/MyLeads.jsx`) now renders as an absolutely-positioned full-bleed SVG (`width/height 100%`, `position:'absolute', inset:0`) instead of Prompt 300's fixed 170×150px box — the translucent black shade (`rgba(0,0,0,0.55)`) again covers the entire locked content region, same footprint as Prompt 297. The fixed-size, undistorted lock cutout (body rect + shackle arc, same coordinates as Prompt 300) is centered inside that full-bleed shade via a nested `<svg>` viewport (`x="50%" y="50%"` + a `translate(-85px,-75px)` CSS transform to offset by half the lock's own pixel dimensions) — so the lock's pixel size never changes/distorts, but the shade scales to whatever size the container actually is. Heading text repositioned with matching `calc(50% - offset)` centering to stay inside the lock's body cutout. Kept everything else from Prompt 300: single lock (no duplicate), text inside the body, real `Button` below.
+
+**Verified via a temporary unauthenticated harness** (`/qa-harness-301`, deleted before commit): Browser-pane screenshot capture was unavailable this session (tool timed out repeatedly, unrelated to the code change) — substituted pixel-level verification instead. Rasterized the live SVG to a canvas and sampled alpha at multiple points: all four corners/edges of the card read `alpha≈140` (confirming `rgba(0,0,0,0.55)` shade coverage across the **full** card, not just a small box), while the lock's body rect and shackle arc read `alpha=0` (confirmed transparent cutout) at the correct centered coordinates, with shading resuming just outside the lock's bounds (no bleed). Heading text's computed center-X matched the card's center-X exactly. Could not get an actual visual screenshot this session — flagging that as an open gap alongside Prompt 283/284's real-login limitation.
+
+---
+
 ### ✅ Prompt 300 SHIPPED 2026-07-16 (`b307c54`, pushed) — My Leads lock: duplicate icon removed, simplified to one centered lock with the heading inside it + a real button below
 
 **Context:** Brayden sent a live screenshot of Prompt 297's lock veil. Two problems, both concrete fixes:
