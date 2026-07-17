@@ -26,7 +26,7 @@ tags:
 
 ---
 
-### 🔲 Prompt 300 — My Leads lock: remove the duplicate icon, simplify to one centered lock with the heading inside it + a real button below
+### ✅ Prompt 300 SHIPPED 2026-07-16 (`b307c54`, pushed) — My Leads lock: duplicate icon removed, simplified to one centered lock with the heading inside it + a real button below
 
 **Context:** Brayden sent a live screenshot of Prompt 297's lock veil. Two problems, both concrete fixes:
 
@@ -44,7 +44,7 @@ tags:
 
 ---
 
-### 🟡 Prompt 299 — Part A SHIPPED 2026-07-16 (`ae8ba1a`, pushed); Part B investigated + reported (see [[Memories]] cont. 17), NOT yet built — waiting on go-ahead for the wide rename
+### 🔲 Prompt 299 — Part A SHIPPED (`ae8ba1a`); Part B GO-AHEAD CONFIRMED 2026-07-16 — build exactly per CC's own investigation + recommendation (see [[Memories]] cont. 17)
 
 **Context:** Brayden, from a live screenshot: (1) the browser tab/bookmark title just says "Ohvara" — wants "Ohvara Portal". (2) the URL path for the rep dashboard is `/rep` (visible in the address bar, screenshot shows `ohvara-dashboard.vercel.app/rep`) and he wants every occurrence of the term "rep"/"Rep" as a role name replaced with "setter"/"Setter" — noting the sidebar already correctly says "Setter Portal" (screenshot confirms this), so the app is already inconsistent: some places call the role "Setter," others (the URL, and likely other spots) still say "Rep."
 
@@ -58,6 +58,17 @@ tags:
 4. **Amended by Brayden, second pass — one spot gets the role REMOVED, not renamed:** the `/join/<token>` signup page's live text currently reads **“You’ve been invited as a Rep”** (confirmed live in Prompt 282's original ship log). Brayden's explicit call: don't change this to “Setter” like everywhere else in this prompt — take the role mention out entirely. His own words: “it can still say [Setter] everywhere else, but when I invite them, I don't think it should say what role I invite them to — even though it goes without saying, I still don't like that it says it.” Reword to something role-agnostic, e.g. “You've been invited to join Ohvara” — the signup form itself is unaffected (still creates the account with whatever role the invite token carries), only this one line of copy drops the role name. This is a deliberate, scoped exception — don't extend it to any other “Rep”→“Setter” spot found during the catalog in point 1, those still get renamed as planned.
 
 **Report the full catalog + recommended mechanism before executing broadly** (same investigate-first standard as Prompt 287) — this prompt touches routing and potentially many files, worth confirming scope isn't bigger than expected before a wide edit.
+
+**✅ GO-AHEAD CONFIRMED 2026-07-16 (Falcon, via AskUserQuestion — Brayden picked "Yes, build it as recommended"):** build exactly per CC's own cont. 17 investigation + recommendation, no changes to the plan:
+- Extract `Sidebar.jsx`'s already-correct `ROLE_LABELS` (`{ rep: 'Setter Portal', closer: 'Closer Portal', admin: 'Admin', client: 'Client Portal' }`) into a shared module (e.g. `src/lib/roleLabels.js`), fix `Join.jsx`'s separately-defined contradictory duplicate to use the shared one.
+- Route every raw role-text render through the shared map: `admin/Users.jsx`'s `Badge label={p.role}` (both the user table and pending-invites list), `admin/Commissions.jsx:514`'s `{person?.role}`, `MessageCenter.jsx`'s `{selected.role}` (fed by the hardcoded `role: 'Rep'` literal at lines 230/234 — that literal itself needs to become `'Setter'`).
+- Swap the 3 duplicate `<option value="rep">Rep</option>` labels in `Users.jsx` to "Setter"; update page headers/nav labels/table columns still reading "Rep" (`RepPerformance.jsx`, `RepAnalytics.jsx`, `Sidebar.jsx:66,72`'s "Rep Activity"/"Rep Performance" nav labels, `Overview.jsx`/`Payouts.jsx`/`LeadPipeline.jsx` table headers, the payout button's disabled-tooltip text) to "Setter".
+- `Join.jsx`'s "You've been invited as a Rep" line: per Brayden's earlier amendment, remove the role mention entirely rather than rename it (e.g. "You've been invited to join Ohvara") — this is the one deliberate exception, don't rename it to "Setter" like everywhere else.
+- Rename the `/rep` route family to `/setter` (all 8 sub-routes: `/rep`, `/rep/training`, `/rep/stats`, `/rep/goals`, `/rep/commissions`, `/rep/feed`, `/rep/messages`, `/rep/calls`) across `App.jsx`'s route definitions and every internal `navigate()`/`<Navigate to>`/`ROLE_HOME` reference (`Login.jsx`, `Settings.jsx`, `ProtectedRoute.jsx`, `Sidebar.jsx`, `MyLeads.jsx`, `MyCommissions.jsx`) — keep a `/rep/*` → `/setter/*` redirect alive for old bookmarks/links.
+- **Critical, don't skip:** update `supabase/functions/stripe-connect-onboard/index.ts:100-101`'s hardcoded `${base}/rep/commissions?onboarding=refresh`/`...=complete` redirect URLs to `/setter/commissions`, and redeploy that edge function — otherwise Stripe's bank-onboarding return flow silently breaks for setters mid-session once the frontend route moves.
+- **Leave untouched, confirmed deliberately out of scope:** `rep_id`/`repId`/`assigned_rep_id` (the ~30-file internal predicate/prop-name surface), `useReps()`/`useRepStats()`/`useRepCredentials()` hook names, the `src/pages/rep/`/`src/components/rep/` directory structure, and the stored `role = 'rep'` DB value itself (`useReps()`'s `.eq('role', 'rep')` predicate stays as-is) — all internal, invisible to the user, renaming them is pure risk for zero visible benefit.
+
+**Verification:** screenshot mandatory (same standard as every visual prompt since 295) for at least the Sidebar nav, `Join.jsx`'s invite-role display, and the `admin/Users.jsx` table/dropdowns, confirming "Setter" renders everywhere "Rep" used to and the removed-role invite line reads correctly. Confirm the `/rep` → `/setter` redirect actually works for an old bookmarked URL. Flag in the ship log whether the Stripe redirect fix could be verified beyond a code read (live Stripe onboarding can't be exercised in a harness, same class of limitation as every other Stripe/live-integration prompt this session).
 
 ---
 
