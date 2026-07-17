@@ -26,6 +26,24 @@ tags:
 
 ---
 
+### ✅ Prompt 304 SHIPPED 2026-07-17 (`e8eb385`, pushed) — flashcards is now a real 4th unlock-gate requirement + chip, with a live-production consequence caught and handled before shipping
+
+**What shipped:** `trainingChecks()` gains `flashcardsMastered` (count) / `flashcardsDone` (>= 48, from a new `TOTAL_FLASHCARDS` export sourced off `data/flashcards.js`); `isTrainingComplete()` now requires all 4 checks. Added the "Master Flashcards X/48" chip to the banner, live count, inert like the other 3.
+
+**Caught before shipping, via a direct Supabase query:** one real rep account already has leads unlocked (`unlocked_at` stamped 2026-06-11 under the old 3-check gate) with 0/48 flashcards mastered. `MyLeads.jsx` re-evaluates `isTrainingComplete()` live on every render rather than trusting the `unlocked_at` stamp — shipping the stricter gate as-is would have immediately re-locked this rep's already-working leads on their next page load. **Flagged to Brayden directly via AskUserQuestion** rather than silently shipping or silently choosing a fix — he picked **grandfather already-unlocked reps**: `isTrainingComplete()` now short-circuits to `true` if `progress.unlocked_at` is already set, checked before the 4 requirements. New reps still need all 4 to unlock for the first time.
+
+**Verified** with a temporary harness (deleted before commit) exercising the gate function directly against 5 cases including the exact real affected rep's shape (grandfathered, 0 flashcards → still `true`) — all passed. Confirmed the chip renders with the correct live count and is inert (not in the interactive-elements list).
+
+---
+
+### Prompt 305 INVESTIGATED, not reproduced 2026-07-17 (no code shipped) — Training Center black bar not found despite real Playwright screenshots across 6 widths
+
+**What was tried:** Switched off the broken live "computer" tool (confirmed timed out 3 sessions running) and used real Playwright (already a dev dependency) driving a harness that mounts the actual `TrainingCenter` component — captured real PNG screenshots of the Videos tab at 375/768/1024/1280/1440/1920px, plus rapid-fire transient captures (0/50/100/200ms) around the tab-switch itself in both directions, trying to catch a flash a settled screenshot might miss. **No black bar at any width, at any capture timing.** Also grepped for hardcoded black colors near the tab bar — the only hit (`#13131F`) is an unrelated fixed-position error toast.
+
+**Conclusion:** could not reproduce despite the most rigorous method available this session. Most likely explanations: something specific to Brayden's actual browser/OS/GPU compositing that headless Chromium can't reproduce, or tied to real in-progress data / real network latency this synthetic empty-state harness doesn't exercise. Per the prompt's own instruction, no further clarifying question queued back to Brayden — screenshots + full writeup saved to [[Prompt 305 Black Bar Investigation]] (`work/active/`) for the record. If it recurs, a fresh screenshot (with browser/OS noted) is the most useful next input.
+
+---
+
 ### ✅ Prompt 302 SHIPPED 2026-07-17 (`fa8fd93`, pushed) — My Leads lock button click bug fixed at root + body enlarged into a real card
 
 **What shipped:** Root cause of the dead "Go to Training Center" button: `navigate('/setter/training')` was already correct (Prompt 299's rename had landed fine) — the real bug was CSS stacking. `LockedVeil`'s `<svg>` is `position:absolute, inset:0` covering the whole locked-content box, and the button used to be a normal in-flow sibling below it; a positioned element with `z-index:auto` always paints above a non-positioned in-flow one regardless of DOM order, so the veil sat on top of the button and ate its clicks even though nothing was visibly there. Fixed two ways: (1) moved the button into the same absolutely-positioned card as the heading, which now out-stacks the veil on DOM-order merit alone, and (2) added `pointer-events:none` to the veil as defense-in-depth. Also resized `LOCK_BODY` from 139×65 to 260×104 (`LOCK_W/H` 170×150 → 300×190) so the body reads as a real card holding both the heading (now one line) and the button stacked inside its own bounds, shackle scaled up proportionally to match.
