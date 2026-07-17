@@ -26,6 +26,14 @@ tags:
 
 ---
 
+### ✅ Prompt 308 SHIPPED 2026-07-17 (`3229cd5`, pushed) — My Leads lock geometry now sourced from lucide's Lock icon, not hand-tuned numbers
+
+**What shipped:** Only `lucide-react` is a dependency in this app (no Font Awesome/Heroicons/Material Symbols), and its `Lock` icon is a stroke-outline glyph, not a filled/solid path — so rather than importing a component that wouldn't fit the mask-cutout veil technique, its exact professionally-designed *proportions* were pulled into the existing geometry system: body `rect(width=18, height=11, x=3, y=11, rx=2)` + shackle `path d="M7 11V7a5 5 0 0 1 10 0v4"`, both on lucide's 24×24 icon grid, scaled 16× (`ICON_SCALE`). This replaces 4 rounds of arbitrary hand-picked numbers (`LOCK_BODY` 300×300, `SHACKLE_R` 80, etc.) with a real icon's ratios: body is now an 18:11 wide rounded rectangle instead of a square (directly answers "square is unnecessarily large"), and shackle stroke width is bumped past the icon's own default (2 grid units → 2.75) for a visibly thicker arch (stroke-to-diameter ratio 16%→27.5%, answers "arch too skinny"). Prompt 307's `SHACKLE_OVERLAP` fusion fix (legs buried past the body's top edge so the union reads as one continuous silhouette) carried over, rescaled to the new proportions (60→35).
+
+**Verified via a temporary Playwright harness** (deleted before commit, same pattern as 307): rasterized the exact body-rect + shackle-stroke geometry to a canvas and sampled pixel alpha along both leg lines from 20px above to 30px below the body's top edge — zero gaps at any sampled row, confirming the seam fix still holds at the new scale. Measured centering via real `getBoundingClientRect()` at 390/768/1280px — 0px diff at every width. `npx vite build` clean. Screenshots saved to [[Prompt 308 Lock Screenshots|work/active/prompt-308-screenshots/]] in the vault.
+
+---
+
 ### ✅ Prompt 307 SHIPPED 2026-07-17 (`385a8ee`, pushed) — My Leads padlock arch fused into body, centering confirmed already correct
 
 **What shipped:** Root cause of the "arch sitting loosely on top" complaint: the shackle's stroked path ended its legs exactly at the body's top edge (`y = LOCK_BODY.top`), so only the round end-cap's own radius (13px, half the 26px stroke width) dipped into the body — a thin, imprecise overlap that read as a seam/gap rather than one continuous silhouette. Fixed by adding `SHACKLE_OVERLAP = 60` and moving both leg endpoints down to `LOCK_BODY.top + 60` — well past the cap radius and the body's rounded-corner curvature — so the union of shackle-stroke + body-rect is now dominated by the body's straight edge right at the seam, with no notch. No keyhole cutout existed already (Prompt 302 replaced it with the text/button region, unchanged this round).
