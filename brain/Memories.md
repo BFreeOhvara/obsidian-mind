@@ -64,6 +64,30 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-17 (cont. 28, Eagle) — Prompt 306 shipped: My Leads lock is now a genuine square padlock, verified with real Playwright screenshots
+
+**What shipped (`b6528ce`, pushed):** Rebuilt the lock geometry in `src/pages/rep/MyLeads.jsx` — `LOCK_BODY` is now a true 300×300 square (was Prompt 302's 260×104 wide rectangle), shackle radius 36→80 with stroke 16→26 to read as a proportionate arch (~53% of the body's width, matching a real padlock's shackle-to-body ratio) instead of a thin sliver. `LOCK_W`/`LOCK_H` now derive from `LOCK_BODY`'s own dimensions instead of being separately hardcoded, so the outer box always sizes itself correctly. Kept large per Brayden's explicit ask, not shrunk.
+
+**Verified with real Playwright screenshots** at 390/768/1280px (dev server needed a restart via `preview_start` first — it wasn't running at session start) — confirmed visually this time, not just via DOM measurement: genuine square body, proportionate arch, heading on one line, button correctly positioned, no clipping at any width. Also re-clicked the button for real and confirmed it still navigates. Screenshots saved to `work/active/prompt-306-screenshots/`. This closes the loop on the exact failure mode Prompt 305's own log flagged — Prompt 302 shipped a lock-shape bug that wasn't caught because screenshot verification wasn't available at the time; this time it was, and the shape was actually confirmed before calling it done.
+
+**Nothing else queued.** LIVE_STATE's "Next Up for CC" is now empty. Outstanding on Brayden's end: Prompt 283's real end-to-end verification, Android's real install-button path, live Stripe onboarding round-trip, spot-checking the grandfathered rep still sees their leads post-304, and the Prompt 305 black bar if it recurs.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompts 285-306 all shipped except Prompt 305 (Training Center black bar), which was investigated thoroughly via real Playwright screenshots but not reproduced — see work/active/Prompt 305 Black Bar Investigation.md. Nothing currently queued in LIVE_STATE's "Next Up for CC". Outstanding on Brayden's end: Prompt 283's real end-to-end verification, Android's real install-button path, live Stripe onboarding round-trip, spot-checking the grandfathered rep still sees their leads post-304's gate change, and the black bar if it recurs.`
+
+---
+
+### 2026-07-17 (cont. 27, Falcon) — lock geometry is genuinely wrong (wide rectangle + tiny arch, doesn't read as a padlock) — queued Prompt 306
+
+**What happened:** Brayden sent another live screenshot — Prompt 302's resized lock body (260×104, ~2.5:1 wide rectangle) topped with a small, disproportionately thin shackle arch no longer reads as a recognizable padlock shape. His words: "look how funky this lock looks... make the lock box a square, and make the top of the lock, the arch part, scale... keep the lock the same scale [overall size], that looks ugly [as a shape]." He confirmed he likes the copy/composition (heading + button) — this is purely a geometry/proportion fix.
+
+Queued **Prompt 306**: body becomes a square (not a wide rectangle), the arch scales proportionally to the square's width so it reads as a normal padlock silhouette, and the overall thing should stay large (grow it further if needed) rather than shrink back down — explicitly told CC to size the square generously enough to still fit the one-line heading + button inside it, prioritizing correct lock proportions over hitting an exact pixel target.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 306 queued: My Leads lock body needs to become a square (currently a 260x104 wide rectangle from Prompt 302) with the shackle arch scaled proportionally to it — currently reads as "wonky"/"funky," not a normal padlock. Keep it large, keep the heading text on one line + button fitting inside, keep everything else from Prompts 300-302 (single lock, full-area shade, working button navigation). Real Playwright screenshot required for verification, not the broken live "computer" tool. Prompts 285-304 shipped, Prompt 305 (black bar) investigated but not reproduced. Outstanding on Brayden's end: Prompt 283's real end-to-end verification, Android's real install-button path, live Stripe onboarding round-trip, spot-checking the grandfathered rep still sees their leads post-304. Nothing else queued beyond 306.`
+
+---
+
 ### 2026-07-17 (cont. 26, Eagle) — Prompt 304 shipped (flashcards real gate + a live-production consequence caught and handled), Prompt 305 investigated with real Playwright screenshots — black bar still not found
 
 **Prompt 304 shipped (`e8eb385`, pushed):** flashcards mastery (all 48 cards) is now a real 4th requirement in `isTrainingComplete()`/`trainingChecks()`, alongside Videos/Final Exam/Roleplay, plus the "Master Flashcards X/48" chip. **Important mid-build finding:** a direct Supabase query turned up one real rep account already unlocked (`unlocked_at` 2026-06-11 under the old 3-check gate) with 0/48 flashcards — since `MyLeads.jsx` re-evaluates the gate live on every render rather than trusting the stamp, shipping as originally speced would have immediately re-locked this rep's working leads. Stopped and asked Brayden directly via AskUserQuestion rather than guessing; he chose to **grandfather already-unlocked reps** — `isTrainingComplete()` now short-circuits true if `unlocked_at` is already set. Verified against 5 cases including the exact real rep's shape.

@@ -26,6 +26,14 @@ tags:
 
 ---
 
+### ✅ Prompt 306 SHIPPED 2026-07-17 (`b6528ce`, pushed) — My Leads lock geometry fixed: square body + proportional arch, real Playwright screenshots confirm it
+
+**What shipped:** `LOCK_BODY` in `src/pages/rep/MyLeads.jsx` is now a true square (300×300), replacing Prompt 302's 260×104 wide rectangle. Shackle radius bumped 36→80 (diameter 160, ~53% of the body's width — a normal padlock's shackle-to-body ratio) with a thicker 26px stroke (up from 16px) to match the larger scale. `LOCK_W`/`LOCK_H` are now derived from `LOCK_BODY`'s own dimensions plus margins rather than hardcoded, so the overall box always sizes correctly around whatever body is configured. Kept large per Brayden's explicit ask — the square's generous size (needed to fit the one-line heading + button legibly) leaves visible padding above/below the text, intentional. Single lock, Prompt 301's full-area shade, and Prompt 302's working button/pointer-events fix all untouched.
+
+**Verified with real Playwright screenshots this time** (not the broken live "computer" tool) at 390/768/1280px — body renders as a genuine square, arch reads as a proportionate padlock shackle rather than a thin sliver, heading stays on one line, button renders correctly positioned with no clipping against the card's edges at any width. Also re-confirmed the button still fires (`navigate()` → `/login` via the `ProtectedRoute` redirect, same proof pattern as Prompt 302). Screenshots saved to `work/active/prompt-306-screenshots/` in the vault — this is the exact category of visual bug (302) that shipped once without a real screenshot catching it, so this time the actual shape was confirmed visually before calling it done.
+
+---
+
 ### ✅ Prompt 304 SHIPPED 2026-07-17 (`e8eb385`, pushed) — flashcards is now a real 4th unlock-gate requirement + chip, with a live-production consequence caught and handled before shipping
 
 **What shipped:** `trainingChecks()` gains `flashcardsMastered` (count) / `flashcardsDone` (>= 48, from a new `TOTAL_FLASHCARDS` export sourced off `data/flashcards.js`); `isTrainingComplete()` now requires all 4 checks. Added the "Master Flashcards X/48" chip to the banner, live count, inert like the other 3.
