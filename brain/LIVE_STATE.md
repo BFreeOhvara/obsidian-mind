@@ -26,7 +26,25 @@ tags:
 
 ---
 
-### 🔲 Prompt 299 — browser tab title → "Ohvara Portal" + "rep" terminology rename to "setter" (investigate scope first — do NOT blind find-and-replace)
+### 🔲 Prompt 300 — My Leads lock: remove the duplicate icon, simplify to one centered lock with the heading inside it + a real button below
+
+**Context:** Brayden sent a live screenshot of Prompt 297's lock veil. Two problems, both concrete fixes:
+
+1. **There are two locks rendering, not one.** A smaller solid dark lock icon is visible behind/underneath the big cutout veil — leftover from Prompt 296's original small icon that apparently wasn't fully removed when Prompt 297 replaced it with the veil, or some other duplicate render. Find and remove whichever element is the leftover — only one lock (the veil) should render.
+2. **Simplify the whole block's layout and copy.** Current state: big lock veil, then below it a heading ("Complete training to unlock your leads"), then a smaller muted line ("They'll appear here on your next scheduled lead reset once training is complete —") with "Go to Training Center" as an inline text link. Brayden wants this collapsed to:
+   - The single remaining lock, centered (it currently reads slightly off-center) and **a little smaller** than its current size (modest reduction, not a big rescale).
+   - **"Complete Training to Unlock Your Leads"** text moved to sit **inside the lock's body/block area** — the solid rectangular base of the padlock shape (not the shackle loop at top) — rather than below the lock as a separate caption. Since the lock is a transparent cutout in a dark shade (Prompt 297's SVG mask technique), the text sits inside that see-through hole; check it stays legible against whatever's behind it (page background) once positioned there.
+   - Directly below the lock: a **real blue button** (not a text link) labeled "Go to Training Center" that navigates to the Training Center, same destination as today's link.
+   - **Delete the "They'll appear here on your next scheduled lead reset..." line entirely** — it's not needed once the copy is this simple.
+   - Final state, top to bottom: one centered lock (slightly smaller) with "Complete Training to Unlock Your Leads" inside its body, then a blue "Go to Training Center" button underneath. Nothing else.
+
+**Build:** locate the locked-state block in `src/pages/rep/MyLeads.jsx` (the `LockedVeil` component from Prompt 297 plus whatever wraps the heading/subtext/link today). Remove the duplicate icon, resize/center the veil, reposition the heading text inside the lock geometry (likely needs the SVG's coordinate system — the same `viewBox`/`transform` values Prompt 297 used — to know where the lock's body rectangle actually sits), swap the "Go to Training Center" link for a real button component (reuse whatever button style/component the rest of the app already uses for primary actions), delete the scheduled-reset subtext line.
+
+**Verification:** screenshot mandatory (same standard as every mobile/visual prompt since 295) — confirm only one lock renders, confirm it's centered and modestly smaller than before, confirm the heading text sits legibly inside the lock body, confirm the button is a real button (not a link) and navigates correctly, confirm the old subtext line is gone.
+
+---
+
+### 🟡 Prompt 299 — Part A SHIPPED 2026-07-16 (`ae8ba1a`, pushed); Part B investigated + reported (see [[Memories]] cont. 17), NOT yet built — waiting on go-ahead for the wide rename
 
 **Context:** Brayden, from a live screenshot: (1) the browser tab/bookmark title just says "Ohvara" — wants "Ohvara Portal". (2) the URL path for the rep dashboard is `/rep` (visible in the address bar, screenshot shows `ohvara-dashboard.vercel.app/rep`) and he wants every occurrence of the term "rep"/"Rep" as a role name replaced with "setter"/"Setter" — noting the sidebar already correctly says "Setter Portal" (screenshot confirms this), so the app is already inconsistent: some places call the role "Setter," others (the URL, and likely other spots) still say "Rep."
 
