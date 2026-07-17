@@ -64,6 +64,17 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-17 (cont. 29, Falcon) — 3rd round on the lock shape: still not fused/proportional, Brayden sent a reference image — queued Prompt 307
+
+**What happened:** Prompt 306's square-body-plus-scaled-arch result still looked wrong to Brayden — the arch reads as a separate piece loosely sitting on top rather than one fused padlock silhouette. He sent a reference image of a standard clean padlock icon (rounded square body, thick U-shaped arch whose legs overlap into the body with no seam, keyhole cutout in the lower-middle) and gave very concrete instructions: match that shape, skip the keyhole entirely and put the heading text in that same spot instead, and explicitly verify the whole graphic is horizontally centered ("I don't even think it already is centered") — text itself doesn't need to be perfectly centered, only the lock shape's accuracy and centering actually matter here.
+
+Queued **Prompt 307**, the 3rd round on this same lock shape — told CC to consider using or closely adapting a real padlock icon path rather than continuing to hand-tune two separately-drifting pieces (body + arch), since that approach has now produced 2 wrong results in a row.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 307 queued (3rd round on the My Leads lock shape): Brayden sent a reference padlock image, wants the arch fused into the body with no visible seam (like a real padlock icon), no keyhole cutout — text goes in that spot instead, and wants the whole graphic's centering explicitly verified via measurement, not assumed. CC should consider adapting a real padlock icon path rather than continuing to hand-tune custom body+arch geometry that's drifted wrong twice now. Prompts 285-306 all shipped otherwise. Outstanding on Brayden's end: Prompt 283's real end-to-end verification, Android's real install-button path, live Stripe onboarding round-trip, spot-checking the grandfathered rep still sees their leads post-304, black bar if it recurs. Nothing else queued beyond 307.`
+
+---
+
 ### 2026-07-17 (cont. 28, Eagle) — Prompt 306 shipped: My Leads lock is now a genuine square padlock, verified with real Playwright screenshots
 
 **What shipped (`b6528ce`, pushed):** Rebuilt the lock geometry in `src/pages/rep/MyLeads.jsx` — `LOCK_BODY` is now a true 300×300 square (was Prompt 302's 260×104 wide rectangle), shackle radius 36→80 with stroke 16→26 to read as a proportionate arch (~53% of the body's width, matching a real padlock's shackle-to-body ratio) instead of a thin sliver. `LOCK_W`/`LOCK_H` now derive from `LOCK_BODY`'s own dimensions instead of being separately hardcoded, so the outer box always sizes itself correctly. Kept large per Brayden's explicit ask, not shrunk.
@@ -5890,3 +5901,20 @@ Did a code-level severity read of each of the 6 requested screens (couldn't live
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 289 shipped + pushed (e6b1249): CallPrepModal.jsx (the shared box for CallModal/ScriptWalk AND the closer's AppointmentCard) now stacks single-column below md — verified via harness, desktop pixel-identical to before. This is the SECOND piece of Prompt 287's mobile-responsiveness fix (after Prompt 288's sidebar drawer). Still open: My Leads (fixed-width table columns — needs a real table→card redesign, the bigger remaining piece), AI Roleplay (oversized column minWidths), Training (minmax(240px,...) card grid), My Commissions (no-wrap KPI row). My Leads recommended next. Waiting on Brayden to confirm or redirect. Nothing else queued.`
 
 [CC | 2026-07-16 — vault log committed + pushed] — The Prompt 289 log entry above and LIVE_STATE.md's Prompt 287/289 update are committed (`509e51c`) and pushed to origin/main. Both repos clean and pushed: `ohvara-dashboard` @ `e6b1249`, `obsidian-mind` @ `509e51c`.
+
+## Session Log — 2026-07-17 (CC) — Prompt 307 shipped + pushed (`385a8ee`) — My Leads padlock arch fused into body, centering confirmed already correct
+
+**What happened:** Read [[LIVE_STATE]]'s "Next Up for CC" queue — Prompt 307 (4th round on this same lock shape: 300 → 301/302 → 306 → now) was the only fresh, non-blocked item; the other two open `🔲` entries (287, 270) are stale/blocked-on-signoff, not new queue items, so left untouched.
+
+**Root cause:** `LockedVeil`'s shackle path (a stroked `<path>`, not a filled shape) ended both leg endpoints exactly at `LOCK_BODY.top` — the only overlap into the body was the stroke's own round end-cap radius (13px, half the 26px stroke width). That's a thin, imprecise junction, which is why Brayden's live screenshot still read the arch as "a separate piece sitting loosely on top" even after 306's square-body resize.
+
+**Fix:** added `SHACKLE_OVERLAP = 60` in `src/pages/rep/MyLeads.jsx` and moved both leg endpoints down to `LOCK_BODY.top + 60` — well past the cap radius and the body's own `rx=20` corner curvature — so the union of shackle-stroke + body-rect is dominated by the body's straight edge right at the seam. No keyhole cutout existed (already replaced by the text/button region back in Prompt 302).
+
+**Centering: investigated, not reproduced.** The existing math was already exact (box centered via `50%` + `-half` transform, `LOCK_BODY.left` margins symmetric on both sides) — not a real bug, just unverified until now.
+
+**Verified via a temporary Playwright harness** (deleted before commit, not the still-broken live "computer" tool per [[Prompt 305 Black Bar Investigation]]): rasterized the exact same body-rect + shackle-stroke geometry to an offscreen canvas and sampled pixel alpha along both leg lines from 20px above to 30px below the body's top edge — **zero gaps across all 26 sampled rows**, confirming one continuous cutout silhouette. Measured centering via real `getBoundingClientRect()` at 390/768/1280px — lock bounding-box center matched container center exactly (**0px diff**, all three widths). `npx vite build` clean. Screenshots saved to `work/active/prompt-307-screenshots/` in the vault. LIVE_STATE's Prompt 307 entry updated to ✅ SHIPPED.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 307 shipped + pushed (385a8ee): My Leads padlock shackle legs now plunge 60px into the body (SHACKLE_OVERLAP) instead of stopping at the top edge, fusing arch+body into one silhouette — verified via Playwright canvas rasterization (zero seam gaps) and real getBoundingClientRect centering math (0px diff at 3 widths). LIVE_STATE's fresh queue is now empty — remaining open items (Prompt 287's 4 leftover per-page mobile fixes, Prompt 270 awaiting signoff) are pre-existing/blocked, not new queue entries. Check North Star's Current Focus or wait for Eagle/Falcon to queue something new.`
+
+[CC | 2026-07-17 — vault log pending commit]

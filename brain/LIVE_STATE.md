@@ -26,6 +26,16 @@ tags:
 
 ---
 
+### ✅ Prompt 307 SHIPPED 2026-07-17 (`385a8ee`, pushed) — My Leads padlock arch fused into body, centering confirmed already correct
+
+**What shipped:** Root cause of the "arch sitting loosely on top" complaint: the shackle's stroked path ended its legs exactly at the body's top edge (`y = LOCK_BODY.top`), so only the round end-cap's own radius (13px, half the 26px stroke width) dipped into the body — a thin, imprecise overlap that read as a seam/gap rather than one continuous silhouette. Fixed by adding `SHACKLE_OVERLAP = 60` and moving both leg endpoints down to `LOCK_BODY.top + 60` — well past the cap radius and the body's rounded-corner curvature — so the union of shackle-stroke + body-rect is now dominated by the body's straight edge right at the seam, with no notch. No keyhole cutout existed already (Prompt 302 replaced it with the text/button region, unchanged this round).
+
+**Centering: investigated and found already correct, not a bug.** The math was already exact (`LOCK_W`/`LOCK_H` box centered via `50%` + `-half` transform, `LOCK_BODY.left` margins symmetric) — Brayden's "I don't think it's centered" was not reproduced.
+
+**Verified via a temporary Playwright harness** (not the broken live "computer" tool, deleted before commit): rasterized the exact same body-rect + shackle-stroke geometry to a canvas and sampled pixel alpha along both leg lines from 20px above to 30px below the body's top edge — **zero gaps at any of the 26 sampled rows**, confirming a continuous fused silhouette. Measured centering via real `getBoundingClientRect()` at 390/768/1280px — lock bounding-box center matched container center exactly (**0px diff** at all three widths). Screenshots saved to [[Prompt 307 Lock Screenshots|work/active/prompt-307-screenshots/]] in the vault. `npx vite build` clean.
+
+---
+
 ### ✅ Prompt 306 SHIPPED 2026-07-17 (`b6528ce`, pushed) — My Leads lock geometry fixed: square body + proportional arch, real Playwright screenshots confirm it
 
 **What shipped:** `LOCK_BODY` in `src/pages/rep/MyLeads.jsx` is now a true square (300×300), replacing Prompt 302's 260×104 wide rectangle. Shackle radius bumped 36→80 (diameter 160, ~53% of the body's width — a normal padlock's shackle-to-body ratio) with a thicker 26px stroke (up from 16px) to match the larger scale. `LOCK_W`/`LOCK_H` are now derived from `LOCK_BODY`'s own dimensions plus margins rather than hardcoded, so the overall box always sizes correctly around whatever body is configured. Kept large per Brayden's explicit ask — the square's generous size (needed to fit the one-line heading + button legibly) leaves visible padding above/below the text, intentional. Single lock, Prompt 301's full-area shade, and Prompt 302's working button/pointer-events fix all untouched.
