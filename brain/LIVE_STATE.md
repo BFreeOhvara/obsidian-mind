@@ -34,6 +34,25 @@ tags:
 
 ---
 
+### 🔲 Prompt 311 — Full-script branching audit: does EVERY branch point actually change what happens next, not just the opener?
+
+Brayden's live reaction looking at the shipped Prompt 309(a) opener gate (Training Center → Script tab, screenshot reviewed 2026-07-18) started as a narrower ask, then broadened: check this same failure mode across the WHOLE script tree, not just the one opener gate. His concern isn't just this one screen — it's whether the script overall genuinely functions as a real branching tree (different answers → meaningfully different paths) or just LOOKS like one while mostly converging.
+
+**Part A — the original opener-gate question.** All 5 named pain-angle options (calls slip through / scheduling mess / slow to get back / unreliable coverage / "that's why we're hiring") plus "kind of everything" appear to route to the exact same next step — if true, a rep reads and picks between 7 similar-looking buttons live on a call for zero behavioral difference, which is pure friction.
+
+**Part B — extend the same audit to every other branch point in the script.** Walk the full tree — Open the Call → Vitals → Pain Amplification → Handoff → Close, and any other branch screens — and for each one, check whether the different options actually lead to different downstream wording/paths, or converge identically like the opener does. Apply the same fix wherever the same problem shows up.
+
+**Part C — investigate whether the "Open the Call" step already personalizes by the specific listed role.** These are Indeed-sourced leads and the exact job title on the listing can vary (receptionist, front desk, dispatcher, etc.) even though the underlying pitch is the same Voice AI product either way. The Training Center screenshot's own step description says "confirm the business, hook on the Indeed listing" — check what that hook currently does: does it reference the SPECIFIC listed role/title, or is it generic regardless of which role was posted? Report only — Brayden isn't mandating a new branch structure for this (he talked himself out of that mid-message, since it's the same Voice AI pitch either way), just wants to know current behavior. If it's already personalizing per-listing, nothing to do. If it's fully generic and cheap to add the specific role into that one line, flag it as a small optional follow-up rather than building it unprompted.
+
+**Fix philosophy for both A and B — investigate first, don't assume.** Check `discoveryScript.js` (or wherever `DISCOVERY_SCRIPT` lives): does a given branch's specific selection get referenced, quoted back, or interpolated anywhere later in the flow (similar to how `create-roleplay-call`'s `{{pain_response}}` interpolation works per Prompt 309(b))? Or is the downstream wording byte-identical regardless of which option was picked? Report actual findings per branch point before changing anything.
+
+- **Where downstream is identical regardless of selection:** collapse that branch point down to fewer, REACTION-TYPE buckets instead of specific-content buckets, modeled on the pattern already used in the Handoff/Close flow (Interested / Hesitant / Not Interested / Owner / Gatekeeper-style categorization by conversation posture, not by specific words). For the opener specifically, Brayden's own suggested shape: something like 5 buckets — engaged/named something specific, hesitant, defensive/no problem, "kind of everything," plus one more as needed. Goal: fewer, faster-to-scan options for a rep mid-call, with zero loss of downstream behavior.
+- **Where downstream DOES reference the specific selection:** don't collapse blindly — that would lose real personalization. Flag back to Brayden/Falcon with what was found per branch point and propose a lighter-weight way to preserve it, rather than picking a redesign unilaterally.
+
+**Scope note:** this stays within the existing Voice-AI-only / receptionist-type script — Brayden confirmed the script "follows pretty much the same pattern" regardless of exact listed role since it's all the same product being pitched (Stage 1 scope, per [[Memories]] 2026-07-18). This is a structural/UX audit of the existing tree, not an expansion into the broader 5-channel survey system discussed that session.
+
+---
+
 ### ✅ Prompt 310 SHIPPED 2026-07-18 (`43010c4`, pushed) — Calls Today real-outcomes only, call-before-status gate
 
 **(a) Root cause confirmed then fixed:** `rep_today_metrics` (migration 026) counted every row in `calls` via `count(*)` — CallModal inserts a row for all 4 non-New statuses including `No Answer`, which is literally "no one picked up" (confirmed by its own UI copy and migration 062's redistribute-no-answers logic), not voicemail-reached or a real conversation. Migration 070 (applied live to `jjextitmbptoaolacocs`, DDL required Brayden's explicit go-ahead since remote schema changes are classifier-blocked) excludes `outcome = 'No Answer'` from the count, so Calls Today now only reflects Booked / Not Interested / Follow-Up. `rep_completed_days` (the 150/day dial-quota tracker) deliberately left untouched — it wants every dial attempt, not just reached ones.
