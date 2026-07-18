@@ -34,6 +34,18 @@ tags:
 
 ---
 
+### ✅ Prompt 313 REPORT DELIVERED 2026-07-18 — full tonality/wording review done, no code touched, awaiting Brayden's call on which rewrites to ship
+
+Read the full 692-line `discoveryScript.js` (post-Prompt-312, `6af3a25`) line by line — every spoken line, every branch, Opener through Close. Full write-up with exact line numbers and suggested rewrites: [[Prompt 313 Tonality Review]].
+
+**7 flagged issues, most-impactful first:** (1) "Anything been kind of a headache" is missing "has" — grammatically broken, repeated verbatim at all 8 opener pain-gate sites (lines 88/97/110/121/138/147/160/171), highest-leverage single fix in the file. (2) "My apologies for the mix-up" (wrong-number exit, line 184) is the one exit line in a notably more formal register than every other casual/Southern-inflected exit ("man," "no worries"). (3) Pain Amplification's two "still no" exits (221, 229) stack "Okay... Okay" back to back. (4) Line 223's re-ask of the "is that something you're doing anything about" question (215) gets garbled into "is that like anything you're doing anything about" the second time it's used. (5) Line 288 is the one Handoff fallback that doesn't use the "No worries —" opener every sibling site uses. (6) "situation" is used as a generic filler noun in 4 different Handoff objection branches (245/261/317/331) — fine individually, noticeable as a word-crutch when read as a set. (7, lower-confidence) the Handoff pitch line (241) mixes two money metaphors ("slipping through the cracks" + "money hole plugged") in one breath — flagged as possibly-intentional since the file is a near-verbatim lift from a real cold-call transcript.
+
+**Reviewed and deliberately NOT flagged:** Pain Amplification's stammering numbers line (214) reads as good natural phone speech, not a defect; line 293's "you don't strike me as the type of person that wants to lose money" reads slightly salesy in isolation but may be verbatim source-transcript language; all of Prompt 312's reused objection-handling motifs are intentional callbacks, not tonal drift.
+
+**Nothing shipped.** This was scoped as review-and-report, and tonality on real sales language is a judgment call — same as Prompt 312's classification step, waiting on Brayden to confirm which of the 7 rewrites (if any) should actually go into the file before touching code.
+
+---
+
 ### ✅ Prompt 312 SHIPPED 2026-07-18 (`6af3a25`, pushed) — Follow-Up now requires real objection-handling first, "gives a time" books directly instead of deferring
 
 **Original ask:** too many paths in the script land on "Follow-Up" as a soft catch-all whenever a prospect hesitates or raises an objection, instead of the script trying to overcome that hesitation and re-attempt booking. Wants the overall demeanor binary — push to book, work through objections, only accept Follow-Up or Not Interested as real end-states. Follow-Up should require an actual legitimate reason (real scheduling conflict, decision-maker genuinely unavailable, "check back next quarter" timing), not be the path of least resistance whenever someone sounds unsure. Step 1 = find and classify every Follow-Up site, report back, don't rewrite yet — this is a judgment call on real sales language that needs Brayden's confirmation before Step 2 touches routing.
