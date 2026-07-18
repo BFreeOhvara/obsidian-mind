@@ -34,7 +34,7 @@ tags:
 
 ---
 
-### 🟡 Prompt 312 — STEP 1 DONE 2026-07-18, PAUSED awaiting Brayden's confirmation before Step 2
+### ✅ Prompt 312 SHIPPED 2026-07-18 (`6af3a25`, pushed) — Follow-Up now requires real objection-handling first, "gives a time" books directly instead of deferring
 
 **Original ask:** too many paths in the script land on "Follow-Up" as a soft catch-all whenever a prospect hesitates or raises an objection, instead of the script trying to overcome that hesitation and re-attempt booking. Wants the overall demeanor binary — push to book, work through objections, only accept Follow-Up or Not Interested as real end-states. Follow-Up should require an actual legitimate reason (real scheduling conflict, decision-maker genuinely unavailable, "check back next quarter" timing), not be the path of least resistance whenever someone sounds unsure. Step 1 = find and classify every Follow-Up site, report back, don't rewrite yet — this is a judgment call on real sales language that needs Brayden's confirmation before Step 2 touches routing.
 
@@ -48,7 +48,13 @@ tags:
 
 **Step 2 (not started) — once classification is confirmed:** rework the 4 soft sites so each gets one genuine re-attempt to book *now* before Follow-Up becomes reachable, modeled on the already-working "what's holding you back?" → real re-pitch → re-ask time → *then* concede pattern from the 2 genuine sites that already do this right. Genuine-reason sites and Not Interested stay untouched. Demeanor/routing change only, same tree structure, same booking-only-for-Voice-AI/Stage-1 scope.
 
-**Full classification with exact line numbers and reasoning given to Brayden in chat — waiting on his confirmation (or corrections to individual sites) before Step 2 rewrites anything.** Do not proceed to Step 2 until that reply lands.
+**Full classification with exact line numbers and reasoning given to Brayden in chat — CONFIRMED 2026-07-18, no corrections to individual sites.** Proceed with Step 2 as originally scoped: rework the 4 soft sites (two "just send me some info" sites, plus the "who is this" / "how much does this cost" sites that concede on first hesitation) so each gets one genuine re-attempt to book *now* before Follow-Up becomes reachable, modeled on the already-working two-round objection-handling pattern from the genuine sites. Genuine-reason sites and Not Interested stay untouched.
+
+**Side issue — folded into this prompt, Brayden said "do what's easiest."** On the genuine "I don't have time this week" site: when the prospect gives a specific callback time on the final fallback, route that directly into Close and book it, instead of logging it as Follow-Up. This is a real behavior fix (a stated concrete time is a booking, not a deferral), not a demeanor/classification change — keep it scoped to just this one site, don't go looking for the same pattern elsewhere unless it's obviously the same shape.
+
+**Step 2 shipped.** Reworked the 4 soft sites in `discoveryScript.js`'s Handoff section, all now modeled verbatim on the already-working "what's holding you back?" → open up → real re-pitch ("just 15 minutes, no pressure, no commitment") → re-ask morning/afternoon → hesitant again → *then* Follow-Up pattern (the same shape the 2 already-genuine sites used): both "just send me some info" sites (agreed-then-hesitant and declined-the-counter variants) and both "who is this" / "how much does this cost" zero-pushback sites. Genuine sites (opener's 2 "not here," Handoff's 2 "timing thing," the already-good "who is this"/"ballpark" pair) left byte-for-byte untouched. Side-fix also shipped: "I don't have time this week" → both alternate days don't work → "Gives a time" now routes `→ Go to Close` (tag changed HESITANT→GOOD to match the existing "Picks a day" sibling) instead of logging Follow-Up — a stated concrete time is a booking, not a deferral.
+
+**Verified via a temporary Node harness** (deleted, scratch copy only): walked the full parsed tree and listed every reachable terminal action. Confirmed exactly 10 Follow-Up sites remain (was 11 — the 1 side-fix site now routes to Close instead), confirmed the "Gives a time" path after "no time this week" resolves to `ROUTE:close` not `Follow-Up`, and confirmed all 4 reworked sites plus the 2 pre-existing genuine sites have a real working "Opens up → Engages → Mornings/Afternoon → route:close" booking path (12 such paths total, proving the re-attempt isn't a dead end). `npx vite build` clean.
 
 ---
 
