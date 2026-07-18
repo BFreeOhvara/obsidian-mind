@@ -34,6 +34,24 @@ tags:
 
 ---
 
+### 🟡 Prompt 312 — STEP 1 DONE 2026-07-18, PAUSED awaiting Brayden's confirmation before Step 2
+
+**Original ask:** too many paths in the script land on "Follow-Up" as a soft catch-all whenever a prospect hesitates or raises an objection, instead of the script trying to overcome that hesitation and re-attempt booking. Wants the overall demeanor binary — push to book, work through objections, only accept Follow-Up or Not Interested as real end-states. Follow-Up should require an actual legitimate reason (real scheduling conflict, decision-maker genuinely unavailable, "check back next quarter" timing), not be the path of least resistance whenever someone sounds unsure. Step 1 = find and classify every Follow-Up site, report back, don't rewrite yet — this is a judgment call on real sales language that needs Brayden's confirmation before Step 2 touches routing.
+
+**Step 1 done — read the full current `discoveryScript.js` (post-Prompt-311) and classified all 11 sites that route to Follow-Up. No code touched, per the prompt's own explicit "report before changing any routing" instruction.**
+
+**GENUINE (7 sites) — leave as-is:** opener's 2 duplicate "not here right now" sites (decision-maker literally isn't on the phone); Handoff's 2 "timing thing or not a good fit?" sites (fires only when the prospect explicitly self-labels it a timing issue, and only after 1–2 rounds of a real "just 15 minutes, hear them out" re-pitch already happened — the sibling "not a good fit" answer already correctly routes to Not Interested); Handoff's "I don't have time this week" site (real stated conflict, two concrete alternate-day offers already made before falling back — flagged a separate side-issue here, see below); Handoff's "who is this" and "just need a ballpark" sites that reach Follow-Up via "what's holding you back?" → open up → genuine re-pitch → re-engage → hesitant again (two full rounds of real objection-handling before conceding — this is already the pattern Brayden wants, used as the model for fixing the soft ones).
+
+**SOFT — objection dressed as a reason, needs rework in Step 2 (4 sites):** two "just send me some info" sites where the "rebuttal" line itself already concedes to a callback ("is there a better time to check back in?") instead of re-pushing to book now; the "who is this" and "how much does this cost" sites where Follow-Up fires on the very FIRST hesitation with a zero-pushback concession line ("I'll send some info over... find time later") — these two are the worst offenders, literally the path-of-least-resistance pattern Brayden called out.
+
+**Side issue flagged, not yet decided:** the "I don't have time this week" genuine site has an adjacent problem — when the prospect finally gives a specific callback time on the final fallback, the script logs it as Follow-Up instead of booking that stated time directly into Close. Asked Brayden whether to fold that into this prompt's fix or handle separately.
+
+**Step 2 (not started) — once classification is confirmed:** rework the 4 soft sites so each gets one genuine re-attempt to book *now* before Follow-Up becomes reachable, modeled on the already-working "what's holding you back?" → real re-pitch → re-ask time → *then* concede pattern from the 2 genuine sites that already do this right. Genuine-reason sites and Not Interested stay untouched. Demeanor/routing change only, same tree structure, same booking-only-for-Voice-AI/Stage-1 scope.
+
+**Full classification with exact line numbers and reasoning given to Brayden in chat — waiting on his confirmation (or corrections to individual sites) before Step 2 rewrites anything.** Do not proceed to Step 2 until that reply lands.
+
+---
+
 ### ✅ Prompt 311 SHIPPED 2026-07-18 (`7c3374a`, pushed) — opener pain-gate collapsed from 7 fake-branching options to 3 real ones; every other branch point audited and confirmed real; opener already personalizes by listed role
 
 **Part A confirmed exactly as suspected.** Read the full 700-line `discoveryScript.js`: the opener's pain-discovery gate appears 8 times at different nesting depths (once per parent path — That's me / Transferring / What's this about→Engages / and their nested retry variants). At every one of the 8 sites, all 5 specific-pain options (calls slip through / scheduling mess / slow response / unreliable coverage / "that's why we're hiring") plus "kind of everything" routed to the byte-identical next action (`→ Go to Vitals Check`), with zero interpolation anywhere downstream (checked Vitals, Pain Amplification, and Handoff — none reference which pain angle was picked). Confirmed a rep really was choosing between 6 near-identical buttons for zero behavioral difference, 8 times over in the tree.
