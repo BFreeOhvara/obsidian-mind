@@ -34,7 +34,21 @@ tags:
 
 ---
 
-### ✅ Prompt 315 SHIPPED 2026-07-19 (`a8699d6`, pushed) — roleplay AI rebuilt to only mirror booked-bound paths, NOT YET DEPLOYED to Supabase
+### 🔲 Prompt 316 — Real-call feedback on the new roleplay agent: turn-taking too fast, AI never hangs up, grading out of sync with the script
+
+Brayden ran an actual live roleplay call against the newly-deployed v20 agent (post-Prompt-315) and reported three separate issues. All three need real fixes, not just investigation.
+
+**(a) AI cuts in before Brayden finishes talking.** Tune the Retell agent's turn-taking so it waits longer before responding — likely `interruption_sensitivity` (currently 0.8 in the `create-agent` call) and/or `responsiveness` (currently 0.7) need to come down, and check whether Retell exposes any other end-of-turn/silence-detection parameter that controls how eagerly the agent jumps in. Look at Retell's docs for the actual recommended ranges rather than guessing blind — the goal is "waits for a natural pause," not "as slow as possible."
+
+**(b) The AI never ends the call — it just keeps going indefinitely unless the human hangs up.** Once the conversation reaches a natural conclusion (appointment booked, or the call has genuinely wrapped up), the AI itself should end the call rather than sitting there waiting. Retell supports agent-invokable tools/functions for retell-llm agents (an end-call type function) — add that capability to the agent config and instruct Mike in the prompt to invoke it once the call is clearly done (booked, or reached whatever the real script's actual end-state is), not before. Investigate the correct Retell mechanism for this rather than assuming the exact API shape — check Retell's docs/API for the current recommended pattern (this may have a specific name like "end_call" tool type).
+
+**(c) Grading doesn't match the script — Brayden followed the script correctly and still got graded poorly.** Investigate `score-roleplay` (the scoring edge function) before changing anything: what does it actually grade against — hardcoded keyword/line matching, a rubric fed to a separate LLM, something else? `score-roleplay` was NOT touched by any of this session's script/roleplay work (309/311/312/314/315 all left it alone), so it may still be grading against stale assumptions — old script wording that's since changed (314's tonality fixes), the old single missed-calls-only pain framing (pre-309), or old Follow-Up routing that 312 changed. Report the actual root cause before fixing — this is the same "investigate first" pattern used throughout this session, since guessing at a grading-logic fix without knowing what it's actually checking risks another mismatch.
+
+**Important dependency for (a) and (b):** both require redeploying `create-roleplay-call` AND clearing `RETELL_ROLEPLAY_AGENT_ID` again afterward (same paid-Retell-API mechanism as Prompt 315) — the agent only picks up code/config changes when rebuilt from scratch. Flag this clearly when done so Brayden knows another round of that same two-step (deploy + clear secret) is needed, don't just say "shipped" — say "shipped, needs redeploy + secret clear to take effect," matching how 315 was reported.
+
+---
+
+### ✅ Prompt 315 SHIPPED 2026-07-19 (`a8699d6`, pushed) — roleplay AI rebuilt to only mirror booked-bound paths, DEPLOYED to Supabase v20 — see [[Prompt 316]] below for live-call follow-up issues found post-deploy
 
 **Root cause investigated first, as asked — NOT the compounding-probability theory.** There is no per-turn code-level branch picker mid-call: `create-roleplay-call` hands Retell's LLM ONE static system prompt per call (persona + numbered behavior rules) and the LLM free-runs the entire conversation itself from there — nothing in the old code randomly selects a fork category turn by turn. The real bug was rule 9 of the old prompt: it explicitly allowed the call to resolve to a bare "callback window" (a Follow-Up-style ending) any time the rep didn't handle an objection perfectly, and nothing in the prompt forced eventual booking — so a merely-okay rep performance regularly ended the call short, and Not Interested was always one bad rebuttal away.
 
