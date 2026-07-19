@@ -34,6 +34,22 @@ tags:
 
 ---
 
+### ✅ Prompt 314 SHIPPED 2026-07-18 (`9f8697f`, pushed) — all 7 tonality fixes from [[Prompt 313 Tonality Review]] shipped
+
+All 7 Brayden-confirmed wording fixes landed in `src/lib/discoveryScript.js`, no line-count changes (every fix was a same-line text replacement, so no line-shift risk):
+
+1. **Grammar, all 8 opener sites:** "Anything been kind of a headache" → "Is anything kind of a headache" (verified exactly 8 occurrences via grep before and after, all replaced).
+2. **Register mismatch, wrong-number exit:** "My apologies for the mix-up — have a good one." → "Ah, my bad — wrong number. Have a good one."
+3. **Double "Okay," Pain Amplification's two "still no" exits:** "Okay, well, that's a different story then. Okay man, well have a good day, good luck to you." → "Okay, well, that's a different story then — have a good day, good luck to you." (2 sites, both identical, replace-all).
+4. **Doubled "anything":** "...is that like anything you're doing anything about, or not important?" → "...is that something you're doing anything about, or not important?"
+5. **Missing "No worries" opener:** "Okay, yeah, no worries — what's a good time for ya?" → "No worries — what's a good time for ya?"
+6. **"Situation" word-crutch, 4 sites, varied per branch (not a single find-replace):** "...how it'd actually help what you're dealing with." / "...how this can actually help you." / "...before they've seen your actual setup." / "...an accurate number based on what you need. You can decide from there."
+7. **Mixed metaphor:** "we get that money hole plugged" → "we get those money cracks sealed" (Brayden's confirmed wording, keeps the single cracks image instead of cracks+hole).
+
+**Verified via a temporary Node harness** (`verify-314.mjs` + a patched-import copy of the module, both deleted before commit): parsed the full tree with `buildScriptFlow()` against a fake lead, walked every fork/route recursively — 0 errors, all 5 sections (opener/vitals/pain/handoff/close) parsed clean. Also asserted all 7 old strings gone and all 7 new strings present at the right occurrence counts (8x for fix 1, 2x for fix 3, 1x each for the rest) directly against the source file. `npx vite build` clean, no warnings beyond the pre-existing chunk-size notice. Wording-only — no routing/branch structure touched, confirmed by the same tree-walk finding identical section/fork/route topology as pre-edit.
+
+---
+
 ### ✅ Prompt 313 REPORT DELIVERED 2026-07-18 — full tonality/wording review done, no code touched, awaiting Brayden's call on which rewrites to ship
 
 Read the full 692-line `discoveryScript.js` (post-Prompt-312, `6af3a25`) line by line — every spoken line, every branch, Opener through Close. Full write-up with exact line numbers and suggested rewrites: [[Prompt 313 Tonality Review]].
