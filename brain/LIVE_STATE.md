@@ -18,7 +18,7 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
-### ✅ Prompt 317 SHIPPED 2026-07-19 (`05d6072`, pushed) — setter script rebuilt around pain-driven urgency + money branching. Retell agent deploy blocked (permission denied), same pattern as Prompt 309/316.
+### ✅ Prompt 317 SHIPPED + DEPLOYED 2026-07-19 (`05d6072`, pushed) — setter script rebuilt around pain-driven urgency + money branching. `create-roleplay-call` v23 and `score-roleplay` v21 deployed to Supabase. Only remaining blocker: `RETELL_ROLEPLAY_AGENT_ID` secret clear (unchanged from Prompt 309/315/316, no secrets tool available).
 
 **Source: Brayden, Falcon manager-chat session 2026-07-19.** Full spec lived here pre-build; see [[Memories]] 2026-07-19 for the build log. Summary of what shipped:
 
@@ -30,7 +30,7 @@ tags:
 
 **Verification:** temporary node harness against `buildScriptFlow()` (deleted before commit) walked every path from opener to a terminal for 2 fake leads (with/without `monthly_labor_cost`) — confirmed all 8 sections reachable, no dead ends, all 3 terminal statuses (Appointment Booked/Follow-Up/Not Interested) reachable, `[labor cost line]` token resolves correctly both with and without data. `npx vite build` clean. Shipped as `05d6072`, pushed to `origin/master`.
 
-**Blocked:** deploying `create-roleplay-call`/`score-roleplay` to Supabase (project `jjextitmbptoaolacocs`) via the Supabase MCP was denied by the permission classifier this session — same shape of blocker as Prompt 309's `RETELL_ROLEPLAY_AGENT_ID` gap (real external-cost action gated for confirmation, not something to force through). Code is committed and correct; needs Brayden (or a session with deploy permission) to push both functions live. Note this doesn't block the LIVE setter script — `discoveryScript.js` is a frontend module, not an edge function, so it's already live via the normal Vercel deploy on push. Only the AI roleplay trainer and its grading are stale until the two functions above are deployed — and roleplay was already non-functional pending the still-open `RETELL_ROLEPLAY_AGENT_ID` secret clear from Prompt 309/316, so this doesn't newly break anything working today.
+**Deployed 2026-07-19 (Brayden said "deploy it"):** both edge functions pushed to Supabase (project `jjextitmbptoaolacocs`) — `create-roleplay-call` v23, `score-roleplay` v21, both ACTIVE. `score-roleplay`'s rubric fix is live immediately (no agent-caching layer). **Still blocked:** `create-roleplay-call`'s new urgency/angle-linked persona won't reflect in real practice calls until `RETELL_ROLEPLAY_AGENT_ID` is cleared — same unresolved secret-clear blocker carried since Prompt 309/315/316 (no secrets-management tool on the connected Supabase MCP, no local `supabase` CLI on this machine). Manual path: Supabase Dashboard → project → Edge Functions → Secrets → delete `RETELL_ROLEPLAY_AGENT_ID`, then one real practice call rebuilds the agent (paid Retell call), then CC pulls the new `agent_id` from `get_logs` for Brayden to paste back in.
 
 ---
 
