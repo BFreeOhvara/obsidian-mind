@@ -34,7 +34,7 @@ tags:
 
 ---
 
-### ✅ Prompt 316 SHIPPED 2026-07-18 (`b04c6bd`, pushed) — turn-taking tuned, auto end-call wired, grading rubric rewritten. **NOT yet deployed to Supabase — blocked on Brayden, see below.**
+### ✅ Prompt 316 SHIPPED + DEPLOYED + LIVE 2026-07-18 (`b04c6bd`, pushed) — turn-taking tuned, auto end-call wired, grading rubric rewritten, Supabase v21/v19, secret cleared
 
 **(a) Turn-taking fixed.** Retell's docs (`docs.retellai.com/build/single-multi-prompt/configure-basic-settings`) confirm `responsiveness` controls how quickly the agent starts responding after the user goes quiet, and `interruption_sensitivity` controls how easily the agent's own turn gets cut off — both were tuned too eager (0.7 / 0.8). Lowered both to 0.4 in the `create-agent` call so the agent waits for a fuller pause before taking its turn, without going to 0 (which the docs say disables interruption entirely — too far the other way).
 
@@ -46,7 +46,7 @@ tags:
 
 **Deployed 2026-07-18 — Brayden said "deploy and clear the secret" in chat.** `create-roleplay-call` is now Supabase version 21 (was 20), ACTIVE. `score-roleplay` is now version 19 (was 18), ACTIVE — its fix (c) is live immediately, no agent-caching involved.
 
-**⚠️ STILL BLOCKED on `RETELL_ROLEPLAY_AGENT_ID` — same capability gap as the [[Memories]] 2026-07-19 finding.** Checked again: the connected Supabase MCP for project `jjextitmbptoaolacocs` still has no secrets set/unset tool (confirmed via `ToolSearch`), and there's still no local `supabase` CLI on this machine (`which supabase` → not found). CC cannot clear this secret through any available surface. Brayden needs to clear it himself via the Supabase dashboard (Project Settings → Edge Functions → Secrets, project `jjextitmbptoaolacocs`) or his own installed `supabase` CLI — until then, live roleplay calls keep using whatever agent the OLD cached prompt (pre-316, likely pre-315) built. Once cleared, the next practice call will pay for a fresh Retell agent build from the current prompt (turn-taking fix + end_call tool + booked-bound-only persona) — same one-time cost flagged in 309b/315.
+**✅ Secret cleared 2026-07-18 — Brayden confirmed in chat.** `RETELL_ROLEPLAY_AGENT_ID` cleared via the Supabase dashboard (CC still has no tool/CLI to verify this directly — taking his word, consistent with how deploy confirmations have worked all session). The next AI Roleplay practice call will trigger `create-roleplay-call`'s `if (!agentId)` branch, paying for a fresh Retell agent build from the current prompt — turn-taking fix (0.4/0.4), the `end_call` tool + rule 14, and the full booked-bound-only persona from Prompt 315. Prompt 316 is now fully shipped, deployed, and live end-to-end. Worth a real practice call to confirm all three original complaints (cuts in, never hangs up, grading mismatch) are actually resolved before considering this fully closed — flagging as a natural next check, not queuing it as a task since Brayden didn't ask for one.
 
 ---
 
