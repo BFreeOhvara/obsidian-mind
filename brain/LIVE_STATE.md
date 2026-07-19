@@ -34,6 +34,26 @@ tags:
 
 ---
 
+### ✅ Prompt 315 SHIPPED 2026-07-19 (`a8699d6`, pushed) — roleplay AI rebuilt to only mirror booked-bound paths, NOT YET DEPLOYED to Supabase
+
+**Root cause investigated first, as asked — NOT the compounding-probability theory.** There is no per-turn code-level branch picker mid-call: `create-roleplay-call` hands Retell's LLM ONE static system prompt per call (persona + numbered behavior rules) and the LLM free-runs the entire conversation itself from there — nothing in the old code randomly selects a fork category turn by turn. The real bug was rule 9 of the old prompt: it explicitly allowed the call to resolve to a bare "callback window" (a Follow-Up-style ending) any time the rep didn't handle an objection perfectly, and nothing in the prompt forced eventual booking — so a merely-okay rep performance regularly ended the call short, and Not Interested was always one bad rebuttal away.
+
+**Classified every fork, as asked.** Built a temporary harness (`_tmp_classify_forks.mjs`, deleted before commit) that calls `discoveryScript.js`'s own `buildScriptFlow()` against a fake lead and walks the parsed fork tree, marking every option booked-bound only if its downstream path can still reach `Set status Appointment Booked`. Result: of ~40 unique fork categories across Opener/Pain Amplification/Handoff, only 12 are true dead-ends (hard "genuinely solid, no gap," "genuinely wrong number," a SECOND stonewall, "not interested" at Handoff, etc.) — almost everything else has a recovery path back to Booked, which made the redesign far more tractable than it first looked.
+
+**Rebuilt `create-roleplay-call/index.ts`'s persona prompt from that classification.** Replaced the old flat `OBJECTION_VARIANTS`/`ENGAGE_VARIANTS` with ~19 booked-bound-only variant groups (pain-gate named/vague/defensive→concede, opener pushback→one stonewall→engage, pain-amp engaged/minimize→reengage/pushback×2→reengage, 5 Handoff objections + one recovery round, morning/afternoon), each with 3 natural phrasings sourced from the real fork's category label. New master rule: "this call always ends with you booked... you may NEVER end the call flat-out not interested, and you may NEVER let it end on a vague callback." Each resistance category now has an explicit retry budget in the prompt (e.g. pain-amp "pushback, you're selling me something" allowed twice, everything else once) matching the real script's own disarm-attempt structure — after the budget, Mike is instructed to concede, never invent a further stall.
+
+**Two categories deliberately scoped OUT, not mirrored** — the opener's "No"/wrong-number confirm-denial wobble and the "transferring to someone else" branch. Both exist in the real script for a live gatekeeper/wrong-person-answers scenario; Mike is a fixed single-voice persona who always answers as himself, so neither is applicable. Flagging this as a scope call, not an oversight, in case it needs revisiting.
+
+**Verified two ways, no real Retell calls spent (same external-cost constraint as 309b):**
+1. Loaded the module under a stubbed `Deno`/`fetch` global (`node --experimental-strip-types`) and ran the real handler end-to-end — confirmed every `{{var}}` in the prompt has a matching `dynamicVariables` key (zero missing, zero unused) and the full Retell payload shape is correct.
+2. Built a second temporary harness that simulates 2000 random walks through the state machine the new prompt instructs Mike to follow (same retry budgets, same forced-concession points) — 2000/2000 resolved to Booked, zero touched Not Interested/Follow-Up. This proves the *instructed* state machine has no exit ramp to those endings; it can't prove the underlying LLM will perfectly obey (that needs real Retell calls). Both harnesses deleted before commit.
+
+`npx vite build` clean (frontend unaffected — this only touches the Deno edge function). Grepped the repo for the old constant names post-rename, zero stale references.
+
+**NOT deployed to Supabase — blocked.** Attempted `deploy_edge_function` (project `jjextitmbptoaolacocs`, currently at version 19) and it was denied by the Claude Code permission classifier as a production/external-cost action. Code is committed and pushed to git (`a8699d6`) but the LIVE function on Supabase is still running the OLD (pre-315) prompt. Two things need Brayden directly: (1) deploy this function himself or explicitly unblock CC to do it, and (2) — unchanged from Prompt 309b — clear the `RETELL_ROLEPLAY_AGENT_ID` secret afterward, since Retell caches the built LLM and won't pick up ANY new prompt version, old or new, until that secret is cleared and the `if (!agentId)` branch rebuilds it (a paid Retell API call, why CC hasn't done it unprompted).
+
+---
+
 ### ✅ Prompt 314 SHIPPED 2026-07-18 (`9f8697f`, pushed) — all 7 tonality fixes from [[Prompt 313 Tonality Review]] shipped
 
 All 7 Brayden-confirmed wording fixes landed in `src/lib/discoveryScript.js`, no line-count changes (every fix was a same-line text replacement, so no line-shift risk):
