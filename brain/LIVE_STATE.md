@@ -50,7 +50,7 @@ tags:
 
 `npx vite build` clean (frontend unaffected — this only touches the Deno edge function). Grepped the repo for the old constant names post-rename, zero stale references.
 
-**NOT deployed to Supabase — blocked.** Attempted `deploy_edge_function` (project `jjextitmbptoaolacocs`, currently at version 19) and it was denied by the Claude Code permission classifier as a production/external-cost action. Code is committed and pushed to git (`a8699d6`) but the LIVE function on Supabase is still running the OLD (pre-315) prompt. Two things need Brayden directly: (1) deploy this function himself or explicitly unblock CC to do it, and (2) — unchanged from Prompt 309b — clear the `RETELL_ROLEPLAY_AGENT_ID` secret afterward, since Retell caches the built LLM and won't pick up ANY new prompt version, old or new, until that secret is cleared and the `if (!agentId)` branch rebuilds it (a paid Retell API call, why CC hasn't done it unprompted).
+**Deployed to Supabase 2026-07-19 — Brayden confirmed in chat, permission classifier retry succeeded.** `create-roleplay-call` is now version 20 (was 19), status ACTIVE, project `jjextitmbptoaolacocs`. **Still blocked on the same unchanged item from Prompt 309b: `RETELL_ROLEPLAY_AGENT_ID` needs clearing** — Retell caches the built LLM and won't pick up this new prompt on real practice calls until that secret is cleared and the `if (!agentId)` branch rebuilds it fresh (a paid Retell API call, why CC hasn't done it unprompted). Until then, live roleplay calls are still running whatever persona the cached agent was built from.
 
 ---
 
