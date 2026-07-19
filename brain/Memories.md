@@ -6105,4 +6105,6 @@ Vault (LIVE_STATE + this entry) committed and pushed separately (`b97b766` for t
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 315 shipped in git (a8699d6, pushed) but NOT live: create-roleplay-call's persona prompt was rebuilt so the AI-prospect only ever raises objections that discoveryScript.js's real fork tree can still resolve to Appointment Booked (classified via buildScriptFlow, ~12 of ~40 categories excluded as true dead-ends). Verified via a stubbed-handler run + a 2000-iteration state-machine simulation (both harnesses deleted). Blocked on two Brayden actions: (1) deploy_edge_function was denied by the permission classifier — needs Brayden to deploy manually or unblock CC, (2) RETELL_ROLEPLAY_AGENT_ID still needs clearing per 309b so Retell rebuilds its cached LLM from whichever prompt version ends up live. Check LIVE_STATE's Next Up for CC queue for what's next.`
 
+[CC | 2026-07-19 — dashboard commit `a8699d6` and vault commit `c3d52bf` both pushed to their remotes; LIVE_STATE.md Prompt 315 entry updated to ✅ SHIPPED with the same deploy-blocked caveat. Nothing further to log — session's only remaining open items are the two Brayden-gated actions above.]
+
 [CC | 2026-07-18 — dashboard code committed and pushed (`9f8697f`), vault log pending commit]
