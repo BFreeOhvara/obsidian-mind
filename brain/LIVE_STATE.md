@@ -18,6 +18,43 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
+### Prompt 319: Confirm-before-quantify gate on every angle's number question — prevents forced/zero numbers feeding broken pain-amplification math — NOT YET BUILT
+
+**Source: Brayden, Falcon manager-chat session 2026-07-20.** Builds on Prompt 317's angle-branching (calls/scheduling/hiring-cost routing unchanged) and Prompt 318's wording pass — this is a structural gap in between them, found by walking the actual failure case. Read `discoveryScript.js` for real before editing.
+
+**The bug:** once an angle is confirmed at the opener gate (e.g. "calls piling up"), the script currently proceeds straight to an open-ended number question for that angle (e.g. "how many calls do you think you're missing a day?") and assumes an answer > 0 will come back. Real conversations don't guarantee that — a lead can pick "calls piling up" loosely at the broad gate, then say "actually, we're not really missing calls" when asked the specific follow-up. Today the script has no branch for that: it forces a number in (including a literal zero), and the very next line is a pain-amplification statement ("you're leaving $X on the table") built on a number that isn't real. That's a broken/nonsensical moment in a live call, not just a wording issue.
+
+**The fix — insert a short yes/no confirm gate immediately before every open-ended number question, for every angle that asks one:**
+- **Calls angle:** before "how many calls do you think you're missing a day?", add a one-beat confirm: *"So, are you actually missing calls?"* → **yes** → continue into the existing number question + math, unchanged. → **no** → do NOT force a number (never let a 0 or fabricated figure reach the pain-amplification line). Instead, re-open pain identification with a short fallback re-ask — reuse language in the same spirit as Prompt 318's opener menu, e.g. *"Gotcha — so is it more the scheduling side, or you're just growing and need more hands?"* — and route into whichever angle the lead actually confirms from there.
+- **Scheduling angle:** same pattern — confirm gate before its quantifying question (e.g. "so is scheduling actually the main headache?"), number question only follows a yes, same no-path re-ask on a no.
+- **Hiring-cost angle:** exempt — it never asks the lead for a number (reflects `monthly_labor_cost` back as a statement, not a question), so there's no open-ended-number-forcing risk here. Confirm this reading holds when reading the actual code; flag if it turns out otherwise.
+
+**Design philosophy behind this, stated explicitly by Brayden — apply generally, not just to this one fix:** prefer more, shorter conversational nodes over fewer, denser ones. Short yes/no beats followed by a number question feel like natural back-and-forth, not interrogation — the earlier "don't stack questions" concern (Prompt 318) was about asking too much *before* the lead understands why you're asking; this is the opposite case, short confirms *after* context is already established, which reads as listening rather than reciting.
+
+**Downstream:** `create-roleplay-call`'s Mike persona should sometimes give a genuine "no, not really" on the confirm gate (not just always confirming whatever angle he's assigned) so reps practice the reroute path, not only the happy path. `score-roleplay`'s rubric should treat correctly re-routing after a "no" as good pain-discovery, not a missed beat.
+
+**Verification:** temp harness against `buildScriptFlow()` (deleted before commit) — walk both the confirm→yes→number path and the confirm→no→reroute path for calls and scheduling, confirm no path ever reaches the pain-amplification line without a real confirmed number behind it, confirm the reroute lands cleanly on a valid angle with no dead ends. `npx vite build` clean.
+
+---
+
+### ✅ Prompt 318 SHIPPED 2026-07-20 (`2013feb`, pushed) — bounded pain-gate menu, adaptive Urgency Check. Intro line was already shipped (Prompt 250). NOT deployed — same secret-clear blocker as every prior roleplay prompt.
+
+**Source: Brayden, Falcon manager-chat session 2026-07-20.** Full spec lived here pre-build; see [[Memories]] 2026-07-20 for the build log. Summary of what shipped:
+
+**Item 1 (intro/hook line) — already shipped, no-op.** The spec's described "current" wording ("got a quick sec?") doesn't exist anywhere in `discoveryScript.js` — `git log -S` confirmed the target replacement text ("I was wondering who I should speak to about that") has been live since Prompt 250 (`3835a60`, 2026-07-08). Verified via git history before touching anything, per the prompt's own "read the file for real" instruction.
+
+**Item 2 (pain-gate SAY-THIS line) — shipped, all 8 sites.** Open-ended "how's it going handling calls day-to-day?" replaced with the bounded menu ("So which is it — calls piling up, scheduling's a mess, or you're just outgrowing what you've got?") at all 6 standalone opener sites + both "Transferring" combined-lead-in sites. Underlying fork/routing options and all 5-angle downstream routing from Prompt 317 untouched.
+
+**Item 3 (Urgency Check → adaptive) — required reconciling a real spec/codebase discrepancy.** The spec's quoted target phrase ("is that something you're doing anything about, or not important?") actually lives in Pain Amplification (pre-317, unrelated), not the `urgency` section — the real Prompt-317-built Urgency Check has a different bridge line entirely. Resolved via the spec's own downstream instruction (update `create-roleplay-call`'s `URGENCY_VARIANTS`, which traces unambiguously to the `urgency` section's bridge line) rather than the stale quoted text. Rebuilt `urgency` as: primary duration question always asked → branch on thin-vs-rich → if thin, ONE of two follow-ups (rep's pick, never both) → converges back into the unchanged 6-option pain-angle routing in all 3 leaves. Added a `painAngleBranchFlow()` generator (same pattern as the existing `timeOfDayOfferFlow`) instead of hand-duplicating the 6-line routing block 3x.
+
+**Downstream matching pass — done, not deferred.** `create-roleplay-call`: `URGENCY_VARIANTS` split into `URGENCY_RICH_VARIANTS`/`URGENCY_THIN_VARIANTS` + new `URGENCY_FOLLOWUP_VARIANTS`, rule 4b rewritten to model the adaptive branch. `score-roleplay`'s rubric point 2 rewritten so skipping the follow-up on a rich answer scores the same as asking it after a thin one.
+
+**Verified same bar as 317:** temp `buildScriptFlow()` harness (Node + scratch-copy import fix, deleted before commit) — all 7 sections reachable, zero dead ends, all 3 terminal statuses reached, both urgency paths (with/without follow-up) confirmed converging cleanly for 2 fake leads (with/without `monthly_labor_cost`). Both edge functions loaded and ran end-to-end under stubbed `Deno`/`fetch` globals; every `{{var}}` in the persona prompt matched against `dynamicVariables` — zero missing. `npx vite build` clean. No live Retell/Stripe calls burned.
+
+**Deployed to Supabase: NOT done — did not attempt unprompted**, matching the established 315/316/317 pattern (Brayden says "deploy it" before edge functions touch production). `create-roleplay-call`/`score-roleplay` are updated in git, live Supabase functions still on Prompt 317 versions (v23/v21). The unchanged `RETELL_ROLEPLAY_AGENT_ID` secret-clear blocker (no secrets tool on the Supabase MCP, no local CLI) applies again once deployed. The live setter script itself (items 1+2, frontend-only) is already on the normal Vercel deploy path, no gate needed.
+
+---
+
 ### ✅ Prompt 317 SHIPPED + DEPLOYED 2026-07-19 (`05d6072`, pushed) — setter script rebuilt around pain-driven urgency + money branching. `create-roleplay-call` v23 and `score-roleplay` v21 deployed to Supabase. Only remaining blocker: `RETELL_ROLEPLAY_AGENT_ID` secret clear (unchanged from Prompt 309/315/316, no secrets tool available).
 
 **Source: Brayden, Falcon manager-chat session 2026-07-19.** Full spec lived here pre-build; see [[Memories]] 2026-07-19 for the build log. Summary of what shipped:
