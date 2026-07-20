@@ -18,7 +18,7 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
-### Prompt 319: Confirm-before-quantify gate on every angle's number question — prevents forced/zero numbers feeding broken pain-amplification math — NOT YET BUILT
+### ✅ Prompt 319 SHIPPED 2026-07-20 (`78c39b0`, pushed) — confirm-before-quantify gate on Vitals/Scheduling. NOT deployed — same secret-clear blocker as every prior roleplay prompt.
 
 **Source: Brayden, Falcon manager-chat session 2026-07-20.** Builds on Prompt 317's angle-branching (calls/scheduling/hiring-cost routing unchanged) and Prompt 318's wording pass — this is a structural gap in between them, found by walking the actual failure case. Read `discoveryScript.js` for real before editing.
 
