@@ -18,7 +18,7 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
-### ✅ Prompt 319 SHIPPED + DEPLOYED 2026-07-20 (`78c39b0`, pushed) — confirm-before-quantify gate on Vitals/Scheduling. `create-roleplay-call` v24 and `score-roleplay` v22 deployed to Supabase. Only remaining blocker: `RETELL_ROLEPLAY_AGENT_ID` secret clear (unchanged from every prior roleplay prompt, no secrets tool available).
+### ✅ Prompt 319 SHIPPED + DEPLOYED 2026-07-20 (`78c39b0`, pushed) — confirm-before-quantify gate on Vitals/Scheduling. `create-roleplay-call` v24 and `score-roleplay` v22 deployed to Supabase. Blocked on Brayden for 2 manual steps: clear `RETELL_ROLEPLAY_AGENT_ID` (no secrets tool exists, re-verified), then one real Training Center practice call to trigger the rebuild (no audio I/O in this environment).
 
 **Source: Brayden, Falcon manager-chat session 2026-07-20.** Builds on Prompt 317's angle-branching (calls/scheduling/hiring-cost routing unchanged) and Prompt 318's wording pass — this is a structural gap in between them, found by walking the actual failure case. Read `discoveryScript.js` for real before editing.
 
