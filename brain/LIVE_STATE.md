@@ -16,26 +16,7 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
-
-### 🔲 Prompt 324 QUEUED 2026-07-21 (Falcon) — Weekend lead-pause (opt-out default), manual "Request Leads" escape valve, Apex (apex11) weekend-state preview
-
-**Ask, in Brayden's words:** don't want leads to auto-reset/assign on weekends by default — give reps the day off. But make it an *option* they can turn back on if they want weekends included. When a rep's local weekend hits (midnight Saturday, their timezone), My Leads should show **zero leads, no lock icon, no "training incomplete" treatment** — just an empty list. Separately, always show a **"Request Leads"** button (distinct from the existing "Go to Training Center" button used for the real training-lock state) that lets a rep pull from the unassigned pool manually if they want to work the weekend anyway.
-
-**Relevant existing mechanism (read before building, don't build parallel infra):**
-- `assign_daily_batches()` (migration 064) — per-rep local-midnight-gated cron, `*/15 * * * *`, keyed off `last_batch_assigned_local_date` + each rep's real IANA `profiles.timezone`. Weekend-skip logic belongs here — gate on the rep's own local day-of-week, not UTC.
-- `request_closer_leads` RPC (migration 056) — closers already have a "request leads from unassigned pool" mechanism (current-count-aware, 500 cap, `assigned_rep_id IS NULL` scope). Adapt this for the new rep-facing "Request Leads" button rather than building a second mechanism from scratch.
-- `MyLeads.jsx`'s `LockedVeil` (the training-incomplete empty state, lock icon + "Complete Training to Unlock Your Leads" + "Go to Training Center") — **do NOT reuse this for the weekend-pause state.** Explicit ask: no lock, no training copy, just an empty list. Needs its own, separate empty-state branch.
-
-**Build:**
-1. New setting — e.g. `profiles.weekend_leads_enabled boolean default false` — surfaced in Settings as a toggle, default **off** (matches "I want them to have that option off").
-2. `assign_daily_batches()`: skip a rep's batch assignment on Sat/Sun in their own local time unless `weekend_leads_enabled = true`.
-3. `MyLeads.jsx`: when it's the rep's local weekend and the batch is empty for that reason (not the training-lock reason) → plain empty state, zero leads, no veil/lock. Alongside it, a new **"Request Leads"** button calling the adapted request-leads RPC, pulling from the unassigned pool on demand.
-4. Keep this fully separate from `isTrainingComplete()` — don't touch or weaken the real training gate.
-
-**Verification required before marking done:** log into `apex11` (Test1234! — used for live verification in multiple earlier prompts) and force its clock/date to a Saturday (same forced-remount `Date.now()` patch technique as earlier prompts) to actually render and screenshot the weekend-paused My Leads page. Brayden wants to see this before it ships — not optional, don't close this on code review alone.
-
----
+*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21 — see [[Memories]] for the full trail.)*
 
 ### 🔲 Prompt 325 QUEUED 2026-07-21 (Falcon) — Mobile dashboard: re-attempt reverted Prompt 322 + new login-screen bugs (real-device verification required this time)
 
