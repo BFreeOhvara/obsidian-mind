@@ -18,6 +18,43 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114 — see [[Memories]] for the full trail.)*
 
+### 🔲 Prompt 324 QUEUED 2026-07-21 (Falcon) — Weekend lead-pause (opt-out default), manual "Request Leads" escape valve, Apex (apex11) weekend-state preview
+
+**Ask, in Brayden's words:** don't want leads to auto-reset/assign on weekends by default — give reps the day off. But make it an *option* they can turn back on if they want weekends included. When a rep's local weekend hits (midnight Saturday, their timezone), My Leads should show **zero leads, no lock icon, no "training incomplete" treatment** — just an empty list. Separately, always show a **"Request Leads"** button (distinct from the existing "Go to Training Center" button used for the real training-lock state) that lets a rep pull from the unassigned pool manually if they want to work the weekend anyway.
+
+**Relevant existing mechanism (read before building, don't build parallel infra):**
+- `assign_daily_batches()` (migration 064) — per-rep local-midnight-gated cron, `*/15 * * * *`, keyed off `last_batch_assigned_local_date` + each rep's real IANA `profiles.timezone`. Weekend-skip logic belongs here — gate on the rep's own local day-of-week, not UTC.
+- `request_closer_leads` RPC (migration 056) — closers already have a "request leads from unassigned pool" mechanism (current-count-aware, 500 cap, `assigned_rep_id IS NULL` scope). Adapt this for the new rep-facing "Request Leads" button rather than building a second mechanism from scratch.
+- `MyLeads.jsx`'s `LockedVeil` (the training-incomplete empty state, lock icon + "Complete Training to Unlock Your Leads" + "Go to Training Center") — **do NOT reuse this for the weekend-pause state.** Explicit ask: no lock, no training copy, just an empty list. Needs its own, separate empty-state branch.
+
+**Build:**
+1. New setting — e.g. `profiles.weekend_leads_enabled boolean default false` — surfaced in Settings as a toggle, default **off** (matches "I want them to have that option off").
+2. `assign_daily_batches()`: skip a rep's batch assignment on Sat/Sun in their own local time unless `weekend_leads_enabled = true`.
+3. `MyLeads.jsx`: when it's the rep's local weekend and the batch is empty for that reason (not the training-lock reason) → plain empty state, zero leads, no veil/lock. Alongside it, a new **"Request Leads"** button calling the adapted request-leads RPC, pulling from the unassigned pool on demand.
+4. Keep this fully separate from `isTrainingComplete()` — don't touch or weaken the real training gate.
+
+**Verification required before marking done:** log into `apex11` (Test1234! — used for live verification in multiple earlier prompts) and force its clock/date to a Saturday (same forced-remount `Date.now()` patch technique as earlier prompts) to actually render and screenshot the weekend-paused My Leads page. Brayden wants to see this before it ships — not optional, don't close this on code review alone.
+
+---
+
+### 🔲 Prompt 325 QUEUED 2026-07-21 (Falcon) — Mobile dashboard: re-attempt reverted Prompt 322 + new login-screen bugs (real-device verification required this time)
+
+**Context — this re-queues work that shipped once and was reverted.** Prompt 322 (`d225444`) built this exact scope — login vertical-centering/scroll-lock/zoom-lock, bell moved out of the sidebar drawer into the mobile top bar next to the clock — and was reverted 2026-07-20 (`1ee89e3`, see Prompt 323 below) after an unconfirmed blank-screen report in prod. Root cause was never confirmed. **Prompt 323's own explicit instruction: don't re-ship on code review + headless simulation alone this time — get a real device or a real login and watch it actually render before calling it done.**
+
+**Rebuild scope (same as original Prompt 322 — nothing here was wrong on its own merits, it was reverted as a package with the unrelated splash-screen prompt, not for a proven bug in this half):**
+1. Login vertical centering (`.login-viewport`, `100dvh` on mobile) + scroll lock (`overflow:hidden`) + pinch-zoom lock (viewport-meta swap on `Login.jsx` mount/unmount).
+2. Bell out of the sidebar drawer, into the mobile top bar next to the clock (`DashboardLayout.jsx`) — **this is what "the bell" change refers to; flag to Brayden directly if he meant something else, this is inferred from the only documented outstanding bell item.**
+
+**New items folded in this time (not in the original Prompt 322 — genuinely new reports):**
+3. **Keyboard shouldn't shift the layout.** Tapping an input currently moves/scrolls the screen up. Distinct from the page-level scroll-lock in item 1 — likely the browser's default scroll-input-into-view on focus, or the visual viewport resizing when the keyboard opens. Investigate root cause on a real device before proposing a fix (candidates: `visualViewport` API handling, confirming `dvh` layout doesn't fight the keyboard resize) — don't guess blind given the last revert.
+4. **Blinking caret moves around while typing.** The text cursor doesn't hold a stable position while typing. Investigate the actual input component/styling on Login (font, line-height, any width/padding transition) for the cause.
+5. **No zoom-on-focus, as a second independent layer.** On top of the existing pinch-zoom lock (item 1), inputs shouldn't trigger the browser's auto-zoom on focus — classic cause is `font-size < 16px` on the input triggering iOS Safari's auto-zoom regardless of viewport-meta. Check/set login input font-sizes to ≥16px on mobile.
+6. **Show-password toggle.** Add a reveal (eye) icon inside the password field. Net-new, wasn't in original scope.
+
+**Before shipping:** get a real device (or apex11 login + remote debugging — Safari Web Inspector / Chrome DevTools) and actually watch items 1–6 render and behave correctly. This is the specific gap Prompt 323 flagged last time, not a suggestion.
+
+---
+
 ### ✅ Prompt 323 RESOLVED via revert 2026-07-20 (`1ee89e3`, pushed) — Prompt 320 + 322 reverted after ~20min investigation found no confirmed root cause; production restored to last known-good state. Both features need to be rebuilt one at a time with real logged-in/device verification before re-shipping — NOT done yet, re-queue when ready.
 
 **Investigation — real, not skipped, but didn't land a confirmed root cause in a reasonable time budget.** Read every `isStandalone()`-gated path end to end: `App.jsx` (splash gating), `platform.js` (`isStandalone()` itself), `SplashScreen.jsx`, `useAuth.jsx` (the cold-launch `getSession()` retry), `supabase.js` (client config + `storage.persist()`), `ProtectedRoute.jsx`. Nothing throws synchronously anywhere in that path — no obvious crash-causing bug from static review. Two real but unconfirmed theories surfaced, both plausible, neither provable from here: **(1)** `RoleRedirect` — the installed PWA's `start_url` (`/`), meaning every cold launch hits this component first — rendered `null` (nothing at all) while auth was loading, a pre-existing gap that predates both reverted prompts but would be made more visible by Prompt 320's added 400ms standalone-mode retry extending how long that blank window lasts, especially if a real device's `getSession()` call is slower than headless testing ever showed. **(2)** Generic PWA service-worker staleness — `registerType: 'autoUpdate'`, two deploys landed back-to-back (320 then 322), and a stale installed shell referencing since-replaced hashed asset filenames is a well-known blank-screen pattern for any PWA, unrelated to the specific new code in either prompt. Could not confirm either theory without a real repro (no login available — same `rep_credentials`-read block as Prompt 322, correctly not routed around) and Brayden hadn't yet relayed a real-device console error when the decision point arrived.
