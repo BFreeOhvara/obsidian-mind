@@ -59,6 +59,8 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 - Read [[North Star]] and [[Memories]] before writing code
 - Append to [[Memories]] before ending every session
 - Never ask Brayden to run SQL or terminal commands manually
+- **When a literal exported mockup file exists (e.g. a Claude Design `.dc.html` export), port its exact visual design literally — colors, layout, spacing, every styled element — not a reinterpretation built from the written brief alone.** Confirmed 2026-07-24: Prompt 326 built real, correct backend/data wiring but its own generic UI instead of literally porting `media/claude-design-export-ohvara-dashboard-v3.html`, and Brayden rejected the result outright — he'd spent dozens of design rounds locking down that exact look specifically so it wouldn't need to be redone. When both a written brief and a literal export exist, the export is the visual source of truth; the brief is the functional/data source of truth. Use both, don't substitute one for the other.
+- **When retiring an old business's UI in favor of a new one, remove it fully — never leave old and new business nav/UI coexisting side-by-side in the same shell**, even temporarily, unless explicitly asked to keep both. Same 2026-07-24 incident: the old setter/SMB portal nav (Setter Performance, Pipeline, Payouts, Messages) shipped alongside the new insurance nav in one merged sidebar — Ohvara's pivot away from the SMB business is a full replacement, not an add-on (see [[North Star]] pivot note), so its UI needs to disappear when the new one lands, not merge with it.
 
 ---
 

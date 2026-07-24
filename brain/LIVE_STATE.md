@@ -18,6 +18,20 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21 — see [[Memories]] for the full trail.)*
 
+### 🔴 Prompt 327 QUEUED 2026-07-24 (Falcon) — Prompt 326's UI is REJECTED outright by Brayden — redo the visual layer as a literal port, and fully remove the old SMB/setter portal
+
+**Brayden logged in and rejected what he saw.** Two distinct problems, both need fixing before this counts as done — the backend/data work from Prompt 326 (below) is NOT being redone, only the UI shell:
+
+**1. The visual design does not match the approved mockup at all.** What's live is a generic dark UI with the right data fields (Active AP, Submitted AP, Policies Active, etc.) but none of the actual design — no near-black canvas / navy sidebar / blue accent from DESIGN.md v13, none of Overview's actual layout (the two-row KPI grid, the accent-filled clock, "Today at a glance," "What's on today's schedule"), none of the styling from 46 rounds of Claude Design work. **Fix: literally port `media/claude-design-export-ohvara-dashboard-v3.html`** — that file is not reference material to loosely draw from, it's the exact visual spec. Translate its `sc-if`/`sc-for`/`{{ }}` template bindings and inline styles into real React components with the same DOM structure, same CSS custom properties (already defined in that file's `<style>` block, matching DESIGN.md), same layout, same spacing — a 1:1 visual port, wired to the real Supabase data Prompt 326 already built instead of the export's sample data. If anything in the export is ambiguous or missing (e.g. an icon from the still-not-provided `sprite.svg`), flag it and ask rather than substitute a different design.
+
+**Covers both roles, not just Closer.** The one export file already contains both experiences, switchable via its own `role: 'closer' | 'admin'` state (see `switchCloser`/`switchAdmin`, `NAVDEF.closer` vs `NAVDEF.admin`, and the `pgA*` page flags in the Component class) — Admin's Overview, Call Pipeline, Closer Roster, Commissions, Users, and Lead Sources all need the same literal-port treatment as Closer's pages, not just Overview. Brayden's rejected screenshot was specifically the Admin view, so don't treat this as a Closer-only fix.
+
+**2. The old setter/SMB portal is still fully present, merged into the same sidebar as the new insurance pages** — "Platform" group (Setter Performance, Pipeline, Users, Commissions, Payouts, Messages) sits right alongside the new "Insurance" group (Book Overview, All Policies, Carrier Portals, Hierarchy) in Brayden's screenshot. **This is wrong — the SMB/setter business is fully retired, not running in parallel** (see North Star's 2026-07-21 pivot note: "Full pivot, not an add-on"). Remove the old business's nav entries and pages entirely from what Admin/Closer see. Reuse of underlying *infrastructure* (auth, the invite-link mechanism, etc.) stays exactly as Prompt 326 already did it correctly — this is about the visible UI/nav, not the backend systems underneath it.
+
+**Both fixes logged as standing rules for future work — see [[Memories]] General section, 2026-07-24 entries** (literal-port rule; full-removal-not-merge rule). Don't repeat either mistake on any future page.
+
+---
+
 ### 🟨 Prompt 326 PARTIALLY SHIPPED 2026-07-24 (`05660b4` + `65db56a`, pushed) — real backend built AND live on the database; still NOT verified logged-in. Remaining work listed here; original spec kept below it, unchanged.
 
 **Shipped this session (commit `05660b4` on `ohvara-dashboard` master, pushed — Vercel auto-deploys):**
