@@ -33,7 +33,9 @@ tags:
 
 **Verified:** clean build, tokens confirmed live in-browser, both Overviews measured by computed style through a temporary unauthenticated route (since removed, build re-run). **Still NOT verified logged-in** — same standing gap as 322/323/326.
 
-**🔲 Still open — part 2:** literally port the remaining pages. Closer: My Policies, Submissions, Carrier Portals, Hierarchy, Settings. Admin: Users & Access (still legacy-styled), and the full designs for Call Pipeline / Closer Roster / Commissions / Lead Sources once their data exists (placeholders today). They inherit the new tokens and card treatment so they no longer look like the rejected UI, but their layouts are not yet the export's.
+**✅ Part 2a also shipped (`f1cbbe7`, pushed):** **My Policies** is now the export's My Pipeline screen — stacked effective-date prompts, search + Filters popover (five selects) + removable filter chips, and the eight-column spacious table (Policy # / Customer / Product / Carrier / AP / Reported / Status / Next action) with the reserve footnote. "Next action" is derived from each real record, not canned. **`ComingSoon` re-ported** to the export's card (72px accent circle, 28px/16px type) — re-skins nine placeholder pages at once. Per-status badge colors had to be inferred onto semantic tokens because `data3.js` (which holds `STAGES`/`LINES`/`CANC_STATUS`) still hasn't been handed over — flagged in the file.
+
+**🔲 Still open — part 2b:** Submissions (3-tab form + cancellation calendar, export lines 1307-1454), Carrier Portals (1456-1471), Hierarchy closer + admin (229-375), Settings (1483+), admin Users & Access (1044-1094). Also still queued: full designs for Call Pipeline / Closer Roster / Commissions / Lead Sources once their data exists (honest placeholders today). These pages inherit the new tokens and card treatment so they no longer look like the rejected UI, but their layouts are not yet the export's.
 
 **Original prompt, for the remaining work:**
 
