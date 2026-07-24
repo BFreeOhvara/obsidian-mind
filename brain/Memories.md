@@ -6390,3 +6390,5 @@ Commit `1ee89e3`, pushed to `origin/master`.
 
 **Remaining part-2 work, unchanged:** Submissions (3-tab form + cancellation calendar, export 1307-1454), Carrier Portals (1456-1471), Hierarchy closer + admin (229-375), Settings (1483+), and admin Users & Access (1044-1094).
 
+[CC | 2026-07-24 — Prompt 327 part 2a close-out] — Post-log close-out: `brain/LIVE_STATE.md`'s Prompt 327 entry updated to mark part 2a shipped (My Policies table + ComingSoon card, `f1cbbe7`) and to narrow the open list to part 2b — Submissions, Carrier Portals, Hierarchy (closer + admin), Settings, admin Users & Access, plus the four admin pages awaiting real call data. Vault committed and pushed (`bad871f`, `8d4074a`); `ohvara-dashboard` clean at `f1cbbe7`, pushed. Dev server still running on :5173. Context flagged at 60%+ to Brayden — next session should start fresh and pick up part 2b from LIVE_STATE. No code changed in this step.
+
