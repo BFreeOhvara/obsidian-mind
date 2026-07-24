@@ -6344,3 +6344,33 @@ Commit `1ee89e3`, pushed to `origin/master`.
 
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 326 is partially shipped (05660b4 + 65db56a, pushed): the six real insurance pages under /agent/* are built AND migrations 072/073/074 are applied and verified on jjextitmbptoaolacocs, with claim-invite redeployed at v5 (verify_jwt off). The backend is live. What's still NOT done: nothing has been verified logged-in (no test account — same gap that caused the 322/323 reverts), light/dark toggle, Underwriting + Stats full UI, and Hierarchy's visibility is enforced in the query rather than RLS because profiles' SELECT policy is auth.uid() is not null. Five questions still open for Brayden (quoter account, real carrier data, cancellation routing number, in-system messaging scope, three missing Claude Design export deps) — all listed in LIVE_STATE's Prompt 326 entry. Prompt 325 (mobile dashboard re-attempt, requires real-device verification) is queued below it.`
+
+---
+
+### 2026-07-24 — Prompt 327 part 1: literal design port (shell + both Overviews), SMB nav removed
+
+**Task:** Prompt 326's UI was rejected outright. Two fixes: (1) stop reinterpreting the design and literally port `media/claude-design-export-ohvara-dashboard-v3.html`, (2) remove the retired SMB/setter portal from what Admin/Closer see instead of running it alongside the insurance pages.
+
+**What shipped (`1db3fa1` on `ohvara-dashboard` master, pushed — Vercel auto-deploys):**
+
+- **Design tokens replaced wholesale.** `index.css`'s `:root` was still the old purple-glass system (`--accent:#6C63FF`, translucent white surfaces, two animated blur orbs on `body::before/after`). Now it's the export's exact block: `--bg-base:#0A0A0F`, `--bg-sidebar:#192C4F`, `--bg-surface:#13131A`, `--bg-elevated:#1C1C26`, `--accent:#4B79CE`, `--border:#2A2A3A`, `--border-w`, `--sidebar-border:#F0F0F5`, plus every status `-dim`/`-bd` pair. Added the full `[data-theme="light"]` teal palette and the `aside` / `[data-theme="light"] aside` overrides verbatim. Body type is now the export's 13px/600. Orbs deleted (`BackgroundOrbs` unmounted from `App.jsx` too) — the approved canvas is flat near-black.
+- **`.glass` kept its name but stopped being glass.** Dozens of legacy call sites use it, so instead of touching them all it now resolves to the export's card: `--bg-surface` fill, 1px `--border`, 8px radius, no blur/lift/shadow. Every existing page inherited the new look for free from that one change.
+- **Light mode now actually exists** — this was item 1 on Prompt 326's deferred list. Header toggle writes `data-theme` on `<html>` and persists to `localStorage`.
+- **Sidebar is a literal port** of the export's `<aside>` (lines 57-112): navy fill, collapses 224px↔64px with a chevron button (persisted), grouped nav with the export's exact NAVDEF groups and order, 2px accent rail on the active item, closer duty widget, profile row, sign out. `DashboardLayout` gained the export's 60px sticky header (page title + subtitle from the export's TITLES map, theme toggle, notification bell) and the 32/40/72 main padding capped at 1440px.
+- **Both Overviews ported 1:1.** Closer: greeting + accent-filled mono clock, "Today at a glance" card with two 4-column hairline-divided KPI rows, "What's on today's schedule" table. Admin (new `pages/admin/InsuranceOverview.jsx`): six KPI tiles, funnel + hourly panels, cancellation breakdown + persistency, closer leaderboard — all real Supabase data where it exists.
+- **SMB portal gone from the nav.** Admin's "Platform" group (Setter Performance, Pipeline, Users, Commissions, Payouts, Messages) is deleted. `/admin` now renders the insurance Overview; the legacy pages stay reachable at `/admin/legacy/overview` and `/admin/legacy/commissions` so wind-down data isn't lost, but nothing links there. New admin routes match the export's nav: `/admin/call-pipeline`, `/admin/roster`, `/admin/leaderboard`, `/admin/lead-sources`, plus `/admin/commissions` now an honest placeholder.
+
+**Honest-data rule held throughout.** Everything call-derived (inbound calls, funnel, hourly bars, transfers, close rate, avg handle, duty status) has no source — calls still happen on the agent's own phone. Those render an em-dash or a one-line "why this is empty" inside the *same* panel the export drew, never invented numbers. Policy-derived figures are real.
+
+**Four deliberate deviations, all flagged rather than silently substituted:**
+1. **Icons.** The export references `sprite.svg`, still never handed over — every sprite name is mapped to its lucide equivalent by name. Swap when the sprite lands.
+2. **Notification bell.** Kept the three existing role-specific bell components (real, working, with the Prompt 322 viewport clamp) rather than porting the export's static dropdown. Button is 34px vs the export's 30px.
+3. **"Viewing as Closer / Admin" switcher — not ported on purpose.** It's a mockup affordance for demoing both roles in one file; real roles come from the signed-in profile.
+4. **Duty toggle persists to `localStorage` only.** It belongs to Live Call, which has no backend — flagged in the component.
+
+**Verification.** `npx vite build` clean. Tokens confirmed live in the browser (`--bg-base #0A0A0F`, `--bg-sidebar #192C4F`, `--accent #4B79CE`, body 13px/600, orb pseudo-element gone, zero console errors). Because there's still no test login, both Overviews were rendered through a **temporary unauthenticated route** and measured by computed style: navy aside at 224px, 60px sticky header, main padding `32px 40px 72px` / max-width 1440, closer's 4-column KPI grid, accent `rgb(75,121,206)` clock in JetBrains Mono, admin's 6-column KPI grid + `1.3fr 1fr` panel pairs + both tables' headers. The temp route was removed and the build re-run before committing (`grep` confirms zero leftovers). **Still not verified logged-in** — the same standing gap as 322/323/326.
+
+**Not done — this is part 1 of Prompt 327, the rest is still queued:** the remaining pages haven't been literally ported yet (Closer: My Policies, Submissions, Carrier Portals, Hierarchy, Settings; Admin: Users & Access still legacy-styled). They inherit the new tokens and card treatment, so they no longer look like the rejected purple UI, but their layouts are not yet the export's.
+
+**Lesson:** when a whole app's look is wrong, the token block and the shared card class are the highest-leverage edit — replacing `:root` and redefining `.glass` in place moved every existing page onto the approved design in one commit, without touching a single page component. Port the shell first, pages second.
+

@@ -18,7 +18,24 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21 — see [[Memories]] for the full trail.)*
 
-### 🔴 Prompt 327 QUEUED 2026-07-24 (Falcon) — Prompt 326's UI is REJECTED outright by Brayden — redo the visual layer as a literal port, and fully remove the old SMB/setter portal
+### 🟨 Prompt 327 PART 1 SHIPPED 2026-07-24 (`1db3fa1`, pushed) — design system, shell and both Overviews are now a literal port; SMB nav removed. Remaining pages still to port.
+
+**Done this session (see [[Memories]] 2026-07-24 entry for the full detail):**
+- `index.css` `:root` replaced with the export's exact token block (near-black canvas, navy sidebar, `#4B79CE` accent, all `-dim`/`-bd` pairs), plus the full `[data-theme="light"]` palette and `aside` overrides. Purple-glass tokens and both background orbs are gone.
+- `.glass` redefined in place as the export's flat `--bg-surface` card — every legacy page moved onto the approved look without editing a single page component.
+- **Light/dark toggle now real** (was deferred item 1 from Prompt 326) — header button, `data-theme` on `<html>`, persisted.
+- Sidebar is a literal port (navy, 224↔64 collapse, export's NAVDEF groups/order, accent rail, duty widget); `DashboardLayout` gained the export's 60px sticky header (title/subtitle/theme/bell) and 32-40-72 main padding capped at 1440.
+- **Closer Overview and Admin Overview ported 1:1**, wired to real Supabase data. New `pages/admin/InsuranceOverview.jsx`.
+- **SMB/setter nav fully removed** for admin. `/admin` is the insurance Overview; legacy pages survive unlinked at `/admin/legacy/overview` and `/admin/legacy/commissions`. New admin routes match the export's nav (`/admin/call-pipeline`, `/admin/roster`, `/admin/leaderboard`, `/admin/lead-sources`).
+- Anything call-derived renders an em-dash + a one-line reason inside the export's own panel — no invented numbers anywhere.
+
+**Four flagged deviations (not silent substitutions):** lucide icons stand in for the still-missing `sprite.svg`; the existing working notification bells were kept over the export's static dropdown; the export's "Viewing as Closer/Admin" switcher was deliberately not ported (mockup-only affordance); the duty toggle persists to `localStorage` only until Live Call has a backend.
+
+**Verified:** clean build, tokens confirmed live in-browser, both Overviews measured by computed style through a temporary unauthenticated route (since removed, build re-run). **Still NOT verified logged-in** — same standing gap as 322/323/326.
+
+**🔲 Still open — part 2:** literally port the remaining pages. Closer: My Policies, Submissions, Carrier Portals, Hierarchy, Settings. Admin: Users & Access (still legacy-styled), and the full designs for Call Pipeline / Closer Roster / Commissions / Lead Sources once their data exists (placeholders today). They inherit the new tokens and card treatment so they no longer look like the rejected UI, but their layouts are not yet the export's.
+
+**Original prompt, for the remaining work:**
 
 **Brayden logged in and rejected what he saw.** Two distinct problems, both need fixing before this counts as done — the backend/data work from Prompt 326 (below) is NOT being redone, only the UI shell:
 
