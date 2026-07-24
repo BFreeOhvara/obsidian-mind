@@ -6374,3 +6374,5 @@ Commit `1ee89e3`, pushed to `origin/master`.
 
 **Lesson:** when a whole app's look is wrong, the token block and the shared card class are the highest-leverage edit — replacing `:root` and redefining `.glass` in place moved every existing page onto the approved design in one commit, without touching a single page component. Port the shell first, pages second.
 
+[CC | 2026-07-24 — Prompt 327 part 1 close-out] — Post-log close-out for the design-port session above: `brain/LIVE_STATE.md`'s Prompt 327 entry rewritten from 🔴 QUEUED to 🟨 PART 1 SHIPPED (what landed, the four flagged deviations, and an explicit part-2 list of pages still to port), with the original prompt text kept underneath it for the remaining work. Vault committed and pushed as `91a2e96`; `ohvara-dashboard` was already at `1db3fa1`, pushed. Both repos clean. Dev server left running on :5173. No code changed in this step — documentation and queue state only.
+
