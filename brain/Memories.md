@@ -6376,3 +6376,17 @@ Commit `1ee89e3`, pushed to `origin/master`.
 
 [CC | 2026-07-24 — Prompt 327 part 1 close-out] — Post-log close-out for the design-port session above: `brain/LIVE_STATE.md`'s Prompt 327 entry rewritten from 🔴 QUEUED to 🟨 PART 1 SHIPPED (what landed, the four flagged deviations, and an explicit part-2 list of pages still to port), with the original prompt text kept underneath it for the remaining work. Vault committed and pushed as `91a2e96`; `ohvara-dashboard` was already at `1db3fa1`, pushed. Both repos clean. Dev server left running on :5173. No code changed in this step — documentation and queue state only.
 
+[CC | 2026-07-24 — Prompt 327 part 2a: My Policies + coming-soon card ported] — Continued the literal design port. **`f1cbbe7` on `ohvara-dashboard` master, pushed.**
+
+**My Policies** is now the export's "Closer · My Pipeline" screen (export lines 647-751) instead of the stacked card list: effective-date prompt banners stacked one per policy (warning-dim, Yes/No inline), a 34px search field + Filters button whose count badge turns the button accent, a 300px `--bg-elevated` popover with the export's five selects (Status / Product / Carrier / State / Reported) and "Clear all", removable active-filter chips, then a single spacious table — Policy # / Customer / Product / Carrier / AP / Reported / Status / Next action, 20px cell padding, row click opens the existing PolicyModal — and the reserve footnote. The You/Team scope toggle survives as the export's small segmented control.
+
+**"Next action" is derived, not canned** — it reads the real record: effective date reached and unanswered → confirm effectuation; cancellation pending → schedule or show the booked 3-way call time; In Effect with cancellation complete → commission released; etc.
+
+**Per-status colors had to be inferred.** `STAGES`/`LINES`/`CANC_STATUS` live in `data3.js`, still never handed over, so Submitted→info, In Effect→success, Undrafted→danger, Follow-up→warning, Not Interested→muted, Cancellation Pending→warning, Complete→success. Product renders as a neutral badge for the same reason. Flagged in the file — revisit when `data3.js` lands.
+
+**`ComingSoon` re-ported too** (export lines 1418-1424): bordered `--bg-surface` card, 72px accent circle, 28px/16px type, centred — it was a small rounded square with a "COMING SOON" pill. This one change re-skins nine placeholder pages at once (Quoter, Live Call, My Calls, Training, Commissions, Underwriting, Stats + the four new admin ones).
+
+**Verified:** clean build; rendered through a temporary unauthenticated route and measured — all eight table headers in the export's order, 34px/`#13131A`/360px-max search box, popover at `rgb(28,28,38)` with 10px radius, the export's shadow, five selects with the right labels, footnote present, no error boundary. Temp route removed and build re-run before commit. **Still not verified logged-in.**
+
+**Remaining part-2 work, unchanged:** Submissions (3-tab form + cancellation calendar, export 1307-1454), Carrier Portals (1456-1471), Hierarchy closer + admin (229-375), Settings (1483+), and admin Users & Access (1044-1094).
+
