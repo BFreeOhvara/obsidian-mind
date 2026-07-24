@@ -18,6 +18,62 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21 — see [[Memories]] for the full trail.)*
 
+### 🟨 Prompt 326 PARTIALLY SHIPPED 2026-07-24 (`05660b4`, pushed) — real backend + the six launch pages are built; NOT live yet (migration unapplied) and NOT verified logged-in. Remaining work listed here; original spec kept below it, unchanged.
+
+**Shipped this session (commit `05660b4` on `ohvara-dashboard` master, pushed — Vercel auto-deploys):**
+- **Migration `072_insurance_launch.sql`** — `policy_status` (the final five: Follow-up / Not Interested / Submitted / In Effect / Undrafted) and `cancellation_status` (two values) enums; `policies` table carrying the full Round 33 New Submission field list with `annual_premium` as a *generated* column (never client-sent); `carriers` table; `profiles.upline_id` + three SECURITY DEFINER helpers (`downline_of`, `upline_of`, `can_view_agent`). Policy RLS: an agent reads their own book plus their downline's, admin reads everything, an agent only ever *writes* their own rows.
+- **Invite flow repurposed, not rebuilt** (per the audit-first rule) — the existing `rep_invites` table + `claim-invite` edge function + `/join/:token` page from the old model already did self-service registration. Only two changes needed: RLS widened so a team owner can mint their own `closer` invites (role escalation stays admin-only), and `claim-invite` now stamps `upline_id` from the invite's `created_by`, which is what actually builds the downline tree.
+- **New `/agent/*` route tree** — closers land here on login now (`/closer/*` still resolves by URL, nothing deleted). Real pages: **Overview** (Active/Submitted AP, policies active, average premium, placed rate, pending cancellations + a "needs your attention" row driven by real rows), **My Policies** (page-level search, filters behind a Filters control, spacious rows, centered horizontal `--bg-elevated` detail modal with scroll-lock, the Effective-Date "Did this go into effect?" prompt), **Submissions** (real New Submission form + real Cancellation Calendar scheduling the 3-way call; Contracting Submission is a placeholder tab), **Carrier Portals**, **Hierarchy** (scoped upline/downline for an agent, company-wide for admin, with invite-link generate/copy/revoke). Sidebar reorganized into Sales / Tools / Growth groups per Round 38; admin gets an Insurance group above its legacy Platform nav.
+- Placeholders in the nav, not dead links: Quoter, Live Call, My Calls, Training, Commissions, Underwriting, Stats.
+
+**⛔ BLOCKING — nothing works until this is done:** migration 072 is written but **not applied to the live database**, and `claim-invite` needs redeploying (`--no-verify-jwt`). CC has no DB password and per Rule 10 doesn't drive Brayden's Supabase session. Paste-ready handoff written to **[[claude-chrome-apply-migration-072]]** — run that first, everything else is downstream of it.
+
+**Not verified logged-in.** Same gap Prompt 323 called out: build is clean and the Login page renders with zero console errors, but every new page sits behind Supabase auth and there's still no test login available. Do not treat these pages as proven until someone actually signs in and clicks through them.
+
+**Still open from the original scope (deliberately deferred, not missed):**
+1. **Light/dark toggle** — the live app has no light mode at all (`index.css` has no light tokens, no `data-theme`). DESIGN.md defines the full light palette from the mockup; wiring it is its own chunk of work, not a Settings checkbox.
+2. **Underwriting + Stats full UI** (Round 39) — spec'd as polished-but-non-functional. Pure UI work with no backend behind it, so it was deferred behind the pages that actually needed wiring. Currently render the placeholder.
+3. **Hierarchy visibility is enforced in the query, not in RLS.** `profiles`' SELECT policy is `auth.uid() is not null` (migration 010, widened years ago so closers could read setter names) — so a determined user could read profiles the Hierarchy page doesn't show them. Tightening it means re-checking every legacy page that joins `profiles`. Fine for three trusted agents; not fine before reselling this to other agencies.
+4. Admin still can't create Nate's account through the new UI — use the existing `/admin/users` flow, which already works.
+
+**Five answers still needed from Brayden — none guessed or stubbed with fake data:** (1) Quoter toolkit account? (2) Real carrier names/portal URLs/phone numbers — the `carriers` table ships **empty on purpose**, admin enters real rows in the app. (3) Dedicated cancellation-handling number, or does the selling closer run their own 3-way? (4) In-system messaging: real for launch or later? (5) The three missing Claude Design export deps — `data3.js`, `support.js`, `sprite.svg`.
+
+---
+
+**Original spec, unchanged, for the remaining work above:**
+
+**Context — this is the real build, not more Claude Design work.** A 46-round Claude Design mockup (`Ohvara Dashboard v3`) plus the functional brief (`media/claude-design-insurance-dashboard-brief.md`) and `North Star.md`'s Current Focus/Pipeline Status Model sections together define exactly what to build. Brayden considers the mockup phase closed and wants this live. **Read `media/claude-design-insurance-dashboard-brief.md` in full (all 46 rounds) and the relevant `North Star.md` sections before starting** — this prompt summarizes the decisions, it doesn't replace reading the source.
+
+**Literal code export now available — start from this, don't rebuild the UI from the written spec.** Brayden uploaded Claude Design's actual generated source file (`Ohvara Dashboard v3.dc.html`, 2026-07-23) — saved complete (2,553 lines, full Component class included, not trimmed) at `media/claude-design-export-ohvara-dashboard-v3.html`. This supersedes an earlier partial save of the same export pasted directly into chat — that copy only had the Overview section; this one is the real full file. Key facts: it's NOT React — a custom "DC" template runtime (`sc-if`/`sc-for`/`{{ }}` bindings) driven by a `DCLogic` component class with a `renderVals()` method — port the logic and exact field/state shape into real React components for `ohvara-dashboard`, don't treat it as drop-in code. Verified consistent with every round in the brief (status model, nav groups, production/persistency controls, submission fields, commission-projection block) — this is the real, current, approved design, not a stale draft. **Three dependencies referenced by the export are NOT included and still need to be grabbed from Brayden/Claude Design: `data3.js`** (the sample data arrays — PIPELINE, CALLS, CLOSERS, CAMPAIGNS, etc. — referenced via `import('./data3.js')`), **`support.js`** (referenced as a script include), and **`sprite.svg`** (the icon sprite, referenced throughout via `href="sprite.svg#..."`). Ask Brayden for these three before assuming any icon/sample-data gap is a bug in the export.
+
+**Real launch team:** Nate (team owner — Brayden creates his account), Jordan, Rego. Nate invites Jordan and Rego himself via the Hierarchy page's invite-link flow — don't build individual admin-created accounts for all three.
+
+**Build philosophy — audit before rebuilding.** This is not a from-scratch app. The current `ohvara-dashboard` repo's existing infrastructure (auth, URLs, and — per Brayden 2026-07-23 — an existing invite-link mechanism from the old model) should be reused/repurposed, not rebuilt. Check what already exists for auth and invites specifically before writing new code for either.
+
+**Pages that need real backend wiring (Supabase schema + real forms, not sample data):**
+- **Overview** — full KPI set already spec'd across Rounds 4–30 (submitted/active AP, policies active, average premium, calls taken, close rate, today's schedule, needs-attention).
+- **My Policies** — the pipeline itself. Status model is final (Round 46 / North Star "Pipeline Status Model," 2026-07-23): main status = Follow-up, Not Interested, Submitted, In Effect, Undrafted (Follow-up/Not Interested have no data source yet until live-call handling lands — build the fields anyway, don't skip them). Cancellation status is a **separate field**, two values only: Cancellation Pending, Cancellation Complete. Submitted → In Effect/Undrafted transitions via an Effective-Date-triggered prompt ("Did this policy go into effect?" Yes/No).
+- **Submissions** — New Submission form (real fields, Round 33: Policy Sold Date, Agent Name, Policy #, Lead Status, Client First/Last Name, Client Phone, Insurance Provider, Product Type, Insurance Type, Effective Date, Monthly Premium, auto-computed Annual Premium) + Cancellation Calendar tab (real scheduling). Contracting Submission tab stays a coming-soon placeholder (not real).
+- **Carrier Portals** — its own page now (split out of Submissions, Round 38), needs real carrier data — see blocker below.
+- **Quoter** — needs a real embed target — see blocker below.
+- **Hierarchy** — real invite-link flow, scoped upline/downline-only visibility per closer, full company-wide view for Admin.
+- **Settings** — profile, notifications, regional, appearance (light/dark toggle).
+
+**Ships as "coming soon" (no real backend needed, simple or polished-but-static placeholder):** Live Call, My Calls, Training Center, Commissions, Underwriting (gets full polished UI per Round 39 but stays non-functional), Stats/Production+Leaderboard (also full polished UI per Round 39, non-functional), Contracting Submission tab.
+
+**Commission model — documented for later, not a launch blocker** (Commissions page is coming-soon): estimated commission at submission (needs real comp-grid rate data per carrier/product/contract-tier, doesn't exist yet), doesn't count as real until the policy is confirmed effectuated, manual carrier-portal link as a verify-it-yourself fallback. See North Star "Commission tracking mechanics."
+
+**Three real-world inputs that block parts of this build — ask Brayden directly, don't guess or stub with fake data presented as real:**
+1. **Quoter:** does Nate's team have an account with a real quoting toolkit (e.g. insurancetoolkits.com, the tool the Liberated Financial reference embeds)? Without one, Quoter ships as a link-out, not a working embed.
+2. **Carrier Portals:** real carrier names, portal URLs, new-business phone numbers, and agent-service phone numbers for whichever carriers Nate/Jordan/Rego are actually appointed with.
+3. **Cancellation Calendar:** does Ohvara have a dedicated cancellation-handling contact/number (like the reference dashboard's routing), or does the closer who booked the deal handle their own 3-way call? Changes whether this page needs a routing number.
+
+**Also still open, not yet answered by Brayden as of 2026-07-23:** whether in-system messaging (internal chat between team members) is in scope for this real launch or a later add — ask before building it either way, it's not in the mockup yet.
+
+**Deploy:** once Nate/Jordan/Rego's pages are wired and pass local verification, push per the standing push-authorization rule (North Star Rule 11) — this is a real, live product multiple people will use immediately, so get a real logged-in check (not just headless/code review) before calling it done, same standard as Prompt 323's lesson.
+
+---
+
 ### 🔲 Prompt 325 QUEUED 2026-07-21 (Falcon) — Mobile dashboard: re-attempt reverted Prompt 322 + new login-screen bugs (real-device verification required this time)
 
 **Context — this re-queues work that shipped once and was reverted.** Prompt 322 (`d225444`) built this exact scope — login vertical-centering/scroll-lock/zoom-lock, bell moved out of the sidebar drawer into the mobile top bar next to the clock — and was reverted 2026-07-20 (`1ee89e3`, see Prompt 323 below) after an unconfirmed blank-screen report in prod. Root cause was never confirmed. **Prompt 323's own explicit instruction: don't re-ship on code review + headless simulation alone this time — get a real device or a real login and watch it actually render before calling it done.**

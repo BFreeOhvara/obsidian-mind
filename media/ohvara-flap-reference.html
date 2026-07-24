@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ohvara flap — precise reference (single flap, exact logo shape)</title>
+<style>
+  html, body { margin:0; padding:0; width:100%; height:100%; background:#060E22; overflow:hidden; }
+  .stage { width:100vw; height:100vh; display:flex; align-items:center; justify-content:center; }
+  svg { width:340px; height:auto; overflow:visible; }
+
+  /* White tucks behind teal: rotate+scale around the SAME crease point teal folds at (281.87,263.73),
+     not around a point on white's own body — that's what made it float away from teal before.
+     Single cycle, holds at rest afterward. */
+  #white {
+    transform-box: fill-box;
+    animation: whiteTuck 1.8s cubic-bezier(.4,0,.2,1) 0.6s 1 both;
+  }
+  @keyframes whiteTuck {
+    0%   { transform: translate(281.87px,263.73px) rotate(0deg)   scale(1)   translate(-281.87px,-263.73px); }
+    22%  { transform: translate(281.87px,263.73px) rotate(190deg) scale(0.3) translate(-281.87px,-263.73px); }
+    56%  { transform: translate(281.87px,263.73px) rotate(190deg) scale(0.3) translate(-281.87px,-263.73px); }
+    100% { transform: translate(281.87px,263.73px) rotate(0deg)   scale(1)   translate(-281.87px,-263.73px); }
+  }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <!-- viewBox matches the real PNG's native pixel grid (478x479) — every point below is a 1:1 trace of the
+         actual logo (extracted via contour detection, not hand-eyeballed), not a redraw. -->
+    <svg viewBox="0 0 478 479" xmlns="http://www.w3.org/2000/svg">
+      <polygon id="white" points="82,158 114,199 137,244 151,297 152,337 226,275 250,234" fill="#FFFFFF"/>
+
+      <!-- Teal is split into two pieces so the fold never self-intersects:
+           - body: the four vertices that NEVER move (241,254)(134,394)(368,295)(325,274)
+           - flap: the triangle formed by the apex + the same two body vertices that bound it.
+             Only the apex vertex animates, reflected across the fixed crease line between those two points. -->
+      <polygon points="241,254 134,394 368,295 325,274" fill="#00BFA6"/>
+      <polygon id="flap" points="325,274 333,49 241,254" fill="#00BFA6">
+        <animate attributeName="points"
+          values="325,274 333,49 241,254;
+                   325,274 230.75,478.46 241,254;
+                   325,274 230.75,478.46 241,254;
+                   325,274 333,49 241,254"
+          keyTimes="0;0.22;0.56;1"
+          dur="1.8s" begin="0.6s" fill="freeze" repeatCount="1"
+          calcMode="spline" keySplines="0.4 0 0.2 1;0 0 1 1;0.4 0 0.2 1"/>
+      </polygon>
+    </svg>
+  </div>
+</body>
+</html>

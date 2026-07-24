@@ -1,0 +1,20 @@
+<svg viewBox="0 0 1000 560" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Ohvara logo, unflapped vs flapped — traced from hand sketches</title>
+<desc>Left: unflapped, wide open pose — white sail swept left, teal spike tall and pointed, overlapping at center. Right: flapped — teal's own top spike folds down onto itself (new jagged crease at top), white tucks almost entirely behind teal, only a small wedge still visible at the right edge. Whole mark reads shorter and more compact.</desc>
+
+<rect x="0" y="0" width="1000" height="560" fill="#050510"/>
+
+<rect x="40" y="40" width="440" height="440" fill="#0B1E42"/>
+<g transform="translate(70,90)">
+<path d="M72,175 Q210,150 180,195 Q150,235 128,261 Q90,230 72,175 Z" fill="#FFFFFF"/>
+<polygon points="200,100 232,205 262,210 132,282" fill="#14C9A3"/>
+</g>
+<text x="260" y="510" fill="#AAAAAA" font-family="sans-serif" font-size="20" text-anchor="middle">Unflapped</text>
+
+<rect x="520" y="40" width="440" height="440" fill="#0B1E42"/>
+<g transform="translate(595,279)">
+<polygon points="241,40 291,48 227,67" fill="#FFFFFF"/>
+<polygon points="67,10 99,40 163,0 184,31 233,19 248,48 150,101 0,89" fill="#14C9A3"/>
+</g>
+<text x="740" y="510" fill="#AAAAAA" font-family="sans-serif" font-size="20" text-anchor="middle">Flapped</text>
+</svg>

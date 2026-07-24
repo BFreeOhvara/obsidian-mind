@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ohvara — splash animation prototype</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: #0B1E42;
+    overflow: hidden;
+  }
+  .stage {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .bird {
+    width: 220px;
+    height: 220px;
+    opacity: 0;
+    transform-origin: 62% 55%;
+    animation:
+      birdIn 0.6s ease-out 0s forwards,
+      flyAway 0.6s ease-in 1.05s forwards;
+  }
+  .wing-white {
+    transform-origin: 55% 55%;
+    animation: flapWhite 0.45s ease-in-out 0.6s 1;
+  }
+  .wing-teal {
+    transform-origin: 55% 55%;
+    animation: flapTeal 0.45s ease-in-out 0.6s 1;
+  }
+  @keyframes birdIn {
+    0%   { opacity: 0; transform: scale(0.6); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  @keyframes flapWhite {
+    0%, 100% { transform: rotate(0deg); }
+    50%      { transform: rotate(10deg); }
+  }
+  @keyframes flapTeal {
+    0%, 100% { transform: rotate(0deg); }
+    50%      { transform: rotate(-10deg); }
+  }
+  @keyframes flyAway {
+    0%   { transform: translate(0, 0) scale(1);     opacity: 1; }
+    100% { transform: translate(340px, -260px) scale(0.35); opacity: 0; }
+  }
+  /* replay button, prototype-only, not part of the real component */
+  .replay {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #14C9A3;
+    color: #0B1E42;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-family: sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <svg class="bird" id="bird" viewBox="0 0 480 480" xmlns="http://www.w3.org/2000/svg">
+      <polygon class="wing-white" points="80,150 262,236 150,252 156,396" fill="#FFFFFF"/>
+      <polygon class="wing-teal" points="330,40 300,270 372,296 150,400" fill="#14C9A3"/>
+    </svg>
+  </div>
+  <button class="replay" onclick="replay()">Replay</button>
+  <script>
+    function replay() {
+      const bird = document.getElementById('bird');
+      const clone = bird.cloneNode(true);
+      bird.replaceWith(clone);
+      clone.id = 'bird';
+    }
+  </script>
+</body>
+</html>
