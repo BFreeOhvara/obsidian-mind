@@ -84,21 +84,11 @@ tags:
 
 ---
 
-### 🔲 Prompt 330 QUEUED 2026-07-24 (Falcon) — Overview box sizing/button styling + sidebar scrollbar (real) + header polish
+### 🟨 Prompt 330 SHIPPED (code) 2026-07-25 (CC, `5415b90`, pushed) — Overview box sizing/button styling + sidebar scrollbar (real) + header polish — **NOT yet verified logged-in**
 
-**Context:** Brayden reviewed the live, logged-in Overview (see Prompt 329's verification note above — screenshot from Nate's real session) and an Eterna Insurance reference screenshot for the header pattern. Five items, all small/targeted — no new data, pure layout/styling on top of what Prompt 329 already shipped.
+**All 5 items done:** (1) attention/goal boxes changed from `1.6fr 1fr` to `1fr 1fr` with `alignItems:'start'` removed so grid stretch makes them equal height too — confirmed via a real-CSS static harness (loaded the app's actual `index.css`, measured computed `getBoundingClientRect()`): both boxes render at identical 590×159px. (2) "View my policies" is now a filled button — computed `background-color: rgb(75,121,206)` (`--accent` exactly) with white text, confirmed via the same harness. (3) sidebar scrollbar: **re-diagnosed properly this time**, not the same guess — found two real sources of extra content height: the `<aside>` had a redundant `bottom:0` AND explicit `height:'100vh'` (over-constrained; 100vh can be a device-pixel or two off true rendered height from DPI/scrollbar-gutter rounding on Windows), and the last nav group carried an unnecessary trailing `marginBottom:20` that added to `nav`'s scrollHeight for no visual reason (nav's own bottom padding already separates it from the duty widget below). Fixed both — full reasoning in the code comment in `Sidebar.jsx`. (4) account chip name bumped 13px → 15px. (5) added a 1px×24px vertical divider between the bell and account chip — confirmed via the same computed-style check.
 
-**1. "Needs your attention" + "Monthly goal" boxes — equal width.** Currently uneven (attention box wider, goal box narrower). Split the row 50/50 down the middle — same width, same height, side by side.
-
-**2. Style "View my policies →" as a filled button, not a text link.** Reference is the digital clock already on this same Overview page (top right of the greeting card) — white text on a solid blue (`--accent`) fill. Give "View my policies" that same treatment: blue-filled pill/button, white text, instead of the current plain blue text link.
-
-**3. Sidebar scrollbar is still showing — Prompt 329's fix (`minHeight:0` on `nav`) did not fully resolve it.** Confirmed via Brayden's screenshot: a thin scroll track is visible on the right edge of the sidebar nav even though nothing needs to scroll. Re-diagnose properly this time rather than reapplying the same guess — check the actual content height vs. available viewport height at real screen sizes, and check for `overflow-y` set anywhere in the sidebar's ancestor chain that might be forcing a track to render even when content fits. Get this actually confirmed gone, not just theoretically fixed.
-
-**4. Header account name — increase font size.** "Nate John" (or whichever name) next to the avatar in the top-right account chip (added in Prompt 329) currently renders too small — bump it up a size.
-
-**5. Add a vertical divider between the notification bell and the account chip.** Short vertical line, doesn't touch the header's top or bottom edge (a fixed-height rule centered vertically, not a full-height border) — matches the pattern on Brayden's Eterna Insurance reference dashboard (bell | short vertical divider | avatar + name, top right). Purely decorative spacing, no functional change.
-
-**Verify against a real logged-in screenshot before calling this done** — Brayden is now sending screenshots directly from live sessions (see Prompt 329), so there's no excuse to skip visual confirmation on this one.
+**Still open:** same standing gap as every prompt since 322 — **not verified against a real logged-in screenshot**, which Brayden explicitly asked for on this one ("there's no excuse to skip visual confirmation"). The static-harness check proves the CSS values are correct in isolation (equal box dimensions, exact accent color, divider size) but can't prove the sidebar scrollbar is actually gone at Brayden's real screen height/zoom — that specific item needs his eyes on the real page above all the others here, since it's the one item CC has now "fixed" twice.
 
 ---
 
