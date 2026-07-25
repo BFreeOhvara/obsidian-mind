@@ -18,6 +18,22 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21 — see [[Memories]] for the full trail.)*
 
+### 🟩 Prompt 343 SHIPPED 2026-07-25 — seeded 20 sample policies for nate44, 5 landing in Needs your attention
+
+**Shipped:** Supabase migration `seed_prompt343_sample_policies_nate44` on project `jjextitmbptoaolacocs` (data only — no dashboard code changed, nothing to push to `ohvara-dashboard`).
+
+1. **Read the real logic first, didn't guess**: confirmed `AgentOverview.jsx`'s `attention` useMemo (`pendingEffectuation()` in `usePolicies.js`: `status='Submitted' AND effective_date <= today AND effectuation_answered_at IS NULL`) plus a separate `cancellation_status === 'Cancellation Pending'` check — same two conditions `MyPolicies.jsx` uses for its own banner/Next Action column, so the two screens can't drift.
+2. **20 policy rows** inserted for `nate44` (agent_id `3f2b2df7-40b1-4921-80e2-09981c819642`, confirmed via `profiles`/`auth.users` join — `full_name` is "Test Agent"): carriers pulled live from the `carriers` table (all 12 real ones), products vary (Term, Whole Life, IUL, GUL, Final Expense), AP from $648–$2,808, reported dates spread May–Jul 2026, statuses mixed across In Effect (9), Submitted (5), Follow-up (2), Not Interested (1), Undrafted (1).
+3. **5 of those 20** satisfy the real attention conditions, not a hardcoded list: 3 `Submitted` with past `effective_date` and null `effectuation_answered_at` (Wendy Ashford, Carlos Deleon, Renee Blackwood), 2 `In Effect` with `cancellation_status='Cancellation Pending'` (Monica Reyes — call already scheduled; Terrence Lockhart — call not yet scheduled, to show both sub-states).
+
+**Blocker hit and resolved mid-session**: the auto-mode classifier denied the first two write attempts (`execute_sql`, then `apply_migration`) against the live Supabase project — direct DB writes aren't in the pre-approved action set even though this LIVE_STATE entry itself pre-authorized it as test data. Surfaced it to Brayden via `AskUserQuestion` rather than working around it; he chose to grant permission in-session over running the SQL himself. `apply_migration` then succeeded.
+
+**Verified live, not just by row count**: loaded `/agent` and `/agent/policies` in the Browser pane (logged in as nate44 already). Overview's "Needs your attention" shows exactly the 3 CONFIRM EFFECTIVE + 2 CANCELLATION PENDING rows expected. My Policies shows "20 of 20 policies" with visibly varied carrier/product/AP/date/status per row — confirmed via `get_page_text`, not a screenshot (Browser pane wasn't displayed on-screen this session, same known issue as recent prompts).
+
+**This was the last item in the queue — it's now empty.**
+
+---
+
 ### 🟩 Prompt 342 SHIPPED 2026-07-25 — Overview clock now renders in a real seven-segment digital font
 
 **Shipped:** [`21b9d00`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/21b9d00) on `ohvara-dashboard`.
