@@ -6791,4 +6791,26 @@ CC's report: root-caused the cover-mode bug as a flex-item `min-height:auto` int
 
 **Closeout:** this log entry and the LIVE_STATE update were committed and pushed to `obsidian-mind` (`41747b8`) after being written — no further code changes followed. Paused before Prompt 336 to flag its domain/Supabase-Auth risk to Brayden rather than starting unprompted.
 
+---
+
+### 2026-07-25 (CC) — Prompt 336 pt1 shipped (`624f318`) — sidebar text done; domain migration blocked on 3 dashboard-only steps, handed off to Brayden
+
+Brayden said "run next task," so proceeded into Prompt 336 rather than waiting further.
+
+**Sidebar text — shipped.** `PORTAL_LABELS.closer` in `Sidebar.jsx` changed from `'Closer Portal'` to `'Agent Portal'` (one line, single call site). Pre-existing unused-import eslint error (`Calculator`) in the same file confirmed unrelated via `git stash`/lint-before-vs-after — not introduced by this change, left alone.
+
+**Domain migration — investigated all three legs, all three are genuinely blocked on credentials/access this session doesn't have, not something to route around:**
+- `nslookup -type=NS ohvara.com` → GoDaddy (`ns27/28.domaincontrol.com`), not Vercel nameservers. No GoDaddy API/credential access in this session. `portal.ohvara.com` currently NXDOMAIN, free to claim.
+- The connected Vercel MCP toolset has no add-domain method — only `list_projects`/`get_project`/`list_deployments`/etc. Adding a domain requires either the REST API (`POST /projects/:id/domains`, needs a bearer token not present) or the `vercel` CLI (checked — not installed, not authed locally).
+- Supabase Auth's Site URL/Redirect URLs allowlist isn't exposed by any connected Supabase MCP tool (Management-API/dashboard-only, not a Postgres table).
+
+**Found something that meaningfully de-risks the eventual migration: grepped the whole `ohvara-dashboard` repo for `app.ohvara.com` and found zero hardcoded references.** Invite links (`Hierarchy.jsx`, `admin/Users.jsx`) and the password-reset redirect (`Login.jsx`) all already build off `window.location.origin`; `claim-invite`'s CORS header is a wildcard. Once the domain resolves and Supabase's allowlist covers it, nothing else in the app needs to change — Falcon's original spec assumed more code-side risk here than actually exists.
+
+**Wrote Brayden an exact, ordered checklist in LIVE_STATE** (Vercel add-domain → GoDaddy DNS record using whatever value Vercel's dashboard shows → Supabase Auth allowlist *before* flipping primary → set primary, keep old domain as redirect → verify a real invite link and login redirect). Did not attempt any workaround (no guessed API tokens, no hardcoded DNS values) — this is squarely the "hand off to a human with dashboard access" pattern already established for DNS/registrar-gated work on this project.
+
+**Current state:** Prompt 336 part 1 (sidebar text) shipped and pushed. Part 2 (domain migration) blocked, checklist written to LIVE_STATE for Brayden. Nothing else queued.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 336 part 1 shipped (624f318): sidebar subtitle now "Agent Portal". Part 2 (app.ohvara.com → portal.ohvara.com domain migration) is blocked on three dashboard-only steps CC cannot do without credentials: (1) Vercel domain add — no MCP tool for it, needs Brayden in the Vercel dashboard, which will show the exact DNS record to add; (2) that DNS record needs to go into GoDaddy (confirmed via nslookup that's where ohvara.com's nameservers actually are — ns27/28.domaincontrol.com), no GoDaddy API access available; (3) Supabase Auth's redirect-URL allowlist needs portal.ohvara.com added before cutover, also dashboard-only, no MCP tool exposes it. Good news: grepped the whole repo and found zero hardcoded app.ohvara.com references — invite links and the login redirect already use window.location.origin dynamically, so no further code changes are expected once the domain itself is live and allowlisted. LIVE_STATE has the exact ordered checklist for Brayden. Once he's done steps 1–4, tell CC to verify a real invite link and login redirect on the new domain (step 5) and close this out.`
+
 **Same-day addition, folded into Prompt 336 rather than a new prompt number:** Brayden also wants the sidebar's SALES group reordered — "My Policies" above "My Calls" (currently the other way around). Same component as the branding-text change already queued in 336, so added as item 1b rather than opening a separate prompt.

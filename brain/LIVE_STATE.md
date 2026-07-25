@@ -18,7 +18,30 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21 — see [[Memories]] for the full trail.)*
 
-### 🔲 Prompt 336 QUEUED 2026-07-25 (Falcon) — domain change app.ohvara.com → portal.ohvara.com, sidebar branding "Closer Portal" → "Agent Portal"
+### 🟨 Prompt 336 PART 1 SHIPPED, PART 2 BLOCKED ON BRAYDEN 2026-07-25 — sidebar text done, domain migration needs 3 manual dashboard steps
+
+**Shipped:** [`624f318`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/624f318) on `ohvara-dashboard` — sidebar subtitle "Closer Portal" → "Agent Portal" (`PORTAL_LABELS.closer` in `Sidebar.jsx`).
+
+**Domain migration (app.ohvara.com → portal.ohvara.com) is blocked — needs Brayden to do 3 things himself, no tooling workaround exists.** Investigated all three legs and every one requires dashboard/credential access this session doesn't have:
+
+1. **DNS is on GoDaddy, not Vercel-managed nameservers** — confirmed via `nslookup -type=NS ohvara.com` → `ns27.domaincontrol.com` / `ns28.domaincontrol.com`. No GoDaddy API/credential access available. `portal.ohvara.com` currently doesn't resolve (NXDOMAIN) — it's free to claim, nothing squatting on it.
+2. **Vercel: no domain-add tool available.** The Vercel MCP connected to this session (`list_projects`, `get_project`, `list_deployments`, etc.) has no add/verify-domain method — that's only exposed via the REST API (needs a bearer token this session doesn't have) or the `vercel` CLI (not installed/authed locally, checked). Current project domains on `ohvara-portal` (`prj_M0xdzcNzrYcU9UXCeglrHKvUnUa8`): `app.ohvara.com`, `ohvara-portal-ohvara.vercel.app`, `ohvara-portal-git-master-ohvara.vercel.app`.
+3. **Supabase Auth's Site URL / Redirect URLs allowlist isn't exposed via any connected Supabase MCP tool** — it's a Management API / dashboard-only setting, not a Postgres table `execute_sql` can touch.
+
+**Genuinely good news found along the way: zero hardcoded `app.ohvara.com` references anywhere in the codebase.** Grepped the whole repo — invite links (`Hierarchy.jsx`, `admin/Users.jsx`) and the password-reset redirect (`Login.jsx`) all already build off `window.location.origin` dynamically; `claim-invite`'s CORS header is a wildcard `*`, not a hardcoded origin. **Once the domain itself resolves and Supabase's allowlist includes it, everything else should just work with no further code changes** — this de-risks the migration considerably from what Falcon's original spec assumed.
+
+**Exact steps for Brayden, in order (each one blocks the next):**
+1. Vercel dashboard → `ohvara-portal` project → Settings → Domains → Add `portal.ohvara.com`. Vercel will show the exact CNAME/A record to add (don't guess it — `app.ohvara.com`'s current CNAME target, `71423706e48ac027.vercel-dns-017.com`, is domain-specific and won't be reused for a new domain).
+2. Add that record at GoDaddy's DNS management for `ohvara.com` (Vercel's dashboard shows the exact host, given the domain is on GoDaddy nameservers).
+3. **Before setting `portal.ohvara.com` as the primary/production domain**, add it to Supabase → Auth → URL Configuration → Redirect URLs allowlist (project `jjextitmbptoaolacocs`), keeping `app.ohvara.com` in the list too during the transition. Skipping this or doing it out of order breaks login/invite links the moment the new domain goes live.
+4. Set `portal.ohvara.com` as primary in Vercel; keep `app.ohvara.com` attached as a redirect rather than removing it.
+5. Test a real invite link and a real login redirect on `portal.ohvara.com` before considering this done.
+
+**Once Brayden's done 1–4, tell CC to pick this back up** to do step 5 (verification) and confirm nothing else needs touching.
+
+---
+
+### ⬛ Prompt 336 original queue entry (superseded by status above, kept for reference)
 
 **Queued behind Prompt 335** (carrier logo fine-tuning) — separate, unrelated work, no reason to reorder ahead of it.
 
