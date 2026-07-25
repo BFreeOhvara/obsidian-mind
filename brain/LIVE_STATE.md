@@ -18,7 +18,63 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21 — see [[Memories]] for the full trail.)*
 
-### ✅ Prompt 334 SHIPPED 2026-07-25 (CC) — all 12 carrier logos done, pending Brayden's screenshot to verify
+### 🔲 Prompt 336 QUEUED 2026-07-25 (Falcon) — domain change app.ohvara.com → portal.ohvara.com, sidebar branding "Closer Portal" → "Agent Portal"
+
+**Queued behind Prompt 335** (carrier logo fine-tuning) — separate, unrelated work, no reason to reorder ahead of it.
+
+**1. Sidebar branding text — quick, no risk.** Top-left of the sidebar currently reads "Ohvara / Closer Portal" (logo + subtitle). Change the subtitle to **"Agent Portal"** — matches the `/agent/*` route naming already used everywhere since the pivot; "Closer Portal" is a leftover label. Plain text change, single component.
+
+**1b. Same sidebar, one more small reorder — added same day, same component, folded in rather than a new prompt.** In the SALES nav group, swap the order so **"My Policies" sits above "My Calls"** (currently My Calls then My Policies). Just a list-order change in whatever array defines the SALES group's nav items.
+
+**2. Domain change app.ohvara.com → portal.ohvara.com — real infra work, has a genuine risk to flag up front: this can break login if the auth redirect config isn't updated in the same pass.** Steps, roughly in order:
+
+- **Check first, don't assume:** confirm `portal.ohvara.com` isn't already pointed somewhere else (DNS lookup) and check what's currently managing `ohvara.com`'s DNS (Vercel-managed nameservers vs. an external registrar) before doing anything.
+- **Add `portal.ohvara.com` to the `ohvara-dashboard` Vercel project** as a domain, verify it, and set it as the primary/production domain for the project (whichever Vercel tooling is available in this session — MCP or otherwise).
+- **DNS record for `portal`** needs to exist wherever `ohvara.com`'s DNS is actually hosted. **If DNS is managed somewhere CC doesn't have API/credential access to (a registrar dashboard, Cloudflare, etc.), this step is blocked — stop and hand Brayden the exact record to add** (same pattern as every other "needs a human with dashboard access" blocker on this project — don't attempt to work around a missing credential).
+- **Keep `app.ohvara.com` alive as a redirect to `portal.ohvara.com`** rather than letting it go dead — default assumption is Brayden doesn't want to break anyone's existing bookmark/saved link; flag back if he'd rather it just stop resolving.
+- **⚠️ Highest-risk step — Supabase Auth config.** `Site URL` and the `Redirect URLs` allowlist in the Supabase project's Auth settings currently reference `app.ohvara.com` — magic links, the `claim-invite` edge function's invite links, and any OAuth callback all depend on this being correct. **Add `portal.ohvara.com` to the allowlist (keep `app.ohvara.com` in it too during the transition, don't remove it outright) before flipping the primary domain over**, or logins/invite links will break the moment the domain changes. Check via the Supabase MCP whether this is settable directly; if it's a dashboard-only setting with no API/MCP path, flag it as a step Brayden needs to click through himself rather than skip it silently.
+- **Grep the codebase for any hardcoded `app.ohvara.com` references** (invite-link construction in `Join.jsx`/`claim-invite`, env vars, CORS allowlists, README/docs) and update them to `portal.ohvara.com` — or better, confirm they already pull from an env var and just update the env var, rather than hardcoded strings scattered around.
+- **Verify a real invite link and a real login redirect both work on the new domain before calling this done** — this is exactly the kind of change that looks fine in code and silently locks everyone out in production if the auth allowlist step is missed.
+
+---
+
+### 🟩 Prompt 335 SHIPPED 2026-07-25 — centering fix re-verified (no bug found, deploy confirmed READY), logo_zoom_pct added + 4 carriers tuned
+
+**Shipped:** [`128ad86`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/128ad86) on `ohvara-dashboard`.
+
+**1. Cover-mode centering — re-verified with a real static harness this time (per the Prompt 330 technique), not just code reasoning.** Built `public/_harness-carrier-cards.html` (deleted after use, not committed) reproducing the exact `CarrierCard` banner markup/CSS with the real Aflac/Chubb/Corebridge/Foresters/F&G/Fidelity Life image files, served by the dev server. Read back actual computed styles via `getBoundingClientRect`/`getComputedStyle`: the banner is `position:relative`, the cover-mode `<img>` is `position:absolute;inset:0` and its rendered box matches the banner box to within the 1px border — confirming `object-fit:cover` + `object-position:50% 50%` crops symmetrically by construction. **No CSS bug found** — Prompt 334's fix (`66af837`) is structurally correct. Cross-checked with Vercel: that commit's deployment (`dpl_5Rs8v8nZ...`) shows `state: READY, target: production`, is the newest deployment in the project, and is `isRollbackCandidate: true` — it was live before Brayden's screenshot. Most likely explanation for what he saw: browser cache or a screenshot taken in the brief window before the deploy finished. **Flagging back to Brayden: if Aflac/Chubb still look off-center after a hard refresh, this needs a fresh screenshot with a timestamp/cache state check, not another CSS re-diagnosis** — the harness rules out the component-level bug class.
+2. **`carriers.logo_zoom_pct` column added** (`integer`, default `100`) via migration `083_carriers_logo_zoom.sql`, applied directly to Supabase. `CarrierCard`'s `<img>` style now layers `transform: scale(logo_zoom_pct/100)` on top of whichever `object-fit` mode the carrier uses (`useCarriers` already does `select('*')`, no hook change needed). Set starting values: F&G 135, Fidelity Life 135, Corebridge 110, Foresters 85 (all other carriers default to 100/unchanged). Confirmed via the harness that each carrier's computed `transform` matches the expected `scale()` value.
+
+`eslint` + `vite build` clean. **Still could not visually screenshot the real logged-in `/agent/carriers` page** — same standing gap as every carrier-page prompt (no agent login for CC). The harness substitutes real markup/CSS/images and DOM-level computed-style verification for a live screenshot, which is the most rigorous check available without login access — **worth Brayden confirming with a real screenshot after a hard refresh**, both for the centering (should already be fixed, unverified visually) and the four zoom values (starting points, may need further adjustment).
+
+---
+
+### ⬛ Prompt 335 original queue entry (superseded by shipped note above, kept for reference)
+
+**Context:** Brayden's screenshot after Prompt 334: "I don't think Aflac and Combined moved at all." The `position:absolute;inset:0` fix from Prompt 334 either isn't deployed correctly or isn't actually fixing the real cause — this is the **second** attempt at this exact bug (same shape as the sidebar-scrollbar saga in Prompts 329/330, which took a real re-diagnosis to actually land). Also four more logos need per-carrier size tweaks now that Brayden's eyeballed all 12 live.
+
+**1. Cover-mode vertical centering — still broken, needs to actually be PROVEN fixed this time, not just reasoned through.**
+
+**Falcon checked whether this is a source-image asymmetry problem first, to rule that out before blaming CSS again:** measured the actual logo-content bounding box (wordmark pixels, not background) in both files. Chubb/Combined's content center sits at 48.9% down its 138px height — essentially already centered. Aflac's "Aflac" wordmark (isolated by detecting white + orange pixels against its textured teal-fur background, since the background itself isn't a flat color) sits at 46.2% down its 719px height — also close to center, not dramatically offset. **Conclusion: this is not primarily a source-image content-asymmetry issue — it's still a real CSS/rendering bug**, and Prompt 334's `position:absolute;inset:0` fix either didn't deploy as intended or doesn't actually resolve whatever's really happening (possible gap: does the banner `<div>` actually have `position: relative` for the child's `inset:0` to size against the right box? — check that specifically, it's the most common way this exact fix silently fails).
+
+**Do not ship this a third time on code-reasoning alone.** Use the same technique CC already proved out for the sidebar-scrollbar fix in Prompt 330 — build a real static harness (actual `CarrierCard` markup + the real CSS + the real Aflac/Chubb image files, rendered in the dev-server browser preview) and **read back the actual rendered image position/computed styles, or take a screenshot of the harness itself**, before claiming this is fixed. If the harness shows it's still off-center, keep iterating against that harness until it's provably centered — don't hand this back to Brayden a third time without having seen it centered somewhere first.
+
+**2. Four logos need per-carrier size tuning — added a `logo_zoom_pct` column to `carriers`** (`integer`, default `100`) so future "make X a little bigger/smaller" requests are a data change, not a new component-code round every time. Apply as a CSS `transform: scale(logo_zoom_pct / 100)` layered on top of whichever `object-fit` the carrier already uses (works for both `cover` and `contain`).
+
+| Carrier | Issue | Starting `logo_zoom_pct` | Notes |
+|---|---|---|---|
+| F&G | Too small, lots of white margin (`contain`, white background so cropping is fine if it ever comes to that) | ~135 | Zoom in — background is white, matches banner, no visual harm from being aggressive here |
+| Fidelity Life | Same — too small, too much white margin (`contain`) | ~135 | Same reasoning |
+| Corebridge | "Just a little bit larger, not a lot" (`cover`) | ~110 | Small nudge only — Brayden was explicit this one needs a light touch |
+| Foresters | Currently cropping too tight — "a little bit of the logo's cut off here and there," "barely fits" (`cover`) | ~85 | Zoom **out** — this is the one going smaller, not bigger |
+
+Treat these as starting points, not final values — **verify against the harness or a real screenshot and adjust further if the first pass over/undershoots**, same as the centering fix above.
+
+**Verify against a real logged-in screenshot before calling this done** — and this time, verify with the harness technique BEFORE asking Brayden to check again, since the centering bug already burned one round of his time on an unverified claim.
+
+---
+
+### 🟥 Prompt 334 SHIPPED BUT CENTERING FIX DID NOT VISIBLY WORK 2026-07-25 — see Prompt 335 above for the re-diagnosis
 
 **Shipped:** [`66af837`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/66af837) on `ohvara-dashboard`. All five items done:
 
