@@ -7068,3 +7068,24 @@ Picked up Prompt 340, next item in LIVE_STATE's queue after 339 (339's remaining
 
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 340 shipped (f7b09c9): nav icons/labels enlarged for the 270px sidebar, logo enlarged, account popover widened to 248px and restructured (avatar + duty toggle folded into one header row) to reduce height. Verified via computed DOM geometry (no screenshot available — Browser pane wasn't displayed this session). Real limitation found: popover fully clears Settings on normal/large screens (1080p+, ~87.5px gap) but still overlaps it by ~92.5px on short viewports (~900px logical height, e.g. some 13-14" laptops) — structural, not a quick fix, since the closer role's popover minimum content needs ~140px but only ~47px of headroom exists there. Flagged for Brayden's call, not silently claimed fixed. Prompt 339 item 3 (kill usernames) still blocked on real emails, unchanged. Check LIVE_STATE's CC queue for what's next.`
+
+---
+
+### 2026-07-25 (CC) — Prompt 341 shipped: collapse-button border, account name, avatar fill all switched to white
+
+Picked up Prompt 341, the remaining queued item after 340 (339's item 3 still correctly blocked on real emails, untouched).
+
+**Shipped** (`e414ce7` on `ohvara-dashboard`), all three in `Sidebar.jsx`:
+
+1. **Collapse-toggle button border**: `var(--border)` (dark gray) → `var(--sidebar-border)` — the same token the header divider line already uses, per Brayden's own reference point. Didn't hardcode a hex; reused the existing sidebar-scoped token from `DESIGN.md`/`index.css`.
+2. **Account name text**: closed footer row's name was `var(--text-secondary)` (grayish `#93A6C4`-family) → `var(--text-primary)`. The popover's identity-header name already used `var(--text-primary)` from the Prompt 340 restructure, so nothing needed there — checked both per the prompt's own instruction, only one needed the fix.
+3. **Avatar/initials circle fill**: `var(--accent-dim)` (blue-tinted) → `var(--text-primary)`, in both places the avatar renders (closed footer row and the popover header added in Prompt 340). Initials text color (`var(--accent)`, blue) left untouched as specified.
+
+**Token-choice note, worth remembering**: `index.css` re-points `--text-primary`/`--text-secondary`/`--text-muted` to solid white specifically inside `aside` (`aside { ... } [data-theme="light"] aside { --text-primary:#FFFFFF; ... }`), which is why `--text-primary` was safe to reuse for a background fill here too, not just text color — it resolves to solid white in both light and dark mode *only inside the sidebar*, unlike the app-wide default. `DESIGN.md` documents a separate `--sidebar-text` token for this exact purpose, but it isn't actually defined anywhere in `index.css` — only `--sidebar-border` made it into real CSS — so using `--sidebar-text` would have silently broken (undefined var). Confirmed by reading the actual CSS before choosing which token to reuse, not just the DESIGN.md prose.
+
+**Verified via computed styles, not a pixel screenshot** — same Browser-pane-not-displayed situation as the Prompt 340 session (`computer{screenshot}` timed out). Checked with `getComputedStyle()` against the running dev server (`nate44`/closer): collapse button `borderColor` reads `rgb(240, 240, 245)` (matches the divider's `--sidebar-border` value exactly); closed-row name color reads `rgb(255, 255, 255)`; closed-row avatar `backgroundColor` reads `rgb(255, 255, 255)` with initials still `rgb(75, 121, 206)` (unchanged blue); re-checked all three inside the open popover too (avatar bg, avatar text, name color) — same white/blue split holds there. `eslint` clean except the same pre-existing, unrelated `Calculator` unused-import in `Sidebar.jsx`. `vite build` clean.
+
+LIVE_STATE's Prompt 341 entry marked shipped; queue now has just Prompt 342 (Overview clock — real digital/LCD font) left.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 341 shipped (e414ce7): collapse-button border, account name text, and avatar circle fill all switched from grayish/blue tones to solid white (--sidebar-border and --text-primary tokens, no hardcoded hex), verified via computed styles in both the closed footer row and open popover — no screenshot available this session (Browser pane not displayed). Only Prompt 342 remains in LIVE_STATE's queue (Overview clock: real digital/seven-segment font, taller characters). Prompt 339 item 3 (kill usernames) still blocked on Brayden supplying real emails for nate44/brayden11, unchanged.`

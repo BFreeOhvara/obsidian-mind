@@ -30,21 +30,21 @@ tags:
 
 ---
 
-### 🆕 Prompt 341 QUEUED 2026-07-25 — collapse-button outline to white, account name to solid white, avatar circle fill to white
+### 🟩 Prompt 341 SHIPPED 2026-07-25 — collapse-button outline, account name, avatar fill all switched to white
 
-Small color-only follow-on, sidebar header + footer.
+**Shipped:** [`e414ce7`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/e414ce7) on `ohvara-dashboard`.
 
-1. **Collapse-toggle button (top-left, the `<` chevron next to the "Ohvara / Agent Portal" logo) — change its outline/border from its current gray to white.** Brayden's reference point: match the color of the horizontal divider line directly below the header (the line separating the logo row from the "TODAY" nav group) — that line already reads white in the UI, use that same color/token for the button's border rather than inventing a new one. Check [[DESIGN]] for the actual token name that line uses (don't hardcode a hex per standing rule) and reuse it.
+1. **Collapse-toggle button border** → `var(--sidebar-border)`, the same token the header divider already uses (was `var(--border)`, dark gray).
+2. **Account name text** (closed footer row) → `var(--text-primary)` (was `var(--text-secondary)`, grayish). Popover's identity-header name already used `var(--text-primary)` from the Prompt 340 restructure — checked, no change needed there.
+3. **Avatar circle fill** → `var(--text-primary)` (was `var(--accent-dim)`, blue-tinted), in both places it renders (closed row + popover header). Initials text color (`var(--accent)`) left unchanged.
 
-2. **Account footer name text ("Test Agent" in the closed row) — change to solid white**, not its current grayish/light tone. Same treatment likely applies to the popover's identity-header name text if it shares the same style — check both, Brayden only screenshotted the closed state.
+**Token note:** `--text-primary` is safe to reuse as a background here specifically because `index.css` re-points it (and `--text-secondary`/`--text-muted`) to solid white *inside `aside`* in both light and dark mode — confirmed by reading the actual CSS, not just `DESIGN.md`'s prose. `DESIGN.md` documents a `--sidebar-text` token for this exact purpose, but it's never actually defined in `index.css` — only `--sidebar-border` made it into real CSS — so using `--sidebar-text` would have silently broken (undefined var).
 
-3. **Avatar/initials circle ("TA") — change the circle's fill/background color to white, leave the initials text color unchanged.** Brayden's reasoning: the current blue fill blends in and is hard to spot at a glance. Applies everywhere the avatar renders (closed footer row, popover header if Prompt 340 added it there, and anywhere else `AccountMenu`'s avatar is reused).
-
-**Verify with a real screenshot** — collapse button's outline reads white against the sidebar background, account name reads solid white, avatar circle has a white fill with initials still legible on top.
+**Verified via computed styles, not a screenshot** — Browser pane wasn't displayed on-screen this session (`computer{screenshot}` timed out). `getComputedStyle()` against the running dev server (`nate44`/closer) confirmed: collapse button `borderColor` = `rgb(240,240,245)` (matches the divider exactly), name color = `rgb(255,255,255)`, avatar `backgroundColor` = `rgb(255,255,255)` with initials still `rgb(75,121,206)` — same in both the closed row and the open popover. `eslint` clean except the same pre-existing `Calculator` unused-import already flagged in every recent Sidebar.jsx prompt. `vite build` clean.
 
 ---
 
-### 🟨 Prompt 340 SHIPPED 2026-07-25 — nav/logo enlarged, popover widened + restructured — but overlap not fully solved on short viewports
+### 🟩 Prompt 340 SHIPPED 2026-07-25 — nav/logo enlarged, popover widened + restructured; short-viewport overlap accepted as-is
 
 **Shipped:** [`f7b09c9`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/f7b09c9) on `ohvara-dashboard`.
 
@@ -54,7 +54,7 @@ Small color-only follow-on, sidebar header + footer.
 
 **Verified via computed DOM geometry, not a screenshot** — Browser pane wasn't displayed on-screen this session (`computer{screenshot}` timed out each attempt), so verification used live `getBoundingClientRect()`/`getComputedStyle()` reads against the running dev server instead (logged in as `nate44`/closer — the tallest version of the popover). `eslint` clean except the same pre-existing `Calculator` unused-import error already flagged in every recent Sidebar.jsx prompt. `vite build` clean.
 
-**Real, unresolved finding — flagging honestly rather than claiming full success:** at a normal/larger viewport (1920×1080 tested), the popover now clears Settings with ~87.5px to spare. But at a shorter viewport (1440×900 tested, a common 13–14" laptop resolution), **the closer-role popover still overlaps Settings by ~92.5px.** This is structural: the closer role has 13 nav items across 5 groups before a single-item Account group (just Settings), so at 900px-tall viewports there's almost no buffer between Settings and the footer — the popover's minimum readable content (header, duty toggle, divider, Profile, Sign out) needs ~140px, but only ~47px of headroom exists there. Closing that gap fully would mean pulling content out of the dropdown entirely (e.g., removing Profile or Sign out, or dropping the duty-toggle label) — bigger than a row-layout restructure, and it would undo UX Brayden approved in Prompt 338. **Needs a decision from Brayden:** accept as-is (fixed on 1080p+, still overlapping on short/~900px-tall windows), or pick a specific different approach (e.g. popover flips to render further up over other nav items when short on room, or one of the two footer buttons gets cut/merged to free up height).
+**Real, unresolved finding — flagging honestly rather than claiming full success:** at a normal/larger viewport (1920×1080 tested), the popover now clears Settings with ~87.5px to spare. But at a shorter viewport (1440×900 tested, a common 13–14" laptop resolution), **the closer-role popover still overlaps Settings by ~92.5px.** This is structural: the closer role has 13 nav items across 5 groups before a single-item Account group (just Settings), so at 900px-tall viewports there's almost no buffer between Settings and the footer — the popover's minimum readable content (header, duty toggle, divider, Profile, Sign out) needs ~140px, but only ~47px of headroom exists there. Closing that gap fully would mean pulling content out of the dropdown entirely (e.g., removing Profile or Sign out, or dropping the duty-toggle label) — bigger than a row-layout restructure, and it would undo UX Brayden approved in Prompt 338. **✅ DECIDED 2026-07-25 (Brayden, via AskUserQuestion): accept as-is.** Fine on 1080p+, known-but-accepted gap on short ~900px-tall windows — not worth trimming popover content or a flip-direction fix. Nothing further to do on Prompt 340.
 
 ---
 
