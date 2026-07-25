@@ -18,13 +18,49 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21 — see [[Memories]] for the full trail.)*
 
-### 🟨 Prompt 331 SHIPPED (code) 2026-07-25 (CC, `8fbf5a3`, pushed) — Real Carrier Portals data + logo card-grid layout — **NOT yet verified logged-in**
+### ✅ Prompt 332 SHIPPED 2026-07-25 (CC) — pending Brayden's logged-in screenshot to verify
+
+**Shipped:** [`4645cdc`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/4645cdc) on `ohvara-dashboard`. All three asks done: (1) CORE CARRIER badge removed from `CarrierCard` in `src/pages/agent/CarrierPortals.jsx` (`carriers.is_core_carrier` column left untouched, just no longer rendered); (2) logo area rebuilt as a full-width 84px header banner at the top of each card (white background, `object-fit: contain`, edge-to-edge — card padding moved from the outer wrapper to the content section below the banner; delete button moved to a small overlay top-right of the banner); (3) Aflac, American Amicable, Baltimore Life, and Chubb now point at Brayden's own logo files (`aflac.png`, `american-amicable.png`, `baltimore-life.png`, `chubb-combined.png` — copied from `media/carrier-logos/` in this vault into `public/carrier-logos/`; old unused `chubb.svg` deleted), applied via new migration `080_carriers_prompt332.sql` (already run against prod). Baltimore Life `portal_url` set to `https://agentportal.baltlife.com/` (the stable `redirect_uri`, not Brayden's raw session-specific OAuth authorize link — that one has a per-session PKCE `code_challenge`/`nonce` and wouldn't work for anyone else or after it expired). `eslint` + `vite build` both clean. **Could not visually verify myself** — `/agent/carriers` is real-auth-gated and CC has no agent login; same standing gap as every other carrier-page prompt, needs a screenshot from Brayden's own logged-in session before this is fully closed out. 8 more of his 12 replacement logos still to come in a future prompt.
+
+<details>
+<summary>Original Prompt 332 spec (2026-07-25, Falcon) — kept for reference</summary>
+
+Carrier Portals refinements: drop the CORE CARRIER badge, bigger header-style logos, real Baltimore Life portal URL
+
+**Context:** Brayden reviewed the real logged-in `/agent/carriers` page (screenshot — confirms Prompt 331 fundamentally works, "looks really good, super solid"). Three changes, all scoped to `CarrierPortals.jsx` + one data fix:
+
+**1. Remove the "CORE CARRIER" badge from every card.** Brayden's call — with the logos in place it's redundant/visual clutter, doesn't add anything. Just stop rendering it; leave the `carriers.is_core_carrier` column alone (harmless, may be useful again later, not part of this ask).
+
+**2. Restyle the logo area as a bigger header-style banner, not the current small square icon.** Brayden's own words: current logos "are not enough to really see" — several render tiny/illegible (Chubb, Baltimore Life, National Life Group especially). He wants each card's logo treated more like a header — bigger, more prominent, at the top of the card. **He is sourcing all 12 replacement logo images himself**, picked specifically to work well in this bigger format — don't re-run the automated logo-sourcing agent from Prompt 331 for this pass, this is a manual swap he's doing on purpose. CC's job here is the layout/CSS change (wider/taller logo region at the top of each card, contain/cover fit as appropriate) plus swapping in whichever of his real images have arrived; keep the existing Prompt-331-sourced logos as placeholders for any carrier whose replacement hasn't landed yet, don't blank them.
+
+**First 4 of his 12 have already arrived and are staged and processed, ready for CC to use — no need to ask Brayden to send them again or to CC directly, Falcon already relayed them:**
+
+| Carrier | Vault file (source of truth) | Processing already done |
+|---|---|---|
+| Aflac | `media/carrier-logos/aflac.png` | Already opaque (solid teal background baked into the source image) — used as-is, no fill needed |
+| American Amicable | `media/carrier-logos/american-amicable.png` | Source PNG had a transparent background — **composited onto solid white** before saving, per Brayden's "fill the background white" instruction |
+| Baltimore Life | `media/carrier-logos/baltimore-life.png` | Source PNG had a transparent background — **composited onto solid white**, same treatment |
+| Chubb (Combined) | `media/carrier-logos/chubb-combined.png` | Already opaque (solid navy background baked into the source image) — used as-is, no fill needed |
+
+CC should copy these 4 files from the vault path above into `public/carrier-logos/` (replacing whatever's there now for these 4 carriers specifically — match by carrier name, not by guessing the existing filename) and update each carrier's `logo_url` to point at the new asset. **8 more carriers' logos are still coming from Brayden** — leave their current Prompt-331 logos untouched until they arrive in a future prompt.
+
+**3. Baltimore Life real portal URL — but use the stable link, not the raw one Brayden pasted.** He found Baltimore Life's actual agent login and sent the live URL he was on:
+`https://baltlifeb2c.b2clogin.com/baltlifeb2c.onmicrosoft.com/b2c_1_agentportalwithclaims_prod/oauth2/v2.0/authorize?client_id=f4fdc274-cf1a-44a0-8502-43e3848b68a8&scope=...&redirect_uri=https%3A%2F%2Fagentportal.baltlife.com%2F&...&code_challenge=...&nonce=...&state=...`
+**Do not store this exact URL** — it's a live OAuth authorize request containing a session-specific PKCE `code_challenge` and `nonce` tied to Brayden's own browser session; it will not work for Nate/Jordan/Rego and may already be expired by the time this runs. The stable target is the `redirect_uri` param decoded: **`https://agentportal.baltlife.com/`** — that's Baltimore Life's real agent portal front door, and it'll kick off its own fresh OAuth flow (with its own new nonce/challenge) for whoever clicks it, same as every other carrier here. Set `carriers.portal_url` to `https://agentportal.baltlife.com/` for Baltimore Life.
+
+**Verify against a real logged-in screenshot before calling this done**, same standing pattern — Brayden's sending them directly now.
+
+</details>
+
+---
+
+### ✅ Prompt 331 VERIFIED LOGGED-IN 2026-07-25 (Falcon) — real screenshot confirms it, follow-ups queued as Prompt 332
 
 **⚠️ CRITICAL FINDING — the in-app iframe embed Brayden asked for (the "same as Quoter" clarification below) is NOT achievable for any of the 12 real carriers.** `curl -I` checked all 12 portal URLs for `X-Frame-Options`/CSP `frame-ancestors` before wiring anything, per the instruction below. Every one of the 10 checkable carriers sends explicit anti-framing headers (Mutual of Omaha, Transamerica, Corebridge, Ethos, American Amicable, Chubb, National Life Group, Foresters all `X-Frame-Options: SAMEORIGIN`; F&G's real Auth0 login sends `frame-ancestors 'none'` + `X-Frame-Options: deny`). Fidelity Life and Aflac couldn't be reached at all from this sandbox (TLS/timeout failures) — treated as blocked rather than assumed to work. **Decision: skipped the `/agent/carriers/:carrierId` iframe route entirely** (would be dead code no carrier could use) — "Open portal" opens in a new tab for all 12, with a small "opens in new tab" note on the card. This is a real platform constraint (carrier login pages are exactly the kind of page that gets clickjacking protection), not a shortcut — **flag back to Brayden, this is a scope change from what he asked for, not a build shortcut.**
 
 **Shipped:** migrations `077`/`078`/`079` (schema + all 12 real carriers + logos, applied to prod and in repo), Carrier Portals page rebuilt as a card grid (`src/pages/agent/CarrierPortals.jsx`) matching the reference layout with Ohvara's blue accent. Logos: 11 of 12 carriers have a real, verified official logo in `public/carrier-logos/` — only **Fidelity Life** is null (fidelitylife.com unreachable from this environment, no alternate clean official asset found), falls back to the initials badge as designed. `vite build` + `eslint` both clean.
 
-**Not yet done:** verified logged-in in the real app — standing gap since Prompt 322, password entry into the login form is a prohibited action for CC to perform itself. Someone with real access should eyeball the live `/agent/carriers` page (grid layout, logo rendering, core-carrier badges, phone numbers, new-tab portal links) before calling this fully closed. Also worth a human sanity check on Fidelity Life specifically — it's a **core carrier** with no logo, the one gap in an otherwise complete set.
+**Verified 2026-07-25 — real screenshot from Brayden's own logged-in session** (`app.ohvara.com/agent/carriers`, all 12 carrier cards rendering, grid layout, logos, phone numbers, new-tab portal links). Brayden's read: "looks really good, super solid." **This closes Prompt 331's standing verification gap** — first thing verified via screenshot on the same day it shipped, fastest turnaround yet. Three refinements he wants on top are queued as Prompt 332 above (drop the CORE CARRIER badge, bigger header-style logos he's sourcing himself, and a corrected Baltimore Life portal URL). The iframe→new-tab scope change (critical finding below) stands as accepted — no objection raised when he reviewed the live page.
 
 ---
 

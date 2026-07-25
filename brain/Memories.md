@@ -6603,3 +6603,51 @@ Commit `1ee89e3`, pushed to `origin/master`.
 **Current state:** both Prompt 330 and 331 are now code-complete and pushed, both waiting on the same thing — Brayden (or Nate) eyeballing the real logged-in app. LIVE_STATE's "Next Up for CC" queue is now empty; nothing else queued.
 
 **Resume prompt:** `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Both Prompt 330 (5415b90) and Prompt 331 (8fbf5a3) are code-complete and pushed, both waiting on Brayden/Nate to verify against the real logged-in app — CC cannot log in itself (prohibited password entry). LIVE_STATE's "Next Up for CC" queue is empty. Two things need Brayden's attention before more building: (1) confirm the sidebar scrollbar is actually gone now — CC has fixed it twice on code-level reasoning alone; (2) acknowledge the Carrier Portals iframe→new-tab scope change (every real carrier login page blocks framing). Check North Star's Current Focus for what's next, or ask Brayden directly.`
+
+---
+
+### 2026-07-25 (Falcon) — Prompt 331 verified same-day via screenshot; Prompt 332 queued (drop CORE CARRIER badge, bigger logos, real Baltimore Life URL)
+
+**Prompt 331 verification closed same day it shipped** — fastest turnaround yet on the standing "verify logged in" gap. Brayden sent a real screenshot of `app.ohvara.com/agent/carriers` signed in — all 12 cards rendering correctly, his read: "looks really good, super solid." No objection to the iframe→new-tab scope change either, so that stands as accepted.
+
+**Answered in chat, not queued:** Brayden asked what "opt 1"/"opt 2" meant on F&G's and Foresters' phone numbers — explained it's an IVR menu option (dial the number, then press 1 or 2 for the relevant department), which was literally on his original Liberated Financial reference screenshot, not something CC invented.
+
+**Prompt 332 queued, three items, all refinements on top of a working page:**
+1. Remove the "CORE CARRIER" badge entirely — Brayden's call, redundant now that logos are in place.
+2. Restyle the logo area as a bigger header-style banner — current logos render too small/illegible on some cards (Chubb, Baltimore Life, National Life Group). **Brayden is sourcing all 12 replacement images himself** this round, picked to fit the new bigger format — told CC not to re-run the automated logo agent, just do the layout change and keep the existing 11 as placeholders until his images land.
+3. **Real Baltimore Life portal URL, with a catch caught before queuing:** Brayden found Baltimore Life's actual login and pasted the live URL he was on — but it's a raw OAuth authorize request with a session-specific PKCE `code_challenge`/`nonce` tied to his own browser session, not a stable link. Extracted the real stable target from the URL's own `redirect_uri` param — `https://agentportal.baltlife.com/` — and told CC to store that instead, since the pasted URL would either be dead on arrival or broken for every other agent who isn't Brayden mid-session.
+
+**Current state:** Prompt 332 fully queued, not yet run. No code touched this session — vault only.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 331 (Carrier Portals) is fully shipped and verified via a same-day screenshot from Brayden — no objections to the iframe→new-tab scope change. Prompt 332 is queued (not yet run by CC): remove the CORE CARRIER badge from every card, restyle the logo area as a bigger header-style banner (Brayden is sourcing all 12 new logo images himself this round — don't re-run the auto-sourcing agent, just build the layout to take them), and fix Baltimore Life's portal_url to the stable https://agentportal.baltlife.com/ rather than the session-specific OAuth URL Brayden pasted. Tell CC to run it. Nothing else queued beyond 332.`
+
+---
+
+### 2026-07-25 (Falcon), same day — first 4 of Brayden's 12 replacement logos received, processed, and staged for CC
+
+**Brayden sent 4 logo images in chat** (Aflac, American Amicable, Baltimore Life, Chubb/"Combined — A Chubb Company") and asked whether he needs to forward them to CC directly or if Falcon handles it. **Answer: Falcon handles it** — Cowork can read uploaded images directly; no direct file access to the `ohvara-dashboard` repo, but the vault (`obsidian-mind`) is on the same machine CC operates from, so images get staged there for CC to pick up.
+
+**Processed via a quick Python/Pillow pass** (not just saved as-is): inspected each PNG's alpha channel first rather than assuming — American Amicable and Baltimore Life both had fully transparent backgrounds (alpha 0 at every corner), Aflac and Chubb/Combined were already fully opaque (solid teal and solid navy backgrounds baked in, respectively). Per Brayden's explicit "fill the background white" instruction, composited the two transparent ones onto solid white; left the two already-opaque ones untouched rather than needlessly reprocessing them.
+
+**Caught and fixed a mapping error before shipping anything to CC:** first pass matched files to carrier names by guessing from image dimensions/visual description rather than upload order, and swapped Baltimore Life and Chubb by mistake (both were small logos, easy to mix up). Caught it by checking actual corner pixel values against what each carrier's real logo should look like (Chubb/Combined's navy `(16,60,99)` vs. Baltimore Life's transparent corners) before writing final files — re-verified against upload timestamp order too, which confirmed the corrected mapping. Worth remembering: match uploaded files to their subject by content (pixel data, timestamp order), not by eyeballing dimensions alone.
+
+**Saved to `media/carrier-logos/` in the vault** (`aflac.png`, `american-amicable.png`, `baltimore-life.png`, `chubb-combined.png`) — full mapping and processing notes written into LIVE_STATE's Prompt 332 entry so CC can copy them into `public/carrier-logos/` and update `logo_url` without re-deriving anything. 8 of Brayden's 12 replacement logos are still outstanding — told CC to leave those carriers' Prompt-331 logos alone until they arrive.
+
+**Current state:** Prompt 332 updated in place (not a new prompt number) with the 4 staged logos. Still queued, not yet run by CC. No code touched.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 332 is queued (not yet run by CC): drop the CORE CARRIER badge, restyle the logo area as a bigger header banner, fix Baltimore Life's portal_url to https://agentportal.baltlife.com/, AND now also copy in the first 4 of Brayden's replacement logos (Aflac, American Amicable, Baltimore Life, Chubb) which Falcon already received, processed (white-filled the two that had transparent backgrounds), and staged at media/carrier-logos/ in the vault — full mapping is in LIVE_STATE. 8 more carrier logos are still coming from Brayden later. Tell CC to run 332.`
+
+---
+
+### 2026-07-25 (CC) — Prompt 332 shipped + pushed (`4645cdc`), pending Brayden's screenshot verification
+
+**All three asks done in `ohvara-dashboard`:** (1) removed the CORE CARRIER badge from `CarrierCard` (`src/pages/agent/CarrierPortals.jsx`) — `carriers.is_core_carrier` column left alone, just not rendered anymore; (2) rebuilt the logo area as a full-width 84px white header banner at the top of each card (`object-fit: contain`, edge-to-edge, card padding moved down into the content section, delete button relocated to a small overlay in the banner's top-right corner); (3) copied Brayden's 4 staged logos (`media/carrier-logos/{aflac,american-amicable,baltimore-life,chubb-combined}.png` in this vault) into `public/carrier-logos/`, deleted the now-unused `chubb.svg`, and wrote migration `080_carriers_prompt332.sql` to point those 4 carriers' `logo_url` at the new files — applied directly to prod via the Supabase MCP and confirmed with a `select` afterward. Baltimore Life `portal_url` set to `https://agentportal.baltlife.com/` in the same migration.
+
+`eslint` and `vite build` both clean. Tried to visually verify via the Browser-pane preview first — `/agent/carriers` is real Supabase-auth-gated and CC has no agent login, same standing gap as every carrier-page prompt before this one (see Prompt 331's iframe finding) — confirmed the dev server itself boots with no console errors, then stopped short of the login wall rather than guessing at credentials.
+
+**Current state:** Prompt 332 shipped and pushed, LIVE_STATE's entry updated in place (marked ✅ SHIPPED, original spec collapsed into a `<details>` block) — **left in the queue, not deleted**, because it's explicitly pending Brayden's real-screenshot verification per his own "verify before calling this done" instruction, same pattern as 331. 8 of Brayden's 12 replacement logos still outstanding for a future prompt.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 332 (CORE CARRIER badge removed, header-style logo banner, 4 of Brayden's replacement logos wired in, Baltimore Life portal_url fixed) is code-complete, pushed (4645cdc), and lint/build clean — but NOT yet verified, same as every carrier-page prompt: CC has no agent login to screenshot /agent/carriers itself. Needs Brayden's own logged-in screenshot before this can be marked verified and folded into the shipped-prompts summary line. Nothing else queued beyond that.`
