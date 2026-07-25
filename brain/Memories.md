@@ -7089,3 +7089,23 @@ LIVE_STATE's Prompt 341 entry marked shipped; queue now has just Prompt 342 (Ove
 
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 341 shipped (e414ce7): collapse-button border, account name text, and avatar circle fill all switched from grayish/blue tones to solid white (--sidebar-border and --text-primary tokens, no hardcoded hex), verified via computed styles in both the closed footer row and open popover — no screenshot available this session (Browser pane not displayed). Only Prompt 342 remains in LIVE_STATE's queue (Overview clock: real digital/seven-segment font, taller characters). Prompt 339 item 3 (kill usernames) still blocked on Brayden supplying real emails for nate44/brayden11, unchanged.`
+
+---
+
+### 2026-07-25 (CC) — Prompt 342 shipped: Overview clock now renders in a real seven-segment digital font
+
+Picked up Prompt 342, the last item in LIVE_STATE's queue.
+
+**File-path correction, worth remembering:** LIVE_STATE's prompt pointed at `src/components/ui/LiveClock.jsx`, but that component is a different, unrelated clock (no seconds, used on the rep's `MyLeads.jsx` page). The actual "filled blue box" clock Brayden meant — the one on the closer's Agent Overview page, showing seconds ("3:39:28 PM" style) — is inline in `pages/agent/AgentOverview.jsx` (lines ~142-159), built in Prompt 231A/232A. Confirmed by reading the component tree before touching anything, rather than editing the wrong file on the prompt's stale filename.
+
+**Shipped** (`21b9d00` on `ohvara-dashboard`):
+1. **Sourced a real seven-segment font**: DSEG7 isn't on Google Fonts (checked via web search before assuming), but is distributed as `@fontsource/dseg7-classic` — the same self-hosting approach this app already uses for Geist and JetBrains Mono (both imported in `main.jsx`, not the `index.css` Google-Fonts-CDN line, which is a separate/parallel mechanism). Installed the 700-weight npm package and imported it in `main.jsx` right after the existing Fontsource imports, matching the established convention instead of introducing a new loading mechanism. `document.fonts` confirmed `status: "loaded"` live — not a silent fallback.
+2. **Scoped the font to the clock only**: added a new `CLOCK_FONT` constant in `AgentOverview.jsx`, left the existing shared `MONO` constant (used elsewhere for policy numbers, etc.) untouched.
+3. **Added extra vertical stretch on top of the font swap**: `scaleY(1.15)` — but caught a bug in my own first pass before shipping: the transform was originally on the same div as the pill's `background`/`borderRadius`/`padding`, which would have visually stretched the whole blue box into an oval, not just the text — exactly the "don't redesign the box" constraint the prompt called out. Fixed by wrapping the time string in an inner `<span>` and moving the transform there; verified via computed styles that the outer pill's `transform` reads `none` and `borderRadius` stays `8px` while the inner span's `transform` shows the scaleY matrix.
+
+**Verified via computed DOM geometry, not a screenshot** — same Browser-pane-not-displayed situation as the last two prompts (`computer{screenshot}` timed out every attempt). Confirmed: font family resolves to `"DSEG7 Classic", monospace` and `document.fonts` reports it `loaded`; pill stays unscaled (`borderRadius: 8px`, `transform: none`); the scaled span's rect (110.25–144.75) sits fully inside the pill's rect (103.5–152), no clipping; no overlap with the date text to its left (14px gap held). `eslint` clean, `vite build` clean, DSEG7 woff2/woff confirmed present in `dist/assets/`.
+
+**This was the last item in LIVE_STATE's queue — it's now empty.** Check [[North Star]]'s Current Focus for what's next, or wait for Brayden to queue something new.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 342 shipped (21b9d00): Overview clock (pages/agent/AgentOverview.jsx, NOT components/ui/LiveClock.jsx as the stale prompt filename said) now renders in DSEG7 Classic (self-hosted via @fontsource, imported in main.jsx alongside Geist/JetBrains Mono) with a scaleY(1.15) stretch on an inner span only — the surrounding blue pill's own styling is untouched. Verified via computed DOM/font-loading status, no screenshot available this session (Browser pane not displayed). LIVE_STATE's CC queue is now fully empty — check North Star's Current Focus, or wait for Brayden to queue something new. Prompt 339 item 3 (kill usernames) still blocked on real emails, unchanged.`

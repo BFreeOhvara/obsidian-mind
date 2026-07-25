@@ -18,15 +18,19 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21 — see [[Memories]] for the full trail.)*
 
-### 🆕 Prompt 342 QUEUED 2026-07-25 — Overview clock: real digital/LCD font, taller characters
+### 🟩 Prompt 342 SHIPPED 2026-07-25 — Overview clock now renders in a real seven-segment digital font
 
-**`src/components/ui/LiveClock.jsx`** — Brayden wants the time display (top-right of Overview, currently reads e.g. "3:39:28 PM" in the filled blue box from Prompt 231A) to look like an actual digital clock, not a regular bold sans-serif stretched to look clock-ish. Reference image he sent: a seven-segment/LCD-style digital font (the blocky segmented digit style used on alarm clocks/calculators, like "DSEG7" or "Digital-7").
+**Shipped:** [`21b9d00`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/21b9d00) on `ohvara-dashboard`.
 
-1. **Swap the clock's font to a real digital/seven-segment display font.** Source one (Google Fonts has options like "DSEG7 Classic"/similar seven-segment families, or check for a free digital-clock webfont) and load it the same way any other custom font in this app is loaded — check `index.html`/`index.css` for the existing pattern (e.g. how the current fonts are brought in) and follow it, don't introduce a new loading mechanism if one already exists.
-2. **Make the characters taller** — Brayden specifically wants more vertical stretch on the time text, on top of the new font itself (increase `font-size`/`line-height` or an explicit vertical `transform: scaleY()` if the chosen font doesn't have a tall-enough variant on its own).
-3. **Scope: the clock text only** — the surrounding filled blue box/pill styling from Prompt 231A stays as-is, this is a font/sizing change inside it, not a redesign of the box.
+**File-path correction:** the prompt named `src/components/ui/LiveClock.jsx`, but that's a different, unrelated clock (used on the rep's `MyLeads.jsx`, no seconds). The real Overview clock (seconds, "3:39:28 PM" style, filled blue box from Prompt 231A) is inline in `pages/agent/AgentOverview.jsx` — confirmed by reading the component before editing, not by trusting the stale filename.
 
-**Verify with a real screenshot** — confirm the digital font actually renders (not silently falling back to a system font if the webfont fails to load) and that the box doesn't overflow/clip now that the glyphs are taller.
+1. **Font sourced**: DSEG7 isn't on Google Fonts (checked before assuming) — installed `@fontsource/dseg7-classic` (700 weight), the same self-hosting approach already used for Geist/JetBrains Mono, imported in `main.jsx` alongside them (not `index.css`'s separate Google-Fonts-CDN line). `document.fonts` confirmed `status: "loaded"` live.
+2. **Taller characters**: added `scaleY(1.15)` for extra vertical stretch on top of the font swap, as asked.
+3. **Scoped correctly**: new `CLOCK_FONT` constant, shared `MONO` constant (used elsewhere) untouched. Caught and fixed a bug pre-ship — the scaleY was originally on the same div as the pill's own background/border-radius/padding, which would have stretched the whole blue box into an oval. Moved it to an inner `<span>` instead; verified the pill's own `transform` reads `none` and `borderRadius` stays `8px` while only the text scales.
+
+**Verified via computed DOM geometry, not a screenshot** — Browser pane wasn't displayed on-screen this session (`computer{screenshot}` timed out, same as the last two prompts). Confirmed: font resolves to `"DSEG7 Classic", monospace` and loads (not a silent fallback); pill geometry unchanged; scaled text's rect sits fully inside the pill's rect, no clipping; no overlap with the date text beside it. `eslint`/`vite build` clean; DSEG7 font files confirmed in `dist/assets/`.
+
+**This was the last item in the queue — it's now empty.**
 
 ---
 
