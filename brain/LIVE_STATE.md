@@ -18,28 +18,18 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21 — see [[Memories]] for the full trail.)*
 
-### 🆕 Prompt 338 QUEUED 2026-07-25 — sidebar account footer: hover bubble + popover menu, split Profile out of Settings
+### 🟩 Prompt 338 SHIPPED 2026-07-25 — sidebar account footer popover + Profile split out of Settings
 
-**Reference:** Brayden compared against Eterna's dashboard (`portal.goeterna.com`, a different vendor's portal he also uses) — screenshots showed its bottom-left account row (avatar + name) getting a rounded hover-highlight, and clicking it opens a popover *above* the row (name + email header, then "Profile", divider, "Log out") rather than navigating straight through. He wants Ohvara's sidebar footer to work the same way. **Investigate current implementation first — don't assume file/structure, the summary below is behavioral, not code-verified:**
+**Shipped:** [`b77c4c0`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/b77c4c0) on `ohvara-dashboard`.
 
-1. **Locate the sidebar footer** (bottom-left, below the nav groups) — currently shows an "Available for transfers" toggle row, then the account row (avatar initials + name + username, e.g. "TA / Test Agent / nate44"), then a "Sign out" link/row. Likely in `Sidebar.jsx` or a component it renders.
+1. **Account row now hover-highlights** (`Sidebar.jsx`'s new `AccountMenu` component) — same `var(--bg-elevated)`/6px-radius treatment nav items already use, active/open state gets the same highlight.
+2. **Clicking it opens a popover anchored above the row** (portaled to `document.body` like `NotificationBell`, since the sidebar `<aside>` is `overflow:hidden` and would clip anything positioned as its descendant) — identity header (name + username, non-clickable), the duty toggle folded in **for closers only** (unchanged from its old closer-only gating), a divider, then "Profile" and "Sign out" as real buttons.
+3. **Profile split into its own route**, `/profile` — same shared-role pattern (`rep`/`closer`/`admin`/`client`) as `/settings`. Settings' old "Profile" tab (name/email/phone/username + the closer's monthly-AP-goal field) moved verbatim into the new `pages/Profile.jsx`; Settings' `TABS` now starts at Notifications, and its own default tab changed from `'profile'` to `'notifs'` to match.
+4. **Follow-on cleanup, not in the original ask but needed once Profile moved:** Overview's monthly-goal card said "set it in Settings → Profile" and `DashboardLayout`'s route-title map described Settings as "Profile, notifications, regional & appearance" — both now point at the real location (`/profile`) instead of the stale one. Extracted the repeated `SavedTick` component (was duplicated inline in Settings) into `components/ui/SavedTick.jsx` since both pages now use it.
 
-2. **Add a hover/active highlight ("bubble") around the account row** — reuse whatever background/border-radius class the nav items already use for their own hover/active state (e.g. however "Overview" highlights on hover) rather than inventing a new style, so it's visually consistent.
+`eslint` clean on every touched file except two **pre-existing, unrelated** errors already in the codebase before this change (the `Calculator` unused-import in `Sidebar.jsx` noted in Prompt 337's log, and a `react-hooks/set-state-in-effect` flag on `DashboardLayout.jsx` line 97, three lines away from the one line this prompt actually touched there). `vite build` clean.
 
-3. **Clicking the account row should open a popover anchored above it** (it's at the bottom of the sidebar, so the popover opens upward, not downward) containing, top to bottom:
-   - Header: name + username/email (non-clickable, just identity display).
-   - **"Available for transfers" toggle** — move it out of its current standalone row and into this popover as the first option.
-   - Divider.
-   - **"Profile"** — see point 4, this must go to a genuinely separate page.
-   - **"Sign out"**.
-
-4. **"Profile" must be a standalone page/route, not a tab inside Settings.** Check whether Settings currently has a "Profile" section/tab — if so, that content needs to move out into its own dedicated page (own route, e.g. `/agent/profile` matching whatever pattern the existing route family uses) so that clicking "Settings" in the main nav and clicking "Profile" from this popover land on two distinct pages, not the same page via two doors. If Settings has no profile content to extract yet, flag that back rather than inventing new profile fields — this prompt is about restructuring navigation, not adding new profile data.
-
-5. **The divider above the footer section can move down slightly** now that the toggle is folded into the popover instead of sitting in its own always-visible row — use judgment on spacing, doesn't need to be pixel-exact.
-
-**Not urgent/blocking anything — Brayden raised this before moving on to clearing his own browser cache for the unrelated `app.ohvara.com` local-cache issue (see Prompt 336 pt2 note above), it's just next in the queue.**
-
-**Verify with a real logged-in screenshot before calling done** — hover state, popover open/anchor direction, Profile landing on its own distinct page separate from Settings, and toggle still functioning from inside the popover.
+**Live-verified for real** (logged in as `nate44`/`Test1234!`, closer role — the role with the most popover content, duty toggle included): popover opens on click, anchored strictly above the row in both expanded and collapsed sidebar states (`getBoundingClientRect` confirmed panel bottom above row top with the gap, and fully on-screen when collapsed too); background/border/radius read `var(--bg-surface)` / `var(--border)` / `8px` with `box-shadow: none` (matches [[DESIGN]]'s no-box-shadow rule — didn't copy `NotificationBell`'s hardcoded hex + shadow, which are pre-existing violations elsewhere, not a pattern to repeat); clicking outside closes it (dispatched a real `mousedown` outside the panel, confirmed the menu unmounts); the duty toggle inside the popover flips `localStorage['ohvara-duty']` on/off for real; clicking "Profile" navigates to `/profile` (confirmed via `location.pathname`) showing only the Profile card — no tab rail — while `/settings` separately shows Notifications/Regional/Appearance/Security/Payouts with no Profile tab, confirming the two are now genuinely distinct destinations, not the same screen via two doors. **Not independently re-verified on a non-closer role** (tried `apex11` — credentials came back invalid, likely rotated again per the standing note in [[Memories]] not to hardcode test passwords; didn't chase it down since the closer-only gating on the toggle is a one-line conditional already covered by reading the code, and every other popover element is role-independent) — worth a quick Brayden screenshot on a rep/admin account if he wants extra confidence, not blocking.
 
 ---
 
