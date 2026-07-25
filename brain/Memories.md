@@ -6506,3 +6506,5 @@ Commit `1ee89e3`, pushed to `origin/master`.
 
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 329 is committed locally in ohvara-dashboard (261296a) but not pushed to origin/master yet — confirm with Brayden and push. After that, the still-open item is real logged-in verification (nate44/brayden11) of all nine Prompt 329 changes, which no session has been able to do yet (credential entry and auth-bypass workarounds were both blocked by the permission classifier last time).`
+
+**Update same day:** Brayden confirmed, CC pushed — `origin/master` now at `261296a`, matches local. Prompt 329's only remaining open item is real logged-in verification (see blocker 2 above, unchanged) — nobody has visually confirmed any of the nine items render correctly. Next session or Brayden/Nate directly should eyeball the live Vercel deploy once it picks up `261296a`.
