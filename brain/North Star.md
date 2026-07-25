@@ -99,6 +99,8 @@ Until override percentages/tiers are confirmed, this shows up in the dashboard a
 
 **New feature idea, scope TBD 2026-07-23:** in-system messaging (internal chat between team members inside the dashboard itself). Brayden wants this added — not yet decided whether it's real for launch or a coming-soon placeholder like Underwriting/Contracting Submission. Ask before building either way.
 
+**Real launch confirmed live, 2026-07-24.** Nate is set up as Closer, Brayden as Admin, both real accounts working on the actual live app. Quoter's toolkit blocker resolved same day — confirmed: InsuranceToolkits.com (the same real tool the Liberated Financial reference embedded), to be embedded directly into the Closer Quoter page. Still open: real Carrier Portals data, Cancellation Calendar routing contact, in-system messaging scope, the three missing Claude Design export files. Also in progress: cleaning up all leftover test/legacy accounts (`apex11`, etc.) and legacy SMB dashboard remnants — real deletion, confirm the exact list with Brayden before executing.
+
 **Mockup phase considered essentially closed, 2026-07-23.** Once Underwriting and Stats (Production/Leaderboard) have their UI polished/locked, Brayden confirmed that's everything needed from the Claude Design mockup before going public — both ship with finished-looking UI but no real functionality behind them at initial launch (same "coming soon"/non-live treatment as the rest of that list), with real integration work (real AI underwriting logic, real production/leaderboard data) happening after public launch, not before. This closes out the UI-exploration phase and hands off to the real build.
 
 **Phase 1 — Build the inbound calling infrastructure.**

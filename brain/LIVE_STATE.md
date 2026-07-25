@@ -18,6 +18,18 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21 — see [[Memories]] for the full trail.)*
 
+### 🟨 Prompt 328 IN PROGRESS 2026-07-25 (Falcon queued 2026-07-24, CC investigated 2026-07-25) — clean up all old/test accounts + legacy dashboard, embed the real Quoter toolkit
+
+**Both open questions resolved by Brayden (AskUserQuestion, 2026-07-25):**
+1. **Delete scope: "Everything — data, account, and code."** Full enumeration done (see [[Memories]] 2026-07-25 entry) — `apex11` test profile, all pre-pivot legacy-SMB rows (`leads` 559, `calls` 35, `appointments` 19, `clients` 5, `commissions` 14, `commission_payouts` 19, plus smaller tables), and the unlinked `/admin/legacy/*` routes + old page components. One `rep_invites` row (`role='closer'`, unused, created ~7pm 2026-07-24) was excluded from the delete as a likely-live invite — flagged to Brayden, not yet re-confirmed either way.
+2. **Quoter: use InsuranceToolkits.com's public quoting tool, no login/account needed.**
+
+**Blocked on: live in-chat confirmation of the exact delete SQL.** The Claude Code auto-mode permission classifier rejected the bulk-delete statement — an earlier AskUserQuestion answer isn't sufficient for a destructive DB operation this size, it needs a direct yes in the same turn. The full statement list was posted to Brayden in chat; next CC session should re-post it, get the explicit go-ahead, run it, then remove the `/admin/legacy/*` routes/pages, then build the InsuranceToolkits.com public embed on the Quoter page (currently `Placeholders.jsx`'s `Quoter` — bare "Coming Soon").
+
+**Still open, unresolved from prior rounds — ask Brayden directly, don't guess:** real Carrier Portals data, Cancellation Calendar routing contact, in-system messaging scope, and the three still-missing Claude Design export deps (`data3.js`/`support.js`/`sprite.svg`).
+
+---
+
 ### ✅ Prompt 327 FULLY SHIPPED 2026-07-24 (`1db3fa1` + `f1cbbe7` + `4701f9c`, all pushed) — the entire approved design export is now ported: design system, shell, both Overviews, My Policies, and part 2b's final five screens. SMB nav removed.
 
 **Done this session (see [[Memories]] 2026-07-24 entry for the full detail):**
