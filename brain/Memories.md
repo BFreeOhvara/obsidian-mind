@@ -6883,3 +6883,97 @@ CC's report on Prompt 336 part 1 only covers `PORTAL_LABELS.closer` — nothing 
 
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 337 shipped (47a26ca): Aflac re-cropped and Foresters re-padded logo files (staged by Falcon) copied into public/carrier-logos/, Foresters' logo_zoom_pct reset to 100 (Prompt 335's 85% value was based on a flawed premise — scaling a cover-mode image below 100% doesn't reduce cropping), and the still-missed SALES nav reorder (My Policies above My Calls) finally done. Verified this time with pixel-level content-position math against the real measured banner aspect ratio (3.96) rather than just CSS box mechanics — that was the actual gap in Prompt 335's harness check that produced a false "no bug" conclusion. Aflac and Foresters both check out; Chubb's math says it should already be fine with no change needed — if Brayden's next screenshot still shows Chubb off, that's a real separate signal worth fresh diagnosis, not another guess. Domain migration (Prompt 336 part 2) is unrelated/parallel — waiting on Brayden to paste brain/claude-chrome-portal-domain-migration.md into his own Claude in Chrome session. Nothing else currently queued in LIVE_STATE — check North Star's Current Focus if this is empty by the time you read it.`
+
+---
+
+### 2026-07-25 (Falcon) — confirmed Claude in Chrome's domain migration directly via the Vercel API; Prompt 336 fully closed pending one last login check
+
+Brayden reported both Claude in Chrome (domain migration) and CC (Prompt 337) finished. Prompt 337 already logged by CC above — item 1b done, Aflac/Foresters logos fixed and verified with corrected math, and CC caught + fixed a real stale-slug bug in the `claude-chrome-portal-domain-migration.md` handoff file (pointed at `ohvara-dashboard` instead of the project's actual current name, `ohvara-portal`) before Claude in Chrome could hit a dead link on Step 1.
+
+**Didn't just take "Claude in Chrome finished" at face value — checked it directly.** Cowork's sandbox can't make raw network requests to arbitrary external domains (a direct `curl`/`nslookup` to `portal.ohvara.com` came back blocked by the environment's own allowlist), but the Vercel MCP connection isn't subject to that restriction. Called `get_project` on `ohvara-portal` directly: its `domains` array now lists **both** `app.ohvara.com` and `portal.ohvara.com`, and the latest production deployment is `READY`. This confirms Step 1 (Vercel add-domain) genuinely landed — real evidence, not just trusting the report.
+
+**What's NOT independently confirmable from here:** whether DNS has actually propagated and whether login/redirect works end-to-end (Step 5 of the artifact) — that needs a real browser hitting the real domain, which neither Falcon nor CC's sandbox can do. Flagged this as the one remaining open item rather than declaring the whole thing done on the Vercel API check alone.
+
+**Current state:** Prompt 336 marked fully shipped in LIVE_STATE with the Vercel-confirmed domain attachment noted, and the one still-open item (real login verification) called out explicitly. Prompt 337 already shipped. LIVE_STATE's CC queue is otherwise empty.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Both Prompt 336 (domain migration) and Prompt 337 (Aflac/Foresters logo fixes + nav reorder) are shipped. Domain migration confirmed via direct Vercel API check (get_project on ohvara-portal shows both app.ohvara.com and portal.ohvara.com attached, latest deployment READY) — but nobody has yet confirmed portal.ohvara.com actually loads and logs in correctly in a real browser (Cowork's sandbox can't make raw requests to external domains to check this itself). That's the one remaining open item — ask Brayden to open portal.ohvara.com and confirm login works, or have CC do it if it has real browser access this session. LIVE_STATE's CC queue is empty otherwise — check North Star's Current Focus for what's next.`
+
+---
+
+### 2026-07-25 (Falcon) — corrected the "fully shipped" claim on the domain migration: only Step 1 actually ran
+
+**Brayden's screenshot showed `app.ohvara.com` still in the URL, and he pasted the full Claude in Chrome transcript.** It confirmed the earlier "Vercel API shows it attached, must be done" read was wrong — the transcript shows the session completed Step 1 (added `portal.ohvara.com` to the `ohvara-portal` project, got the exact CNAME record), started Step 2 on GoDaddy, navigated to the DNS management page, and then stopped mid-action ("Scrolling down" to check the existing `app` record) — never actually added the new record. Steps 3–5 never started. Owning the miss: the Vercel `domains` array listing `portal.ohvara.com` only proves it was *added* to the project, not that DNS/cutover happened — conflated those two facts in the last update. Corrected LIVE_STATE immediately rather than leaving the wrong "fully shipped" status in place.
+
+**Real silver lining: the transcript confirms CC's stale-slug fix (from the Prompt 337 session) actually mattered** — Claude in Chrome hit the old `ohvara-dashboard` URL first, got a 404, self-corrected to `ohvara-portal` via the dashboard, and Step 1 succeeded from there. That fix genuinely saved this run from failing at step 1.
+
+**Wrote a resume artifact instead of the original full checklist** — `brain/claude-chrome-portal-domain-migration-resume.md` — starting directly at finishing Step 2 with the exact DNS record already captured (`CNAME portal → 71423706e48ac027.vercel-dns-017.com`), so a fresh Claude in Chrome session doesn't redo Step 1 or re-derive the DNS value.
+
+**Current state:** Domain migration is genuinely partial — Step 1 done, Steps 2–5 outstanding. Resume artifact ready for Brayden to paste into a new Claude in Chrome session. Prompt 337 (logos, nav reorder) remains fully shipped, unaffected by this correction.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. The domain migration (app.ohvara.com → portal.ohvara.com) is only partially done — Step 1 (Vercel domain add) completed and confirmed, but the Claude in Chrome session stopped mid-Step-2 before adding the actual GoDaddy DNS record, so Steps 2-5 are still outstanding. brain/claude-chrome-portal-domain-migration-resume.md has the exact DNS record value already captured (CNAME portal → 71423706e48ac027.vercel-dns-017.com) so it can resume without redoing Step 1. Prompt 337 (Aflac/Foresters logos, nav reorder) is unaffected and fully shipped. Once the domain migration actually completes (verify with a real login on portal.ohvara.com), this whole thread is closed.`
+
+---
+
+### 2026-07-25 (Falcon) — domain migration progressing: Step 2 (GoDaddy DNS) done, stopped correctly at Step 3 on a real Supabase config surprise
+
+**Good sign first: the resume artifact worked as intended** — this run picked up straight at Step 2 with the DNS value already in hand and got the GoDaddy CNAME record added (implied by reaching Step 3 next), no repeat of Step 1.
+
+**Real finding at Step 3: Supabase's Auth URL Configuration doesn't match what the original instructions assumed.** Site URL is `http://localhost:3000` (a dev default, never changed) and Redirect URLs is completely empty — no `app.ohvara.com` entry exists at all, despite that domain being the real, working production login today. Claude in Chrome correctly stopped and asked rather than guessing at a wildcard pattern to "preserve" that doesn't actually exist.
+
+**Worked out why this hasn't already broken production, rather than just being alarmed by it:** Supabase's redirect allowlist only gates flows with an explicit `redirectTo` param — magic links, password reset, and Supabase's own built-in invite system. Plain email+password login (confirmed via earlier code greps that `Login.jsx` does exactly this) never touches it, and `claim-invite` is Ohvara's own custom edge function, not Supabase's built-in invite flow — so normal login and invites probably never depended on this setting being correct. **Likely real, separate bug: password reset (which does call `resetPasswordForEmail` with a `redirectTo`) is probably silently broken in production right now** — unrelated to this migration, worth Brayden testing and flagging as its own item later.
+
+**Instructed Claude in Chrome to:** add both `app.ohvara.com` and `portal.ohvara.com` to Redirect URLs (no reason not to add the existing domain too, costs nothing), leave Site URL at localhost for now per the original "don't touch the canonical URL until Step 5 confirms things work" caution, then continue to Steps 4–5.
+
+**Current state:** Domain migration is now through Steps 1–2, paused at Step 3 pending this instruction. Not yet verified end-to-end.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Domain migration (app.ohvara.com → portal.ohvara.com): Steps 1 (Vercel) and 2 (GoDaddy DNS) are done. Claude in Chrome paused at Step 3 (Supabase) because the real Auth URL Configuration doesn't match assumptions — Site URL was localhost:3000, Redirect URLs was empty, no existing app.ohvara.com entry. Instructed it to add both app.ohvara.com and portal.ohvara.com to Redirect URLs, leave Site URL alone for now, and continue to Steps 4-5 (set primary domain, verify real login). Also flagged as a likely separate pre-existing bug: password reset probably doesn't work in production since it depends on this same redirect allowlist, which was never populated. Worth Brayden testing separately once the domain work is done. Prompt 337 (logos, nav) remains shipped and unaffected.`
+
+---
+
+### 2026-07-25 (Falcon) — plan change: app.ohvara.com gets fully retired, not kept as a redirect
+
+**Brayden's explicit call: "I don't want app.ohvara to exist anymore. I want it to just be portal.ohvara."** Overrides the earlier default assumption (keep the old domain as a redirect so bookmarks don't break) — full retirement instead.
+
+**Updated the plan for the remaining steps, rewrote `brain/claude-chrome-portal-domain-migration-resume.md` in place:**
+1. Supabase Redirect URLs — only add `portal.ohvara.com`, skip `app.ohvara.com` entirely since it's being killed.
+2. Vercel — set `portal.ohvara.com` primary, then remove `app.ohvara.com` from the project (no auto-redirect option).
+3. **New step not in the original plan:** delete the `app` CNAME record at GoDaddy too — removing it only from Vercel would leave it resolving to a generic error page, not actually gone. Explicit DNS deletion is what "stop existing" actually requires.
+4. Update Supabase Site URL to `https://portal.ohvara.com` once the new domain is confirmed live (no more `app.ohvara.com` to keep it pointed at).
+5. Verify `app.ohvara.com` no longer resolves at all — that's now the expected/correct outcome, not a bug.
+
+**Current state:** Resume artifact updated with the full-retirement plan, Steps 1–2's captured values (Vercel project name, DNS record) still intact so nothing needs re-deriving. Ready for Brayden to continue the Claude in Chrome session.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Domain migration plan changed: Brayden wants app.ohvara.com fully retired, not kept as a redirect. brain/claude-chrome-portal-domain-migration-resume.md has the updated steps: Supabase gets only portal.ohvara.com in Redirect URLs, Vercel gets portal.ohvara.com set primary and app.ohvara.com removed entirely, GoDaddy's app CNAME record gets deleted (new step, needed for app.ohvara.com to actually stop resolving rather than just error), then Supabase Site URL updates to portal.ohvara.com once verified live. Steps 1-2 (Vercel domain add, GoDaddy DNS for portal) are already done from earlier runs. Prompt 337 (logos, nav reorder) remains shipped and unrelated.`
+
+---
+
+### 2026-07-25 (Falcon) — domain migration infra fully done; only real login check remains, and that's Brayden's alone
+
+**Claude in Chrome finished everything it could do without credentials, and self-confirmed each piece rather than just asserting done:**
+- Vercel: `portal.ohvara.com` Valid Configuration, sole domain on `ohvara-portal`, connected to Production. `app.ohvara.com` fully removed.
+- GoDaddy: `app` CNAME deleted (confirmed via GoDaddy's own success toast). `portal` CNAME in place.
+- Supabase: Redirect URLs has exactly `https://portal.ohvara.com/**` (one entry). Site URL updated from `localhost:3000` to `https://portal.ohvara.com`.
+- Verified in-browser: `portal.ohvara.com` renders the real login page; `app.ohvara.com` now 404s (`DEPLOYMENT_NOT_FOUND`) — the intended outcome, not a bug, though DNS caching may make it resolve inconsistently for a little while yet.
+
+**What's left is exactly one thing, and it can't be automated:** a real login on `portal.ohvara.com`. Claude in Chrome correctly declined to enter credentials itself, same standing rule CC operates under. Told Brayden this is the one remaining step — log in as `nate44` or `brayden11`, and ideally generate a real invite link to confirm it points at the new domain.
+
+**Condensed LIVE_STATE's Prompt 336 pt2 entry** — the full blow-by-blow (stale-slug catch, the session that stopped mid-DNS-edit, the Supabase discrepancy, the plan change to full retirement) is now collapsed into a `<details>` block under a clean current-status summary, rather than leaving five stacked "update" paragraphs as the live state.
+
+**Also still flagged, separately:** password reset is likely broken in production (depended on the Supabase redirect allowlist, which was empty until this session) — unrelated to this migration, worth Brayden testing on his own time.
+
+**Current state:** Domain migration is infra-complete. Blocked only on Brayden's own login confirmation. Prompt 337 (logos, nav) remains separately shipped.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. The app.ohvara.com → portal.ohvara.com domain migration is infra-complete: Vercel, GoDaddy DNS, and Supabase Auth config are all done and self-confirmed by Claude in Chrome (portal.ohvara.com live and serving the login page, app.ohvara.com fully retired and 404ing). The only remaining step is Brayden logging into portal.ohvara.com himself to confirm real login works — Claude in Chrome correctly won't enter credentials. Once he confirms, this whole thread is closed. Separately flagged: password reset is likely broken in production (empty Supabase redirect allowlist until this session), worth Brayden testing on his own schedule. Prompt 337 (Aflac/Foresters logos, nav reorder) remains shipped and unrelated. LIVE_STATE's CC queue is otherwise empty — check North Star's Current Focus for what's next.`
+
+## 2026-07-25 — Domain migration (app.ohvara.com → portal.ohvara.com) CLOSED
+
+Brayden confirmed real login on `portal.ohvara.com` himself (Test Agent/`nate44`) — Overview and Hierarchy pages both render correctly, logged in. This was the last open item from Prompt 336 pt2. Migration is fully done: Vercel domain swap+removal, GoDaddy CNAME swap+deletion, Supabase Site URL+Redirect URLs update, all previously self-confirmed by Claude in Chrome, now also confirmed by a real login.
+
+**One wrinkle Brayden noticed and asked about:** `app.ohvara.com` still loaded for him in his main browser (with a real dashboard, not an error) even though the GoDaddy CNAME is deleted and the domain is removed from the Vercel project. It did NOT load in a fresh Chrome browser he tried. Diagnosis: local browser-level caching (DNS resolver cache and/or HTTP disk cache) inside that one browser profile — Chromium-based browsers keep their own DNS cache independent of the OS resolver, and can also serve a previously-fetched page from disk cache without re-resolving. The fact a separate, never-used browser correctly failed to load it confirms this is NOT the domain actually still resolving publicly — infra-side it's genuinely gone. Told Brayden this isn't a production issue (new users/machines get nothing at that address) and gave him the fix if he wants it gone locally too: clear that browser's DNS host cache (Edge: `edge://net-internals/#dns` → Clear host cache) plus clear browsing data.
+
+**Resume prompt:** Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Domain migration thread (app.ohvara.com → portal.ohvara.com) is fully closed as of 2026-07-25, confirmed by Brayden's own real login. Separately flagged, still open: password reset likely broken in production due to the previously-empty Supabase redirect allowlist — not yet tested or fixed, just flagged for Brayden to check on his own schedule. LIVE_STATE's CC queue should be checked fresh for whatever's next.

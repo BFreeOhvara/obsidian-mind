@@ -18,6 +18,31 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21 — see [[Memories]] for the full trail.)*
 
+### 🆕 Prompt 338 QUEUED 2026-07-25 — sidebar account footer: hover bubble + popover menu, split Profile out of Settings
+
+**Reference:** Brayden compared against Eterna's dashboard (`portal.goeterna.com`, a different vendor's portal he also uses) — screenshots showed its bottom-left account row (avatar + name) getting a rounded hover-highlight, and clicking it opens a popover *above* the row (name + email header, then "Profile", divider, "Log out") rather than navigating straight through. He wants Ohvara's sidebar footer to work the same way. **Investigate current implementation first — don't assume file/structure, the summary below is behavioral, not code-verified:**
+
+1. **Locate the sidebar footer** (bottom-left, below the nav groups) — currently shows an "Available for transfers" toggle row, then the account row (avatar initials + name + username, e.g. "TA / Test Agent / nate44"), then a "Sign out" link/row. Likely in `Sidebar.jsx` or a component it renders.
+
+2. **Add a hover/active highlight ("bubble") around the account row** — reuse whatever background/border-radius class the nav items already use for their own hover/active state (e.g. however "Overview" highlights on hover) rather than inventing a new style, so it's visually consistent.
+
+3. **Clicking the account row should open a popover anchored above it** (it's at the bottom of the sidebar, so the popover opens upward, not downward) containing, top to bottom:
+   - Header: name + username/email (non-clickable, just identity display).
+   - **"Available for transfers" toggle** — move it out of its current standalone row and into this popover as the first option.
+   - Divider.
+   - **"Profile"** — see point 4, this must go to a genuinely separate page.
+   - **"Sign out"**.
+
+4. **"Profile" must be a standalone page/route, not a tab inside Settings.** Check whether Settings currently has a "Profile" section/tab — if so, that content needs to move out into its own dedicated page (own route, e.g. `/agent/profile` matching whatever pattern the existing route family uses) so that clicking "Settings" in the main nav and clicking "Profile" from this popover land on two distinct pages, not the same page via two doors. If Settings has no profile content to extract yet, flag that back rather than inventing new profile fields — this prompt is about restructuring navigation, not adding new profile data.
+
+5. **The divider above the footer section can move down slightly** now that the toggle is folded into the popover instead of sitting in its own always-visible row — use judgment on spacing, doesn't need to be pixel-exact.
+
+**Not urgent/blocking anything — Brayden raised this before moving on to clearing his own browser cache for the unrelated `app.ohvara.com` local-cache issue (see Prompt 336 pt2 note above), it's just next in the queue.**
+
+**Verify with a real logged-in screenshot before calling done** — hover state, popover open/anchor direction, Profile landing on its own distinct page separate from Settings, and toggle still functioning from inside the popover.
+
+---
+
 ### 🟩 Prompt 337 SHIPPED 2026-07-25 — Aflac re-cropped + Foresters re-padded copied in, logo_zoom_pct reset, SALES nav reordered, verified with corrected crop-window math
 
 **Shipped:** [`47a26ca`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/47a26ca) on `ohvara-dashboard`.
@@ -53,11 +78,44 @@ tags:
 
 ---
 
-### 🟨 Prompt 336 PART 1 SHIPPED (BUT MISSED ITEM 1b), PART 2 BLOCKED ON BRAYDEN 2026-07-25 — sidebar text done, SALES reorder still outstanding, domain migration needs 3 manual dashboard steps
+### ✅ Prompt 336 pt2 (domain migration) — CLOSED 2026-07-25, confirmed by Brayden
 
-**⚠️ Item 1b (My Policies above My Calls in the SALES nav group) was queued before this run but is NOT in what CC reported shipping** — CC's commit only touched `PORTAL_LABELS.closer`, nothing about nav order. Likely a stale-pull timing issue (CC may have continued straight from Prompt 335 into 336 without re-pulling LIVE_STATE in between, missing the 1b edit that landed while 335 was running) rather than a deliberate skip. **Still needs doing — CC should pick this up before anything else next run:** swap the order so "My Policies" sits above "My Calls" in the SALES group's nav array in `Sidebar.jsx`.
+Brayden logged into `portal.ohvara.com` himself (Test Agent/`nate44`), confirmed real login works and Hierarchy page loads correctly on the new domain. Domain migration is fully done, nothing further to do here.
 
-**Shipped:** [`624f318`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/624f318) on `ohvara-dashboard` — sidebar subtitle "Closer Portal" → "Agent Portal" (`PORTAL_LABELS.closer` in `Sidebar.jsx`).
+**One thing Brayden flagged along the way, explained not a bug:** `app.ohvara.com` still loaded for him in one browser (worked in his main browser, didn't in a fresh Chrome) even though the CNAME record is deleted at GoDaddy and the domain is removed from Vercel. This is local browser caching (DNS resolver cache and/or HTTP disk cache inside that one browser profile — Chromium browsers keep their own DNS cache independent of Windows' resolver, separate per browser/profile), not the domain actually still resolving publicly. Confirmed real by the fact a different, never-used browser correctly failed to load it. Fix if he wants it gone locally too: clear that browser's cache/DNS cache (e.g. Edge: `edge://net-internals/#dns` → Clear host cache, plus clear browsing data). Not a production issue — new users/other machines get nothing at that address.
+
+<details>
+<summary>Original infra-done note, kept for reference</summary>
+
+**Everything Claude in Chrome could do without credentials is done and self-confirmed:**
+- **Vercel:** `portal.ohvara.com` shows Valid Configuration, is the only domain on `ohvara-portal`, connected to Production. `app.ohvara.com` fully removed from the project.
+- **GoDaddy:** `app` CNAME deleted (confirmed via GoDaddy's own success toast, gone from the records list). `portal` CNAME in place.
+- **Supabase:** Redirect URLs has exactly one entry, `https://portal.ohvara.com/**`. Site URL updated from `localhost:3000` to `https://portal.ohvara.com`.
+- **Confirmed in-browser:** `portal.ohvara.com` renders the real login page. `app.ohvara.com` returns `404 DEPLOYMENT_NOT_FOUND` — the intended fully-retired outcome.
+
+</details>
+
+**Still open, unrelated to this migration, flagged along the way:** password reset likely doesn't work in production — it depends on Supabase's redirect allowlist, which was sitting empty/at defaults until this session populated it. Worth Brayden testing separately; not blocking anything here.
+
+<details>
+<summary>Full step-by-step history (stale-slug bug caught by CC, session that stopped mid-DNS-edit, the Supabase discrepancy, the full-retirement plan change) — kept for reference</summary>
+
+**Falcon's earlier "fully shipped" note above was wrong — caught and correcting it now rather than leaving it stale.** The Vercel API check (domain listed in `get_project`) only proved Step 1 happened; it does NOT mean DNS/Supabase/cutover were done. Brayden's actual screenshot still shows `app.ohvara.com` in the URL bar, and his pasted Claude in Chrome transcript confirms why: **the session did Step 1 completely, started Step 2, and stopped mid-way** — last logged action was "Scrolling down" to read the existing `app` CNAME record on GoDaddy's DNS page, before ever adding the new `portal` record. Steps 2 (finish), 3 (Supabase), 4 (set primary), 5 (verify) never ran.
+
+**What IS confirmed done (Step 1, complete):** `portal.ohvara.com` added to the `ohvara-portal` Vercel project. Vercel returned the exact DNS record needed — **CNAME, host `portal`, value `71423706e48ac027.vercel-dns-017.com`** — captured directly from the transcript, so this doesn't need to be re-fetched. Vercel currently shows it as "Invalid Configuration," which is expected and correct until the DNS record actually exists.
+
+**Also confirmed from the transcript: CC's stale-slug fix worked.** Claude in Chrome hit the same wrong `ohvara-dashboard` URL initially (404), self-corrected to `ohvara-portal` via the Vercel dashboard nav, and completed Step 1 successfully from there — so that fix was real and necessary, not wasted effort.
+
+**Update — Step 2 (GoDaddy DNS) completed on the resume run; stopped correctly at Step 3 (Supabase) on a real discrepancy, not an error.** Claude in Chrome got to the Supabase URL Configuration page and found it doesn't match what the instructions assumed: **Site URL is `http://localhost:3000`, and Redirect URLs is completely empty** — no existing `app.ohvara.com` entry to pattern-match, despite `app.ohvara.com` being the real, working production domain today. It correctly stopped and asked rather than guessing at a wildcard pattern or touching Site URL blind — right call.
+
+**Falcon's read on why this doesn't already break production:** Supabase's redirect-URL allowlist only gates flows that use an explicit `redirectTo` — magic links, password reset, and Supabase's own built-in invite system. Plain email+password login (what `Login.jsx` actually does) doesn't touch it, and `claim-invite` is Ohvara's own custom edge function, not Supabase's built-in invite flow, so it likely doesn't depend on this setting either.
+
+**⚠️ Plan changed 2026-07-25 — Brayden: "I don't want app.ohvara to exist anymore. I want it to just be portal.ohvara."** Overrode the earlier default of keeping `app.ohvara.com` as a redirect. Full retirement, not a forward — and that's exactly what shipped (see status at top of this entry).
+
+</details>
+
+---
+### ⬛ Prompt 336 pt2 — superseded status notes below, kept for history only
 
 **Domain migration (app.ohvara.com → portal.ohvara.com) is blocked — needs Brayden to do 3 things himself, no tooling workaround exists.** Investigated all three legs and every one requires dashboard/credential access this session doesn't have:
 
