@@ -18,7 +18,44 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21 — see [[Memories]] for the full trail.)*
 
-### 🟨 Prompt 336 PART 1 SHIPPED, PART 2 BLOCKED ON BRAYDEN 2026-07-25 — sidebar text done, domain migration needs 3 manual dashboard steps
+### 🟩 Prompt 337 SHIPPED 2026-07-25 — Aflac re-cropped + Foresters re-padded copied in, logo_zoom_pct reset, SALES nav reordered, verified with corrected crop-window math
+
+**Shipped:** [`47a26ca`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/47a26ca) on `ohvara-dashboard`.
+
+1. **Item 1b done first** (was missed in the earlier 336 run) — `Sidebar.jsx`'s Sales group now lists "My Policies" above "My Calls".
+2. **Copied Falcon's re-cropped `aflac.png`** (1280×665, 54px trimmed off the bottom) from the vault into `public/carrier-logos/`. No DB change — `logo_url` already pointed at this filename.
+3. **Copied Falcon's re-padded `foresters.png`** (433×106, matching maroon padding) from the vault into `public/carrier-logos/`, replacing the Prompt 334/335 file.
+4. **Reset `carriers.logo_zoom_pct` back to 100 for Foresters** — confirmed via `select` that Aflac/Chubb/Foresters are all now 100, Corebridge 110, F&G/Fidelity Life 135 (unaffected — `contain` mode).
+5. **Re-verified with the corrected method this time — checked where content sits inside the actual visible crop window, not just CSS box mechanics** (the gap that made Prompt 335's harness give a false negative). Computed the real crop window from Falcon's measured 3.96 container aspect, then measured pixel content position in each image against it:
+   - **Aflac**: wordmark rows 224–441 of the new 665px-tall image → center at exactly 50.0% of image height, fully inside the visible 25.7%–74.3% window.
+   - **Foresters**: real content spans 25.6%–79.4% of image width, fully inside the visible 1.5%–98.5% window (crop only touches padding).
+   - **Chubb** (no change queued): content center at 48.9% vertically — ~1.5px off nominal, negligible, confirms Falcon's math that it should already be fine.
+
+`eslint` (same pre-existing unrelated `Calculator` unused-import error) + `vite build` clean. **Still no agent login to screenshot `/agent/carriers` directly** — this is pixel-level source-image verification against the real measured banner aspect ratio, which is a stronger check than Prompt 335's CSS-only harness but still not a substitute for Brayden's own screenshot. **Worth a real screenshot after a hard refresh** — if Chubb is still visibly off despite the math saying it's fine, that's a genuine signal something else is going on (per Falcon's note) and needs fresh diagnosis, not another computed check.
+
+---
+
+### ⬛ Prompt 337 original queue entry (superseded by shipped note above, kept for reference)
+
+**Context:** Brayden's freshest screenshot (post-Prompt 335/336) still shows Aflac and Chubb off-center — proves Prompt 335's "harness confirmed no bug" conclusion was wrong; the harness checked that the `<img>` box matched the container box and that `object-position` computed to 50/50, but never checked *where within the source image* the visible crop window actually falls relative to the logo content. Falcon did that math this time, with real numbers from Brayden's actual screenshot (measured the live banner at ~325×82px, aspect ≈3.96, directly off his screenshot rather than guessing).
+
+**1. Aflac — root cause confirmed and fixed at the source, not the CSS.** At a 3.96 container aspect, `cover` only shows the middle ~45% of the image's height — which massively amplifies any off-centeredness in the source file. Aflac's wordmark sat at rows 224–441 of a 719px-tall image (center 46.2%, not 50%) — small in the full image, but a real ~7px visible offset inside an 82px-tall banner, which reads as clearly "closer to the top" exactly as Brayden described. **Re-cropped `aflac.png` (54px off the bottom) so the wordmark is now dead-centered** (top/bottom margins 224/223, effectively identical) — staged at `media/carrier-logos/aflac.png` in the vault, same filename, ready for CC to re-copy into `public/carrier-logos/` (no DB change needed, `logo_url` already points at this file).
+
+**2. Chubb — math says it should already be fine (source asymmetry is only ~1px after the same crop-window analysis), so if it's STILL visibly off after Aflac's fix ships, that's a real signal something else is going on** (e.g. its card rendering at a different width than assumed, or the deployed code not matching what the harness tested) — worth a genuine screenshot check this time, not another computed-style pass. No source-image change queued for Chubb; diagnose for real if the problem persists.
+
+**3. Foresters — Brayden re-sent the logo because it "got messed up"; new file staged and already padded correctly.** Real problem, worth understanding: at the banner's 3.96 aspect, `cover` was cropping real logo content off the top and bottom of the *previous* Foresters image (its own aspect was only 1.74 — much more "square" than the banner, so `cover` had to crop deep into the vertical content to fill the wide banner). **Padded the new image with matching maroon background (same measured color, `(94,39,80)`) on the left/right to bring its own aspect ratio up to ~4.1 — wider than the banner needs**, so `cover` now crops only the padding, never the real logo, and there's no seam since the padding color exactly matches the image's own background. Staged at `media/carrier-logos/foresters.png` (replaces the same-named file from Prompt 334/335). **Also reset `carriers.logo_zoom_pct` back to `100` for Foresters** — see item 4, the 85% value from Prompt 335 doesn't actually do what it was meant to and should be undone now that the real fix is the image itself.
+
+**4. ⚠️ Real correction to how `logo_zoom_pct` should be used going forward — Prompt 335's Foresters value (85%) was based on a flawed premise.** For a `cover`-mode image that's already absolutely-positioned to exactly fill its container, CSS `transform: scale()` **below 100%** doesn't show more of the source image or reduce cropping — `object-fit: cover` has already determined the crop before the transform runs, so scaling the whole already-cropped result down just shrinks it within the banner and reveals the banner's own background color on all sides, which for a `cover`-mode carrier defeats the entire point (no more edge-to-edge bleed, white/background shows again). **`logo_zoom_pct` values above 100% remain valid and safe** — scaling UP an already-covering image just crops a bit further into the safe margin, magnifying the visible content with zero risk of exposing background (Corebridge's 110% is fine as-is, no change needed; F&G/Fidelity Life's 135% on `contain` mode is a different, unaffected case since `contain` never crops to begin with). **The real fix for "content getting cut off" on a `cover`-mode logo is what was just done for Foresters — pad the source image's own aspect ratio to match or exceed the container's (~3.96–4.0) using the image's own background color** — note this pattern for any future carrier that has the same problem, rather than reaching for `logo_zoom_pct` below 100 again.
+
+**5. Item 1b from Prompt 336 is still outstanding** (My Policies above My Calls in the SALES nav group — confirmed still not done in Brayden's latest screenshot). Do this first, it's one line.
+
+**Verify with a real screenshot after a hard refresh before calling any of this done** — same standing instruction, now doubly true given Prompt 335's non-visual verification method already produced one false "fixed" claim.
+
+---
+
+### 🟨 Prompt 336 PART 1 SHIPPED (BUT MISSED ITEM 1b), PART 2 BLOCKED ON BRAYDEN 2026-07-25 — sidebar text done, SALES reorder still outstanding, domain migration needs 3 manual dashboard steps
+
+**⚠️ Item 1b (My Policies above My Calls in the SALES nav group) was queued before this run but is NOT in what CC reported shipping** — CC's commit only touched `PORTAL_LABELS.closer`, nothing about nav order. Likely a stale-pull timing issue (CC may have continued straight from Prompt 335 into 336 without re-pulling LIVE_STATE in between, missing the 1b edit that landed while 335 was running) rather than a deliberate skip. **Still needs doing — CC should pick this up before anything else next run:** swap the order so "My Policies" sits above "My Calls" in the SALES group's nav array in `Sidebar.jsx`.
 
 **Shipped:** [`624f318`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/624f318) on `ohvara-dashboard` — sidebar subtitle "Closer Portal" → "Agent Portal" (`PORTAL_LABELS.closer` in `Sidebar.jsx`).
 
@@ -30,14 +67,9 @@ tags:
 
 **Genuinely good news found along the way: zero hardcoded `app.ohvara.com` references anywhere in the codebase.** Grepped the whole repo — invite links (`Hierarchy.jsx`, `admin/Users.jsx`) and the password-reset redirect (`Login.jsx`) all already build off `window.location.origin` dynamically; `claim-invite`'s CORS header is a wildcard `*`, not a hardcoded origin. **Once the domain itself resolves and Supabase's allowlist includes it, everything else should just work with no further code changes** — this de-risks the migration considerably from what Falcon's original spec assumed.
 
-**Exact steps for Brayden, in order (each one blocks the next):**
-1. Vercel dashboard → `ohvara-portal` project → Settings → Domains → Add `portal.ohvara.com`. Vercel will show the exact CNAME/A record to add (don't guess it — `app.ohvara.com`'s current CNAME target, `71423706e48ac027.vercel-dns-017.com`, is domain-specific and won't be reused for a new domain).
-2. Add that record at GoDaddy's DNS management for `ohvara.com` (Vercel's dashboard shows the exact host, given the domain is on GoDaddy nameservers).
-3. **Before setting `portal.ohvara.com` as the primary/production domain**, add it to Supabase → Auth → URL Configuration → Redirect URLs allowlist (project `jjextitmbptoaolacocs`), keeping `app.ohvara.com` in the list too during the transition. Skipping this or doing it out of order breaks login/invite links the moment the new domain goes live.
-4. Set `portal.ohvara.com` as primary in Vercel; keep `app.ohvara.com` attached as a redirect rather than removing it.
-5. Test a real invite link and a real login redirect on `portal.ohvara.com` before considering this done.
+**⚠️ Correction 2026-07-25 (Falcon) — this doesn't need Brayden clicking through dashboards by hand. It needs Claude in Chrome, same as last time.** Brayden pushed back correctly: `app.ohvara.com` was set up this exact same way before (Vercel domain + GoDaddy DNS), so "we can't do it" didn't add up. Checked the vault and found the original artifact — `brain/claude-chrome-connect-app-subdomain.md` — confirming that cutover was done via a **Claude in Chrome** session (Brayden's own browser, already logged into Vercel/GoDaddy/Supabase), not via CC's API/MCP tools and not via Brayden manually reading a checklist. Per North Star's standing rule, Cowork (Eagle/Falcon) and CC never drive Claude in Chrome directly — the correct move is a self-contained prompt file Brayden pastes into his own Claude in Chrome session, exactly like the original domain setup. **Written: `brain/claude-chrome-portal-domain-migration.md`** — same structure as the original file, plus the Supabase Auth redirect-allowlist step this migration additionally needs. Brayden: paste that file's contents into Claude in Chrome to run it — not a manual dashboard checklist for you personally, and not something CC should attempt directly.
 
-**Once Brayden's done 1–4, tell CC to pick this back up** to do step 5 (verification) and confirm nothing else needs touching.
+**Once that's run, tell CC to pick this back up** to do the final verification pass (step 5 in the artifact) and confirm nothing else needs touching.
 
 ---
 
