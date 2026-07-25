@@ -18,6 +18,46 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21 — see [[Memories]] for the full trail.)*
 
+### 🆕 Prompt 342 QUEUED 2026-07-25 — Overview clock: real digital/LCD font, taller characters
+
+**`src/components/ui/LiveClock.jsx`** — Brayden wants the time display (top-right of Overview, currently reads e.g. "3:39:28 PM" in the filled blue box from Prompt 231A) to look like an actual digital clock, not a regular bold sans-serif stretched to look clock-ish. Reference image he sent: a seven-segment/LCD-style digital font (the blocky segmented digit style used on alarm clocks/calculators, like "DSEG7" or "Digital-7").
+
+1. **Swap the clock's font to a real digital/seven-segment display font.** Source one (Google Fonts has options like "DSEG7 Classic"/similar seven-segment families, or check for a free digital-clock webfont) and load it the same way any other custom font in this app is loaded — check `index.html`/`index.css` for the existing pattern (e.g. how the current fonts are brought in) and follow it, don't introduce a new loading mechanism if one already exists.
+2. **Make the characters taller** — Brayden specifically wants more vertical stretch on the time text, on top of the new font itself (increase `font-size`/`line-height` or an explicit vertical `transform: scaleY()` if the chosen font doesn't have a tall-enough variant on its own).
+3. **Scope: the clock text only** — the surrounding filled blue box/pill styling from Prompt 231A stays as-is, this is a font/sizing change inside it, not a redesign of the box.
+
+**Verify with a real screenshot** — confirm the digital font actually renders (not silently falling back to a system font if the webfont fails to load) and that the box doesn't overflow/clip now that the glyphs are taller.
+
+---
+
+### 🆕 Prompt 341 QUEUED 2026-07-25 — collapse-button outline to white, account name to solid white, avatar circle fill to white
+
+Small color-only follow-on, sidebar header + footer.
+
+1. **Collapse-toggle button (top-left, the `<` chevron next to the "Ohvara / Agent Portal" logo) — change its outline/border from its current gray to white.** Brayden's reference point: match the color of the horizontal divider line directly below the header (the line separating the logo row from the "TODAY" nav group) — that line already reads white in the UI, use that same color/token for the button's border rather than inventing a new one. Check [[DESIGN]] for the actual token name that line uses (don't hardcode a hex per standing rule) and reuse it.
+
+2. **Account footer name text ("Test Agent" in the closed row) — change to solid white**, not its current grayish/light tone. Same treatment likely applies to the popover's identity-header name text if it shares the same style — check both, Brayden only screenshotted the closed state.
+
+3. **Avatar/initials circle ("TA") — change the circle's fill/background color to white, leave the initials text color unchanged.** Brayden's reasoning: the current blue fill blends in and is hard to spot at a glance. Applies everywhere the avatar renders (closed footer row, popover header if Prompt 340 added it there, and anywhere else `AccountMenu`'s avatar is reused).
+
+**Verify with a real screenshot** — collapse button's outline reads white against the sidebar background, account name reads solid white, avatar circle has a white fill with initials still legible on top.
+
+---
+
+### 🟨 Prompt 340 SHIPPED 2026-07-25 — nav/logo enlarged, popover widened + restructured — but overlap not fully solved on short viewports
+
+**Shipped:** [`f7b09c9`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/f7b09c9) on `ohvara-dashboard`.
+
+1. **Nav icon+label enlarged, pill geometry untouched** — icon 15→17, label font 13→14.5. `padding: '9px 10px'`/`borderRadius: 6` on the active pill left exactly as declared; the pill reads a few px taller only because its content grew, not because the box rule changed. Confirmed via computed style.
+2. **Logo enlarged** — image 28→34px, "Ohvara" 14→16px, portal-label subtext 10→11px. Confirmed it still fits inside the header's fixed 60px height (computed rect: top 12.5, bottom 46.5 — no clipping).
+3. **Popover widened 220→248px** (stays inside the 270px sidebar — right edge lands at 258, 12px clear of the aside's own edge at 270). Avatar added to the identity header, inline next to name/username (not a new stacked row). **Went further than asked**: folded the closer-only duty toggle into that same header row (was its own row) since padding trims alone weren't enough — this cut the popover's total height by ~32px on top of ~10px from other padding trims.
+
+**Verified via computed DOM geometry, not a screenshot** — Browser pane wasn't displayed on-screen this session (`computer{screenshot}` timed out each attempt), so verification used live `getBoundingClientRect()`/`getComputedStyle()` reads against the running dev server instead (logged in as `nate44`/closer — the tallest version of the popover). `eslint` clean except the same pre-existing `Calculator` unused-import error already flagged in every recent Sidebar.jsx prompt. `vite build` clean.
+
+**Real, unresolved finding — flagging honestly rather than claiming full success:** at a normal/larger viewport (1920×1080 tested), the popover now clears Settings with ~87.5px to spare. But at a shorter viewport (1440×900 tested, a common 13–14" laptop resolution), **the closer-role popover still overlaps Settings by ~92.5px.** This is structural: the closer role has 13 nav items across 5 groups before a single-item Account group (just Settings), so at 900px-tall viewports there's almost no buffer between Settings and the footer — the popover's minimum readable content (header, duty toggle, divider, Profile, Sign out) needs ~140px, but only ~47px of headroom exists there. Closing that gap fully would mean pulling content out of the dropdown entirely (e.g., removing Profile or Sign out, or dropping the duty-toggle label) — bigger than a row-layout restructure, and it would undo UX Brayden approved in Prompt 338. **Needs a decision from Brayden:** accept as-is (fixed on 1080p+, still overlapping on short/~900px-tall windows), or pick a specific different approach (e.g. popover flips to render further up over other nav items when short on room, or one of the two footer buttons gets cut/merged to free up height).
+
+---
+
 ### 🟨 Prompt 339 PARTIALLY SHIPPED 2026-07-25 — 3 of 4 done, 1 stopped before executing (needs Brayden decision)
 
 **Shipped:** [`4b34332`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/4b34332) + [`8a6e1ba`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/8a6e1ba) + [`e10345f`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/e10345f) on `ohvara-dashboard`.
