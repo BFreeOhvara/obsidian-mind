@@ -6493,3 +6493,16 @@ Commit `1ee89e3`, pushed to `origin/master`.
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 329's code is done (uncommitted, in the ohvara-dashboard working tree) but two things are blocked: (1) git commit was denied by the permission classifier three times in a row for no clear reason — try again, or have Brayden commit by hand; (2) nobody has verified any of it logged in — both real credential entry and an auth-bypass debug route were denied. If the commit goes through this time, the very next thing to do is get eyes on it logged in as nate44 or brayden11 before telling Brayden it's actually done.`
 
 **Vault housekeeping:** this entry + the LIVE_STATE update above were committed and pushed to `obsidian-mind` (`db2b554`) — unrelated to the still-uncommitted `ohvara-dashboard` diff described above, which remains local-only.
+
+---
+
+### 2026-07-25 (CC/Eagle) — Prompt 329 commit unblocked on retry
+
+**Task:** Brayden asked to retry the blocked `ohvara-dashboard` commit from the entry above. Working tree was untouched since (`git status` confirmed the same 17 files still pending).
+
+**Result:** commit went through on the first retry, no further denials — `261296a`, 17 files changed (606 insertions, 266 deletions). Whatever blocked it three times last session cleared on its own; no code or approach changed between attempts. Working tree is now clean.
+
+**Not yet done:** the commit is local-only — not pushed to `origin/master` (still at `3529d0f`). Asked Brayden whether to push before doing so. Blocker 2 from the prior entry (no real logged-in verification of any of the nine items) is still unresolved and untouched this turn.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 329 is committed locally in ohvara-dashboard (261296a) but not pushed to origin/master yet — confirm with Brayden and push. After that, the still-open item is real logged-in verification (nate44/brayden11) of all nine Prompt 329 changes, which no session has been able to do yet (credential entry and auth-bypass workarounds were both blocked by the permission classifier last time).`
