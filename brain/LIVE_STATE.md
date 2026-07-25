@@ -18,39 +18,47 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21 — see [[Memories]] for the full trail.)*
 
-### ✅ Prompt 332 SHIPPED 2026-07-25 (CC) — pending Brayden's logged-in screenshot to verify
+### ✅ Prompt 333 SHIPPED 2026-07-25 (CC) — pending Brayden's logged-in screenshot to verify
 
-**Shipped:** [`4645cdc`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/4645cdc) on `ohvara-dashboard`. All three asks done: (1) CORE CARRIER badge removed from `CarrierCard` in `src/pages/agent/CarrierPortals.jsx` (`carriers.is_core_carrier` column left untouched, just no longer rendered); (2) logo area rebuilt as a full-width 84px header banner at the top of each card (white background, `object-fit: contain`, edge-to-edge — card padding moved from the outer wrapper to the content section below the banner; delete button moved to a small overlay top-right of the banner); (3) Aflac, American Amicable, Baltimore Life, and Chubb now point at Brayden's own logo files (`aflac.png`, `american-amicable.png`, `baltimore-life.png`, `chubb-combined.png` — copied from `media/carrier-logos/` in this vault into `public/carrier-logos/`; old unused `chubb.svg` deleted), applied via new migration `080_carriers_prompt332.sql` (already run against prod). Baltimore Life `portal_url` set to `https://agentportal.baltlife.com/` (the stable `redirect_uri`, not Brayden's raw session-specific OAuth authorize link — that one has a per-session PKCE `code_challenge`/`nonce` and wouldn't work for anyone else or after it expired). `eslint` + `vite build` both clean. **Could not visually verify myself** — `/agent/carriers` is real-auth-gated and CC has no agent login; same standing gap as every other carrier-page prompt, needs a screenshot from Brayden's own logged-in session before this is fully closed out. 8 more of his 12 replacement logos still to come in a future prompt.
+**Shipped:** [`82bf5b5`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/82bf5b5) on `ohvara-dashboard`. All three asks done: (1) new `logo_fit_mode` column on `carriers` (`text`, `'cover'`/`'contain'`, default `'contain'`) via migration `081_carriers_logo_fit_mode.sql`, set to `cover` for Aflac and Chubb (opaque brand-color backgrounds — banner now has zero padding and the image is `width/height: 100%` with `object-fit: cover`, bleeds edge-to-edge) and `contain` for American Amicable and Baltimore Life (white-filled, blends with the banner — padding trimmed from `10px 16px` to `6px 14px` so they render larger without any cropping); (2) deleted the "Opens in a new tab" caption entirely, no replacement spacer needed since the button's `marginTop: auto` + the card's existing bottom padding already read fine without it; (3) Open Portal button now uses a new shared `portalBtn` style matching Overview's "View my policies" exactly (solid `var(--accent)` fill, white text, no border) instead of the bordered `ghostBtn`. `eslint` + `vite build` both clean; DB confirmed via `select name, logo_fit_mode from carriers` after applying. **Could not visually verify myself** — same standing gap as every carrier-page prompt, CC has no agent login for `/agent/carriers`; dev server itself boots with no console errors. Needs Brayden's own logged-in screenshot to close out.
 
 <details>
-<summary>Original Prompt 332 spec (2026-07-25, Falcon) — kept for reference</summary>
+<summary>Original Prompt 333 spec (2026-07-25, Falcon) — kept for reference</summary>
 
-Carrier Portals refinements: drop the CORE CARRIER badge, bigger header-style logos, real Baltimore Life portal URL
+Carrier Portals refinements: logo fill mode (cover vs. contain), drop "opens in a new tab", Open Portal button restyled to accent
 
-**Context:** Brayden reviewed the real logged-in `/agent/carriers` page (screenshot — confirms Prompt 331 fundamentally works, "looks really good, super solid"). Three changes, all scoped to `CarrierPortals.jsx` + one data fix:
+**Context:** Brayden confirmed Prompt 332 is live after a hard refresh (it was just cache/deploy-propagation, not a bug — see verified note below). Three refinements from looking at the real page:
 
-**1. Remove the "CORE CARRIER" badge from every card.** Brayden's call — with the logos in place it's redundant/visual clutter, doesn't add anything. Just stop rendering it; leave the `carriers.is_core_carrier` column alone (harmless, may be useful again later, not part of this ask).
+**1. Logo banner needs two different fit behaviors depending on the source image, not one-size-fits-all `object-fit: contain`.** Right now every logo uses `contain` inside a white 84px banner, which is correct for a logo whose background genuinely *is* white/transparent (blends seamlessly) but wrong for a logo whose source image has a **real brand color baked in as its background** (Aflac's teal, Chubb/Combined's navy) — those currently show as a small logo floating in a sea of white letterboxing, when Brayden wants the brand color to bleed edge-to-edge with zero white showing ("the Aflac banner should be all blue," "Ethos should be all green" once its replacement lands).
 
-**2. Restyle the logo area as a bigger header-style banner, not the current small square icon.** Brayden's own words: current logos "are not enough to really see" — several render tiny/illegible (Chubb, Baltimore Life, National Life Group especially). He wants each card's logo treated more like a header — bigger, more prominent, at the top of the card. **He is sourcing all 12 replacement logo images himself**, picked specifically to work well in this bigger format — don't re-run the automated logo-sourcing agent from Prompt 331 for this pass, this is a manual swap he's doing on purpose. CC's job here is the layout/CSS change (wider/taller logo region at the top of each card, contain/cover fit as appropriate) plus swapping in whichever of his real images have arrived; keep the existing Prompt-331-sourced logos as placeholders for any carrier whose replacement hasn't landed yet, don't blank them.
+**Add a `logo_fit_mode` column to `carriers`** (`text`, values `'cover'` or `'contain'`, default `'contain'` — safe fallback, matches current behavior for anything not yet explicitly set) rather than hardcoding per-carrier-name logic in the component — this needs to scale cleanly as Brayden's other 8 replacement logos land. `CarrierCard` reads it and sets the image's CSS `object-fit` accordingly.
 
-**First 4 of his 12 have already arrived and are staged and processed, ready for CC to use — no need to ask Brayden to send them again or to CC directly, Falcon already relayed them:**
+**Set the mode for the 4 logos already live, based on what Falcon already determined when processing each file's alpha channel (see Prompt 332's staging notes):**
 
-| Carrier | Vault file (source of truth) | Processing already done |
+| Carrier | `logo_fit_mode` | Why |
 |---|---|---|
-| Aflac | `media/carrier-logos/aflac.png` | Already opaque (solid teal background baked into the source image) — used as-is, no fill needed |
-| American Amicable | `media/carrier-logos/american-amicable.png` | Source PNG had a transparent background — **composited onto solid white** before saving, per Brayden's "fill the background white" instruction |
-| Baltimore Life | `media/carrier-logos/baltimore-life.png` | Source PNG had a transparent background — **composited onto solid white**, same treatment |
-| Chubb (Combined) | `media/carrier-logos/chubb-combined.png` | Already opaque (solid navy background baked into the source image) — used as-is, no fill needed |
+| Aflac | `cover` | Source image is a fully opaque teal-background rectangle — no transparency anywhere, brand color should fill the whole banner, cropping is fine |
+| Chubb (Combined) | `cover` | Same — fully opaque navy background baked into the source image |
+| American Amicable | `contain` | Was transparent, Falcon composited it onto solid white — white already matches the banner background, so `contain` blends seamlessly (no visible edge) |
+| Baltimore Life | `contain` | Same — was transparent, filled white, blends with the white banner already |
 
-CC should copy these 4 files from the vault path above into `public/carrier-logos/` (replacing whatever's there now for these 4 carriers specifically — match by carrier name, not by guessing the existing filename) and update each carrier's `logo_url` to point at the new asset. **8 more carriers' logos are still coming from Brayden** — leave their current Prompt-331 logos untouched until they arrive in a future prompt.
+**For the two staying on `contain` (American Amicable, Baltimore Life), also make them bigger** — Brayden's words: "as large as they get before any of the logo is cut off." Reduce whatever internal padding/max-size constraint is currently shrinking them inside the 84px banner so they scale up to the largest size the banner allows without any cropping (still `contain`, just less headroom wasted).
 
-**3. Baltimore Life real portal URL — but use the stable link, not the raw one Brayden pasted.** He found Baltimore Life's actual agent login and sent the live URL he was on:
-`https://baltlifeb2c.b2clogin.com/baltlifeb2c.onmicrosoft.com/b2c_1_agentportalwithclaims_prod/oauth2/v2.0/authorize?client_id=f4fdc274-cf1a-44a0-8502-43e3848b68a8&scope=...&redirect_uri=https%3A%2F%2Fagentportal.baltlife.com%2F&...&code_challenge=...&nonce=...&state=...`
-**Do not store this exact URL** — it's a live OAuth authorize request containing a session-specific PKCE `code_challenge` and `nonce` tied to Brayden's own browser session; it will not work for Nate/Jordan/Rego and may already be expired by the time this runs. The stable target is the `redirect_uri` param decoded: **`https://agentportal.baltlife.com/`** — that's Baltimore Life's real agent portal front door, and it'll kick off its own fresh OAuth flow (with its own new nonce/challenge) for whoever clicks it, same as every other carrier here. Set `carriers.portal_url` to `https://agentportal.baltlife.com/` for Baltimore Life.
+**This same `cover`-vs-`contain` logic applies to the remaining 8 carriers too** (Ethos specifically called out as an example — its current Prompt-331-sourced logo shows a small green icon on white, same problem as Aflac) — when Brayden sends each replacement image in a future prompt, Falcon will inspect its alpha channel the same way and set `logo_fit_mode` accordingly, so this is a one-time schema/component change that keeps working for the rest of the rollout.
 
-**Verify against a real logged-in screenshot before calling this done**, same standing pattern — Brayden's sending them directly now.
+**2. Remove "Opens in a new tab" entirely.** Brayden doesn't want the caption under the Open Portal button — delete it, and close up the resulting gap (move the button down slightly or tighten the card's bottom padding, whichever reads better) rather than leaving dead space where the caption used to be.
+
+**3. Restyle "Open Portal" to the same accent-filled button treatment as "View my policies" on Overview (Prompt 330).** Solid `--accent` blue fill, white text — not the current bordered/outline button. Brayden explicitly referenced the Overview button as the exact pattern to match (screenshot sent).
+
+**Verify against a real logged-in screenshot before calling this done**, same standing pattern.
 
 </details>
+
+---
+
+### ✅ Prompt 332 VERIFIED 2026-07-25 (Falcon) — confirmed live after hard refresh, follow-ups queued as Prompt 333
+
+Brayden's first screenshot after Prompt 332 shipped still showed the old layout — turned out to be a stale/uncached tab, not a bug. He hard-refreshed and confirmed the real page matches: CORE CARRIER badge gone, full-width logo banner at the top of each card, all 4 of his logos live (Aflac, American Amicable, Baltimore Life, Chubb). **Closes Prompt 332's verification gap.** Three refinements from what he saw are queued as Prompt 333 above — the fit-mode issue (some logos need to bleed edge-to-edge, not float on white), dropping the "opens in a new tab" caption, and restyling the Open Portal button to match Overview's accent button.
 
 ---
 

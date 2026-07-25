@@ -6653,3 +6653,48 @@ Commit `1ee89e3`, pushed to `origin/master`.
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 332 (CORE CARRIER badge removed, header-style logo banner, 4 of Brayden's replacement logos wired in, Baltimore Life portal_url fixed) is code-complete, pushed (4645cdc), and lint/build clean — but NOT yet verified, same as every carrier-page prompt: CC has no agent login to screenshot /agent/carriers itself. Needs Brayden's own logged-in screenshot before this can be marked verified and folded into the shipped-prompts summary line. Nothing else queued beyond that.`
 
 **Closeout:** this log entry itself plus the LIVE_STATE update were committed and pushed to `obsidian-mind` (`22b0cf4`) after being written — no further code changes followed. Queue is empty in LIVE_STATE beyond Prompt 332 awaiting verification.
+
+---
+
+### 2026-07-25 (Falcon) — Prompt 332 verified same-day (turned out to be a cache issue, not a bug); Prompt 333 queued — logo fit mode, drop new-tab caption, accent portal button
+
+Brayden's first look at Prompt 332 still showed the old layout — Falcon caught that this was a stale/uncached browser tab, not a real bug, and had him hard-refresh; the real page matched the shipped code. **Prompt 332 verification closed.**
+
+**Prompt 333 queued, three refinements from what he saw on the live page:**
+1. **Logo fit mode isn't one-size-fits-all.** Aflac and Chubb/Combined have real brand colors (teal, navy) baked into their source images as an opaque background — those should bleed edge-to-edge in the header banner, not float as a small logo on white letterboxing. American Amicable and Baltimore Life were composited onto white by Falcon and already blend seamlessly with `contain` — but Brayden wants those bigger too, "as large as they get before any of the logo is cut off." Told CC to add a `logo_fit_mode` column (`cover`/`contain`) rather than hardcoding carrier names, since this same issue will repeat for the remaining 8 logos as they land (Ethos specifically flagged as another `cover` candidate once its replacement arrives).
+2. Drop the "Opens in a new tab" caption under Open Portal — Brayden doesn't want it.
+3. Restyle Open Portal to the same solid accent-filled button as Overview's "View my policies" (Prompt 330) instead of the current bordered/outline style — he sent a screenshot referencing that exact button as the pattern to match.
+
+**Current state:** Prompt 333 queued, not yet run by CC. No code touched this session — vault only.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 332 is fully shipped and verified (was just a caching issue on Brayden's first look, confirmed fine after a hard refresh). Prompt 333 is queued (not yet run by CC): add a logo_fit_mode column (cover/contain) to carriers — cover for Aflac/Chubb (opaque brand-color backgrounds, should bleed edge-to-edge), contain for American Amicable/Baltimore Life (white-filled, but make them render bigger within the banner); drop the "Opens in a new tab" caption; restyle Open Portal to the same accent-filled button as Overview's "View my policies". Tell CC to run it.`
+
+---
+
+### 2026-07-25 (CC) — Prompt 333 shipped + pushed (`82bf5b5`), pending Brayden's screenshot verification
+
+**All three asks done in `ohvara-dashboard`:** (1) added `logo_fit_mode` column to `carriers` (migration `081_carriers_logo_fit_mode.sql`, `text` default `'contain'`, checked to `'cover'`/`'contain'`) — set `cover` for Aflac and Chubb, `contain` for American Amicable and Baltimore Life, matching Falcon's alpha-channel findings from staging the logos; `CarrierCard`'s logo banner now branches on it — `cover` gets zero banner padding and an image at `width/height: 100%` with `object-fit: cover` (fills edge-to-edge, crops as needed), `contain` keeps `object-fit: contain` but with banner padding trimmed from `10px 16px` to `6px 14px` so the logo renders larger without cropping; (2) deleted the "Opens in a new tab" caption paragraph outright — no extra spacing fix needed, the button's existing `marginTop: auto` plus the card's bottom padding already reads fine without it; (3) added a shared `portalBtn` style (solid `var(--accent)` fill, white text, no border) matching Overview's "View my policies" exactly, replacing the bordered `ghostBtn` on the Open Portal button (both the linked and disabled-no-URL states).
+
+`eslint` and `vite build` both clean; confirmed the migration landed with a `select name, logo_fit_mode from carriers`. Same standing verification gap as every carrier-page prompt — no agent login to screenshot `/agent/carriers` myself, confirmed only that the dev server boots clean with no console errors before the auth wall.
+
+**Current state:** Prompt 333 shipped and pushed, LIVE_STATE updated in place (✅ SHIPPED, original spec collapsed into `<details>`) — left in the queue pending Brayden's screenshot, same pattern as every prompt on this page. Also cleaned up a stale duplicate "Prompt 332 SHIPPED (CC)" block in LIVE_STATE that had been sitting alongside Falcon's newer "Prompt 332 VERIFIED" block since last session — removed rather than left as clutter now that it's superseded. 8 of Brayden's 12 replacement logos still outstanding.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 333 (logo_fit_mode column, cover/contain banner treatment, dropped new-tab caption, accent-filled Open Portal button) is code-complete, pushed (82bf5b5), and lint/build clean — but NOT yet verified, same as every carrier-page prompt: CC has no agent login to screenshot /agent/carriers itself. Needs Brayden's own logged-in screenshot before this can be marked verified. Nothing else queued beyond that.`
+
+---
+
+### 2026-07-25 (Falcon) — Prompt 332 verified (was just a stale tab); Prompt 333 queued (logo fill mode, drop "opens in new tab", accent button)
+
+**Prompt 332 verification closed.** Brayden's first screenshot still showed the pre-332 layout — correctly diagnosed as a stale/uncached browser tab rather than a broken deploy, since the code had already shipped and matched exactly what he was describing. Told him to hard refresh; he did, sent a second screenshot, confirmed it now matches (badge gone, full-width banner, all 4 logos live).
+
+**Prompt 333 queued, three items from what the real page showed:**
+1. **The core issue: two different logos need two different `object-fit` treatments, not one setting for all.** Aflac and Chubb/Combined's source images are fully opaque with a real brand-color background baked in (teal, navy) — under the current `contain` fit they float as a small logo in a sea of white letterboxing. Brayden wants those to bleed edge-to-edge with zero white showing. American Amicable and Baltimore Life were originally transparent and Falcon composited them onto white — those correctly blend with the white banner under `contain`, just need to be scaled bigger. **Solution: added a `logo_fit_mode` column to `carriers`** (`cover`/`contain`) rather than hardcoding per-carrier-name logic, since this same problem will recur for all 8 remaining logos Brayden hasn't sent yet (he explicitly called out Ethos's current auto-sourced logo as the same problem). Set `cover` for Aflac/Chubb, `contain` (but bigger) for American Amicable/Baltimore Life, based on the alpha-channel check Falcon already did when staging these files for Prompt 332.
+2. Remove the "Opens in a new tab" caption entirely, close up the resulting gap.
+3. Restyle "Open Portal" to match Overview's accent-filled white-on-blue button (Prompt 330's "View my policies" button is the explicit reference).
+
+**Current state:** Prompt 333 queued, not yet run. No code touched this session — vault only. No new logo images to process this round (Brayden's feedback was on the existing 4, not new files).
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 332 (Carrier Portals badge removal + logo banner + 4 real logos) is fully shipped and verified — Brayden's first screenshot was just a stale tab, a hard refresh confirmed it matches. Prompt 333 is queued (not yet run by CC): add a carriers.logo_fit_mode column (cover/contain) so Aflac and Chubb's opaque brand-color-background logos can bleed edge-to-edge (cover) while American Amicable and Baltimore Life's white-composited logos stay contain but scale up bigger; remove the "opens in a new tab" caption under Open Portal; restyle Open Portal to match Overview's accent-filled button. This same fit-mode logic will need to be applied to Brayden's other 8 replacement logos as they arrive (Ethos flagged as the same problem). Tell CC to run 333. Nothing else queued beyond it.`
