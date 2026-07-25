@@ -18,15 +18,15 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21 — see [[Memories]] for the full trail.)*
 
-### 🟨 Prompt 328 IN PROGRESS 2026-07-25 (Falcon queued 2026-07-24, CC investigated 2026-07-25) — clean up all old/test accounts + legacy dashboard, embed the real Quoter toolkit
+### ✅ Prompt 328 FULLY SHIPPED 2026-07-25 (`3529d0f`, pushed) — legacy accounts/data/code deleted, real Quoter embed live
 
-**Both open questions resolved by Brayden (AskUserQuestion, 2026-07-25):**
-1. **Delete scope: "Everything — data, account, and code."** Full enumeration done (see [[Memories]] 2026-07-25 entry) — `apex11` test profile, all pre-pivot legacy-SMB rows (`leads` 559, `calls` 35, `appointments` 19, `clients` 5, `commissions` 14, `commission_payouts` 19, plus smaller tables), and the unlinked `/admin/legacy/*` routes + old page components. One `rep_invites` row (`role='closer'`, unused, created ~7pm 2026-07-24) was excluded from the delete as a likely-live invite — flagged to Brayden, not yet re-confirmed either way.
-2. **Quoter: use InsuranceToolkits.com's public quoting tool, no login/account needed.**
+**Data:** all pre-pivot legacy-SMB rows deleted from Supabase (leads/calls/appointments/clients/commissions/commission_payouts + smaller tables). `apex11` removed from both `profiles` and `auth.users`. `profiles` now has exactly 2 rows: `brayden11`, `nate44`. One `rep_invites` row (`role='closer'`, unused, hours-old) was deliberately kept as a likely-live invite.
 
-**Blocked on: live in-chat confirmation of the exact delete SQL.** The Claude Code auto-mode permission classifier rejected the bulk-delete statement — an earlier AskUserQuestion answer isn't sufficient for a destructive DB operation this size, it needs a direct yes in the same turn. The full statement list was posted to Brayden in chat; next CC session should re-post it, get the explicit go-ahead, run it, then remove the `/admin/legacy/*` routes/pages, then build the InsuranceToolkits.com public embed on the Quoter page (currently `Placeholders.jsx`'s `Quoter` — bare "Coming Soon").
+**Code:** `/admin/legacy/*`, `/admin/reps`, `/admin/pipeline`, `/admin/sources`, `/admin/scraper` routes removed, orphaned page files deleted (`Overview.jsx`, `RepPerformance.jsx`, `LeadPipeline.jsx`, `LeadSources.jsx`). **Not touched, flagged as a follow-on:** `/closer/*` (10 routes — revenue, reps, scraper, call-leads, pipeline, stats, messages, script, calls, commissions) are now equally orphaned since closer's real nav runs through `/agent/*`, but weren't in what Brayden explicitly confirmed. `/setter/*` is NOT orphaned — still live in nav for the `rep` role, kept on purpose.
 
-**Still open, unresolved from prior rounds — ask Brayden directly, don't guess:** real Carrier Portals data, Cancellation Calendar routing contact, in-system messaging scope, and the three still-missing Claude Design export deps (`data3.js`/`support.js`/`sprite.svg`).
+**Quoter:** real iframe embed of `https://app.insurancetoolkits.com/fex/quoter` (Brayden's own account — turned out InsuranceToolkits has no true no-account public embed, corrected mid-task via AskUserQuestion). Full-height layout + "Open in new tab" fallback. `src/pages/agent/Quoter.jsx`.
+
+**Still open, unresolved from prior rounds — ask Brayden directly, don't guess:** real Carrier Portals data, Cancellation Calendar routing contact, in-system messaging scope, the three still-missing Claude Design export deps (`data3.js`/`support.js`/`sprite.svg`), whether to clean up the now-orphaned `/closer/*` legacy routes too, and whether a real test-login is worth building (every port since 322 has hit the same "can't verify logged in" gap).
 
 ---
 
