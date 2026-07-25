@@ -18,9 +18,58 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21 — see [[Memories]] for the full trail.)*
 
-### ✅ Prompt 333 SHIPPED 2026-07-25 (CC) — pending Brayden's logged-in screenshot to verify
+### ✅ Prompt 334 SHIPPED 2026-07-25 (CC) — all 12 carrier logos done, pending Brayden's screenshot to verify
 
-**Shipped:** [`82bf5b5`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/82bf5b5) on `ohvara-dashboard`. All three asks done: (1) new `logo_fit_mode` column on `carriers` (`text`, `'cover'`/`'contain'`, default `'contain'`) via migration `081_carriers_logo_fit_mode.sql`, set to `cover` for Aflac and Chubb (opaque brand-color backgrounds — banner now has zero padding and the image is `width/height: 100%` with `object-fit: cover`, bleeds edge-to-edge) and `contain` for American Amicable and Baltimore Life (white-filled, blends with the banner — padding trimmed from `10px 16px` to `6px 14px` so they render larger without any cropping); (2) deleted the "Opens in a new tab" caption entirely, no replacement spacer needed since the button's `marginTop: auto` + the card's existing bottom padding already read fine without it; (3) Open Portal button now uses a new shared `portalBtn` style matching Overview's "View my policies" exactly (solid `var(--accent)` fill, white text, no border) instead of the bordered `ghostBtn`. `eslint` + `vite build` both clean; DB confirmed via `select name, logo_fit_mode from carriers` after applying. **Could not visually verify myself** — same standing gap as every carrier-page prompt, CC has no agent login for `/agent/carriers`; dev server itself boots with no console errors. Needs Brayden's own logged-in screenshot to close out.
+**Shipped:** [`66af837`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/66af837) on `ohvara-dashboard`. All five items done:
+
+1. **Cover-mode centering bug root-caused and fixed at the component level.** The actual cause: `<img>` is a flex item inside the banner's `display:flex` container, and a flex item's default `min-height: auto` is derived from its *intrinsic aspect ratio* for replaced elements like images — that can force the item to render taller than the explicit `height: 84` the banner box specifies, and the overflow crops off-center rather than symmetrically. Fixed by taking cover-mode images **out of flex flow entirely** — `position: absolute, inset: 0` on the image (plus `overflow: hidden` added to the banner div as a backstop) sizes it to exactly match the banner regardless of its own intrinsic size, which is the standard robust pattern for `<img>`-based cover crops. Confirmed this is the correct class of bug rather than guessing at object-position (already defaulted to center, that was never the issue).
+2. Ethos flipped to `logo_fit_mode = 'cover'` — no new image, reuses its existing solid-green-background asset.
+3. National Life Group: took approach (b) from the spec — **cropped the "Experience Life" tagline off the existing asset locally** with a Python/Pillow row-scan (found the tagline occupied rows 158–188 of the 220px-tall source with a clean gap from row 137, cropped to 500×157 so top/bottom margins around the mark stay visually balanced) rather than sourcing a new external image — kept it deterministic and didn't require downloading anything new. Verified the crop visually before shipping; no tagline pixels remain. Set to `cover`.
+4. Transamerica — untouched, confirmed already fine.
+5. **Corebridge, F&G, Fidelity Life, Foresters, and Mutual of Omaha** now point at Brayden's own logo files (copied from `media/carrier-logos/` in this vault into `public/carrier-logos/`; old `corebridge.svg`, `foresters.svg`, `mutual-of-omaha.svg`, `f-and-g.png` deleted — Fidelity Life had no logo before this, now does), fit modes set per Falcon's alpha-channel staging notes (all `cover` except F&G and Fidelity Life which are `contain`). Applied via migration `082_carriers_prompt334.sql`, confirmed with a `select` covering all 12 carriers afterward — every row now has a real `logo_url` and the correct `logo_fit_mode`.
+
+`eslint` + `vite build` both clean. **Could not visually verify myself** — same standing gap as every carrier-page prompt, no agent login for `/agent/carriers`; confirmed only that the dev server itself boots with no console errors. **This was flagged as the batch to close out all 12 carriers — worth a specifically careful screenshot check on the cover-mode centering fix**, since that's the one real bug in this round and CC couldn't see it render.
+
+<details>
+<summary>Original Prompt 334 spec (2026-07-25, Falcon) — kept for reference</summary>
+
+this closes out ALL 12 carrier logos: fix cover-mode vertical centering, Ethos/Transamerica/National Life Group treatments, 5 new real logos wired in
+
+**Context:** Brayden confirmed Prompt 333 looks "really good," one real bug plus a few remaining logo items. After this prompt, all 12 carriers are done — no more logo rounds queued behind it.
+
+**1. Bug: `cover`-mode logos (Aflac, Chubb) render anchored too high in the banner, not vertically centered.** Brayden's words: "closer to the top than the bottom." Diagnose properly rather than guessing — most likely the image or its container isn't using `object-position: center` (50% 50%), or something in the banner's layout (flex alignment, a fixed image height less than the container) is pinning it to the top. Get it actually centered, confirm the crop takes equal amounts off top and bottom. This same fix needs to carry through to every other carrier using `cover` mode (Foresters, Mutual of Omaha, National Life Group, Ethos below), so fix it at the shared component level, not per-carrier.
+
+**2. Ethos — no new image needed, just flip it to `cover`.** Brayden: "looks like you could probably do the same thing with the Ethos one... just make the Ethos one larger." Its current Prompt-331-sourced logo is already a solid-green-background image (same shape of problem as Aflac/Chubb before their fix) — set `carriers.logo_fit_mode = 'cover'` for Ethos, no file changes.
+
+**3. National Life Group — remove the "Experience Life" tagline, enlarge the logo.** Brayden: "couldn't you just kinda maybe color over the experience life and then make the logo larger?" Two acceptable approaches, CC's judgment on which is cleaner: (a) preferred — search for a clean official National Life Group logo asset that's just the mark/wordmark without the tagline (same sourcing method used for the original 11 in Prompt 331) and swap it in; (b) fallback if a clean tagline-free official asset can't be confidently found — crop or mask the tagline off the current asset (e.g. crop the bottom band where "Experience Life" sits) rather than leaving it in, then apply `cover` so the remaining mark fills the banner. Don't leave the tagline visible either way.
+
+**4. Transamerica — no change.** Brayden confirmed it's already fine as-is.
+
+**5. Five more of Brayden's real logos have arrived, staged and processed in the vault, ready to wire in exactly like Prompt 332/333's batch:**
+
+| Carrier | Vault file | `logo_fit_mode` | Processing done |
+|---|---|---|---|
+| Corebridge | `media/carrier-logos/corebridge.png` | `cover` | Already opaque (solid dark-purple background baked in) — used as-is |
+| F&G | `media/carrier-logos/fg.png` | `contain` | Already opaque, solid white background — used as-is |
+| Fidelity Life | `media/carrier-logos/fidelity-life.png` | `contain` | Source had a transparent background — composited onto solid white, same treatment as American Amicable/Baltimore Life in Prompt 332 |
+| Foresters | `media/carrier-logos/foresters.png` | `cover` | Already opaque (solid maroon background baked in) — used as-is |
+| Mutual of Omaha | `media/carrier-logos/mutual-of-omaha.png` | `cover` | Already opaque (solid blue background baked in) — used as-is |
+
+Copy these into `public/carrier-logos/`, update each carrier's `logo_url` and `logo_fit_mode` (both columns already exist from Prompts 332/333, no new migration needed for the columns themselves — just a data migration to update these 5 rows plus Ethos and National Life Group).
+
+**After this prompt, all 12 carriers are done** (7 with Brayden's own real images across Prompts 332/333/334, Ethos/Transamerica/National Life Group handled via the fit-mode fix or a targeted crop, National Life Group's tagline removed) — no more logo-sourcing prompts expected behind this one unless Brayden flags something new.
+
+**Verify against a real logged-in screenshot before calling this done**, standing pattern, especially the vertical-centering fix since that's the one real bug in the batch.
+
+</details>
+
+---
+
+### ✅ Prompt 333 VERIFIED 2026-07-25 (Falcon) — confirmed via screenshot, one bug found and rolled into Prompt 334
+
+Brayden confirmed the real page: badge gone, banner logos, accent Open Portal button all landed and "look really good." **One real bug found on the two `cover`-mode logos (Aflac, Chubb): they render anchored too high in the banner instead of vertically centered.** Not a regression from anything else — queued as item 1 of Prompt 334 above, along with the rest of that prompt's remaining carrier-logo work.
+
+**Shipped:** [`82bf5b5`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/82bf5b5) on `ohvara-dashboard`. All three asks done: (1) new `logo_fit_mode` column on `carriers` (`text`, `'cover'`/`'contain'`, default `'contain'`) via migration `081_carriers_logo_fit_mode.sql`, set to `cover` for Aflac and Chubb (opaque brand-color backgrounds — banner now has zero padding and the image is `width/height: 100%` with `object-fit: cover`, bleeds edge-to-edge) and `contain` for American Amicable and Baltimore Life (white-filled, blends with the banner — padding trimmed from `10px 16px` to `6px 14px` so they render larger without any cropping); (2) deleted the "Opens in a new tab" caption entirely, no replacement spacer needed since the button's `marginTop: auto` + the card's existing bottom padding already read fine without it; (3) Open Portal button now uses a new shared `portalBtn` style matching Overview's "View my policies" exactly (solid `var(--accent)` fill, white text, no border) instead of the bordered `ghostBtn`. `eslint` + `vite build` both clean; DB confirmed via `select name, logo_fit_mode from carriers` after applying.
 
 <details>
 <summary>Original Prompt 333 spec (2026-07-25, Falcon) — kept for reference</summary>

@@ -6698,3 +6698,45 @@ Brayden's first look at Prompt 332 still showed the old layout — Falcon caught
 
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 332 (Carrier Portals badge removal + logo banner + 4 real logos) is fully shipped and verified — Brayden's first screenshot was just a stale tab, a hard refresh confirmed it matches. Prompt 333 is queued (not yet run by CC): add a carriers.logo_fit_mode column (cover/contain) so Aflac and Chubb's opaque brand-color-background logos can bleed edge-to-edge (cover) while American Amicable and Baltimore Life's white-composited logos stay contain but scale up bigger; remove the "opens in a new tab" caption under Open Portal; restyle Open Portal to match Overview's accent-filled button. This same fit-mode logic will need to be applied to Brayden's other 8 replacement logos as they arrive (Ethos flagged as the same problem). Tell CC to run 333. Nothing else queued beyond it.`
+
+---
+
+### 2026-07-25 (Falcon) — Prompt 333 verified with one real bug found; Prompt 334 queued — this closes out all 12 carrier logos
+
+**Prompt 333 verification.** Brayden confirmed the page looks "really good" — badge gone, banner logos, accent button all landed. **One genuine bug in the cover-mode treatment:** Aflac and Chubb's logos render anchored toward the top of the banner instead of vertically centered ("closer to the top than the bottom"). Not a big deal, but real — queued as item 1 of Prompt 334, and flagged to fix at the shared component level since it'll affect every future `cover`-mode carrier, not just these two.
+
+**5 more of Brayden's replacement logos received, processed, and staged** the same way as the first batch — checked each file's alpha channel before deciding `cover` vs `contain`:
+- Corebridge, Foresters, Mutual of Omaha — all fully opaque with solid brand-color backgrounds baked in (dark purple, maroon, blue respectively) → `cover`.
+- F&G — already opaque, solid white background → `contain`.
+- Fidelity Life — transparent background → composited onto white, same treatment as Baltimore Life/American Amicable → `contain`.
+
+Staged at `media/carrier-logos/{corebridge,fg,fidelity-life,foresters,mutual-of-omaha}.png` in the vault.
+
+**Two more items closed out without new images:**
+- **Ethos** — Brayden noticed its current Prompt-331-sourced logo has the same "small logo floating on white" problem as pre-fix Aflac/Chubb, and correctly guessed the fix is the same one — just flip `logo_fit_mode` to `cover`, no new file needed.
+- **National Life Group** — Brayden wants the "Experience Life" tagline gone and the logo enlarged. Told CC to try finding a clean official tagline-free asset first (same sourcing method as Prompt 331's original batch), falling back to cropping/masking the tagline off the current asset if a clean one can't be confidently found — didn't attempt to pull one from generic clip-art aggregator sites myself, not reliable enough for a real production asset.
+- **Transamerica** — Brayden confirmed it's already fine, no change.
+
+**This is the last carrier-logo prompt expected** — after Prompt 334 ships, all 12 carriers will have either Brayden's real image or a deliberate fit/crop fix, closing out an initiative that started with Prompt 331.
+
+**Current state:** Prompt 334 queued, not yet run. No code touched this session — vault + image processing only.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 333 (logo_fit_mode, dropped new-tab caption, accent Open Portal button) is shipped and verified, with one bug found (cover-mode logos render too high, not centered). Prompt 334 is queued (not yet run by CC) and is the last carrier-logo prompt expected: fix the cover-mode vertical-centering bug at the shared component level, flip Ethos to cover (no new image), fix National Life Group's tagline (find a clean official asset or crop/mask the current one), confirm Transamerica needs no change, and wire in 5 more of Brayden's real logos (Corebridge, F&G, Fidelity Life, Foresters, Mutual of Omaha) staged at media/carrier-logos/ in the vault with fit modes already determined. After this, all 12 carriers are done. Tell CC to run 334.`
+
+---
+
+### 2026-07-25 (CC) — Prompt 334 shipped + pushed (`66af837`), all 12 carrier logos done, pending Brayden's screenshot verification
+
+**Root-caused the cover-mode centering bug rather than guessing.** It wasn't `object-position` (already defaulted to center) — the real cause: the `<img>` is a flex item inside the banner's `display: flex` container, and a flex item's default `min-height: auto` is derived from its *intrinsic aspect ratio* for replaced elements. That let cover-mode images render taller than the fixed 84px banner and get cropped off-center instead of symmetrically. Fixed by pulling cover-mode images out of flex flow entirely — `position: absolute, inset: 0` on the image, plus `overflow: hidden` added to the banner div as a backstop — which sizes the image to exactly match the banner regardless of its own intrinsic dimensions. This is the standard robust pattern for `<img>`-based cover crops and sidesteps the flex/replaced-element quirk completely rather than patching around symptoms.
+
+**Ethos** flipped to `logo_fit_mode = 'cover'`, no new image. **Transamerica** untouched, confirmed fine. **National Life Group** — took the fallback approach (crop, not re-source): wrote a quick Python/Pillow row-scan against the existing `national-life-group.png` (500×220) to find exactly where the tagline sat — logo mark spans rows 31–136, then a clean all-background gap from 137–157, then "Experience Life®" starts at row 158 with a hard edge (no anti-aliasing bleed into the gap). First attempt cropped to 167px and still caught 9 rows of the tagline's top edge — caught it by re-reading the cropped output image before shipping, not by trusting the math blind; re-cropped to 157px which lands exactly on the gap and fully excludes the tagline, verified visually a second time. Saved to `media/carrier-logos/national-life-group.png` in the vault, no external image sourced. Set to `cover`.
+
+**Wired in Brayden's 5 newest real logos** (Corebridge, F&G, Fidelity Life, Foresters, Mutual of Omaha) — copied from `media/carrier-logos/` into `public/carrier-logos/`, deleted the old `corebridge.svg`/`foresters.svg`/`mutual-of-omaha.svg`/`f-and-g.png` placeholders (Fidelity Life had no logo before this — first one it's ever had), fit modes set per Falcon's staging notes (`cover` for Corebridge/Foresters/Mutual of Omaha, `contain` for F&G/Fidelity Life). All of it applied via migration `082_carriers_prompt334.sql`; confirmed afterward with a `select` across all 12 carriers — every row now has a real `logo_url` and correct `logo_fit_mode`.
+
+`eslint` and `vite build` both clean. Same standing verification gap as every carrier-page prompt — no agent login to screenshot `/agent/carriers`, confirmed only the dev server boots clean with no console errors.
+
+**Current state:** Prompt 334 shipped and pushed, LIVE_STATE updated in place (✅ SHIPPED, original spec collapsed into `<details>`) — left in the queue pending Brayden's screenshot, same pattern as every carrier-page prompt. **This closes out the carrier-logo initiative that started with Prompt 331** — no more logo-sourcing work expected unless Brayden flags something new. The cover-mode centering fix is the one item worth double-checking carefully in his screenshot, since it's a real bug fix CC couldn't see render.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 334 (cover-mode centering bug fixed via absolute positioning, Ethos flipped to cover, National Life Group tagline cropped off locally, 5 more of Brayden's real logos wired in — Corebridge/F&G/Fidelity Life/Foresters/Mutual of Omaha) is code-complete, pushed (66af837), and lint/build clean. All 12 carriers now have a real logo in the correct fit mode — this closes the carrier-logo initiative from Prompt 331 onward. NOT yet verified: CC has no agent login to screenshot /agent/carriers itself, same gap as every prompt on this page. Needs Brayden's own logged-in screenshot, with particular attention to whether the cover-mode logos (Aflac, Chubb, Corebridge, Foresters, Mutual of Omaha, Ethos, National Life Group) now render vertically centered. Nothing else queued beyond that.`
