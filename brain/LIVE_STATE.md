@@ -16,15 +16,7 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26 — see [[Memories]] for the full trail.)*
-
-### 🆕 Prompt 361 QUEUED 2026-07-26 — AccountMenu popover: "Sign out" text + icon turn red
-
-Small color-only change to the account popover (`AccountMenu`, bottom-left sidebar). "Sign out" — both its label text and the icon next to it — should render in red instead of the current color, matching the standard destructive/sign-out-action convention. Use the app's existing danger/red token (check [[DESIGN]] for the right one, e.g. `var(--danger)` or equivalent — don't hardcode a hex) rather than inventing a new red.
-
-**Verify with a real screenshot** — Sign out's text and icon both read red in the popover.
-
----
+*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26 — see [[Memories]] for the full trail.)*
 
 ### 🆕 Prompt 359 QUEUED 2026-07-26 — Submissions: segmented-pill tab style, drop Agent Name + Lead Status from New Submission, State becomes a dropdown
 
