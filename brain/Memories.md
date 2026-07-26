@@ -74,6 +74,8 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 362's SQL (migration 084_team_chat.sql, the Messages/Team-chat backend from Prompt 357) is now pasted into LIVE_STATE's Prompt 362 entry, waiting on Falcon to apply via direct Supabase MCP (apply_migration) and verify against pg_policies/list_tables, then close out in North Star Current Focus. CC's queue is otherwise empty — check North Star Current Focus for anything else in flight.`
 
+**Vault commit:** [`a3b600d`](https://github.com/BFreeOhvara/obsidian-mind/commit/a3b600d) on `obsidian-mind` — `LIVE_STATE.md` + this log entry, pushed to `origin/main`. No other repos touched this session.
+
 ---
 
 ### 2026-07-17 (cont. 30, Falcon) — 4th round on the lock shape: told CC to stop hand-tuning custom geometry and use a real icon glyph instead — queued Prompt 308
