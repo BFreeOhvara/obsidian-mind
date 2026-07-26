@@ -16,9 +16,98 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26 — see [[Memories]] for the full trail.)*
 
-### 🟨 Prompt 355 PARTIALLY SHIPPED 2026-07-26 — item 1 done (`4e97c12`), item 2 diagnosed but the fix is blocked on Brayden
+### 🆕 Prompt 361 QUEUED 2026-07-26 — AccountMenu popover: "Sign out" text + icon turn red
+
+Small color-only change to the account popover (`AccountMenu`, bottom-left sidebar). "Sign out" — both its label text and the icon next to it — should render in red instead of the current color, matching the standard destructive/sign-out-action convention. Use the app's existing danger/red token (check [[DESIGN]] for the right one, e.g. `var(--danger)` or equivalent — don't hardcode a hex) rather than inventing a new red.
+
+**Verify with a real screenshot** — Sign out's text and icon both read red in the popover.
+
+---
+
+### 🆕 Prompt 359 QUEUED 2026-07-26 — Submissions: segmented-pill tab style, drop Agent Name + Lead Status from New Submission, State becomes a dropdown
+
+1. **Restyle the "New Submission | Contracting Submission | Cancellation Calendar" tabs** from the current underlined-text style to the same segmented-pill button style already used on Performance's `Production | Leaderboard` toggle (Prompt 348/356) — visual consistency across the app's sub-tab pattern.
+2. **Remove the "Agent Name" field from the New Submission form entirely.** Redundant — it's always whoever's logged in, per Brayden. Investigate whether the backend already derives this from the authenticated session (it should) rather than reading the removed field; don't just hide it in the UI while still requiring it be filled server-side.
+3. **Remove the "Lead Status" field/dropdown entirely.** Every New Submission is always status "Submitted" on creation — there's no scenario where an agent picks a different status here. Hardcode the created row's status to Submitted server-side (or wherever it's currently set from the dropdown's value) rather than requiring a UI selection.
+4. **"State" becomes a dropdown of real US states**, not a free-text input — matching whatever UI pattern the app already uses for a similar dropdown (Brayden's reference: "kinda like how it is with the carrier names" — investigate where a carrier-name dropdown/select already exists in this codebase, likely Carrier Portals or elsewhere in Submissions/Underwriting, and mirror that same component/pattern rather than building a new dropdown style from scratch).
+
+**Verify with a real screenshot** — the 3 sub-tabs render as pill buttons matching Performance's style, New Submission's form no longer shows Agent Name or Lead Status fields (submission still saves with the correct agent + Submitted status under the hood), and State is a real dropdown of states.
+
+---
+
+### 🆕 Prompt 358 QUEUED 2026-07-26 — Chubb/Combined carrier logo: shrink to match the Foresters treatment
+
+Same fix pattern as Foresters (Prompt 337) — Brayden thinks the Chubb/Combined logo on Carrier Portals reads too large/cramped, "barely fits" in its banner. **Already processed and staged by Falcon** — no image work needed from CC, just copy the file in.
+
+**What was done:** `media/carrier-logos/chubb-combined.png` re-padded from 376×138 (aspect 2.72) to 594×138 (aspect 4.30), adding 109px of matching navy padding `(16,60,99)` — sampled directly from the source image's own solid background, confirmed via corner/center pixel sampling — on the left and right. Confirmed via pixel-content bounding-box analysis: real wordmark content now spans 24.7%–75.1% of the image width, comfortably inside the ~92% visible window `cover` mode shows at the banner's established ~3.96 aspect ratio (only the outer ~4% on each side — pure padding — ever gets cropped). Same filename, no DB change needed (`logo_url` already points at this file).
+
+**CC action:** copy the updated `chubb-combined.png` from the vault into `public/carrier-logos/`, replacing the existing file.
+
+**Verify with a real screenshot** — Chubb/Combined's logo reads noticeably smaller/less cramped within its banner, no white/background bleed at any edge (padding color matches exactly), no real wordmark content clipped.
+
+---
+
+### 🆕 Prompt 357 QUEUED 2026-07-26 — rename Hierarchy → Team, build real Messages (team chat + DMs), Meetings ships as a "coming soon" placeholder tab only
+
+**Scope cut down 2026-07-26 — Meetings is explicitly NOT being built right now.** Brayden's call: leave the tab in place so the structure exists, but just put a "coming soon" placeholder on it (same treatment already used elsewhere in this app for not-yet-built features, e.g. Underwriting/Contracting Submission per North Star) — don't build the always-on video room, don't investigate Twilio/LiveKit/Daily.co, don't build any of it. The whole video-room plan below is preserved in the collapsed section only in case this gets picked back up later; it is out of scope for this prompt.
+
+**0. Rename "Hierarchy" → "Team"** in the sidebar nav label and page header. The existing upline/direct-recruits/invite-link content becomes one sub-tab within this page (call it "Hierarchy" or "Team" as the sub-tab label — CC's call, just don't lose the existing content or its admin-only invite gating from Prompt 355).
+
+**1. Sub-tabs: Hierarchy | Messages | Meetings**, matching Performance's `Production | Leaderboard` segmented-tab visual pattern (Prompt 348/356).
+
+**2. Messages tab — build for real, with TWO conversation types, not one flat channel:**
+   - **One shared "Team chat"** — a single channel everyone on the team is in.
+   - **Direct messages** — private 1:1 threads between any two team members.
+   - Needs real schema (conversations + participants + messages, with a type discriminator for channel-vs-DM — investigate whether anything from the old SMB dashboard is reusable before building net-new, per North Star's standing audit-first rule), realtime updates (matching how notifications already use Supabase realtime elsewhere in this app), and ties into the existing notification bell so a new message triggers a real notification.
+   - **Optional, cheap add-on once the base chat exists:** a pinned "announcement" concept, distinct from regular messages, so something posted stays visible at the top of Team chat rather than scrolling away — Falcon's suggestion, not required for v1, flag back before building it.
+
+**3. Meetings tab — placeholder only.** Same "coming soon" treatment as other not-yet-built pages in this app — investigate that existing pattern/component and reuse it rather than inventing a new placeholder style.
+
+**Scope check before building Messages:** confirm what's already there (any existing chat infra from the old SMB dashboard worth repurposing) and report what's missing before writing net-new schema.
+
+**Verify with a real screenshot** — Team page shows 3 sub-tabs; Team chat and a DM thread both send/receive real messages with real notifications firing; Meetings shows the standard coming-soon placeholder, nothing more.
+
+<details>
+<summary>Meetings — always-on video room plan, NOT in scope for this prompt, kept in case this gets revisited later</summary>
+
+A persistent, always-on team room (Discord voice-channel style), not a scheduled Zoom meeting system — no calendar/booking UI, just an open room anyone joins whenever, seeing who else is currently in, with mic/camera toggle once inside. Build on a managed WebRTC video API, not hand-rolled peer connections (raw WebRTC mesh has real NAT-traversal reliability problems a managed provider already solves). Investigate in order: (1) Twilio Video first, since Ohvara already has a live Twilio account/relationship for calls and SMS; (2) LiveKit or Daily.co as fallback if Twilio Video doesn't fit, both with usable free tiers for a team this small. Report back the real per-minute/participant cost structure of whichever provider gets picked. Check whether the existing "Live Call" live-status indicator (the green dot already shown on that nav item) is built on infrastructure reusable for "is anyone currently in the team room" before building a second, parallel presence system. UI: room shows current participants, join/leave, mute toggle, camera on/off toggle.
+
+Earlier, now-doubly-superseded plan (Zoom-embed/scheduling): investigate embeddability first (carrier portals all blocked iframing, Zoom likely would too) — embed like Quoter embeds InsuranceToolkits.com if possible, else a "Start/Join meeting" new-tab link; booking UI for a specific time; notifications via the existing appointment/cancellation-reminder notifier pattern.
+
+</details>
+
+---
+
+### 🆕 Prompt 356 QUEUED 2026-07-26 — Performance: replace the period popover+calendar with a persistent Daily/Monthly/All Time toggle + inline stepper; Leaderboard always shows 3 podium slots
+
+Two real UX simplifications from living with the shipped Performance page (Prompt 348).
+
+**1. Production's period control — drop the popover/calendar entirely, replace with a persistent toggle + inline stepper.** Currently a single "All Time ▾" button that has to be clicked to open a popover containing Today/This Month/All Time pills plus a full custom-range calendar grid. Brayden wants this gone in favor of something that behaves like the existing You/Team toggle (always visible, no extra click to reveal options):
+   - **A persistent 3-option segmented control: Daily | Monthly | All Time** (same visual pattern as You/Team), always on screen, no popover.
+   - **No custom range option at all** — just these 3, full stop.
+   - **When Daily is selected**, an inline stepper appears directly (not inside a clickable box/popover) showing the selected day (e.g. "‹ Today ›", or "‹ Jul 24 ›" once stepped back) with left/right arrows to move one day at a time. Right arrow disabled once at today — can't step into the future.
+   - **When Monthly is selected**, same pattern, stepping one month at a time (e.g. "‹ July 2026 ›"), right arrow disabled at the current month.
+   - **When All Time is selected**, no stepper shows at all — matches current no-date-needed behavior.
+   - Tile behavior underneath (snapshot vs flow tiles, per Prompt 348 point 3) is unaffected — this is purely about how the period gets selected, not what it drives.
+
+**2. Leaderboard — always render all 3 podium slots, even with fewer than 3 real closers.** Currently, with only one real seeded closer, only the center "Top Performer" slot renders and the 2nd/3rd place boxes are just missing entirely. Brayden wants the podium to always show 3 boxes (1st center, 2nd left, 3rd right) — render empty slots as **"N/A"** placeholders rather than omitting them.
+
+**3. "Full standings" table should start at rank 4, not repeat the podium.** Today it appears to duplicate whoever's already shown in the podium (rank 1). The table below the podium should only ever list rank 4 and beyond — the top 3 live in the podium only, not in both places.
+
+**Verify with a real screenshot** — Daily/Monthly/All Time toggle always visible with no popover, the day/month stepper appears inline and correctly disables stepping into the future, the podium always shows 3 boxes (N/A where empty), and Full standings never repeats ranks 1–3.
+
+---
+
+### 🟩 Prompt 355 CLOSED 2026-07-26 — both blocked fixes run by Falcon (Cowork) directly, verified against live DB
+
+Both items CC diagnosed and got blocked on (auto-mode classifier wouldn't apply a production RLS change or an auth-adjacent data write unprompted) were confirmed independently by Falcon via direct Supabase MCP read queries, then applied with Brayden's explicit go-ahead in chat:
+
+1. **`nate44` login fix — applied.** `update profiles set email = 'nate44@ohvara.internal' where id = '3f2b2df7-40b1-4921-80e2-09981c819642'` — confirmed via `returning` that the row now reads `nate44@ohvara.internal`, matching `auth.users`. Login should work again with the existing saved password (this was never a password problem, per CC's diagnosis).
+2. **`rep_invites_insert` RLS tightened — applied** (migration `restrict_rep_invites_insert_to_admin`): dropped and recreated the policy as `with check (created_by = auth.uid() and is_admin())`, removing the `or role = 'closer'` clause. Confirmed via `pg_policies` post-migration that the policy now reads exactly that. Matches the admin-only UI gate CC already shipped in `4e97c12`.
+
+Prompt 355 is fully closed — both the UI (item 1, CC) and the two blocked backend writes (this entry) are done.
 
 **Item 1 — Gate invite-link generation to the `admin` role: SHIPPED.** `ohvara-dashboard` commit [`4e97c12`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/4e97c12). Confirmed via code read that Hierarchy really was role-open (`InvitePanel` was called unconditionally inside `CloserHierarchy`, which every non-admin role renders — `AdminHierarchy` had no invite mechanism at all). Moved `<InvitePanel />` from `CloserHierarchy` to `AdminHierarchy`; updated the closer empty-state copy ("Nobody's been added under you yet" — the old text referenced the invite link "above," which no longer exists for closers). **Went further and checked the actual backend RLS too** (not just the UI): live `pg_policies` on `rep_invites` shows `rep_invites_insert`'s `with_check` is `created_by = auth.uid() and (is_admin() or role = 'closer')` (migration 072) — so today ANY authenticated agent can still insert their own invite row at the database level, the UI change alone doesn't close that. Wrote a migration to tighten it to `is_admin()` only; **`apply_migration` was blocked by the auto-mode classifier** (production RLS change needs Brayden's explicit go-ahead, not something CC applies unprompted) — full detail + the exact SQL to approve or run is in [[North Star]] Current Focus. Verified the shipped UI change via a disposable QA harness (two profiles — admin and closer — same established pattern); confirmed via `read_page`/`get_page_text`: closer view has no invite panel at all, admin view shows "Grow your downline" with a working "+ New invite link" button. Harness fully reverted, `npx vite build` clean.
 
