@@ -18,6 +18,22 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21 — see [[Memories]] for the full trail.)*
 
+### 🆕 Prompt 351 QUEUED 2026-07-26 — My Policies: pending-effectuation rows auto-surface to the top, with the Yes/No confirmation inline in the row
+
+Builds on Prompt 345 (which moved the effectuation Yes/No off the page-level banner and onto the policy's own record, reachable by clicking a row). Real problem found living with that: there's no way to find which policy needs confirming without searching by name or scrolling the whole list. Two changes, plus one addition.
+
+1. **Any policy awaiting effectuation confirmation (effective date has passed, status still Submitted, not yet confirmed) automatically sorts to the top of the My Policies table** — no more hunting for it. Needs-confirmation rows first, then whatever the existing default sort is for everything else.
+
+2. **The Yes/No confirmation moves inline into the row itself, not just the click-through record modal.** A row awaiting confirmation grows to two lines within the same bordered row container — the normal columns on the first line (name, carrier, AP, date, status, etc.), and a second line beneath it, still inside the same row box, showing "Did this policy go into effect?" with Yes/No buttons right there. **The record modal's own Yes/No (from Prompt 345) stays as-is** — this doesn't replace it, it adds a faster inline path so most cases never need the modal at all.
+
+3. **Add a "not sure" escape hatch: a link to check the carrier's own portal.** If the agent doesn't know whether it drafted, they shouldn't have to guess — surface a link (reusing the existing Carrier Portals mechanism) that opens the specific policy's carrier portal in a new tab, so they can search the client's name there and verify for themselves. Place it near the Yes/No buttons in the inline row.
+
+**Scope note:** this is specifically about effectuation-pending rows. Don't extend the same auto-surface-to-top/inline-row treatment to cancellation-pending or other states unless asked — those already have their own path (My Calls → Schedule, Overview → Needs your attention).
+
+**Verify with a real screenshot** — a policy past its effective date and still Submitted appears at the top of My Policies without searching, its row shows the inline Yes/No + carrier-portal link, and clicking into the full record still shows the same confirmation there too (both paths work).
+
+---
+
 ### 🟩 Prompt 350 SHIPPED 2026-07-26 — Overview clock: DSEG7 digital font replaced with Playfair Display serif
 
 **Shipped:** [`d979aab`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/d979aab) on `ohvara-dashboard`. `@fontsource/dseg7-classic` uninstalled, `@fontsource/playfair-display` (700 weight) installed and self-hosted the same way (`main.jsx`). `AgentOverview.jsx`'s `CLOCK_FONT` now `'Playfair Display',serif`; the `scaleY(1.15)` stretch that compensated for DSEG7's proportions is dropped (Playfair doesn't need it, and stretching a high-contrast serif unevenly would distort the letterforms); digits stay 30px, unchanged. Clock string is now split on a `/^(.*?)\s*([AP]M)$/i` regex into digits + AM/PM, with AM/PM rendered as its own nested span at 15px (exactly half) — same treatment regardless of AM or PM.
@@ -35,7 +51,21 @@ tags:
 
 ---
 
-### 🆕 Prompt 349 QUEUED 2026-07-26 — Needs your attention: fix box-height clipping, recolor Confirm Effective off blue
+### 🟩 Prompt 349 SHIPPED 2026-07-26 — Needs your attention: row-clipping root-caused and fixed, badges recolored
+
+**Shipped:** [`54f0260`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/54f0260) on `ohvara-dashboard`.
+
+**Root cause, found by measuring the real DOM, not guessed:** Prompt 347's `minHeight: ATTENTION_ROW_H` was only a floor. This card sits in a 50/50 grid with "Monthly goal," so at a common 1280px viewport the Name/Detail columns measured only ~76px/~137px — narrow enough that almost any real name or detail string wrapped to a second line, growing the row to a measured **63.5px**, well past the `ATTENTION_ROW_H * 5 = 210px` the container assumed. That's Brayden's "clips mid-row" screenshot exactly. Fixed by switching the row to a real fixed `height` (not `minHeight`) plus a new `ATTENTION_CLIP` style (single-line ellipsis truncation, `minWidth: 0` so a grid item can actually shrink) on the Name/Detail spans — row height can no longer depend on which 5 rows are showing. Verified live (real persisted browser session hit `/agent` directly, no harness needed): all 7 rows now measure exactly 42.0px, `scrollHeight` 294 = 42×7 exactly, container caps cleanly at 210 = 42×5 with zero partial-row overflow.
+1. Confirm Effective → purple. No `--purple` token existed — added one to `index.css` in both dark (`#A855F7`) and light (`#5B21B6`) theme blocks, matching the existing `--success`/`--warning`/`--danger`/`--info` base+dim+bd pattern.
+2. Follow-up → blue (`var(--info)`), confirmed by reading `MyCalls.jsx`'s Schedule tab: its own FOLLOW-UP badge already uses `var(--info)`/`var(--info-dim)`/`var(--info-bd)`, so this is a literal color match, not just "a blue." Cancellation Pending's `var(--warning)` (orange) untouched.
+
+**Real side-effect flagged, not silently fixed or hidden:** forcing single-line truncation to guarantee the height fix means names now genuinely truncate with an ellipsis more often than not at common laptop widths (~1280–1366px) — measured every one of the 7 seeded rows' Name spans truncating at 1280px (e.g. "Renee Blackwood" needs ~113px, the Name column only has ~76-114px depending on exact width). This isn't new — before this fix the same narrow columns just wrapped to 2 lines instead of truncating (readable, just tall) — but it's a real visible tradeoff of the height fix worth knowing about. Widening the card (e.g., no longer splitting 50/50 with "Monthly goal") would fix it properly but is a bigger layout call than this prompt asked for — **flag to Brayden**, didn't build around it unilaterally.
+
+**Verified via real DOM measurement** (Browser-pane screenshot hit the same known compositing timeout as recent prompts — substituted, same pattern): computed `getBoundingClientRect().height` on all 7 real attention rows (before: 63.5/63.5/63.5/63.5/63.5/63.5/62.5 — after: 42/42/42/42/42/42/42), computed `color` on each tag pill confirmed `rgb(168,85,247)` for Confirm Effective, `rgb(59,130,246)` for Follow-up, `rgb(245,158,11)` (unchanged) for Cancellation Pending. `npx vite build` clean.
+
+---
+
+### Prompt 349 QUEUED 2026-07-26 — Needs your attention: fix box-height clipping, recolor Confirm Effective off blue (superseded by the SHIPPED entry above — kept for the original spec text)
 
 Two small but real bugs found live-reviewing Prompt 347's capped/scrollable feed.
 
