@@ -1,5 +1,5 @@
 ---
-date: 2026-06-19
+date: 2026-07-26
 description: "Single current-state doc for all Ohvara sessions — overwritten on update, never appended. Read this + /reload convention to become fully operational."
 tags:
   - brain
@@ -17,6 +17,42 @@ tags:
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21 — see [[Memories]] for the full trail.)*
+
+### 🆕 Prompt 346 QUEUED 2026-07-25 — Overview's "Needs your attention": badge sizing, copy cleanup, cancellation calls only ever show same-day
+
+Prompt 345 (below) has landed — cancellation-pending now lives only in My Calls → Schedule, not as a Policies badge — so this one is unblocked.
+
+1. **Badge sizing** — "CONFIRM EFFECTIVE" and "CANCELLATION PENDING" pills have visibly more padding than the text needs. Tighten to fit, same treatment for both.
+
+2. **Drop "3-way" from all cancellation-call copy here** — "3-way call Jul 28, 2:00 PM" / "Schedule the 3-way cancellation call" should just say "cancellation call," not "3-way cancellation call."
+
+3. **Collapse the two cancellation-call detail variants into one.** Today there are two: a scheduled one (has a date/time) and an unscheduled one ("Schedule the cancellation call"). Brayden's real-world point: a closer should never end the original call without booking the cancellation appointment on the spot — so the "not yet scheduled" state shouldn't really occur, and isn't worth a distinct UI state. **Always render as "Cancellation call at {time}"** (today's time only — see point 5) — drop the "needs scheduling" copy/state entirely. Update Terrence Lockhart's sample row to carry an actual scheduled time instead of the "schedule the call" placeholder.
+
+4. **Confirm Effective copy** — drop the literal effective date from the detail line (if it's surfacing here, it's already due — no need to restate the date) and move away from the literal "did it go into effect?" question phrasing toward something more like an "effectuation status" label. Brayden hasn't locked exact wording — use judgment, just get off the yes/no-question phrasing and drop the redundant date.
+
+5. **Cancellation-call entries should ONLY appear on "Needs your attention" the day they're actually scheduled for — not any time before, and reset at midnight.** Brayden's own example: close a policy today (Jul 26), book the cancellation call for Jul 28 2pm — that entry should NOT show in Needs your attention on the 26th or 27th; it should only appear starting midnight of the 28th, matching the calendar date, not a rolling "within 24 hours" window. **This is specifically about cancellation-call entries** — Brayden's example and reasoning were entirely about scheduled calls; he did not say Confirm Effective items need the same day-of filtering (those already read as an accumulating overdue-backlog concept based on the sample dates, which are all in the past relative to "today" — don't add same-day filtering to Confirm Effective unless a future ask says otherwise).
+
+**Known consequence of point 5, flag don't silently work around:** Prompt 343's seeded cancellation-call sample date(s) will fall outside "today" as real days pass and stop showing here — that's the filter working correctly, not a bug, but it means the sample data will need touching up again whenever Brayden wants to demo this specific card in the future. Not something to fix now, just don't be surprised by it.
+
+**Verify with a real screenshot** — pill padding is tight, no "3-way" wording anywhere in this section, every cancellation-call row reads "Cancellation call at {time}" with no separate unscheduled variant, Confirm Effective rows read without a date or "?" question format, and a cancellation call dated for a future day is confirmed NOT showing today (test by checking the query/filter logic, not just current sample data which may happen to comply already).
+
+---
+
+### 🟩 Prompt 345 SHIPPED 2026-07-26 — My Policies: real scope/status rules, drop Next Action column and the second cancellation badge, move effectuation confirmation onto the record itself
+
+**Shipped:** [`acbc4ae`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/acbc4ae) on `ohvara-dashboard`, plus Supabase migration `prompt345_reseed_nate44_policies` on `jjextitmbptoaolacocs` (data re-seed).
+
+1. **Next Action column dropped entirely** from `MyPolicies.jsx` — header, body cell, the `nextAction()` helper, and the now-dead `today` var all removed; `colSpan` on the empty-state row corrected 8→7.
+2. **My Policies restricted to In Effect/Submitted/Undrafted.** Added `LIVE_POLICY_STATUSES` (= `POLICY_STATUSES` minus `PRE_SUBMISSION_STATUSES`) to `usePolicies.js` — the same filter pattern `Submissions.jsx` already used for its own status dropdown, just promoted to a shared export. Applied as a base filter in `MyPolicies.jsx`'s `rows` memo (so it holds regardless of the Filters popover) and swapped into both the Status filter dropdown and `PolicyModal.jsx`'s edit dropdown (so a rep can no longer flip a real policy back to Follow-up/Not Interested via the record view either).
+3. **Stacked "Cancellation Pending" badge removed** from policy rows in `MyPolicies.jsx` — dropped the `cc`/`CANC_STYLE` machinery entirely, status cell is now a single badge. Overview's own "Needs your attention" cancellation-pending badge (Prompt 344) is untouched — different component, same underlying `cancellation_status` field.
+4. **Effectuation Yes/No moved from the list-view banner into `PolicyModal.jsx`.** Deleted the `EffectuationPrompts` component and its `needsEffectuation` memo from `MyPolicies.jsx`; added the equivalent banner (same copy, same Yes→In Effect/No→Undrafted mutation, same `pendingEffectuation` helper — now called on a single-item array) directly in the modal, gated on `canEdit` and rendered right below the header badges.
+5. **Re-seeded nate44's book** via direct Supabase migration (same auto-mode classifier block on `apply_migration` as Prompt 343 — asked Brayden in chat, he granted it again, then it succeeded): Tasha Coleman and Bruce Lin (the two Follow-up rows) moved into `closer_followups` as real follow-up entries (Jul 29 10am / Aug 1 12:30pm) and deleted from `policies`; Diane Ford (Not Interested) deleted outright, no replacement; Terrence Lockhart's `cancellation_call_at` set to Jul 30 6pm so he now shows as a second distinct cancellation-call entry on Schedule alongside Monica Reyes's existing Jul 28 2pm one. nate44 now carries 17 policy rows (11 In Effect, 5 Submitted, 1 Undrafted) — Overview's "Needs your attention" count is unaffected (still 3 pending-effectuation + 2 cancellation-pending = 5), confirmed via direct SQL before and after.
+
+**Verified live** (Browser pane not displayed on-screen again this session — same known issue as recent prompts — used `get_page_text`/`read_page` instead): My Policies reads "17 of 17 policies" with only In Effect/Submitted/Undrafted status values visible, no Next Action column in the header row, Monica Reyes and Terrence Lockhart each show exactly one status badge. My Calls → Schedule lists all 4 entries — both cancellation calls (Monica Jul 28, Terrence Jul 30) and both follow-ups (Tasha Jul 29, Bruce Aug 1). Opened Wendy Ashford's record (a real pending-effectuation row) via `PolicyModal` and confirmed via `read_page` the Yes/No banner ("Reached its effective date (Jul 10, 2026) — did this policy go into effect?") renders inside the modal with a 3-option Status dropdown (Submitted/In Effect/Undrafted only) — not on the list page. `eslint`/`vite build` clean (4 pre-existing lint errors on unrelated lines confirmed via `git stash` diff, not introduced by this change).
+
+**This was the last item in the queue except Prompt 346, which was blocked on this one landing — it's now unblocked.**
+
+---
 
 ### 🟩 Prompt 344 SHIPPED 2026-07-25 — Overview tile de-dup, Needs your attention decluttered
 
