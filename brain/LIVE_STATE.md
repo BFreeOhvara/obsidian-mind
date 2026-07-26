@@ -16,25 +16,9 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26, Prompt 358 shipped 2026-07-26, Prompt 357 shipped frontend 2026-07-26 (DB migration blocked, see [[North Star]] Current Focus) — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26, Prompt 358 shipped 2026-07-26, Prompt 357 shipped frontend 2026-07-26 (DB migration blocked, see [[North Star]] Current Focus), Prompt 356 shipped 2026-07-26 — see [[Memories]] for the full trail.)*
 
-### 🆕 Prompt 356 QUEUED 2026-07-26 — Performance: replace the period popover+calendar with a persistent Daily/Monthly/All Time toggle + inline stepper; Leaderboard always shows 3 podium slots
-
-Two real UX simplifications from living with the shipped Performance page (Prompt 348).
-
-**1. Production's period control — drop the popover/calendar entirely, replace with a persistent toggle + inline stepper.** Currently a single "All Time ▾" button that has to be clicked to open a popover containing Today/This Month/All Time pills plus a full custom-range calendar grid. Brayden wants this gone in favor of something that behaves like the existing You/Team toggle (always visible, no extra click to reveal options):
-   - **A persistent 3-option segmented control: Daily | Monthly | All Time** (same visual pattern as You/Team), always on screen, no popover.
-   - **No custom range option at all** — just these 3, full stop.
-   - **When Daily is selected**, an inline stepper appears directly (not inside a clickable box/popover) showing the selected day (e.g. "‹ Today ›", or "‹ Jul 24 ›" once stepped back) with left/right arrows to move one day at a time. Right arrow disabled once at today — can't step into the future.
-   - **When Monthly is selected**, same pattern, stepping one month at a time (e.g. "‹ July 2026 ›"), right arrow disabled at the current month.
-   - **When All Time is selected**, no stepper shows at all — matches current no-date-needed behavior.
-   - Tile behavior underneath (snapshot vs flow tiles, per Prompt 348 point 3) is unaffected — this is purely about how the period gets selected, not what it drives.
-
-**2. Leaderboard — always render all 3 podium slots, even with fewer than 3 real closers.** Currently, with only one real seeded closer, only the center "Top Performer" slot renders and the 2nd/3rd place boxes are just missing entirely. Brayden wants the podium to always show 3 boxes (1st center, 2nd left, 3rd right) — render empty slots as **"N/A"** placeholders rather than omitting them.
-
-**3. "Full standings" table should start at rank 4, not repeat the podium.** Today it appears to duplicate whoever's already shown in the podium (rank 1). The table below the podium should only ever list rank 4 and beyond — the top 3 live in the podium only, not in both places.
-
-**Verify with a real screenshot** — Daily/Monthly/All Time toggle always visible with no popover, the day/month stepper appears inline and correctly disables stepping into the future, the podium always shows 3 boxes (N/A where empty), and Full standings never repeats ranks 1–3.
+**Queue is empty.** Nothing left to build — check [[North Star]] Current Focus for open items, including Prompt 357's blocked migration waiting on Brayden.
 
 ---
 
