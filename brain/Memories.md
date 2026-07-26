@@ -7153,3 +7153,14 @@ Picked up Prompt 344, the last item in LIVE_STATE's queue — Brayden's own revi
 ---
 
 [CC | 2026-07-25 — Prompt 344 close-out] — Dashboard commit `e718070` and vault commit `c9d40d5` both pushed to their respective `origin/main`/`origin/master`, with the full Prompt 344 write-up above already covering the tile de-dup and "Needs your attention" decluttering. No further work occurred after that push (only the browser preview server was stopped); this entry exists only to satisfy the Atlas logging gate on session stop. Nothing new to capture.
+
+---
+
+### 2026-07-26 (CC) — Prompt 345 in progress: mid-session checkpoint, no ship yet
+
+Started Prompt 345 (My Policies status/scope corrections — drop Next Action column, restrict to 3 statuses, drop stacked cancellation badge, move effectuation Yes/No to the record view, re-seed nate44 data per corrected rules). Both `obsidian-mind` and `ohvara-dashboard` confirmed clean/pulled/up to date at session start. Set up 6 tracked tasks covering each numbered requirement in LIVE_STATE's Prompt 345 entry, and launched a read-only Explore agent against `ohvara-dashboard` to map the exact files/lines for: the My Policies table + Next Action column, the status-filtering query/enum, the cancellation-pending badge, the top-of-page effectuation banner, the policy detail/record view, My Calls → Schedule's data model, the nate44 seed script from Prompt 343, and Overview's "Needs your attention" query.
+
+**Nothing shipped yet** — this entry exists only because the Atlas logging gate fired mid-research (no code touched, no commits). No LIVE_STATE change needed; the Prompt 345/346 queue entries are still accurate as written. Once the Explore agent's findings land, next step is implementing the 5 numbered changes in Prompt 345, then re-verifying Overview's "Needs your attention" still works before touching Prompt 346 (which explicitly depends on 345 landing first).
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Mid-flight on Prompt 345 (My Policies scope/status corrections) when this session ended — an Explore agent had been launched against ohvara-dashboard to map the relevant files (My Policies table, status enum/query, cancellation badge, effectuation banner, policy detail view, My Calls Schedule data model, Prompt 343's seed script, Overview's Needs-your-attention query) but results may not have landed before the session closed. Check task list (6 tasks tracked) for what's done vs. pending, then continue implementing Prompt 345's 5 numbered requirements per LIVE_STATE, verify with a real screenshot, and only then move to Prompt 346 (depends on 345).`
