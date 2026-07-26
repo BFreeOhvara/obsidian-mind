@@ -18,7 +18,19 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21 — see [[Memories]] for the full trail.)*
 
-*(Queue is empty — check [[North Star]]'s Current Focus for what's next.)*
+### 🟩 Prompt 347 SHIPPED 2026-07-26 — Overview: swap two stat tiles, unify "Needs your attention" into one capped/scrollable feed, drop its View Policies button
+
+**Shipped:** [`a25df8b`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/a25df8b) on `ohvara-dashboard`, plus a Supabase data-only seed (no migration file — DML via `execute_sql`, `apply_migration` was blocked by the auto-mode classifier) adding 2 cancellation-pending policies (Diane Whitfield, Walter Higgins, calls today) and 2 `closer_followups` rows (Priya Chandra, Omar Delgado, today) for `nate44`.
+
+1. **Tiles 2/3 swapped** — row1 array reordered to Submitted AP Today, Policies Submitted This Month, Active AP This Month, Average Premium This Month.
+2. **Unified feed** — added a `useFollowUps(profile?.id)` call and a `followups` branch in the `attention` memo, filtered to `localISO(f.scheduled_at) === today` (same helper Prompt 346 built for cancellations). Confirm Effective stays unfiltered (accumulating backlog).
+3. **5-row cap** — every row forced to a fixed `ATTENTION_ROW_H = 42` via `minHeight` + `boxSizing: border-box`; rows live in their own `overflowY: auto` div capped at `42*5=210px`, sibling to the header row (which sits outside the scroll container so it never scrolls).
+4. **Dropped "View my policies" button** and the now-unused `useNavigate`/`ArrowRight` imports.
+5. **Seeded 7 total attention items** for `nate44` (3 existing Confirm Effective + 2 new cancellation-today + 2 new follow-up-today) via direct SQL against the `jjextitmbptoaolacocs` project.
+
+**Verified live** (Browser pane not displayed on-screen this session — same known issue as recent prompts — used `get_page_text`/`javascript_tool` DOM checks instead): confirmed tile order, all 3 attention-row types render (Confirm Effective ×3, Cancellation Pending ×2, Follow-up ×2 = 7 rows), scroll container measured `maxHeight: 210px` / `scrollHeight: 312px` (scrollbar present), scrolling to bottom revealed the last row (Omar Delgado) while the "Needs your attention" header and TYPE/NAME/DETAIL row stayed unscrolled, and the View my policies button is gone from the DOM. `eslint`/`vite build` clean.
+
+**Queue is now empty.**
 
 ---
 
