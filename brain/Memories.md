@@ -7337,3 +7337,7 @@ Picked up Prompt 352, next after 353 — Falcon's reconsideration of Prompt 348'
 
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 352 shipped (f9f3d48): removed Performance page's Persistency period-picker (This Month/Last Month/Custom Range) entirely — the 4 rolling-window tiles are inherently "as of today," so persistencyWindows() now always runs with [todayMonthKey], no control needed. Also deleted 4 now-dead helper functions/styles that only existed for the picker. Verified via disposable QaHarness352 (same established pattern) since a real login attempt got blocked by the auto-mode classifier on password entry (respected the boundary, didn't work around it) — read_page/get_page_text confirmed the picker is gone and tiles compute correctly. Harness fully reverted, git status clean, vite build clean. LIVE_STATE's CC queue has 1 item left: Prompt 351 (My Policies pending-effectuation rows auto-surface to top + inline Yes/No + carrier-portal escape hatch) — pick that up next.`
+
+---
+
+[CC | 2026-07-26 — Prompt 352 close-out] — Dashboard commit `f9f3d48` and vault commit `b800c04` both pushed to their respective `origin/master`/`origin/main`; the full Prompt 352 write-up above already covers the picker removal, dead-code cleanup, and QA-harness verification. LIVE_STATE's Prompt 352 entry updated from QUEUED to SHIPPED with the same detail. No new work happened after that push — this entry exists to satisfy the Atlas logging gate on session stop.
