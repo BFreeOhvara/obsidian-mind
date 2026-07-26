@@ -67,6 +67,15 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-26 (cont. 32, Eagle) — Prompt 362: pasted migration 084_team_chat.sql into LIVE_STATE for Falcon's direct-MCP handoff
+
+**What happened:** Queue had exactly one item — Prompt 362, a handoff task not a build task. Falcon (Cowork) can't read the `ohvara-dashboard` repo directly (only this vault is mounted), so needed the full text of `supabase/migrations/084_team_chat.sql` (Prompt 357's Messages migration, still blocked from `apply_migration` by the classifier same as Prompt 355's fixes) routed through [[LIVE_STATE]] so Falcon can apply it via direct Supabase MCP access with Brayden's prior go-ahead precedent. Read the file from `C:\Users\freem\ohvara-dashboard\supabase\migrations\084_team_chat.sql`, pasted its complete, verbatim contents into the Prompt 362 entry in LIVE_STATE.md as instructed — did not delete the entry (per instructions, left in place for Falcon's next pass to apply + verify + close out). No code changes, no migration applied by CC — that action is explicitly Falcon's to take via MCP.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 362's SQL (migration 084_team_chat.sql, the Messages/Team-chat backend from Prompt 357) is now pasted into LIVE_STATE's Prompt 362 entry, waiting on Falcon to apply via direct Supabase MCP (apply_migration) and verify against pg_policies/list_tables, then close out in North Star Current Focus. CC's queue is otherwise empty — check North Star Current Focus for anything else in flight.`
+
+---
+
 ### 2026-07-17 (cont. 30, Falcon) — 4th round on the lock shape: told CC to stop hand-tuning custom geometry and use a real icon glyph instead — queued Prompt 308
 
 **What happened:** Prompt 307 fixed the seam (verified via pixel-level canvas rasterization) but Brayden still doesn't think the lock looks normal — 4th round of feedback on this exact shape now. His message included a live self-correction mid-dictation ("the square could be smaller, and the arch can be larger... I feel like the arch part is way too big for the lock part") — preserved both statements verbatim in the prompt rather than picking one, since it reads as him thinking out loud, not two literal separate asks. The one clear, consistent thread across all his feedback: the arch stroke is too thin/skinny, and the overall proportions don't read as a real padlock despite 3 rounds of numeric adjustment (body size, shackle overlap, centering).
