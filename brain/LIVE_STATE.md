@@ -18,6 +18,27 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21 — see [[Memories]] for the full trail.)*
 
+### 🆕 Prompt 353 QUEUED 2026-07-26 — Overview clock: fix baseline/sizing bugs from the Playfair Display swap, make digits bigger
+
+Real rendering bugs found living with Prompt 350's font swap, not a new redesign.
+
+1. **All digit characters must share one common baseline — nothing may render below where AM/PM sits.** Brayden's example: the "3" currently visually extends below AM's baseline, which should never happen. Every character (digits, colons, AM/PM) needs to sit on a consistent baseline — investigate whether this is a `vertical-align`/`line-height` issue from how Prompt 350 split the clock string into a digits-span + AM/PM-span, since that's the most likely cause of a baseline mismatch.
+2. **All digits must render at the same size** — currently inconsistent (some characters visibly larger/smaller than others). This should not happen with a single `font-size` applied uniformly; investigate whether individual characters are picking up different sizes from stray inline styles, the regex split from Prompt 350, or a font-rendering quirk with Playfair Display's numeral proportions at this weight/size — fix at the root rather than papering over it.
+3. **Make the digits bigger — taller specifically**, once 1 and 2 are fixed (no point resizing before the baseline/consistency bug is actually fixed). Use judgment on exact size, no specific px given.
+4. **AM/PM stays at exactly 50% of the digit height** (per Prompt 350), recalculated against whatever the new larger digit size ends up being, and still sharing the same baseline as the digits per point 1.
+
+**Verify with a real screenshot** — every character sits on the same baseline (nothing dips below AM/PM), every digit is visually the same size as every other digit, the whole clock reads larger/taller than before, and AM/PM is still proportioned to half the digit height.
+
+---
+
+### 🆕 Prompt 352 QUEUED 2026-07-26 — Performance: remove Persistency's This Month/Last Month/Custom Range picker entirely
+
+Brayden reviewed the shipped Performance page and reconsidered Prompt 348's spec for Persistency — Falcon agrees this is the right call. **Remove the period-picker control above the Persistency block entirely** (the "This Month / Last Month / Custom Range" pill group + its date label). The 4 rolling-window tiles (30-day, 3-month, 6-month, 12-month) already are inherently "as of today" calculations — there's no clean meaning for "what was my 30-day persistency as of last month" at this stage, and the picker was solving a problem that doesn't exist yet. Persistency just always shows current rolling-window values, full stop, no control needed. Leave the "X% all-time" sub-captions and the "6- and 12-month windows unlock as the book ages" note untouched — only the picker control goes.
+
+**Verify with a real screenshot** — Persistency renders with no period control above it, just the 4 tiles.
+
+---
+
 ### 🆕 Prompt 351 QUEUED 2026-07-26 — My Policies: pending-effectuation rows auto-surface to the top, with the Yes/No confirmation inline in the row
 
 Builds on Prompt 345 (which moved the effectuation Yes/No off the page-level banner and onto the policy's own record, reachable by clicking a row). Real problem found living with that: there's no way to find which policy needs confirming without searching by name or scrolling the whole list. Two changes, plus one addition.
@@ -31,6 +52,18 @@ Builds on Prompt 345 (which moved the effectuation Yes/No off the page-level ban
 **Scope note:** this is specifically about effectuation-pending rows. Don't extend the same auto-surface-to-top/inline-row treatment to cancellation-pending or other states unless asked — those already have their own path (My Calls → Schedule, Overview → Needs your attention).
 
 **Verify with a real screenshot** — a policy past its effective date and still Submitted appears at the top of My Policies without searching, its row shows the inline Yes/No + carrier-portal link, and clicking into the full record still shows the same confirmation there too (both paths work).
+
+---
+
+### 🟩 Prompt 354 SHIPPED 2026-07-26 — Overview: widened "Needs your attention" unevenly against "Monthly goal" to reduce name truncation
+
+**Shipped:** [`1670283`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/1670283) on `ohvara-dashboard`. `AgentOverview.jsx`'s outer grid changed from `gridTemplateColumns: '1fr 1fr'` to `'1.8fr 1fr'` (~64/36) — pure width-ratio change, no layout rebuild, no stacking.
+
+Resolved the side-effect CC flagged honestly at the end of Prompt 349 — Falcon's call, confirmed with Brayden: worth fixing. Problem was the row-height fix in 349 forcing single-line rows, so real names/details genuinely ellipsis-truncated at common laptop widths because the card only got half the row's width, split evenly with "Monthly goal" (which is just a number + progress bar and doesn't need that much space).
+
+**Verified via real DOM measurement** (disposable `QaHarness354.jsx`, mocked `AuthContext` + pre-seeded react-query cache — same established pattern as prior prompts; Browser-pane screenshot would hit the same known compositing timeout as 301/303/348/350) with seeded names reusing Prompt 349's own "Renee Blackwood" test case plus 3 longer names. Measured the harness's own container width (930px) matches DashboardLayout's real content column at a 1280px browser viewport (270px sidebar + 80px page padding subtracted) — cross-checked against Prompt 349's live 76–114px range, harness gave a matching 84px pre-fix, confirming the harness is faithful, not just plausible. At that same 930px width: **before** (1fr/1fr) Name column = 84px, all 4 seeded names truncated including the short one; **after** (1.8fr/1fr) Name column = 130px (+55%) — "Renee Blackwood" now renders in full, the 3 longer names still truncate but with roughly half the prior deficit. "Monthly goal" card measured 325px (down from 455px) with its `$5,100 of $20,000` line at 275px — fits cleanly, no wrap. Harness + temp route + temp `AuthContext` export fully reverted before commit (`git status` showed only the 1 real file changed). `npx vite build` clean.
+
+**Honest limitation carried forward, not hidden:** this ratio widens the column meaningfully but does not guarantee zero truncation for every real name — very long names (2+ long words) still truncate, just less severely. A full fix would need either a wider card, a two-line name allowance, or a tooltip-on-truncate — none of which this prompt asked for. Flag to Brayden if it comes up again in practice.
 
 ---
 
