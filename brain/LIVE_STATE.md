@@ -18,7 +18,11 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21 — see [[Memories]] for the full trail.)*
 
-### 🆕 Prompt 350 QUEUED 2026-07-26 — Overview clock: swap the digital/LCD font for an elegant serif numeral font
+### 🟩 Prompt 350 SHIPPED 2026-07-26 — Overview clock: DSEG7 digital font replaced with Playfair Display serif
+
+**Shipped:** [`d979aab`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/d979aab) on `ohvara-dashboard`. `@fontsource/dseg7-classic` uninstalled, `@fontsource/playfair-display` (700 weight) installed and self-hosted the same way (`main.jsx`). `AgentOverview.jsx`'s `CLOCK_FONT` now `'Playfair Display',serif`; the `scaleY(1.15)` stretch that compensated for DSEG7's proportions is dropped (Playfair doesn't need it, and stretching a high-contrast serif unevenly would distort the letterforms); digits stay 30px, unchanged. Clock string is now split on a `/^(.*?)\s*([AP]M)$/i` regex into digits + AM/PM, with AM/PM rendered as its own nested span at 15px (exactly half) — same treatment regardless of AM or PM.
+
+**Verified with real DOM checks** (Browser-pane screenshot hit the same known compositing timeout as Prompts 301/303/348 — substituted, same pattern) via a disposable QA harness (`QaHarness350.jsx`, mocked `AuthContext` + pre-seeded react-query cache, fully reverted before commit — `git status` showed only the 4 real files after): `document.fonts` confirmed a `Playfair Display` 700-weight face with `status: "loaded"` (not a silent fallback), computed style on the clock span showed `fontFamily: '"Playfair Display", serif'`, `fontSize: 30px`, `transform: none`; the nested AM/PM span computed to `fontSize: 15px` with text "AM". `npx vite build` clean before and after the harness revert.
 
 **Supersedes Prompt 342's font choice — this is a replacement, not an addition.** Brayden lived with the DSEG7 seven-segment digital font for a bit and doesn't like it after all. Still wants seconds shown (no change there), just a different typeface.
 
