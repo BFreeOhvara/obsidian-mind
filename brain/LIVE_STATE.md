@@ -16,38 +16,7 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26, Prompt 358 shipped 2026-07-26 — see [[Memories]] for the full trail.)*
-
-### 🆕 Prompt 357 QUEUED 2026-07-26 — rename Hierarchy → Team, build real Messages (team chat + DMs), Meetings ships as a "coming soon" placeholder tab only
-
-**Scope cut down 2026-07-26 — Meetings is explicitly NOT being built right now.** Brayden's call: leave the tab in place so the structure exists, but just put a "coming soon" placeholder on it (same treatment already used elsewhere in this app for not-yet-built features, e.g. Underwriting/Contracting Submission per North Star) — don't build the always-on video room, don't investigate Twilio/LiveKit/Daily.co, don't build any of it. The whole video-room plan below is preserved in the collapsed section only in case this gets picked back up later; it is out of scope for this prompt.
-
-**0. Rename "Hierarchy" → "Team"** in the sidebar nav label and page header. The existing upline/direct-recruits/invite-link content becomes one sub-tab within this page (call it "Hierarchy" or "Team" as the sub-tab label — CC's call, just don't lose the existing content or its admin-only invite gating from Prompt 355).
-
-**1. Sub-tabs: Hierarchy | Messages | Meetings**, matching Performance's `Production | Leaderboard` segmented-tab visual pattern (Prompt 348/356).
-
-**2. Messages tab — build for real, with TWO conversation types, not one flat channel:**
-   - **One shared "Team chat"** — a single channel everyone on the team is in.
-   - **Direct messages** — private 1:1 threads between any two team members.
-   - Needs real schema (conversations + participants + messages, with a type discriminator for channel-vs-DM — investigate whether anything from the old SMB dashboard is reusable before building net-new, per North Star's standing audit-first rule), realtime updates (matching how notifications already use Supabase realtime elsewhere in this app), and ties into the existing notification bell so a new message triggers a real notification.
-   - **Optional, cheap add-on once the base chat exists:** a pinned "announcement" concept, distinct from regular messages, so something posted stays visible at the top of Team chat rather than scrolling away — Falcon's suggestion, not required for v1, flag back before building it.
-
-**3. Meetings tab — placeholder only.** Same "coming soon" treatment as other not-yet-built pages in this app — investigate that existing pattern/component and reuse it rather than inventing a new placeholder style.
-
-**Scope check before building Messages:** confirm what's already there (any existing chat infra from the old SMB dashboard worth repurposing) and report what's missing before writing net-new schema.
-
-**Verify with a real screenshot** — Team page shows 3 sub-tabs; Team chat and a DM thread both send/receive real messages with real notifications firing; Meetings shows the standard coming-soon placeholder, nothing more.
-
-<details>
-<summary>Meetings — always-on video room plan, NOT in scope for this prompt, kept in case this gets revisited later</summary>
-
-A persistent, always-on team room (Discord voice-channel style), not a scheduled Zoom meeting system — no calendar/booking UI, just an open room anyone joins whenever, seeing who else is currently in, with mic/camera toggle once inside. Build on a managed WebRTC video API, not hand-rolled peer connections (raw WebRTC mesh has real NAT-traversal reliability problems a managed provider already solves). Investigate in order: (1) Twilio Video first, since Ohvara already has a live Twilio account/relationship for calls and SMS; (2) LiveKit or Daily.co as fallback if Twilio Video doesn't fit, both with usable free tiers for a team this small. Report back the real per-minute/participant cost structure of whichever provider gets picked. Check whether the existing "Live Call" live-status indicator (the green dot already shown on that nav item) is built on infrastructure reusable for "is anyone currently in the team room" before building a second, parallel presence system. UI: room shows current participants, join/leave, mute toggle, camera on/off toggle.
-
-Earlier, now-doubly-superseded plan (Zoom-embed/scheduling): investigate embeddability first (carrier portals all blocked iframing, Zoom likely would too) — embed like Quoter embeds InsuranceToolkits.com if possible, else a "Start/Join meeting" new-tab link; booking UI for a specific time; notifications via the existing appointment/cancellation-reminder notifier pattern.
-
-</details>
-
----
+*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26, Prompt 358 shipped 2026-07-26, Prompt 357 shipped frontend 2026-07-26 (DB migration blocked, see [[North Star]] Current Focus) — see [[Memories]] for the full trail.)*
 
 ### 🆕 Prompt 356 QUEUED 2026-07-26 — Performance: replace the period popover+calendar with a persistent Daily/Monthly/All Time toggle + inline stepper; Leaderboard always shows 3 podium slots
 
