@@ -18,6 +18,20 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21 — see [[Memories]] for the full trail.)*
 
+### 🟩 Prompt 344 SHIPPED 2026-07-25 — Overview tile de-dup, Needs your attention decluttered
+
+**Shipped:** [`e718070`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/e718070) on `ohvara-dashboard`.
+
+1. **Confirmed the duplication was real before touching anything**: read `AgentOverview.jsx`'s `k` useMemo — tile 2 ("Active AP — This Month") and the old tile 3 ("Policies Active — This Month") both filtered the exact same `activeThisMonth` cohort (`status === 'In Effect' AND effective_date` this month), just AP sum vs. count of the identical rows.
+2. **Swapped tile 3 to "Policies Submitted — This Month"** — a new `submittedMonthCount` in the same memo, using the same "`policy_sold_date`, falling back to `created_at`, in this month" window `bookMetrics()` already uses for Stats' own `submittedAP`, so Overview and Stats can't drift on what "submitted" means. Genuinely distinct cohort from tile 2 (no status filter), and pairs naturally with "Submitted AP — Today" above it. Reused the `FileText` icon to tie the two submission tiles together visually; dropped the now-unused `CheckCircle` import.
+3. **"Needs your attention" decluttered**: dropped the POLICY # column entirely (grid `160px 1fr 1.8fr 130px` → `150px 1fr 1.8fr`, and removed the now-dead `policyNo` field from both the effectuation and cancellation branches of the `attention` memo). Trimmed row/header padding (`16px 26px`→`11px 22px` data rows, `18px 26px`→`14px 22px` header) and font sizes down a notch (name 15→13.5, detail 14→13, tag/header ~11→10.5) so the block reads lighter without losing the type badge/name/detail info.
+
+**Verified live** (Browser pane not on-screen this session — `computer{screenshot}` timed out, same known issue as recent prompts — used `get_page_text` + computed-DOM checks instead, logged in as `nate44`): Overview's 3rd tile shows "POLICIES SUBMITTED — THIS MONTH: 7", distinct from tile 2's "$0.00 / 0 policies went active." "Needs your attention" `get_page_text` confirms TYPE/NAME/DETAIL only (no Policy # anywhere in the block); computed styles on a live data row confirm `grid-template-columns: 150px 129px 233px` (3 tracks) and `padding: 11px 22px`. `eslint`/`vite build` clean.
+
+**This was the last item in the queue — it's now empty.**
+
+---
+
 ### 🟩 Prompt 343 SHIPPED 2026-07-25 — seeded 20 sample policies for nate44, 5 landing in Needs your attention
 
 **Shipped:** Supabase migration `seed_prompt343_sample_policies_nate44` on project `jjextitmbptoaolacocs` (data only — no dashboard code changed, nothing to push to `ohvara-dashboard`).

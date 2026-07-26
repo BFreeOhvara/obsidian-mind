@@ -7129,4 +7129,23 @@ Picked up Prompt 343, a data-only ask (no dashboard code changed) — seed nate4
 **Resume prompt:**
 `Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 343 shipped: seeded 20 sample policy rows for nate44 via Supabase migration seed_prompt343_sample_policies_nate44 (data only, no dashboard code/commit) — 5 of the 20 land in Overview's "Needs your attention" for real, driven by the same pendingEffectuation()/cancellation_status logic MyPolicies.jsx and AgentOverview.jsx already share. Hit an auto-mode classifier block on direct Supabase writes mid-session (LIVE_STATE pre-authorizing an action isn't the same as runtime permission granting it) — asked Brayden in chat, he granted it, then it worked. Verified live via get_page_text (no screenshot — Browser pane not displayed). LIVE_STATE's CC queue is now fully empty — check North Star's Current Focus, or wait for Brayden to queue something new. Prompt 339 item 3 (kill usernames) still blocked on real emails, unchanged.`
 
+---
+
+### 2026-07-25 (CC) — Prompt 344 shipped: Overview tile de-dup, Needs your attention decluttered
+
+Picked up Prompt 344, the last item in LIVE_STATE's queue — Brayden's own review of Prompt 343's seeded data surfaced two real issues.
+
+**Confirmed the duplication before touching anything:** read `AgentOverview.jsx`'s `k` useMemo — tile 2 ("Active AP — This Month") and the old tile 3 ("Policies Active — This Month") both filtered the identical `activeThisMonth` cohort (`status === 'In Effect' AND effective_date` in this month), just dollar sum vs. count of the same rows. Redundancy was real, not just a visual coincidence.
+
+**Shipped** (`e718070` on `ohvara-dashboard`):
+1. Swapped tile 3 to **"Policies Submitted — This Month"** — new `submittedMonthCount` in the same memo, using the identical "`policy_sold_date` falling back to `created_at`, in this month" window `bookMetrics()` already uses for Stats' `submittedAP`, so Overview and Stats can't drift on the definition of "submitted." No status filter, so it's genuinely distinct from tile 2's In-Effect-only cohort, and pairs naturally with "Submitted AP — Today" above it. Reused the `FileText` icon to tie the two submission tiles together; removed the now-unused `CheckCircle` import.
+2. **"Needs your attention" decluttered**: dropped the POLICY # column entirely (grid `160px 1fr 1.8fr 130px` → `150px 1fr 1.8fr`; also deleted the now-dead `policyNo` field from both branches of the `attention` memo, not just hidden it in the render). Trimmed padding (`16px 26px`→`11px 22px` rows, `18px 26px`→`14px 22px` header) and font sizes down a notch (name 15→13.5, detail 14→13, tag/header ~11→10.5).
+
+**Verified live** (Browser pane not on-screen this session — same known issue as the last several prompts — used `get_page_text` + computed-DOM checks instead, logged in as `nate44`/Test Agent): tile 3 reads "POLICIES SUBMITTED — THIS MONTH: 7" against tile 2's "$0.00 / 0 policies went active" — confirmed genuinely different numbers, not just a different label on the same value. `get_page_text` on "Needs your attention" shows only TYPE/NAME/DETAIL headers, no Policy # anywhere; `getComputedStyle` on a live data row confirms 3 grid tracks (`150px 129px 233px`) and `11px 22px` padding. `eslint`/`vite build` clean.
+
+**This was the last item in LIVE_STATE's queue — it's now empty again.**
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 344 shipped (e718070): Overview's 3rd stat tile ("Policies Active — This Month") was a real duplicate of tile 2 ("Active AP — This Month", same activeThisMonth cohort, dollars vs. count) — swapped for "Policies Submitted — This Month" (new submittedMonthCount, same window bookMetrics() uses for Stats' submittedAP, so the two can't drift). "Needs your attention" decluttered: Policy # column dropped entirely (grid + data field both, not just hidden), row/header padding and font sizes trimmed down a notch. Verified live via get_page_text + computed DOM styles, no screenshot (Browser pane not displayed, ongoing known issue). LIVE_STATE's CC queue is now fully empty — check North Star's Current Focus, or wait for Brayden to queue something new. Prompt 339 item 3 (kill usernames) still blocked on real emails, unchanged.`
+
 [CC | 2026-07-25 — Prompt 343 close-out] — Vault commit `537546f` pushed to `origin/main` with the full write-up above. No further work occurred after that push; this entry exists only to satisfy the Atlas logging gate on session stop. Nothing new to capture.
