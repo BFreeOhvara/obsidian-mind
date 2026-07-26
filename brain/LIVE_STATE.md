@@ -16,18 +16,7 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26 — see [[Memories]] for the full trail.)*
-
-### 🆕 Prompt 359 QUEUED 2026-07-26 — Submissions: segmented-pill tab style, drop Agent Name + Lead Status from New Submission, State becomes a dropdown
-
-1. **Restyle the "New Submission | Contracting Submission | Cancellation Calendar" tabs** from the current underlined-text style to the same segmented-pill button style already used on Performance's `Production | Leaderboard` toggle (Prompt 348/356) — visual consistency across the app's sub-tab pattern.
-2. **Remove the "Agent Name" field from the New Submission form entirely.** Redundant — it's always whoever's logged in, per Brayden. Investigate whether the backend already derives this from the authenticated session (it should) rather than reading the removed field; don't just hide it in the UI while still requiring it be filled server-side.
-3. **Remove the "Lead Status" field/dropdown entirely.** Every New Submission is always status "Submitted" on creation — there's no scenario where an agent picks a different status here. Hardcode the created row's status to Submitted server-side (or wherever it's currently set from the dropdown's value) rather than requiring a UI selection.
-4. **"State" becomes a dropdown of real US states**, not a free-text input — matching whatever UI pattern the app already uses for a similar dropdown (Brayden's reference: "kinda like how it is with the carrier names" — investigate where a carrier-name dropdown/select already exists in this codebase, likely Carrier Portals or elsewhere in Submissions/Underwriting, and mirror that same component/pattern rather than building a new dropdown style from scratch).
-
-**Verify with a real screenshot** — the 3 sub-tabs render as pill buttons matching Performance's style, New Submission's form no longer shows Agent Name or Lead Status fields (submission still saves with the correct agent + Submitted status under the hood), and State is a real dropdown of states.
-
----
+*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26 — see [[Memories]] for the full trail.)*
 
 ### 🆕 Prompt 358 QUEUED 2026-07-26 — Chubb/Combined carrier logo: shrink to match the Foresters treatment
 
