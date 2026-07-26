@@ -16,19 +16,7 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26 — see [[Memories]] for the full trail.)*
-
-### 🆕 Prompt 358 QUEUED 2026-07-26 — Chubb/Combined carrier logo: shrink to match the Foresters treatment
-
-Same fix pattern as Foresters (Prompt 337) — Brayden thinks the Chubb/Combined logo on Carrier Portals reads too large/cramped, "barely fits" in its banner. **Already processed and staged by Falcon** — no image work needed from CC, just copy the file in.
-
-**What was done:** `media/carrier-logos/chubb-combined.png` re-padded from 376×138 (aspect 2.72) to 594×138 (aspect 4.30), adding 109px of matching navy padding `(16,60,99)` — sampled directly from the source image's own solid background, confirmed via corner/center pixel sampling — on the left and right. Confirmed via pixel-content bounding-box analysis: real wordmark content now spans 24.7%–75.1% of the image width, comfortably inside the ~92% visible window `cover` mode shows at the banner's established ~3.96 aspect ratio (only the outer ~4% on each side — pure padding — ever gets cropped). Same filename, no DB change needed (`logo_url` already points at this file).
-
-**CC action:** copy the updated `chubb-combined.png` from the vault into `public/carrier-logos/`, replacing the existing file.
-
-**Verify with a real screenshot** — Chubb/Combined's logo reads noticeably smaller/less cramped within its banner, no white/background bleed at any edge (padding color matches exactly), no real wordmark content clipped.
-
----
+*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26, Prompt 358 shipped 2026-07-26 — see [[Memories]] for the full trail.)*
 
 ### 🆕 Prompt 357 QUEUED 2026-07-26 — rename Hierarchy → Team, build real Messages (team chat + DMs), Meetings ships as a "coming soon" placeholder tab only
 
