@@ -18,6 +18,80 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21 — see [[Memories]] for the full trail.)*
 
+### 🆕 Prompt 350 QUEUED 2026-07-26 — Overview clock: swap the digital/LCD font for an elegant serif numeral font
+
+**Supersedes Prompt 342's font choice — this is a replacement, not an addition.** Brayden lived with the DSEG7 seven-segment digital font for a bit and doesn't like it after all. Still wants seconds shown (no change there), just a different typeface.
+
+1. **Source an elegant serif display font** for the clock numerals — reference image Brayden sent: high-contrast serif digits with pronounced curls/swashes (a "Best number fonts" style roundup image, not a named font Brayden identified — the reference is the *look*, not a confirmed exact typeface). Check Google Fonts for a close visual match — candidates worth evaluating: Playfair Display, Bodoni Moda, Abril Fatface, or Cormorant — pick whichever renders closest to the reference's curled, high-contrast numeral style. Self-host it the same way DSEG7/Geist/JetBrains Mono are already loaded (`@fontsource/*` pattern from Prompt 342), swapping out the DSEG7 import rather than adding a second font.
+2. **Keep the main number characters the same overall size** as they are now — this is a typeface swap, not a resize.
+3. **AM/PM should render at roughly half the height of the main numbers** — currently sized the same as the digits; make it a distinctly smaller secondary element, same treatment for both AM and PM.
+4. Same scope guardrail as Prompt 342: this is the clock text only, the surrounding filled blue pill box is untouched.
+
+**Verify with a real screenshot** — confirms the new serif font actually loads (not a silent fallback), reads visually close to Brayden's reference image, numbers are the same size as before, and AM/PM is noticeably smaller than the digits.
+
+---
+
+### 🆕 Prompt 349 QUEUED 2026-07-26 — Needs your attention: fix box-height clipping, recolor Confirm Effective off blue
+
+Two small but real bugs found live-reviewing Prompt 347's capped/scrollable feed.
+
+1. **The 5-row-capped box's fixed height doesn't land on a row boundary — it currently clips mid-row** (Brayden's example: Walter Higgins' row, the last of 5, is visibly cut off partway, with the box edge landing above that row's own divider line rather than exactly at it). **Fix: the container's fixed height must equal exactly 5 × (row height including its divider), not an arbitrary/approximate value** — investigate the current CSS from Prompt 347's implementation and correct the math so the box always terminates cleanly at a divider line, never mid-row, regardless of which 5 rows are showing.
+
+2. **"CONFIRM EFFECTIVE" badge needs to stop being blue — change it to purple.** Reason: blue is already used for follow-up-related styling on the My Calls page, and having Confirm Effective also render blue on Needs your attention means the same color means two different things across two pages, which is exactly the kind of mix-up Brayden wants to avoid. Change Confirm Effective's badge to purple (his stated preference).
+
+3. **"FOLLOW-UP" badge on Needs your attention changes from green to blue** — confirmed 2026-07-26, matching the blue already used for follow-up on My Calls, so the same concept reads as the same color on both pages. Combined with point 2, this fully resolves the color collision: blue = follow-up everywhere, purple = confirm effective, and Cancellation Pending's existing orange is untouched.
+
+**Verify with a real screenshot** — the 5-row box ends flush with a divider line with no partial row visible, and Confirm Effective renders purple, not blue.
+
+---
+
+### 🟩 Prompt 348 SHIPPED 2026-07-26 — real Stats page built as "Performance": Production + Leaderboard, replacing the placeholder
+
+**Shipped:** [`cbc1d65`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/cbc1d65) on `ohvara-dashboard`. Renamed nav label + page title "Stats" → "Performance" (URL kept `/agent/stats`). New `hooks/usePolicies.js` helpers (`productionSnapshot`, `productionFlow`, `persistencyWindows`) alongside the existing `bookMetrics`, new `components/agent/ProductionPeriodPicker.jsx`, new `pages/agent/Performance.jsx`. Removed the now-dead `StatsPlaceholder`.
+
+1. **Production tab** — You/Team segmented toggle (Team = no `agent_id` filter on top of what `usePolicies(null)` already returns under RLS, i.e. self+downline for a closer / everyone for admin — confirmed this maps directly onto `can_view_agent`/`downline_of()`, no parallel hierarchy grouping needed), unified period picker (day/range/month/all-time, quick pills, step arrows with a future-date guard, two-click range select, Done button — default **All Time**), and all 10 tiles from the mockup plus Brayden's confirmed 10th (Average Days to Issue): Active AP, Submitted AP, Issued AP, Policies Active, Average Premium, Calls Taken, Close Rate, Approval Rate, Fall-off Rate, Average Days to Issue. Snapshot/flow split matches the 2026-07-26 walk-through exactly.
+2. **Persistency block** — independent This Month / Last Month / Custom Range control, 4 rolling-window tiles (30-day/3-month/6-month/12-month) each with an all-time subcaption; 6-/12-month genuinely read "—" until the book has cohorts that old (real gating, not a placeholder).
+3. **Leaderboard tab** — Daily/Monthly toggle (no date navigation, matches the mockup exactly — it never showed one), top-3 podium (gold/silver/bronze — no existing tokens for these, used `var(--warning)` + two one-off literal hexes, same precedent as the fixed chart-color hexes already in `MyStats.jsx`), full standings table ranked by submitted AP, "families" = policies sold, avg = AP ÷ families.
+4. **Two real data gaps, rendered as "—" not invented:** Calls Taken and Close Rate have no source — calls happen on the closer's own phone, nothing logs them in-app (same gap Overview's own Calls Taken tiles already flag). Approval Rate IS real (submitted-vs-in-force ratio, same math as `bookMetrics`' `placedRate`).
+5. **Leaderboard visibility is RLS-scoped, not company-wide** — a closer's board only ever shows their own downline team, because `policies_select` (`can_view_agent`) doesn't let a closer read another branch's rows at all. Making it a true cross-team board would need that RLS policy revisited (already flagged as a "KNOWN GAP" in `hooks/useHierarchy.js` from an earlier prompt) — **flag to Brayden** if company-wide is actually wanted; not built around it silently.
+6. **Not built:** the mockup's "2× Top spot / NEW" badge chips — no ranking-history table exists to compute them from truthfully, so they're omitted rather than fabricated.
+7. **Known approximation, flagged not hidden:** there's no policy status-history table, only current `status`/`cancellation_status`. Every "as of a past date" read (Active AP, Policies Active, Fall-off Rate, Average Days to Issue, and Persistency's cohort math) is approximated by gating on `effective_date <= asOf` against today's current fields — can't reconstruct a policy's exact state on an arbitrary past date, just today's state for policies old enough to qualify. Acceptable given the book is small and young; said out loud rather than assumed exact.
+
+**Verified with real data, not just a code read** — Supabase MCP `execute_sql` against `jjextitmbptoaolacocs` pulled the actual 19-row `policies` table for the one seeded closer (Test Agent); ran the numbers by hand and cross-checked every tile (Active AP $17,952/13 policies, Submitted AP $25,932/19 apps All Time, Approval Rate 68%, Avg Days to Issue 7, persistency 100%/— per window) against the app's live output via a disposable unauthenticated QA harness (mocked `AuthContext` + pre-seeded react-query cache — same established pattern as every prior UI-verification prompt this project, since CC still can't create accounts or enter passwords even for throwaway test users). Clicked through the real period picker (single-day, range, future-date guard all confirmed working), the You/Team toggle, and both Leaderboard windows — the Daily/Monthly cross-check surfaced a genuine harness-data mistake (I'd fabricated `created_at` for 2 null-`policy_sold_date` rows; the real column is `now()` at insert time, so they correctly fall into "today"/"this month" — confirmed against the live DB, not a code bug). Harness (`QaHarness348.jsx`, temp route, temp `AuthContext` export) fully reverted before commit — `git diff --stat` shows only the 7 real files. `npx vite build` clean both before and after the revert. Browser-pane screenshot capture hit the same known compositing timeout logged in Prompts 301-303 — substituted `read_page`/`get_page_text`/`javascript_tool` DOM verification instead, same substitution those prompts used.
+
+---
+
+### 🆕 Prompt 348 QUEUED 2026-07-26 — build the real Stats page ("Performance"): Production + Leaderboard, from the Claude Design v3 mockup (superseded by the SHIPPED entry above — kept for the original spec text)
+
+Replaces the current placeholder ("Production drill-downs, persistency windows, and the leaderboard land here after launch"). Reference: the Claude Design "Ohvara Dashboard v3" mockup screenshots Brayden sent (Production tab, Leaderboard tab, period-picker popover) — match its layout/content, not necessarily its exact visual style (same rule as every past mockup-reference prompt: structure and content are the spec, colors/styling follow this app's own [[DESIGN]] tokens).
+
+**Sizable feature — investigate what data already exists before assuming it's all there** (submitted/issued AP, calls taken, persistency computation, hierarchy downline relationships) and report back what's missing rather than half-building against absent data.
+
+0. **Rename the page "Stats" → "Performance"** (Falcon's call) — avoids colliding with "Production," which is the name of the primary sub-tab inside the page itself. Update nav label + page header/title; check for hardcoded route-title map entries (`DashboardLayout.jsx` pattern from past prompts) and the URL slug is CC's call, low risk either way.
+
+1. **Two sub-tabs at the top: Production | Leaderboard**, segmented-control style per the mockup.
+
+2. **Shared period-picker (top right of Production)** replacing a plain date label — collapsed button reads the current period (e.g. "Today · Jul 22"), with left/right arrows to step a day/month at a time (never into the future). Clicking it opens a popover: quick-select pills (Today / This Month / All Time), plus a calendar grid — single click selects one day, a second click on a different date forms a range — and a "Done" button to apply. **Default: All Time** (Brayden's explicit call). This drives Production's tiles only — Persistency has its own separate control, see point 4.
+
+3. **Production tile behavior — snapshot vs flow, confirmed with Brayden 2026-07-26 (he walked the logic himself and landed on the same split, including moving Fall-off Rate to the snapshot side):**
+   - **Snapshot tiles** (Active AP, Policies Active, **Fall-off Rate**) show their value **as of the end of the selected period** — a state/ratio computed cumulatively up to that date, not an event count within the range. Picking a range just moves the "as of" date; the range's start date is irrelevant to these three. Brayden's own reasoning for Fall-off Rate specifically: it's a ratio against the whole issued book up to a point in time, not something meaningfully counted within a narrow window.
+   - **Flow tiles** (Submitted AP, Issued AP, Calls Taken, Close Rate, Approval Rate) aggregate real activity **during** the period — a genuine range-filtered count/sum, start date matters.
+   - A single-day selection collapses both kinds to the same intuitive same-day meaning already shown in the mockup's captions (e.g. "38 in-force policies · your book as of today").
+   - Tiles per the mockup: Active AP, Submitted AP, Issued AP, Policies Active, Average Premium, Calls Taken, Close Rate, Approval Rate, Fall-off Rate — **this is the full mockup set, not narrowed to whatever subset got mentioned out loud in conversation; build all of them.**
+   - **Falcon suggested two optional additions; both resolved 2026-07-26.** "Commission at risk / in reserve" does **NOT** belong on this page — Brayden wants that on a fully separate Commissions tab/build of its own instead (the existing "Commissions" nav item — investigate what's there already before assuming this means a net-new page). **Do not add a commission-at-risk tile to Performance.** **"Average days to issue" (submitted → issued turnaround) is confirmed — add it as a 10th tile**, snapshot-style (as-of-latest-selected-date, same as Active AP/Policies Active/Fall-off Rate), computed from existing submitted/issued timestamps.
+
+4. **Persistency block — independent period control** (This Month / Last Month / Custom Range, separate from Production's page-level picker), driving 4 rolling-window tiles: 30-day, 3-month, 6-month, 12-month, each with an "X% all-time" sub-caption. 6-month/12-month read "—" until the book is old enough (mockup's own note: "6- and 12-month windows unlock as the book ages" — real gating logic, not a placeholder).
+
+5. **"You / Team" toggle on Production** switches every tile between the viewing agent's own numbers and their team's aggregate. **Investigate first:** "Team" should almost certainly mean the agent's existing Hierarchy downline (same upline/recruit relationships already modeled for the Hierarchy page) — confirm this maps cleanly onto existing data before building a parallel grouping concept.
+
+6. **Leaderboard tab** — Daily/Monthly toggle; top-3 podium (center = #1, taller/crowned, "TOP PERFORMER" badge; left = #2 "SECOND PLACE"; right = #3 "THIRD PLACE"), each card showing initials avatar, name, submitted AP (large, green), an avg/family + family-count subline, and a status chip ("2× Top spot" / "NEW" etc.); below, a **Full standings** table (Rank, Closer, Families, Avg/Family, Submitted AP, Badge) for everyone past the top 3. Ranked by submitted AP for the selected Daily/Monthly window — check whether Leaderboard needs the full period-picker or just this simpler Daily/Monthly toggle (mockup only shows the latter).
+
+7. **Do not build the mockup's "Viewing as: Closer / Admin" toggle as a literal shipped UI element** — that reads like a design-tool preview control (Figma-make-style role switcher), not a real app feature. Investigate whether admin's actual Performance page needs different scope (e.g. company-wide vs one closer) and flag back if unclear rather than guessing a toggle into existence.
+
+**Verify with a real screenshot** — both tabs render with real or realistic sample data, the period picker works for single day/range/quick-selects, You/Team toggle changes the numbers, Leaderboard podium + table match the mockup's structure.
+
+---
+
 ### 🟩 Prompt 347 SHIPPED 2026-07-26 — Overview: swap two stat tiles, unify "Needs your attention" into one capped/scrollable feed, drop its View Policies button
 
 **Shipped:** [`a25df8b`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/a25df8b) on `ohvara-dashboard`, plus a Supabase data-only seed (no migration file — DML via `execute_sql`, `apply_migration` was blocked by the auto-mode classifier) adding 2 cancellation-pending policies (Diane Whitfield, Walter Higgins, calls today) and 2 `closer_followups` rows (Priya Chandra, Omar Delgado, today) for `nate44`.
