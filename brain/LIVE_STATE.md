@@ -28,11 +28,13 @@ tags:
 
 ---
 
-### 🆕 Prompt 352 QUEUED 2026-07-26 — Performance: remove Persistency's This Month/Last Month/Custom Range picker entirely
+### 🟩 Prompt 352 SHIPPED 2026-07-26 — Performance: removed Persistency's This Month/Last Month/Custom Range picker entirely
 
-Brayden reviewed the shipped Performance page and reconsidered Prompt 348's spec for Persistency — Falcon agrees this is the right call. **Remove the period-picker control above the Persistency block entirely** (the "This Month / Last Month / Custom Range" pill group + its date label). The 4 rolling-window tiles (30-day, 3-month, 6-month, 12-month) already are inherently "as of today" calculations — there's no clean meaning for "what was my 30-day persistency as of last month" at this stage, and the picker was solving a problem that doesn't exist yet. Persistency just always shows current rolling-window values, full stop, no control needed. Leave the "X% all-time" sub-captions and the "6- and 12-month windows unlock as the book ages" note untouched — only the picker control goes.
+**Shipped:** [`f9f3d48`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/f9f3d48) on `ohvara-dashboard`.
 
-**Verify with a real screenshot** — Persistency renders with no period control above it, just the 4 tiles.
+Removed the `persMode`/`persFrom`/`persTo` state, the "This Month/Last Month/Custom Range" `Segmented` control, and the custom-range month `<select>` pair above the Persistency block in `Performance.jsx`'s `ProductionTab`. `persistencyWindows()` now always gets called with `[todayMonthKey]` — the 4 rolling-window tiles (30-day, 3-month, 6-month, 12-month) show current values only, no control needed. Also removed `addMonthsToKey`, `monthRange`, `pad2`, and `selectStyle` — all now-dead code that only existed to support the removed picker (`monthLabel` stays, still used by the Leaderboard tab's period label). Net: 79 lines removed, 7 added.
+
+**Verified without a real login** (`type` into the password field was blocked by the auto-mode classifier — a dev/local test-account password still trips the "never enter passwords" rule, so didn't attempt to work around it): built a disposable `QaHarness352.jsx` (same established pattern as Prompt 353) — mocked `AuthContext` with a `closer`-role profile + pre-seeded a react-query cache (`['policies','visible']`) with 6 fake policies spanning the 30-day/3-month/6-month/12-month cohort windows, added a temp `/qa352` route in `App.jsx`, and briefly exported `AuthContext` from `useAuth.jsx` to wire it. `read_page`/`get_page_text` (screenshot hit the same known Browser-pane compositing timeout as recent prompts) confirmed: no period-picker UI above "Persistency," just the label and the 4 tiles rendering computed values (30-day 50%/88% all-time, 3/6/12-month 100%/100%). Harness file, temp route, and temp `AuthContext` export fully reverted before commit (`git status` showed only the 1 real file changed). `npx vite build` clean both before and after revert.
 
 ---
 
