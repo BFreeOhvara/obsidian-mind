@@ -67,6 +67,25 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### [CC | 2026-07-26 — Prompt 363 SHIPPED] — Overview "Needs your attention" column drift fixed, root cause was per-row independent CSS grids re-resolving max-content
+
+**Shipped:** [`ade415d`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/ade415d) on `ohvara-dashboard`. Last item in the LIVE_STATE queue (after 365/364) — queue is now empty.
+
+**Root cause, measured not assumed:** each attention row in `AgentOverview.jsx` renders as its own independent `display:grid` div, with Type sized `minmax(70px,max-content)` (Prompt 360). Since each row is its own grid formatting context, `max-content` resolves separately per row against that row's own badge width. Logged in as nate44 with real data covering all 3 tag types, measured via `getBoundingClientRect`: badge widths FOLLOW-UP 77.86px / CONFIRM EFFECTIVE 120.89px / CANCELLATION PENDING 142.58px, and Name's x drifted 430.9/473.9/495.6px accordingly (Detail 603.3/629.8/643.2px) — exactly Brayden's screenshot bug. Note: Prompt 360's own verification only ever measured the FOLLOW-UP tag (~57-79px) and never tested the other two real strings, which is how this shipped unnoticed.
+
+**Fix:** Type column changed from `minmax(70px,max-content)` to a plain fixed `150px` (content-independent, headroom above the widest real tag's measured 142.58px) — Name/Detail's `fr` tracks now compute from the same fixed remainder on every row. Gap bumped 20→24 for breathing room now that Type isn't stealing variable shared space per row.
+
+**Verified live** (nate44, all 3 tag types present simultaneously): Name lands at x=507 on all 6 rows (was 430.9/473.9/495.6), Detail at x=652.66 on all 6 rows (was 603.3/629.8/643.2). `npx vite build` clean, no console errors. Screenshot hit the same known Browser-pane compositing timeout as recent prompts — substituted with pre/post-fix `getBoundingClientRect` measurements, more precise than a screenshot for a pixel-alignment bug anyway.
+
+**Flagged to Brayden, not fixed (out of scope):** header row sits outside the scrollable rows container; with >5 rows (6 here vs. the 5-row cap) a scrollbar appears only in the body, narrowing its width vs. the header's — header's Detail column starts ~6px right of the body rows' Detail column. Type/Name unaffected (fixed-width/fixed-offset), only the `fr`-sized Detail column is width-sensitive. Pre-existing side effect of the 5-row-cap/scroll design (Prompt 347), not introduced or worsened by this fix; scope explicitly excluded touching scroll behavior. Full detail in [[LIVE_STATE]]'s Prompt 363 close-out.
+
+Also found and committed a leftover uncommitted vault edit from a prior session (`brain/North Star.md` — Prompt 357 "fully closed" note) that had never been pushed; committed separately (`0b556a5`) since it was unrelated but correct.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 363 shipped (ade415d). LIVE_STATE queue is empty — check North Star Current Focus for next direction.`
+
+---
+
 ### 2026-07-27 (cont. 34, Eagle) — Prompt 364 SHIPPED: My Policies effectuation banner converted to fixed CSS grid columns, root cause was a flexWrap reflow bug
 
 **Shipped:** [`c1061a4`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/c1061a4) on `ohvara-dashboard`. Next item down the queue after Prompt 365.
