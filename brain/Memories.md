@@ -67,6 +67,21 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### [CC | 2026-07-26 — Prompts 366/367 SHIPPED] — Activity: nate44 dedup rescoped to a real, permanent day-stepper feature
+
+**Shipped:** [`c24495f`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/c24495f) on `ohvara-dashboard`. Queue had two items (367 listed above 366, but 367's own text explicitly builds on 366) — did 366 first since it's the dependency, then 367.
+
+**Found on session start:** LIVE_STATE had an uncommitted local edit — Prompts 366/367 were written into the queue, but a stale leftover "Queue is empty" line from before they were added was never removed underneath them. Treated the two prompt blocks as the real, current queue (the stale line was clearly an editing artifact, not intentional) and proceeded top-to-bottom.
+
+**Prompt 366 (nate44 Activity dedup) + Prompt 367 (real day-stepper), built together since they interact:** Added `ActivityDayStepper` to `MyCalls.jsx` — same inline prev/next-arrow visual as Performance's Daily mode (`ProductionPeriodPicker.jsx`'s `PeriodPicker`, minus the Daily/Monthly/All Time toggle since Activity only ever needs one day, no popover). Sits top-right of the header row next to the Schedule/Activity/Graded-calls `Segmented` tabs, defaults to today. Real activity rows filter to the selected local calendar day via a `localISO()` helper matching `todayISO()`'s existing local-time convention (same pattern `AgentOverview.jsx` already uses — no new UTC-vs-local rule invented). nate44's per-type dedup (366) now runs *after* the day filter, scoped to the selected day rather than globally — so stepping to a different day surfaces that day's real events instead of permanently hiding them behind whichever day happened to hold the "most recent" occurrence of each type. The 8 "PREVIEW — NOT REAL DATA" catalog rows (Prompt 365) stay exempt from day-filtering per 367's own explicit carve-out, so nate44's full review catalog still renders on every day. Empty state reads "No activity on [date]." when a day has no real rows, with preview rows still showing beneath it.
+
+**Verified live** (nate44, real data): Today showed 5 real rows (one each: Went into effect, Effectuation confirmed, Cancellation call booked, New submission, Follow-up logged) + all 8 preview rows. Stepped back to Jul 25 — 3 different real rows for that day + all 8 preview rows unchanged. Stepped to Jul 24 (no real activity that day) — "No activity on Jul 24." + all 8 preview rows still rendering. Confirmed via `javascript_tool`: Next-day button `disabled: true, opacity: 0.4` at today, Previous-day stays enabled. `npx vite build` clean.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompts 366/367 shipped (c24495f). LIVE_STATE queue is empty — check North Star Current Focus for next direction.`
+
+---
+
 ### [CC | 2026-07-26 — Prompt 363 SHIPPED] — Overview "Needs your attention" column drift fixed, root cause was per-row independent CSS grids re-resolving max-content
 
 **Shipped:** [`ade415d`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/ade415d) on `ohvara-dashboard`. Last item in the LIVE_STATE queue (after 365/364) — queue is now empty.

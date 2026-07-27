@@ -16,9 +16,19 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26, Prompt 358 shipped 2026-07-26, Prompt 357 fully closed 2026-07-26 (frontend + migration 084), Prompt 356 shipped 2026-07-26, Prompt 362 closed 2026-07-26, Prompt 365 closed 2026-07-26, Prompt 364 closed 2026-07-26, Prompt 363 closed 2026-07-26 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26, Prompt 358 shipped 2026-07-26, Prompt 357 fully closed 2026-07-26 (frontend + migration 084), Prompt 356 shipped 2026-07-26, Prompt 362 closed 2026-07-26, Prompt 365 closed 2026-07-26, Prompt 364 closed 2026-07-26, Prompt 363 closed 2026-07-26, Prompt 366 closed 2026-07-26, Prompt 367 closed 2026-07-26 — see [[Memories]] for the full trail.)*
 
 **Queue is empty.** Nothing left to build — check [[North Star]] Current Focus for open items.
+
+### 🟩 Prompt 366/367 CLOSED 2026-07-26 — Activity: nate44 dedup scoped to a real, permanent day-stepper
+
+**Shipped:** [`c24495f`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/c24495f) on `ohvara-dashboard`.
+
+**Prompt 367 — day-stepper (permanent, every agent).** Added `ActivityDayStepper` to `MyCalls.jsx`, same inline prev/next-arrow visual pattern as Performance's Daily mode (`ProductionPeriodPicker.jsx`'s `PeriodPicker`, just without the Daily/Monthly/All Time toggle — Activity only ever needs one day, no popover/calendar). Sits top-right of the header row, opposite the Schedule/Activity/Graded calls `Segmented` tabs, defaults to today. Real activity rows are filtered to the selected local calendar day via a `localISO()` helper matching `todayISO()`'s existing local-time convention (same pattern `AgentOverview.jsx` already uses) — no new UTC-vs-local rule invented. Empty state reads "No activity on [date]." when a day has no real rows.
+
+**Prompt 366 — nate44 dedup, scoped to the day filter.** Real events are deduped to one row per type (most recent) *within* the selected day, not globally — so a day with 3 "New submission" rows collapses to 1, but different real event types across different days still surface as you step through. The 8 fixed-fake-date "PREVIEW — NOT REAL DATA" rows stay exempt from day-filtering entirely (per 367's own carve-out), so nate44's full review catalog renders on every single day regardless of the stepper.
+
+**Live-verified** (nate44, real data): Today shows 5 real rows (one each: Went into effect, Effectuation confirmed, Cancellation call booked, New submission, Follow-up logged) + all 8 preview rows. Stepping back to Jul 25 shows 3 different real rows for that day + all 8 preview rows unchanged. Stepping to Jul 24 (no real activity) shows "No activity on Jul 24." + all 8 preview rows still rendering below it. Next-arrow computed `disabled: true, opacity: 0.4` at today; Previous-arrow stays enabled. `npx vite build` clean.
 
 ### 🟩 Prompt 365 CLOSED 2026-07-26 — My Calls: primary button + Segmented tabs shipped; Activity overshoot catalog audited + built as a nate44-only preview
 
