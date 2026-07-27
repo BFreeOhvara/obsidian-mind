@@ -67,6 +67,23 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-27 (cont. 34, Eagle) — Prompt 364 SHIPPED: My Policies effectuation banner converted to fixed CSS grid columns, root cause was a flexWrap reflow bug
+
+**Shipped:** [`c1061a4`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/c1061a4) on `ohvara-dashboard`. Next item down the queue after Prompt 365.
+
+**Root cause, measured not assumed:** live-measured two real pending-effectuation rows (Fidelity Life, F&G) with identical 873px container width — old flex layout put "Yes" at x=866 on one, x=906 on the other, a 40px drift despite `flex:1` on the message span. Real cause: `flexWrap:'wrap'` reflows items onto a new line once natural content exceeds the container, and which item lands first on the wrapped line shifts with each row's own message text length (effective-date digit count differs) — a wrap-order bug, not a simple "wider text pushes buttons" story.
+
+**Fix:** rebuilt `EffectuationRow` (`MyPolicies.jsx`) as `display:grid, gridTemplateColumns: '1fr max-content 260px'` — message absorbs slack, Yes/No sizes to `max-content` (constant), portal-link/no-portal-fallback gets a fixed 260px. Grid tracks never reflow across lines the way flexWrap does, so columns 2/3 structurally can't drift again. 260px was sized by reading the real 12-carrier list (migrations 078/080/082) then live-measuring rendered text width for the two longest names in the real font — "National Life Group" (245px) and "American Amicable" (247px, wider despite fewer chars) — not eyeballed.
+
+**Trade-off flagged to Brayden (in the LIVE_STATE close-out, not buried):** hitting AP's exact x (879.6px) while ALSO reserving full width for the longest carrier name doesn't fit in the table's current natural width without either forcing the table wider (risky — native `table-layout:auto`, could shift every other column) or shrinking column 3 below what "National Life Group" needs. Chose to hold the no-wrap guarantee (the prompt's harder, more specific requirement) and let the button cluster land ~69px *before* AP's start instead of exactly under it — matches the prompt's own softer "roughly...a little ahead" wording on that point, but flagged as a real trade-off in case Brayden wants pixel-exact alignment instead.
+
+**Verified live** (nate44): both real pending rows now measure identical Yes/No/portal-link x positions (bug confirmed gone). Live-injected the two longest carrier names into the actual rendered link and checked `getClientRects().length === 1` for both — no wrap. `npx vite build` clean, no console errors. `PolicyModal`'s separate Yes/No banner (Prompt 351) untouched — scope held.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 364 shipped (c1061a4). Prompt 363 (Overview "Needs your attention" Type/Name/Detail column alignment) is the last item queued in LIVE_STATE — pick that up next.`
+
+---
+
 ### 2026-07-27 (cont. 33, Eagle) — Prompt 365 SHIPPED: My Calls primary button + Segmented tabs, Activity overshoot catalog audited and built as a nate44-only preview
 
 **Shipped:** [`896467a`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/896467a) on `ohvara-dashboard`. Queue after Prompt 362's close-out had three new items (363, 364, 365, listed top-to-bottom); took the topmost per LIVE_STATE's literal "executes top to bottom" rule.

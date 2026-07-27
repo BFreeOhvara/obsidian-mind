@@ -16,7 +16,7 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26, Prompt 358 shipped 2026-07-26, Prompt 357 fully closed 2026-07-26 (frontend + migration 084), Prompt 356 shipped 2026-07-26, Prompt 362 closed 2026-07-26, Prompt 365 closed 2026-07-26 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26, Prompt 358 shipped 2026-07-26, Prompt 357 fully closed 2026-07-26 (frontend + migration 084), Prompt 356 shipped 2026-07-26, Prompt 362 closed 2026-07-26, Prompt 365 closed 2026-07-26, Prompt 364 closed 2026-07-26 — see [[Memories]] for the full trail.)*
 
 ### 🟩 Prompt 365 CLOSED 2026-07-26 — My Calls: primary button + Segmented tabs shipped; Activity overshoot catalog audited + built as a nate44-only preview
 
@@ -56,41 +56,21 @@ All 5 verified live as nate44: "Follow-up logged" (4 rows, his real seeded follo
 
 **Verified live** (logged in as nate44/`Test1234!`, dev server): screenshot itself hit the known Browser-pane compositing timeout (same recurring issue noted in past prompts), substituted with `read_page`/`get_page_text` (full Activity feed content, in order) + `javascript_tool` computed-style checks (button/tab colors) — both confirm the visual and functional result described above. `npx vite build` clean. No console errors.
 
-- Cancellation call completed — client stayed (save)
-- Cancellation call completed — policy cancelled
-- Policy declined by carrier (submitted but never approved)
-- Policy lapsed / fell off (ties to the Fall-off Rate tile on Performance — non-payment, no cancellation call involved)
-- Policy reinstated (came back after a lapse/cancellation)
-- Effectuation — did NOT go into effect ("No" answer on the effectuation banner, not just "Yes")
-- Follow-up logged (agent adds one manually via "Log follow-up")
-- Follow-up completed / resolved
-- New team message (channel or DM — ties to the just-shipped Team → Messages tab, Prompt 357/362)
-- Invite sent (admin generates a new rep invite link — Team page)
-- Invite accepted (a new agent actually joins via that link)
-- Commission payout logged (speculative — Commissions page doesn't exist yet, flag as lowest-confidence)
-- Training module completed (Training Center)
-- Monthly AP goal reached / crossed 100%
-- Persistency milestone crossed for a cohort (speculative — flag as lowest-confidence, may be too granular to belong here at all)
-
-**How to show it:** seed one fake sample row of each type against the existing `nate44` test account/data (same throwaway-test-data convention as the 20 seeded sample policies) so Brayden can scroll the real Activity tab in his own browser and see the whole catalog live — not just a screenshot. Label clearly in the close-out entry which seeded rows are backed by real schema today vs. which needed a placeholder/fake field to demonstrate the concept at all (don't silently wire up new production tracking for the speculative ones — this is a review pass, not a commitment to build all of them).
-
-**Verify with a real screenshot** of the restyled button, plus a real screenshot scrolling through the full seeded Activity catalog.
-
 ---
 
-### 🆕 Prompt 364 QUEUED 2026-07-26 — My Policies pending-effectuation banner: Yes/No buttons must start at a fixed column position across all rows
+### 🟩 Prompt 364 CLOSED 2026-07-26 — My Policies effectuation banner converted to fixed grid columns, verified with real DOM measurements
 
-Same class of bug as Prompt 363, different location. Screenshot (`My Policies`, real live data, Prompt 351's inline effectuation banner): the yellow "Reached its effective date… did this policy go into effect?" banner row currently positions Yes/No based on the left-hand message text's width (looks like flex/space-between pushing the button cluster around rather than a fixed column) — so Yes/No lands at a different x on Carlos Deleon's row vs Renee Blackwood's row. Brayden likes the yellow box itself, this is purely a button/link alignment fix within it.
+**Shipped:** [`c1061a4`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/c1061a4) on `ohvara-dashboard`.
 
-**Fix:**
-1. **Yes/No buttons get a fixed start x, the same on every row** — positioned roughly under/a little ahead of the **AP column's** x position from the table header above (not flush right, not text-width-dependent). The banner message text to their left can be whatever length it is and end wherever — ragged is fine, same rule as Prompt 363.
-2. **The "Not sure? Check {carrier} portal" link also gets a fixed start x, immediately after the buttons' fixed column** — same idea, consistent position regardless of the buttons' own width (Yes/No are already fixed-width so this should be easy, but don't let button width or icon spacing drift it).
-3. **Reserve enough width for the portal-link column to fit the longest real carrier name without wrapping or truncating** — check `useCarriers()`'s actual carrier list (there are 12 carriers per the live DB) and size the column/min-width off the longest one (e.g. "Mutual of Omaha", "National Life Group" — verify against the real list, don't guess) plus the fixed "Not sure? Check ___ portal" surrounding text and the external-link icon. Rows with shorter carrier names just leave trailing space — that's fine, same ragged-right rule.
-4. Convert the row's layout to a fixed grid/columns (same technique as Prompt 363 — CSS grid with explicit column widths, not flex-with-gap) rather than trying to patch flex ordering.
+**Root cause confirmed, not assumed:** the old layout was `display:flex, flexWrap:'wrap'`, and measuring two real pending rows live (both with an identical 873px container width) showed the Yes button at x=866 on one row and x=906 on the other — a 40px drift despite `flex:1` on the message span, which should have absorbed all leftover space identically regardless of content. The actual cause: `flexWrap:'wrap'` reflows items onto a new line once natural content width exceeds the container, and *which* item lands first on the wrapped line depends on that row's own message text's rendered width (each policy's date string is a few px different) — not a simple "wider text pushes buttons right" story, an actual wrap-order bug matching the prompt's own flex/space-between suspicion.
 
-Scope: alignment/spacing only. Don't touch the Yes/No click behavior, the yellow box's color/border, the auto-sort-to-top logic, or the record-modal's own separate Yes/No banner (Prompt 351) — all of that stays exactly as shipped.
+**Fix:** `EffectuationRow` rebuilt as `display:'grid', gridTemplateColumns: '1fr max-content 260px', gap:16` — column 1 (icon+message) absorbs all slack, column 2 (Yes/No, wrapped in its own flex div) sizes to exactly its content via `max-content` (constant since the button text never changes), column 3 (portal link / no-portal fallback) is a fixed 260px. Grid tracks don't reflow across "lines" the way `flexWrap` does, so columns 2 and 3 land at the same x regardless of column 1's content — structurally can't drift again.
 
-**Verify with a real screenshot** — Yes/No buttons start at the same x on every visible pending-effectuation row (roughly aligned under the AP column), and the portal-check link starts at its own consistent x right after, with no wrapping for any carrier name in the real list.
+**260px sizing verified, not guessed:** read migrations 078/080/082 for the real 12-carrier list (Mutual of Omaha, Transamerica, Fidelity Life, Corebridge, Ethos, American Amicable, Baltimore Life, Aflac, Chubb, National Life Group, Foresters, F&G), then measured actual rendered text width live in the real font/weight/size for the two longest candidates: "Not sure? Check National Life Group portal" = 245px, "...American Amicable portal" = 247px (character shape, not char count, decides longest — confirmed by measuring both rather than eyeballing). 260px gives headroom for both plus the icon.
+
+**Verified live** (nate44, real pending rows — Fidelity Life and F&G): both rows now measure **identical** Yes (811.06), No (865.78), and portal-link (927) x positions — the bug is gone. AP's `<th>` starts at x=879.6; Yes/No now lands ~69px *before* it (matches the prompt's own "a little ahead of AP, not flush right" framing — landing exactly at 879.6 was not achievable without either forcing the table wider (risks destabilizing all other column widths, since this is a native `table-layout:auto` table, not a page-level CSS grid) or shrinking column 3 below what the longest carrier name needs, which the prompt treats as the harder requirement ("verify against the real list, don't guess" vs. "roughly...a little ahead"). Chose to hold column 3's no-wrap guarantee and let the button-cluster position be approximate, per the prompt's own softer wording on that point — flag this trade-off to Brayden in case he wants pixel-exact AP alignment instead, which would need either a wider table or a narrower carrier-name allowance.
+
+Confirmed no real carrier name wraps: live-injected "National Life Group" and "American Amicable" into the actual rendered link element and read `getClientRects().length` — both returned `1` (single line, no wrap) with the link's right edge safely inside the table. Scope held — `PolicyModal`'s separate Yes/No banner (Prompt 351) untouched, only `MyPolicies.jsx`'s `EffectuationRow`. `npx vite build` clean, no console errors. Screenshot hit the same known Browser-pane compositing timeout as recent prompts — substituted with direct `getBoundingClientRect`/`getClientRects` measurements via `javascript_tool`, which is more precise than a screenshot for a pixel-alignment bug anyway.
 
 ---
 
