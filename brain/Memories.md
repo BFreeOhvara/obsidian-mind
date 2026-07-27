@@ -67,6 +67,23 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### [CC | 2026-07-27 — Prompt 371 SHIPPED] — admin dashboard unified with closer view, nate44 isolated from company-wide rollups
+
+**Shipped:** [`d02cb9f`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/d02cb9f) on `ohvara-dashboard`. Ran this as the top item off [[LIVE_STATE]]'s queue.
+
+**Root cause:** the "old admin look" Brayden flagged live was `InsuranceOverview.jsx` — a standalone admin-only Overview (KPI/funnel/leaderboard) that never got reconciled with `AgentOverview` once that became the real shared closer page — plus a fully separate `Sidebar.jsx` admin `NAV` array (Monitor/Revenue/Manage groups) pointing at 5 `ComingSoon` placeholders (Call Pipeline, Closer Roster, Leaderboard, Lead Sources, admin Commissions) instead of the real, already-built `/agent/*` pages. Admin's nav was also missing Live Call, My Policies, Quoter, Underwriting, Submissions, Carrier Portals, and Training Center entirely — a real functional gap, not just cosmetic.
+
+**Fix:** `/admin` now renders `AgentOverview` (same component as closer, already `isAdmin`-aware). Sidebar's `admin` NAV is now identical to `closer`'s (same groups, same `/agent/*` routes), with **Users & Access** kept as the one deliberate addition — it's real account management (create/deactivate/delete/reveal-creds + role-scoped invite), meaningfully broader than the Team page's closer-only invite panel, so I judged it as the legitimate "invite capability" addition the prompt asked for rather than something to delete. Deleted `InsuranceOverview.jsx` and the 5 orphaned placeholder exports/routes. Flagged (via `spawn_task`, not touched) a discovered dead legacy page: `Payouts.jsx`/`/admin/payouts` pays "reps" via Stripe against pre-pivot `commission_payouts`/`appointments`/`leads` tables, already unreachable from any nav.
+
+**nate44 isolation:** `upline_id` was already `null`, but nothing excluded its 19 seeded policies from admin-scoped company-wide numbers. Added `src/lib/testAccounts.js` (`TEST_ACCOUNT_IDS` + `excludeTestAccounts(rows, viewerId)` — drops a row unless the viewer IS the test account), wired into `useHierarchy.js`'s `useAgents()` (Team page member list), `Performance.jsx` (Team-scope production + Leaderboard tab), and `AgentOverview.jsx` (admin-scope KPIs + attention feed). Pure client-side query filtering — no migration needed, so it didn't hit the auto-mode classifier block that new-table prompts keep hitting.
+
+**Verification gap, disclosed rather than hidden:** `npx vite build` clean, live-verified as nate44/`Test1234!` (Overview, Performance You+Team+Leaderboard, Hierarchy — no regressions, self-exception and `self || profile` fallback both confirmed working). **Could not log in as Brayden's real Brayden11 admin account** — no password available, and typing one in for him isn't something I do regardless of who provides it (safety-rule boundary, not a technical limitation). Admin-specific parity is verified by code read + the fact that `/admin` and `/agent` literally render the same component, not by an admin-eye screenshot — logged this explicitly so Brayden knows to spot-check his own login once he sees it.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 371 (d02cb9f) shipped — admin/closer dashboard parity + nate44 rollup isolation. Prompt 370 (real Compensation Grid page from Eterna comp data) is next in LIVE_STATE's queue.`
+
+---
+
 ### [CC | 2026-07-26 — Prompts 368/369 SHIPPED] — Not Approved + Lapsed policy tracking, Activity catalog trimmed
 
 **Shipped:** Prompt 368 [`8dd8eb8`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/8dd8eb8), Prompt 369 [`a43f623`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/a43f623), both on `ohvara-dashboard`. Queue had 369 listed above 368, but 368's own text explicitly deferred its "declined"/"lapsed" preview rows to 369 ("do NOT build these two until that's resolved") — did 368 first since 369 depends on it, same top-to-bottom-with-dependencies pattern as Prompts 366/367.
