@@ -16,171 +16,109 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26, Prompt 358 shipped 2026-07-26, Prompt 357 shipped frontend 2026-07-26 (DB migration blocked, see [[North Star]] Current Focus), Prompt 356 shipped 2026-07-26 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26, Prompt 358 shipped 2026-07-26, Prompt 357 fully closed 2026-07-26 (frontend + migration 084), Prompt 356 shipped 2026-07-26, Prompt 362 closed 2026-07-26, Prompt 365 closed 2026-07-26 — see [[Memories]] for the full trail.)*
 
-### 🆕 Prompt 362 QUEUED 2026-07-26 — paste the full text of `supabase/migrations/084_team_chat.sql` into this file (no code change)
+### 🟩 Prompt 365 CLOSED 2026-07-26 — My Calls: primary button + Segmented tabs shipped; Activity overshoot catalog audited + built as a nate44-only preview
 
-Not a build task — a handoff task. Falcon doesn't have file access to the `ohvara-dashboard` repo from Cowork (only this vault is mounted), so can't read the migration CC already wrote for Prompt 357. Falcon does have direct Supabase MCP access to project `jjextitmbptoaolacocs` this session and already has a precedent for applying classifier-blocked writes directly once Brayden gives a real go-ahead in chat (see Prompt 355's `nate44`/RLS fixes). Rule 4 in [[North Star]] says never ask Brayden to run commands manually — so instead of telling him to paste this into the Supabase SQL editor himself, route the exact SQL back through here so Falcon can apply it directly via MCP.
+**Shipped:** [`896467a`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/896467a) on `ohvara-dashboard`.
 
-**Action:** paste the complete, current contents of `supabase/migrations/084_team_chat.sql` verbatim into this entry (replace this line with the SQL in a fenced code block), then leave the entry in place — don't delete it — so Falcon's next "cc finished" pass picks it up, applies it via `apply_migration`, verifies against `pg_policies`/`list_tables`, and closes this out in [[North Star]] Current Focus.
+**Item 1 — "Log follow-up" button.** Was `ghostBtn` (outline), now `{ ...primaryBtn, display: 'inline-flex', alignItems: 'center', gap: 6 }` — the exact icon+filled-CTA pattern already established at `Users.jsx:153` ("Invite user"), not invented. Verified live (logged in as nate44): computed style is `background: rgb(75, 121, 206)` (`var(--accent)`), `color: rgb(255, 255, 255)`, `display: flex` — icon and text sit correctly inline.
 
-No other action needed — don't re-run `apply_migration` yourselves again (already confirmed blocked), don't touch any other files.
+**Item 2 — sub-tabs.** Swapped the hand-rolled underline-tab strip for the shared `Segmented` component (`components/ui/Segmented.jsx`, same one Performance's Production/Leaderboard and Submissions' 3 tabs already use) — `TABS` keys renamed `key`→`value` to match `Segmented`'s prop shape, no new tab styling written. Verified live: active tab computed style is filled `rgb(75, 121, 206)` bg + white text, inactive tabs transparent bg + muted text — pixel-identical mechanism to Performance/Submissions since it's the same component instance, not a lookalike.
 
-```sql
--- Migration 084: Team chat (Prompt 357)
---
--- Real backend for the Team page's new Messages sub-tab: one shared "Team
--- chat" channel every closer/admin is implicitly in, plus arbitrary 1:1 DMs
--- between any two team members. Deliberately net-new — the existing
--- `messages` table (migration 001/043) is a fixed rep→brayden/nate directed
--- inbox with at most one reply per row, not a general conversation model, so
--- it can't represent a shared channel or an arbitrary DM pair without a
--- rewrite. Nothing in that table is touched here.
---
--- No separate participants table: a DM's two sides live directly on
--- team_conversations as dm_participant_a/b (always stored with a < b so a
--- pair has exactly one row, found or created without a self-join). A channel
--- row has both null and is visible to any closer/admin by role alone.
---
--- DO NOT run supabase db push for this migration — apply via SQL editor.
--- ─────────────────────────────────────────────────────────────────────────────
+**Item 3 — Activity overshoot catalog.** Full audit of all 15 candidate types against the real schema (migrations 072 `policies`/`policy_status`/`cancellation_status` enums, 076 `closer_followups`, 067 `rep_invites`, 084 `team_messages`, 075 `monthly_ap_goal`, 059/020/068 `training_progress`, 049 `commission_payouts`):
 
-create or replace function public.is_team_member()
-returns boolean
-language sql
-security definer
-stable
-set search_path = public
-as $$
-  select exists (
-    select 1 from public.profiles
-    where id = auth.uid() and role in ('closer', 'admin')
-  )
-$$;
+**Already shipped, just under different copy — no new work:**
+- "Effectuation — did NOT go into effect" = the existing `undrafted` type ("Came back undrafted"). Confirmed in code (`MyPolicies.jsx`'s `EffectuationRow`): the "No" button calls `answerEffectuation(p, 'Undrafted')` — answering No **is** what sets `status = 'Undrafted'`, there's no separate Yes/No answer column to add.
+- "Cancellation call completed — policy cancelled" = the existing `cancelcomplete` type (`cancellation_status = 'Cancellation Complete'`).
 
-create table if not exists team_conversations (
-  id                uuid primary key default gen_random_uuid(),
-  type              text not null check (type in ('channel', 'dm')),
-  dm_participant_a  uuid references profiles(id) on delete cascade,
-  dm_participant_b  uuid references profiles(id) on delete cascade,
-  created_at        timestamptz not null default now(),
-  constraint team_conversations_shape check (
-    (type = 'dm' and dm_participant_a is not null and dm_participant_b is not null and dm_participant_a < dm_participant_b)
-    or (type = 'channel' and dm_participant_a is null and dm_participant_b is null)
-  )
-);
+**Real, backed by existing schema, newly wired into the Activity feed (no migration needed):**
+- **Follow-up logged** — `closer_followups.created_at` existed since migration 076 but was never queried by this feed. Now is.
+- **New team message** — `team_messages.created_at` (migration 084, just applied via Prompt 362). New `useRecentTeamMessages()` hook added to `useTeamChat.js`.
+- **Invite sent / Invite accepted** — `rep_invites.created_at` / `used_at`. New `useSentInvites(agentId)` hook added to `useProfiles.js` (existing `usePendingInvites` is global/pending-only, not agent-scoped).
+- **Monthly AP goal reached** — fully derivable from `policies` (cumulative AP this month) vs `profiles.monthly_ap_goal`, no new column; computed client-side, finds the exact policy whose sale crossed the target.
 
--- Exactly one channel row ever; exactly one row per unordered DM pair.
-create unique index if not exists team_conversations_one_channel_idx
-  on team_conversations (type) where type = 'channel';
-create unique index if not exists team_conversations_dm_pair_idx
-  on team_conversations (dm_participant_a, dm_participant_b) where type = 'dm';
+All 5 verified live as nate44: "Follow-up logged" (4 rows, his real seeded follow-ups) and "Invite sent" (1 row, a real invite he generated) both appeared in the real feed with no code path forced. "Invite accepted"/"New team message"/"Monthly AP goal reached" correctly did **not** appear — nate44 has no accepted invites, no incoming team messages, and is at 33% of goal ($6,612 of $20,000) this month, so the derivation logic is behaving correctly on real data, not silently always-on.
 
-create table if not exists team_messages (
-  id               uuid primary key default gen_random_uuid(),
-  conversation_id  uuid not null references team_conversations(id) on delete cascade,
-  sender_id        uuid not null references profiles(id),
-  sender_name      text not null,
-  body             text not null,
-  created_at       timestamptz not null default now()
-);
+**Speculative — NO schema exists for these today, confirmed by reading the actual enums/tables, not guessed:**
+- **Cancellation call completed — client stayed (save)** — `cancellation_status` enum is only `'Cancellation Pending' | 'Cancellation Complete'`, no "saved" outcome value exists.
+- **Policy declined by carrier** — `policy_status` enum has no `'Declined'` value.
+- **Policy lapsed / fell off** — confirmed this is a genuinely different concept than what's tracked: Performance's Fall-off Rate tile (`usePolicies.js`) is literally `cancellation_status === 'Cancellation Complete'` count / total — the *3-way-call* cancellation flow, not a passive non-payment lapse. No column distinguishes the two.
+- **Policy reinstated** — no history/event table exists to represent "came back after a lapse."
+- **Follow-up completed / resolved** — `closer_followups` has no `completed_at`/status column; today a follow-up only ever gets deleted, never marked done.
+- **Commission payout logged** — `commission_payouts` table exists (migration 049) but is wired to the OLD `appointments` model (pre-pivot SMB business), not `policies` — would need a rework for the new insurance pipeline, not just a query. Matches Brayden's own "lowest-confidence" flag.
+- **Training module completed** — `training_progress.unlocked_at` exists but is scoped to `src/pages/rep/TrainingCenter.jsx` (the legacy setter-training flow) — closers/admins have no training-completion tracking at all under the new business.
+- **Persistency milestone crossed for a cohort** — no cohort/persistency-tracking concept exists anywhere in schema. Matches Brayden's own "lowest-confidence, may be too granular" flag.
 
-create index if not exists team_messages_conversation_idx on team_messages (conversation_id, created_at);
+**How it's shown:** rather than writing fake rows into production tables (several are structurally impossible — e.g. Postgres would reject inserting `cancellation_status = 'Save'`, that enum value doesn't exist), all 8 speculative types render as a hardcoded `previewCatalog()` array in `MyCalls.jsx`, gated to `profile?.username === 'nate44'` only (no other agent's real feed is touched), each tagged with a visible **"PREVIEW — NOT REAL DATA"** badge so they're never mistaken for real activity. Verified live: exactly 8 preview rows appear interspersed by their (fake, staggered) dates only on nate44's Activity tab. This is explicitly a review-pass artifact — the code comment directly above `previewCatalog()` says to delete the function and its one merge-line once Brayden has said what to keep.
 
-alter table team_conversations enable row level security;
-alter table team_messages enable row level security;
+**Brayden's action:** review the 8 preview rows + the "real, newly wired" 5 on nate44's Activity tab, say which to keep. Anything kept from the speculative 8 needs a real migration (new enum value / column / table) before it can go beyond preview — that's new work, not a copy change.
 
-create policy "team_conversations_select" on team_conversations
-  for select using (
-    type = 'channel' or auth.uid() in (dm_participant_a, dm_participant_b)
-  );
+**Verified live** (logged in as nate44/`Test1234!`, dev server): screenshot itself hit the known Browser-pane compositing timeout (same recurring issue noted in past prompts), substituted with `read_page`/`get_page_text` (full Activity feed content, in order) + `javascript_tool` computed-style checks (button/tab colors) — both confirm the visual and functional result described above. `npx vite build` clean. No console errors.
 
-create policy "team_conversations_insert" on team_conversations
-  for insert with check (
-    public.is_team_member()
-    and (type = 'channel' or auth.uid() in (dm_participant_a, dm_participant_b))
-  );
+- Cancellation call completed — client stayed (save)
+- Cancellation call completed — policy cancelled
+- Policy declined by carrier (submitted but never approved)
+- Policy lapsed / fell off (ties to the Fall-off Rate tile on Performance — non-payment, no cancellation call involved)
+- Policy reinstated (came back after a lapse/cancellation)
+- Effectuation — did NOT go into effect ("No" answer on the effectuation banner, not just "Yes")
+- Follow-up logged (agent adds one manually via "Log follow-up")
+- Follow-up completed / resolved
+- New team message (channel or DM — ties to the just-shipped Team → Messages tab, Prompt 357/362)
+- Invite sent (admin generates a new rep invite link — Team page)
+- Invite accepted (a new agent actually joins via that link)
+- Commission payout logged (speculative — Commissions page doesn't exist yet, flag as lowest-confidence)
+- Training module completed (Training Center)
+- Monthly AP goal reached / crossed 100%
+- Persistency milestone crossed for a cohort (speculative — flag as lowest-confidence, may be too granular to belong here at all)
 
-create policy "team_messages_select" on team_messages
-  for select using (
-    exists (
-      select 1 from team_conversations c
-      where c.id = team_messages.conversation_id
-        and (c.type = 'channel' or auth.uid() in (c.dm_participant_a, c.dm_participant_b))
-    )
-  );
+**How to show it:** seed one fake sample row of each type against the existing `nate44` test account/data (same throwaway-test-data convention as the 20 seeded sample policies) so Brayden can scroll the real Activity tab in his own browser and see the whole catalog live — not just a screenshot. Label clearly in the close-out entry which seeded rows are backed by real schema today vs. which needed a placeholder/fake field to demonstrate the concept at all (don't silently wire up new production tracking for the speculative ones — this is a review pass, not a commitment to build all of them).
 
-create policy "team_messages_insert" on team_messages
-  for insert with check (
-    sender_id = auth.uid()
-    and exists (
-      select 1 from team_conversations c
-      where c.id = team_messages.conversation_id
-        and (c.type = 'channel' or auth.uid() in (c.dm_participant_a, c.dm_participant_b))
-    )
-  );
+**Verify with a real screenshot** of the restyled button, plus a real screenshot scrolling through the full seeded Activity catalog.
 
--- Seed the single channel row if it doesn't exist yet.
-insert into team_conversations (type)
-select 'channel'
-where not exists (select 1 from team_conversations where type = 'channel');
+---
 
--- New message → a `notifications` row for every other recipient, same shape
--- as the existing messages_reply_notify trigger (migration 043). Channel:
--- every other closer/admin. DM: the other participant.
-create or replace function public.team_messages_notify()
-returns trigger
-language plpgsql
-security definer
-set search_path = public
-as $$
-declare
-  conv       team_conversations;
-  recipient  uuid;
-begin
-  select * into conv from team_conversations where id = new.conversation_id;
+### 🆕 Prompt 364 QUEUED 2026-07-26 — My Policies pending-effectuation banner: Yes/No buttons must start at a fixed column position across all rows
 
-  if conv.type = 'channel' then
-    for recipient in
-      select id from profiles where role in ('closer', 'admin') and id != new.sender_id
-    loop
-      insert into notifications (profile_id, type, message, data)
-      values (
-        recipient, 'team_message',
-        new.sender_name || ' in Team chat: ' || left(new.body, 80),
-        jsonb_build_object('conversation_id', new.conversation_id, 'message_id', new.id, 'kind', 'channel')
-      );
-    end loop;
-  else
-    recipient := case when conv.dm_participant_a = new.sender_id then conv.dm_participant_b else conv.dm_participant_a end;
-    insert into notifications (profile_id, type, message, data)
-    values (
-      recipient, 'team_message',
-      new.sender_name || ': ' || left(new.body, 80),
-      jsonb_build_object('conversation_id', new.conversation_id, 'message_id', new.id, 'kind', 'dm')
-    );
-  end if;
+Same class of bug as Prompt 363, different location. Screenshot (`My Policies`, real live data, Prompt 351's inline effectuation banner): the yellow "Reached its effective date… did this policy go into effect?" banner row currently positions Yes/No based on the left-hand message text's width (looks like flex/space-between pushing the button cluster around rather than a fixed column) — so Yes/No lands at a different x on Carlos Deleon's row vs Renee Blackwood's row. Brayden likes the yellow box itself, this is purely a button/link alignment fix within it.
 
-  return new;
-end;
-$$;
+**Fix:**
+1. **Yes/No buttons get a fixed start x, the same on every row** — positioned roughly under/a little ahead of the **AP column's** x position from the table header above (not flush right, not text-width-dependent). The banner message text to their left can be whatever length it is and end wherever — ragged is fine, same rule as Prompt 363.
+2. **The "Not sure? Check {carrier} portal" link also gets a fixed start x, immediately after the buttons' fixed column** — same idea, consistent position regardless of the buttons' own width (Yes/No are already fixed-width so this should be easy, but don't let button width or icon spacing drift it).
+3. **Reserve enough width for the portal-link column to fit the longest real carrier name without wrapping or truncating** — check `useCarriers()`'s actual carrier list (there are 12 carriers per the live DB) and size the column/min-width off the longest one (e.g. "Mutual of Omaha", "National Life Group" — verify against the real list, don't guess) plus the fixed "Not sure? Check ___ portal" surrounding text and the external-link icon. Rows with shorter carrier names just leave trailing space — that's fine, same ragged-right rule.
+4. Convert the row's layout to a fixed grid/columns (same technique as Prompt 363 — CSS grid with explicit column widths, not flex-with-gap) rather than trying to patch flex ordering.
 
-drop trigger if exists team_messages_notify_trigger on team_messages;
-create trigger team_messages_notify_trigger
-  after insert on team_messages
-  for each row execute function public.team_messages_notify();
+Scope: alignment/spacing only. Don't touch the Yes/No click behavior, the yellow box's color/border, the auto-sort-to-top logic, or the record-modal's own separate Yes/No banner (Prompt 351) — all of that stays exactly as shipped.
 
--- Realtime, so the Messages tab updates live without waiting on a poll
--- (matches migration 052's pattern for `calls`).
-DO $$ BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_publication_tables
-    WHERE pubname = 'supabase_realtime' AND tablename = 'team_messages'
-  ) THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE team_messages;
-  END IF;
-END $$;
-```
+**Verify with a real screenshot** — Yes/No buttons start at the same x on every visible pending-effectuation row (roughly aligned under the AP column), and the portal-check link starts at its own consistent x right after, with no wrapping for any carrier name in the real list.
+
+---
+
+### 🆕 Prompt 363 QUEUED 2026-07-26 — Overview "Needs your attention": Type/Name/Detail must each start at a fixed column position across all rows
+
+Brayden's screenshot ([[Overview]] page, real live data) shows the current row layout isn't a true fixed-width grid — Type badge, Name, and Detail don't line up vertically row to row. Specifically: the badge column itself is fine, but **Name's left edge shifts depending on how wide the preceding Type badge is** (e.g. "CONFIRM EFFECTIVE" is a wider pill than "FOLLOW-UP", so rows with the wider badge push Name further right than rows with a shorter badge) — looks like the row is laid out with flex + a gap after the badge rather than fixed-width columns, so each column's start position depends on the content before it instead of being pinned.
+
+**Fix:** convert each row (and the header row) to fixed-width columns — e.g. CSS grid with explicit `grid-template-columns` (or a `<table>` with fixed `<col>` widths) — so:
+1. Every row's Type badge starts at the same x position (already true, don't break it).
+2. Every row's Name starts at the same x position, regardless of how wide that row's own Type badge happens to be.
+3. Every row's Detail starts at the same x position, regardless of how long that row's own Name happens to be.
+4. Content is still left-aligned within each column and can end wherever (ragged right edge is fine, expected) — this is about start alignment only, not centering or truncation changes.
+
+**Now that the card is wider** (Prompt 354 widened it to a 1.8fr/1fr split against Monthly goal), there's real room to add generous spacing between the Type/Name/Detail columns — don't cram them tight just because they now fit; use the extra width for breathing room between columns, not just wider text areas.
+
+Scope: this is a column-alignment/spacing fix only. Don't touch row height, colors, the 5-row cap/scroll, or any of the other "Needs your attention" behavior already shipped (Prompts 347/349/354).
+
+**Verify with a real screenshot** — Type, Name, and Detail columns each show a single common left edge across every visible row, with clear breathing space between columns.
+
+---
+
+### 🟩 Prompt 362 CLOSED 2026-07-26 — migration 084_team_chat.sql applied by Falcon, Prompt 357 fully done
+
+Ran via Supabase MCP `apply_migration` against `jjextitmbptoaolacocs` with Brayden's explicit go-ahead in chat. Verified post-apply: `team_conversations` (RLS on, 1 row — the auto-seeded channel) and `team_messages` (RLS on, empty) both exist via `list_tables`; all 4 policies (`team_conversations_select/insert`, `team_messages_select/insert`) confirmed live via `pg_policies`. Team chat is now fully functional — Messages tab has real data behind it, no further action needed.
+
+Prompt 357 (Team page rebuild) is now fully closed — frontend (CC, `0930794`) + backend migration (this entry) both done.
+
+**Queue is empty.** Nothing left to build — check [[North Star]] Current Focus for open items.
 
 ---
 
