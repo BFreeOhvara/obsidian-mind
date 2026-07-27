@@ -16,7 +16,9 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26, Prompt 358 shipped 2026-07-26, Prompt 357 fully closed 2026-07-26 (frontend + migration 084), Prompt 356 shipped 2026-07-26, Prompt 362 closed 2026-07-26, Prompt 365 closed 2026-07-26, Prompt 364 closed 2026-07-26 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26, Prompt 358 shipped 2026-07-26, Prompt 357 fully closed 2026-07-26 (frontend + migration 084), Prompt 356 shipped 2026-07-26, Prompt 362 closed 2026-07-26, Prompt 365 closed 2026-07-26, Prompt 364 closed 2026-07-26, Prompt 363 closed 2026-07-26 — see [[Memories]] for the full trail.)*
+
+**Queue is empty.** Nothing left to build — check [[North Star]] Current Focus for open items.
 
 ### 🟩 Prompt 365 CLOSED 2026-07-26 — My Calls: primary button + Segmented tabs shipped; Activity overshoot catalog audited + built as a nate44-only preview
 
@@ -74,21 +76,17 @@ Confirmed no real carrier name wraps: live-injected "National Life Group" and "A
 
 ---
 
-### 🆕 Prompt 363 QUEUED 2026-07-26 — Overview "Needs your attention": Type/Name/Detail must each start at a fixed column position across all rows
+### 🟩 Prompt 363 CLOSED 2026-07-26 — Overview "Needs your attention": Type/Name/Detail column drift fixed, root-caused to per-row independent grids
 
-Brayden's screenshot ([[Overview]] page, real live data) shows the current row layout isn't a true fixed-width grid — Type badge, Name, and Detail don't line up vertically row to row. Specifically: the badge column itself is fine, but **Name's left edge shifts depending on how wide the preceding Type badge is** (e.g. "CONFIRM EFFECTIVE" is a wider pill than "FOLLOW-UP", so rows with the wider badge push Name further right than rows with a shorter badge) — looks like the row is laid out with flex + a gap after the badge rather than fixed-width columns, so each column's start position depends on the content before it instead of being pinned.
+**Shipped:** [`ade415d`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/ade415d) on `ohvara-dashboard`.
 
-**Fix:** convert each row (and the header row) to fixed-width columns — e.g. CSS grid with explicit `grid-template-columns` (or a `<table>` with fixed `<col>` widths) — so:
-1. Every row's Type badge starts at the same x position (already true, don't break it).
-2. Every row's Name starts at the same x position, regardless of how wide that row's own Type badge happens to be.
-3. Every row's Detail starts at the same x position, regardless of how long that row's own Name happens to be.
-4. Content is still left-aligned within each column and can end wherever (ragged right edge is fine, expected) — this is about start alignment only, not centering or truncation changes.
+**Root cause confirmed via live measurement, not guessed:** each attention row (`AgentOverview.jsx`) renders as its own independent `display:grid` div — not one shared grid across all rows — with the Type column set to `minmax(70px,max-content)` (Prompt 360). Because each row is its own grid formatting context, `max-content` resolves separately per row against THAT row's own badge width. Logged in as nate44 with real seeded data covering all 3 tag types, measured via `getBoundingClientRect`: Type badge widths were FOLLOW-UP 77.86px / CONFIRM EFFECTIVE 120.89px / CANCELLATION PENDING 142.58px, and Name's x drifted 430.9 / 473.9 / 495.6px accordingly (Detail drifted 603.3 / 629.8 / 643.2px) — exactly Brayden's reported bug. Note: Prompt 360's own verification pass only measured the FOLLOW-UP tag (~57-79px) and never tested the other two real tag strings, which is how this shipped unnoticed.
 
-**Now that the card is wider** (Prompt 354 widened it to a 1.8fr/1fr split against Monthly goal), there's real room to add generous spacing between the Type/Name/Detail columns — don't cram them tight just because they now fit; use the extra width for breathing room between columns, not just wider text areas.
+**Fix:** Type column changed from `minmax(70px,max-content)` to a plain fixed `150px` (content-independent, sized with headroom above the widest real tag, CANCELLATION PENDING's measured 142.58px) — Name and Detail now compute their `fr` tracks from the same fixed remainder on every row regardless of which tag it holds. Gap bumped 20→24 for the breathing-room ask now that Type isn't stealing variable shared space per row. Header and rows still share the same `ATTENTION_COLUMNS` constant, so they can't drift from each other on the Type/Name boundary either.
 
-Scope: this is a column-alignment/spacing fix only. Don't touch row height, colors, the 5-row cap/scroll, or any of the other "Needs your attention" behavior already shipped (Prompts 347/349/354).
+**Verified live** (nate44, real data, all 3 tag types present simultaneously): re-measured after the fix — Name lands at **x=507 on all 6 rows** (was 430.9/473.9/495.6), Detail lands at **x=652.66 on all 6 rows** (was 603.3/629.8/643.2). Type badge start (x=333) was already correct and stayed correct. `npx vite build` clean, no console errors. Screenshot hit the same known Browser-pane compositing timeout as recent prompts — substituted with `getBoundingClientRect` measurements pre/post-fix, which is more precise than a screenshot for a pixel-alignment bug anyway.
 
-**Verify with a real screenshot** — Type, Name, and Detail columns each show a single common left edge across every visible row, with clear breathing space between columns.
+**Known minor artifact, out of scope, flagging for Brayden:** the header row sits outside the scrollable rows container (`overflowY:auto`); with more than 5 rows (as here — 6 real items vs. the 5-row cap) a vertical scrollbar appears only in the body, narrowing its content width vs. the header's. This makes the header's Detail column start ~6px right of the body rows' Detail column (658.4 vs 652.66px) — Type and Name are unaffected since they're fixed-width/fixed-offset columns, only the `fr`-sized Detail column is sensitive to total container width. This is a pre-existing structural side effect of the 5-row-cap/scroll design (Prompt 347), not something this fix introduced or worsened, and Prompt 363's scope explicitly excludes touching the scroll behavior — leaving as-is unless Brayden wants a follow-up (e.g. `scrollbar-gutter: stable` reserved in both header and body).
 
 ---
 
