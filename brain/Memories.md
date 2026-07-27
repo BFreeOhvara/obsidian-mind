@@ -67,6 +67,15 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### 2026-07-27 (cont. 33, Eagle) — Prompt 365 started (in progress, no code changes yet): kicked off research pass on My Calls page
+
+**What happened:** Queue (after Prompt 362's close-out) had three new items — Prompts 363, 364, 365, listed top-to-bottom in that order in [[LIVE_STATE]]. Following the doc's literal "executes top to bottom" rule, started with the topmost/newest, **Prompt 365** (My Calls: restyle "Log follow-up" button + Schedule/Activity/Graded-calls sub-tabs to the shared Segmented pattern, plus build an "overshoot" sample Activity-type catalog seeded against `nate44` test data). Launched a background Explore agent against `ohvara-dashboard` to map: the My Calls page files, the existing primary-button style used elsewhere (e.g. "+ New invite link"), the shared `Segmented` component from Prompt 359 (Performance/Submissions), the Activity tab's current type enum + Supabase query shape, and the `nate44` seed-data convention used for the 20 sample policies. **No files edited yet** — this entry exists only because the Atlas gate fired on the git-pull/research tool calls; real build work (and the eventual close-out entry covering all three of 363/364/365) still to come once the research agent returns.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 365 (My Calls: primary-button restyle + Segmented sub-tabs + Activity overshoot catalog) is in progress — a research pass on the My Calls page/Segmented component/Activity schema/nate44 seed convention was kicked off but no code has been written yet. Prompts 364 and 363 (My Policies effectuation-banner alignment, Overview "Needs your attention" column alignment) are still queued below it in LIVE_STATE, untouched. Pick up Prompt 365 first.`
+
+---
+
 ### 2026-07-26 (cont. 32, Eagle) — Prompt 362: pasted migration 084_team_chat.sql into LIVE_STATE for Falcon's direct-MCP handoff
 
 **What happened:** Queue had exactly one item — Prompt 362, a handoff task not a build task. Falcon (Cowork) can't read the `ohvara-dashboard` repo directly (only this vault is mounted), so needed the full text of `supabase/migrations/084_team_chat.sql` (Prompt 357's Messages migration, still blocked from `apply_migration` by the classifier same as Prompt 355's fixes) routed through [[LIVE_STATE]] so Falcon can apply it via direct Supabase MCP access with Brayden's prior go-ahead precedent. Read the file from `C:\Users\freem\ohvara-dashboard\supabase\migrations\084_team_chat.sql`, pasted its complete, verbatim contents into the Prompt 362 entry in LIVE_STATE.md as instructed — did not delete the entry (per instructions, left in place for Falcon's next pass to apply + verify + close out). No code changes, no migration applied by CC — that action is explicitly Falcon's to take via MCP.
