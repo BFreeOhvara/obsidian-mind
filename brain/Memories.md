@@ -67,6 +67,21 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### [CC | 2026-07-27 — Prompt 372 SHIPPED] — Quoter Invalid Token fixed with Brayden's real embed token; production Vercel env var still needed
+
+**Shipped:** [`645ff6c`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/645ff6c) on `ohvara-dashboard`. Follow-up to this session's own earlier investigation (logged below) — Brayden got the real token from InsuranceToolkits directly rather than continuing the self-serve UI hunt, and dropped it into LIVE_STATE for CC to consume.
+
+**Handled as a real secret, not just a URL string:** added `VITE_INSURANCETOOLKITS_EMBED_TOKEN` to `ohvara-dashboard/.env.local` (confirmed gitignored before writing), `Quoter.jsx`'s `QUOTER_URL` now builds from the base path + `import.meta.env.VITE_INSURANCETOOLKITS_EMBED_TOKEN` instead of a bare string. Verified the commit diff has no raw token in it (`git show` grepped clean). **Redacted the token from LIVE_STATE's Prompt 372 entry** once consumed — the value only lives in `.env.local` now (plus this vault's git history from today, an accepted tradeoff of LIVE_STATE being the only Falcon↔CC channel).
+
+**Two real gaps flagged rather than silently closed:**
+1. **Production Vercel deploy still needs the same env var.** Checked the available Vercel MCP tools — no set/update-env-var tool exists (only read-oriented: get/list project, deployments, logs). Can't do this myself; Brayden needs to add `VITE_INSURANCETOOLKITS_EMBED_TOKEN` to the `ohvara-dashboard` Vercel project's environment variables himself and redeploy.
+2. **Could not visually verify the fix.** Confirmed the iframe's `src` attribute now correctly includes the token (checked via `javascript_tool`), but couldn't confirm the "Invalid Token" badge is actually gone or that a real quote returns — this session's Browser pane screenshot tool errors ("pane not displayed"), and the widget is a cross-origin iframe so its DOM is inaccessible to inspection tools from the parent page regardless (same limitation hit during the original investigation — no network requests for the iframe were ever captured either). Flagged to Brayden to spot-check live himself.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 372 (645ff6c) shipped — Quoter token fix is in code+.env.local, but Brayden still needs to (1) add VITE_INSURANCETOOLKITS_EMBED_TOKEN to the Vercel project's env vars for production, and (2) spot-check the live Quoter himself since this session couldn't visually verify past the iframe's src attribute. LIVE_STATE queue is otherwise empty — check North Star Current Focus for next direction.`
+
+---
+
 ### [CC | 2026-07-27 — Prompt 370 SHIPPED] — Real Compensation Grid page, seeded from Brayden's Eterna comp data
 
 **Shipped:** [`7cd057d`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/7cd057d) on `ohvara-dashboard`. Migration 086 applied to `jjextitmbptoaolacocs` after explicit go-ahead (AskUserQuestion, same auto-mode schema-change gate as 084/085).
