@@ -56,18 +56,22 @@ Prompt 370 (real Compensation Grid page) is unaffected and still queued below �
 
 ---
 
-### 🆕 Prompt 372 QUEUED 2026-07-27 — BUG: Quoter's InsuranceToolkits embed shows "Invalid Token", quoting is fully broken
+### 🟨 Prompt 372 BLOCKED 2026-07-27 — Quoter "Invalid Token": root cause found, needs a real embed token from Brayden's InsuranceToolkits account (not a code bug)
 
-Real bug, confirmed live by Brayden (screenshot, `Brayden11` admin account, `/agent/quoter`): the embedded InsuranceToolkits "FexToolkit Lite" widget loads its own UI (form fields render fine — Coverage Options, About the Client) but shows a red **"Invalid Token"** badge top-right *inside the embed itself*, and the results table underneath (Company Name/Monthly/Coverage Type/Actions) is empty — clicking "Get Quote" almost certainly does nothing useful right now. This is the real quoting tool every closer needs for live calls, so it's a real blocker, not cosmetic.
+**Investigated, not guessed — findings below, no fix shipped (correctly, per the prompt's own fork).**
 
-**Investigate first, don't guess a fix:**
-1. Find how the Quoter page embeds InsuranceToolkits (iframe `src` with a token query param, a JS SDK init call, a postMessage handshake, etc. — whichever it actually is).
-2. Find where that token comes from — hardcoded in the frontend (shouldn't be, per this project's own "never hardcode credentials" rule), pulled from `.env.local`, or fetched from the `secrets` table / a Supabase edge function.
-3. Determine why it's invalid: expired, revoked, wrong format, wrong env var name, or a real InsuranceToolkits account/API issue on their end (their service, not code — check if InsuranceToolkits' own status/docs mention token rotation or embed-token generation requirements).
+**Current code** (`src/pages/agent/Quoter.jsx`): a bare `<iframe src="https://app.insurancetoolkits.com/fex/lite">` — no query param, no JS SDK init, no postMessage handshake, nothing in `.env.local` or Supabase referencing InsuranceToolkits at all (grepped both). There has never been any token in this integration, from Prompt 328 through today.
 
-**If the fix is a real code bug** (wrong param name, expired local token that just needs regenerating via a known API call, wrong env var referenced, etc.) — fix and ship it directly, verify with a real screenshot showing the widget with no "Invalid Token" badge and an actual quote returned for a test client.
+**Reproduced the split:** navigated directly (top-level, not iframed) to the exact same URL our iframe uses — form renders cleanly, no "Invalid Token" anywhere in the DOM (`document.body.innerText` checked directly, clean). The failure is specific to being loaded inside a foreign iframe, which matches an anti-embedding/embed-authentication check on InsuranceToolkits' side, not a Supabase/env/code issue on ours.
 
-**If the fix requires a NEW credential/token from Brayden's own InsuranceToolkits account** (e.g. their embed tokens expire and need manual regeneration from their dashboard, or the current one was revoked) — do not guess or fabricate one. Report back through LIVE_STATE exactly what's needed (which credential, where in InsuranceToolkits' own dashboard to find/regenerate it) so Brayden can get it and either paste it back through this same route-back pattern (Prompt 362-style) or apply it himself, whichever is safer given whether it's a secret.
+**Real evidence of the actual embed mechanism**, found via web search (not fabricated): a live, indexed URL — `https://insurancetoolkits.com/fex/lite-form/?token=<real-looking-token>` — shows InsuranceToolkits' real embed form lives at a **different domain+path than what we're using** (`insurancetoolkits.com/fex/lite-form/`, not `app.insurancetoolkits.com/fex/lite`) and **requires a `?token=` query param** scoped to the embedding site. This is almost certainly a per-account "get your embed code" feature in Brayden's own InsuranceToolkits dashboard (likely under Fex Toolkit settings / an "Embed on your website" or integrations page) that was never used when Prompt 328 originally shipped — Brayden (or whoever built it originally) grabbed the plain app URL instead of going through that flow, so the widget has been running in an unauthenticated/wrong mode the whole time, not a token that "expired."
+
+**What's needed from Brayden — can't guess or fabricate this:**
+1. Log into `app.insurancetoolkits.com`, find the FEX Toolkit's "Embed on your website" / widget / integration settings (name TBD, wasn't visible from the outside).
+2. Generate (or copy, if one already exists) the real embed URL — should look like `https://insurancetoolkits.com/fex/lite-form/?token=...`.
+3. Paste that real URL back into this LIVE_STATE entry (or hand it directly), and CC will swap `QUOTER_URL` in `Quoter.jsx` to it, rebuild, and verify live with a real quote for a test client.
+
+**Not closing this out** — leaving as 🟨 BLOCKED (not 🟩 CLOSED) since nothing shipped. Re-queue once the real token/URL is available.
 
 ---
 

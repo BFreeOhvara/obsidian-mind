@@ -67,6 +67,21 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### [CC | 2026-07-27 — Prompt 372 INVESTIGATED, BLOCKED] — Quoter "Invalid Token" root-caused to a missing real embed token, not a code bug
+
+**No fix shipped — correctly, per the prompt's own explicit fork not to guess.** Full findings in [[LIVE_STATE]]'s Prompt 372 entry (now 🟨 BLOCKED, not closed).
+
+**Investigation:** `Quoter.jsx`'s embed is a bare `<iframe src="https://app.insurancetoolkits.com/fex/lite">` — no token param, no SDK, no postMessage, and grepped `.env.local`/Supabase for anything InsuranceToolkits-related (nothing exists). Confirmed the split by navigating directly (top-level, not iframed) to that exact URL — renders clean, zero "Invalid Token" anywhere in `document.body.innerText`. So the failure is iframe-context-specific, not an env/Supabase/code bug on our side.
+
+Web search surfaced a real, indexed URL for InsuranceToolkits' actual embed mechanism: `https://insurancetoolkits.com/fex/lite-form/?token=<token>` — different domain (`insurancetoolkits.com`, not `app.`), different path (`/fex/lite-form/`), and a required `token` param. This means the whole integration has been pointed at the wrong URL since Prompt 328 (a plain app URL grabbed directly, not a real per-account embed link) — not a token that expired.
+
+**Why I didn't fabricate a fix:** I have no access to Brayden's InsuranceToolkits account to find/generate the real embed token, and guessing a token value or URL structure risks shipping something that looks fixed but silently fails differently, or worse, hits a real endpoint with a made-up token. Reported the exact ask back through LIVE_STATE per the prompt's own instruction: Brayden needs to find InsuranceToolkits' "Embed on your website" feature in his own dashboard and hand back the real `?token=`-bearing URL.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 372 (Quoter Invalid Token) is root-caused but BLOCKED — needs Brayden to generate a real embed URL/token from his InsuranceToolkits account (see LIVE_STATE for exact ask). Don't attempt to fix further without that. LIVE_STATE's queue is otherwise empty except Prompt 370 (real Compensation Grid page) — pick that up next.`
+
+---
+
 ### [CC | 2026-07-27 — Prompt 373 SHIPPED] — Projected Commission block removed from New Submission form
 
 **Shipped:** [`eeac4b8`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/eeac4b8) on `ohvara-dashboard`. Next item off [[LIVE_STATE]]'s queue after Prompt 374.
