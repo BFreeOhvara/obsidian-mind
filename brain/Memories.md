@@ -67,6 +67,19 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### [CC | 2026-07-27 — Prompt 373 SHIPPED] — Projected Commission block removed from New Submission form
+
+**Shipped:** [`eeac4b8`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/eeac4b8) on `ohvara-dashboard`. Next item off [[LIVE_STATE]]'s queue after Prompt 374.
+
+Removed the "Projected Commission" strip (—/"Projected" badge, `GapNote`, "Verify in carrier portal" link) from `Submissions.jsx`'s New Submission tab — Brayden flagged it as scope CC added proactively beyond Prompt 370's actual ask (the standalone Compensation Grid page, not a form preview widget). Cleaned up the now-unused `ArrowRight` import and the file's header comment, which had documented the strip as part of the literal export port.
+
+**Verified live** (nate44, `get_page_text` — same Browser-pane screenshot compositing issue as Prompts 374/375): form's last element is "Log Submission," nothing below it. `npx vite build` clean. Confirmed Prompt 370 (still queued) is unaffected — different page entirely.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 373 (eeac4b8) shipped — Projected Commission widget removed from New Submission form. Prompt 372 (BUG: Quoter InsuranceToolkits embed shows Invalid Token) is next in LIVE_STATE's queue — needs investigation before any fix.`
+
+---
+
 ### [CC | 2026-07-27 — Prompt 374 SHIPPED] — Leaderboard defaults to Monthly, zero-entries renders full podium+standings skeleton
 
 **Shipped:** [`9cc3fe8`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/9cc3fe8) on `ohvara-dashboard`. Next item off [[LIVE_STATE]]'s queue after Prompt 375.

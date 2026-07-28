@@ -16,7 +16,7 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26, Prompt 358 shipped 2026-07-26, Prompt 357 fully closed 2026-07-26 (frontend + migration 084), Prompt 356 shipped 2026-07-26, Prompt 362 closed 2026-07-26, Prompt 365 closed 2026-07-26, Prompt 364 closed 2026-07-26, Prompt 363 closed 2026-07-26, Prompt 366 closed 2026-07-26, Prompt 367 closed 2026-07-26, Prompt 368 shipped 2026-07-26, Prompt 369 shipped 2026-07-26 (migration 085), Prompt 371 closed 2026-07-27, Prompt 375 closed 2026-07-27, Prompt 374 closed 2026-07-27 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26, Prompt 358 shipped 2026-07-26, Prompt 357 fully closed 2026-07-26 (frontend + migration 084), Prompt 356 shipped 2026-07-26, Prompt 362 closed 2026-07-26, Prompt 365 closed 2026-07-26, Prompt 364 closed 2026-07-26, Prompt 363 closed 2026-07-26, Prompt 366 closed 2026-07-26, Prompt 367 closed 2026-07-26, Prompt 368 shipped 2026-07-26, Prompt 369 shipped 2026-07-26 (migration 085), Prompt 371 closed 2026-07-27, Prompt 375 closed 2026-07-27, Prompt 374 closed 2026-07-27, Prompt 373 closed 2026-07-27 — see [[Memories]] for the full trail.)*
 
 ### 🟩 Prompt 375 CLOSED 2026-07-27 — Chubb/Combined logo bumped back up (504×138 re-crop copied in, verified no clipping)
 
@@ -44,11 +44,15 @@ Copied Falcon's re-cropped `chubb-combined.png` (504×138, vault-confirmed) into
 ---
 
 
-### 🆕 Prompt 373 QUEUED 2026-07-27 — Remove "Projected Commission" block from the New Submission form
+### 🟩 Prompt 373 CLOSED 2026-07-27 — "Projected Commission" block removed from New Submission form
 
-Screenshot (`/agent/submissions`, New Submission tab): below the "Log Submission" button there's a "Projected Commission" section (— / "Projected" badge / "No figure yet — comp-grid rates by carrier, product and contract tier haven't been loaded, so anything shown here would be made up." / a "Verify in carrier portal" link) — this wasn't explicitly asked for in Prompt 370 (which only scoped the standalone Compensation Grid page, not a submission-form preview widget); looks like CC built it proactively as forward-looking scaffolding. **Brayden doesn't want it** — remove the whole block from `Submissions.jsx`'s New Submission tab. Doesn't affect Prompt 370 itself (the real Compensation Grid page is still wanted, just not surfaced as a live preview on this form) — if 370 hasn't shipped yet when this is picked up, make sure its implementation doesn't re-add this widget as part of that work.
+**Shipped:** [`eeac4b8`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/eeac4b8) on `ohvara-dashboard`.
 
-**Verify with a real screenshot** — New Submission form ends at "Log Submission," nothing below it.
+Removed the whole bordered strip (—/"Projected" badge, `GapNote` explaining no comp-grid rates exist yet, "Verify in carrier portal" link) from `Submissions.jsx`'s New Submission tab. Also removed the now-unused `ArrowRight` import (only used inside the deleted block — `carrier` var and `GapNote` import both stay, still used elsewhere in the file) and updated the file's header comment block, which had described the projected-commission strip as part of the literal export port.
+
+**Verified live** (nate44, `get_page_text` — same Browser-pane screenshot issue as Prompts 374/375): New Submission form's last element is now "Log Submission," nothing renders below it. `npx vite build` clean.
+
+Prompt 370 (real Compensation Grid page) is unaffected and still queued below — this only touched the submission-form preview widget, not the standalone comp-grid page.
 
 ---
 
