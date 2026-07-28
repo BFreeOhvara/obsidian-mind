@@ -16,7 +16,48 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26, Prompt 358 shipped 2026-07-26, Prompt 357 fully closed 2026-07-26 (frontend + migration 084), Prompt 356 shipped 2026-07-26, Prompt 362 closed 2026-07-26, Prompt 365 closed 2026-07-26, Prompt 364 closed 2026-07-26, Prompt 363 closed 2026-07-26, Prompt 366 closed 2026-07-26, Prompt 367 closed 2026-07-26, Prompt 368 shipped 2026-07-26, Prompt 369 shipped 2026-07-26 (migration 085), Prompt 371 closed 2026-07-27, Prompt 375 closed 2026-07-27, Prompt 374 closed 2026-07-27, Prompt 373 closed 2026-07-27, Prompt 370 closed 2026-07-27, Prompt 372 closed 2026-07-27, Prompt 376 closed 2026-07-27, Prompt 377 closed 2026-07-27 (real bug was a PostgREST 1000-row cap silently truncating the grid, not MOO/NLG abbreviations — the carrier names were already correct in the DB) — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26, Prompt 358 shipped 2026-07-26, Prompt 357 fully closed 2026-07-26 (frontend + migration 084), Prompt 356 shipped 2026-07-26, Prompt 362 closed 2026-07-26, Prompt 365 closed 2026-07-26, Prompt 364 closed 2026-07-26, Prompt 363 closed 2026-07-26, Prompt 366 closed 2026-07-26, Prompt 367 closed 2026-07-26, Prompt 368 shipped 2026-07-26, Prompt 369 shipped 2026-07-26 (migration 085), Prompt 371 closed 2026-07-27, Prompt 375 closed 2026-07-27, Prompt 374 closed 2026-07-27, Prompt 373 closed 2026-07-27, Prompt 370 closed 2026-07-27, Prompt 372 closed 2026-07-27, Prompt 376 closed 2026-07-27, Prompt 377 closed 2026-07-27 (real bug was a PostgREST 1000-row cap silently truncating the grid, not MOO/NLG abbreviations — the carrier names were already correct in the DB), Prompt 379 closed 2026-07-28 (URGENT admin data-leak fix, done first out of file order), Prompt 378 closed 2026-07-28 (Carrier/Product dropdowns), Prompt 380 closed 2026-07-28 (form copy/field cleanup), Prompt 381 closed 2026-07-28 (bug-report button) — see [[Memories]] for the full trail.)*
+
+### 🟩 Prompt 379 CLOSED 2026-07-28 — URGENT admin data-leak fixed: My Policies own-scope + notification bell RLS narrowed
+
+**Shipped:** [`5462dda`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/5462dda) on `ohvara-dashboard`. Done first, ahead of 378/380/381 in file order — URGENT overrides queue position.
+
+**Bug A:** `MyPolicies.jsx` forced `effectiveScope = isAdmin ? 'all' : scope`, so admin never had an own-book option at all. Now every role defaults to `scope === 'own'` (`agent_id = auth.uid()`); admin keeps a You/Everyone toggle to opt into the company-wide view. SQL-confirmed: all 19 seed policies belong to Test Agent, Brayden's admin profile owns 0 — matches expected post-fix state.
+
+**Bug B:** admin's `useNotifications`/`useUnreadCount` had zero `profile_id` filter, relying entirely on the `"Admins manage notifications"` RLS policy's broad `ALL` access. Migration 087 drops that policy, replaces with INSERT/UPDATE/DELETE-only admin policies (verified via `pg_policies` — only `"Reps read own notifications"` SELECT policy remains). Hooks + `NotificationBell.jsx` + `DashboardLayout.jsx` now thread `profileId` through explicitly as defense in depth.
+
+**Verification gap, flagged not hidden:** couldn't get pixel screenshots on Brayden's real admin account (`brayden11` / the password on file in `work/active/ohvara-dashboard.md` returned "Invalid login credentials" — stale doc, pre-pivot). Fix is verified at the SQL/RLS layer instead (exact row counts, exact policy list) plus a clean `npx vite build`. Brayden: next time you're in, a quick look at My Policies (should be empty) and the bell (should show just your 1 team-message row) would close this out visually — or drop the current `brayden11` password in Atlas so future sessions can self-verify.
+
+---
+
+### 🟩 Prompt 378 CLOSED 2026-07-28 — Real Carrier/Product dropdowns on New Submission
+
+**Shipped:** [`f314772`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/f314772) on `ohvara-dashboard`.
+
+Insurance provider is now a real `SelectField` sourced from the `carriers` table (was free-text + datalist). Product Type is a dependent `SelectField`, empty/disabled until a carrier is picked, then listing that carrier's real products from `commission_schedule` — driven by which carriers actually have non-null rates (not a hardcoded carrier list), so Aflac/Baltimore Life/Chubb fall back to free text automatically and will stop the moment real comp data lands for them.
+
+Added `policies.product_name` (migration 088) for the specific product string; `product_type` keeps its short-category role, now auto-derived from the selected product instead of typed by hand. Surfaced `product_name` in `PolicyModal` and folded it into My Policies' search/badge fallback so the new data isn't invisible. `npx vite build` clean, no new lint errors.
+
+---
+
+### 🟩 Prompt 380 CLOSED 2026-07-28 — Underwriting question reworded, Insurance Type + Notes fields dropped
+
+**Shipped:** [`1df97c2`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/1df97c2) on `ohvara-dashboard`.
+
+Underwriting label changed to "Is this policy already approved or in underwriting?" with **Approved** / **In Underwriting** options — same `pending_underwriting` logic, copy only. Insurance Type field removed; `insurance_type` is now hardcoded to `"Life"` at submission (column stays nullable, but real data still lands so `PolicyModal` doesn't go blank). Notes field removed from the form; `notes` column left alone, unused for now.
+
+---
+
+### 🟩 Prompt 381 CLOSED 2026-07-28 — Floating "Report a bug" button, role-conditional
+
+**Shipped:** [`7df122b`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/7df122b) on `ohvara-dashboard`.
+
+New `bug_reports` table + private `bug-screenshots` storage bucket (migration 089), floating circular button bottom-right on every authenticated page. Non-admins get a submit form (description + optional screenshot → one row, no email/tab). Admins get a company-wide inbox — newest first, reporter name, description, page URL, screenshot thumbnail via short-lived signed URL, Mark resolved action, unresolved-count badge on the button itself. Admin SELECT-all on this table is intentional (unlike Prompt 379's bug) since there's no "my own stuff" page for it to leak into.
+
+**Verification gap, same as 379:** schema/RLS/build all confirmed (FK name, policies, clean `npx vite build`), but no working login to click through both role flows live — blocked on the same stale-password issue.
+
+---
+
 
 **Queue is empty** — nothing pending from Eagle/Falcon. Check [[North Star]]'s Current Focus for next direction.
 
