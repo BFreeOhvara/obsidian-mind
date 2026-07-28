@@ -67,6 +67,19 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### [CC | 2026-07-27 — Prompt 374 SHIPPED] — Leaderboard defaults to Monthly, zero-entries renders full podium+standings skeleton
+
+**Shipped:** [`9cc3fe8`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/9cc3fe8) on `ohvara-dashboard`. Next item off [[LIVE_STATE]]'s queue after Prompt 375.
+
+Two small, independent fixes in `LeaderboardTab` (`Performance.jsx`): (1) `boardMode` initial state `'daily'` → `'monthly'`. (2) removed the `standings.length === 0` special-case branch that rendered a plain "No submissions in this window yet." text block instead of the real podium+standings structure — zero entries now falls through to the same render path Prompt 356 already built for partial data, so all 3 `PodiumCard`s show N/A/"No closer yet" and the Full Standings table renders with headers and no rows.
+
+**Verified live** (nate44): Leaderboard tab opened straight to Monthly (`Jul 2026`, Test Agent's real $6,612 as Top Performer). Switched to Daily (today, zero real submissions) — all 3 podium slots read N/A, Full Standings table present with headers and no rows, old empty-state text gone. Used `get_page_text` instead of a screenshot (same Browser-pane compositing error as Prompt 375). `npx vite build` clean.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 374 (9cc3fe8) shipped — Leaderboard Monthly default + zero-entries skeleton fixed. Prompt 373 (remove Projected Commission block from New Submission form) is next in LIVE_STATE's queue.`
+
+---
+
 ### [CC | 2026-07-27 — Prompt 375 SHIPPED] — Chubb/Combined logo bumped up (504×138), verified via DOM measurement not screenshot
 
 **Shipped:** [`9b894d2`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/9b894d2) on `ohvara-dashboard`. Top item off [[LIVE_STATE]]'s queue.

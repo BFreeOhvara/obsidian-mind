@@ -16,7 +16,7 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26, Prompt 358 shipped 2026-07-26, Prompt 357 fully closed 2026-07-26 (frontend + migration 084), Prompt 356 shipped 2026-07-26, Prompt 362 closed 2026-07-26, Prompt 365 closed 2026-07-26, Prompt 364 closed 2026-07-26, Prompt 363 closed 2026-07-26, Prompt 366 closed 2026-07-26, Prompt 367 closed 2026-07-26, Prompt 368 shipped 2026-07-26, Prompt 369 shipped 2026-07-26 (migration 085), Prompt 371 closed 2026-07-27, Prompt 375 closed 2026-07-27 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26, Prompt 358 shipped 2026-07-26, Prompt 357 fully closed 2026-07-26 (frontend + migration 084), Prompt 356 shipped 2026-07-26, Prompt 362 closed 2026-07-26, Prompt 365 closed 2026-07-26, Prompt 364 closed 2026-07-26, Prompt 363 closed 2026-07-26, Prompt 366 closed 2026-07-26, Prompt 367 closed 2026-07-26, Prompt 368 shipped 2026-07-26, Prompt 369 shipped 2026-07-26 (migration 085), Prompt 371 closed 2026-07-27, Prompt 375 closed 2026-07-27, Prompt 374 closed 2026-07-27 — see [[Memories]] for the full trail.)*
 
 ### 🟩 Prompt 375 CLOSED 2026-07-27 — Chubb/Combined logo bumped back up (504×138 re-crop copied in, verified no clipping)
 
@@ -31,15 +31,15 @@ Copied Falcon's re-cropped `chubb-combined.png` (504×138, vault-confirmed) into
 ---
 
 
-### 🆕 Prompt 374 QUEUED 2026-07-27 — Leaderboard: default to Monthly, and always render the podium+standings skeleton even with zero total entries
+### 🟩 Prompt 374 CLOSED 2026-07-27 — Leaderboard defaults to Monthly, zero-entries renders full podium+standings skeleton
 
-Screenshot (`/agent/stats`, Leaderboard tab): two real bugs.
+**Shipped:** [`9cc3fe8`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/9cc3fe8) on `ohvara-dashboard`.
 
-**1. Default period is wrong.** Page loads with **Daily** selected; Brayden wants it to default to **Monthly** instead. Just flip the initial state on the Daily/Monthly toggle — no other behavior change.
+**Fix 1:** `LeaderboardTab`'s `boardMode` initial state flipped `'daily'` → `'monthly'` — one-line change, `Performance.jsx`.
 
-**2. Zero-entries case collapses to a generic "No submissions in this window yet." message instead of the real skeleton.** Prompt 356 already fixed the *partial*-data case (podium shows N/A for any of the top-3 slots with no real closer, full standings starts at rank 4) — verified at the time with 1 seeded closer present. This is the case Prompt 356 didn't test: **zero** closers with any qualifying data in the selected window. Right now that hits a different code path entirely — some `standings.length === 0` (or similar) branch short-circuits to a plain text empty-state block instead of reusing the same 3-podium-slots-plus-standings-table structure. **Fix: remove that special-case branch.** Zero real entries should render exactly like "1 real entry" already correctly does — all 3 `PodiumCard`s render unconditionally (all showing N/A/"No closer yet" when nobody qualifies), and the Full Standings table renders in its normal position (empty is fine, it's just structurally always there, not swapped out for different copy).
+**Fix 2:** removed the `standings.length === 0` branch that short-circuited to a plain "No submissions in this window yet." text block. Zero-entries now falls through to the same render path as any other count — all 3 `PodiumCard`s render (N/A/"No closer yet" per empty slot) and the Full Standings table renders with headers and zero body rows.
 
-**Verify with a real screenshot** — Leaderboard tab defaults to Monthly on page load, and with zero submissions in the selected window it shows all 3 podium boxes reading N/A instead of the "No submissions in this window yet." text block.
+**Verified live** (nate44, real data, no screenshot — same Browser-pane compositing issue as Prompt 375, used `get_page_text` instead): switching to the Leaderboard tab defaulted straight to Monthly (`Jul 2026 · ranked by submitted AP`, Test Agent's real $6,612 showing as Top Performer). Switching to Daily (today, zero real submissions) showed all 3 podium slots as N/A/"No closer yet" plus the Full Standings table with headers and no rows — old "No submissions in this window yet." text is gone. `npx vite build` clean.
 
 ---
 
