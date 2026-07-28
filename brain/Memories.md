@@ -67,6 +67,23 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### [CC | 2026-07-27 — Prompt 370 SHIPPED] — Real Compensation Grid page, seeded from Brayden's Eterna comp data
+
+**Shipped:** [`7cd057d`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/7cd057d) on `ohvara-dashboard`. Migration 086 applied to `jjextitmbptoaolacocs` after explicit go-ahead (AskUserQuestion, same auto-mode schema-change gate as 084/085).
+
+New `commission_schedule` table, normalized long format (carrier/type/product/tier/pct), seeded 2,860 rows from `brain/commission-schedule-tier70.csv` (143 products × 20 tiers, 12 carriers). Found and fixed a small source-CSV glitch: the 3 placeholder rows (Baltimore Life/Aflac/Chubb, "AWAITING REAL DATA") were missing 2 trailing commas each (18 tier columns parsed instead of 20) — padded to the full 20 with null, matching the CSV's obvious intent since every value in those rows is null anyway. Confirmed Augustar/SBLI were already absent from the CSV (grepped) — nothing to exclude at seed time.
+
+**Tool-call size workaround:** the full seed as literal `INSERT ... VALUES` (one line per carrier+product+tier) would have been ~217KB across ~2,860 lines — instead applied the schema via `apply_migration`, then seeded via `execute_sql` using a compact form: one line per product (143 lines) holding a `numeric[]` array of its 20 tier rates, expanded server-side via `cross join lateral unnest(tier_array, pct_array)`. Cut the payload from 217KB to ~27KB. Verified post-seed via direct query: 2,860 total rows, 12 distinct carriers, 80 null pcts (matches expected: 20 for F&G ExecuDex 61-99 + 60 for the 3 placeholders), spot-checked specific carrier/product/tier values against the source CSV.
+
+New `CompensationGrid.jsx` page under Growth (added to both `closer` and `admin` sidebar nav — same parity convention as Prompt 371), carrier + type filter dropdowns, one column per tier, tier 70 (Ohvara's real contracted tier, hardcoded constant with a comment) visually highlighted. New `useCommissionSchedule.js` hook explicitly `.range(0, 4999)`s past PostgREST's default 1000-row cap since the table has ~2,860 rows — would have silently truncated to 1000 rows otherwise.
+
+**Verified live** (nate44): page loads, carrier filter tested (F&G → its 6 real products including the ExecuDex 61-99 all-dash row), tier 70 column's computed style confirmed visually distinct from other tiers, Baltimore Life/Aflac/Chubb render as single dashed placeholder rows, Augustar/SBLI absent from carrier dropdown. `npx vite build` clean. Screenshot tool errored (same known Browser-pane compositing issue as recent prompts) — used `get_page_text` + `javascript_tool` computed-style checks instead.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 370 (7cd057d) shipped — real Compensation Grid page live with migration 086 seeded. Prompt 372's Quoter fix now has a real embed token from Brayden (see LIVE_STATE's Prompt 372 entry) — that's the next actionable item, handle the token as a real secret (.env.local, never hardcoded/logged) and redact it from LIVE_STATE once consumed.`
+
+---
+
 ### [CC | 2026-07-27 — Prompt 372 INVESTIGATED, BLOCKED] — Quoter "Invalid Token" root-caused to a missing real embed token, not a code bug
 
 **No fix shipped — correctly, per the prompt's own explicit fork not to guess.** Full findings in [[LIVE_STATE]]'s Prompt 372 entry (now 🟨 BLOCKED, not closed).
