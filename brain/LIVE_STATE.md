@@ -16,7 +16,56 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26, Prompt 358 shipped 2026-07-26, Prompt 357 fully closed 2026-07-26 (frontend + migration 084), Prompt 356 shipped 2026-07-26, Prompt 362 closed 2026-07-26, Prompt 365 closed 2026-07-26, Prompt 364 closed 2026-07-26, Prompt 363 closed 2026-07-26, Prompt 366 closed 2026-07-26, Prompt 367 closed 2026-07-26, Prompt 368 shipped 2026-07-26, Prompt 369 shipped 2026-07-26 (migration 085), Prompt 371 closed 2026-07-27 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26, Prompt 358 shipped 2026-07-26, Prompt 357 fully closed 2026-07-26 (frontend + migration 084), Prompt 356 shipped 2026-07-26, Prompt 362 closed 2026-07-26, Prompt 365 closed 2026-07-26, Prompt 364 closed 2026-07-26, Prompt 363 closed 2026-07-26, Prompt 366 closed 2026-07-26, Prompt 367 closed 2026-07-26, Prompt 368 shipped 2026-07-26, Prompt 369 shipped 2026-07-26 (migration 085), Prompt 371 closed 2026-07-27, Prompt 375 closed 2026-07-27 — see [[Memories]] for the full trail.)*
+
+### 🟩 Prompt 375 CLOSED 2026-07-27 — Chubb/Combined logo bumped back up (504×138 re-crop copied in, verified no clipping)
+
+**Shipped:** [`9b894d2`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/9b894d2) on `ohvara-dashboard`.
+
+Copied Falcon's re-cropped `chubb-combined.png` (504×138, vault-confirmed) into `ohvara-dashboard/public/carrier-logos/`, replacing the 594×138 file from Prompt 358.
+
+**Live verification (nate44, dev server, `/agent/carriers`):** queried `carriers` table directly — Chubb's `logo_fit_mode` is `cover` (padding 0, absolutely positioned, `objectFit: cover`), not `contain`, resolving the regime ambiguity Prompt 375 flagged. Measured the actual rendered banner via `getBoundingClientRect()`: box is 292.33×84px (aspect 3.48), image natural size 504×138 (aspect 3.65) — image aspect > box aspect, so cover-mode scales to fill height and crops left/right, confirming the "horizontal crop" branch of Falcon's dual-scenario math. Scaled crop amount ≈ 11.9 real image-pixels off each side; wordmark content bbox (x:102–401 of 504) has ≈102px/103px of navy margin on each side — more than 8x the actual crop amount, no clipping.
+
+**Note:** the Browser pane's screenshot tool errored ("pane is not displayed") in this environment, so verification is via precise DOM measurement (`getBoundingClientRect` on both the banner box and the image element) rather than a visual screenshot. The math has no ambiguity left (both dimensions and fit-mode are real, queried values, not assumptions), so this is being logged as fully verified — flag to Brayden if he wants an eyeball confirmation too.
+
+---
+
+
+### 🆕 Prompt 374 QUEUED 2026-07-27 — Leaderboard: default to Monthly, and always render the podium+standings skeleton even with zero total entries
+
+Screenshot (`/agent/stats`, Leaderboard tab): two real bugs.
+
+**1. Default period is wrong.** Page loads with **Daily** selected; Brayden wants it to default to **Monthly** instead. Just flip the initial state on the Daily/Monthly toggle — no other behavior change.
+
+**2. Zero-entries case collapses to a generic "No submissions in this window yet." message instead of the real skeleton.** Prompt 356 already fixed the *partial*-data case (podium shows N/A for any of the top-3 slots with no real closer, full standings starts at rank 4) — verified at the time with 1 seeded closer present. This is the case Prompt 356 didn't test: **zero** closers with any qualifying data in the selected window. Right now that hits a different code path entirely — some `standings.length === 0` (or similar) branch short-circuits to a plain text empty-state block instead of reusing the same 3-podium-slots-plus-standings-table structure. **Fix: remove that special-case branch.** Zero real entries should render exactly like "1 real entry" already correctly does — all 3 `PodiumCard`s render unconditionally (all showing N/A/"No closer yet" when nobody qualifies), and the Full Standings table renders in its normal position (empty is fine, it's just structurally always there, not swapped out for different copy).
+
+**Verify with a real screenshot** — Leaderboard tab defaults to Monthly on page load, and with zero submissions in the selected window it shows all 3 podium boxes reading N/A instead of the "No submissions in this window yet." text block.
+
+---
+
+
+### 🆕 Prompt 373 QUEUED 2026-07-27 — Remove "Projected Commission" block from the New Submission form
+
+Screenshot (`/agent/submissions`, New Submission tab): below the "Log Submission" button there's a "Projected Commission" section (— / "Projected" badge / "No figure yet — comp-grid rates by carrier, product and contract tier haven't been loaded, so anything shown here would be made up." / a "Verify in carrier portal" link) — this wasn't explicitly asked for in Prompt 370 (which only scoped the standalone Compensation Grid page, not a submission-form preview widget); looks like CC built it proactively as forward-looking scaffolding. **Brayden doesn't want it** — remove the whole block from `Submissions.jsx`'s New Submission tab. Doesn't affect Prompt 370 itself (the real Compensation Grid page is still wanted, just not surfaced as a live preview on this form) — if 370 hasn't shipped yet when this is picked up, make sure its implementation doesn't re-add this widget as part of that work.
+
+**Verify with a real screenshot** — New Submission form ends at "Log Submission," nothing below it.
+
+---
+
+### 🆕 Prompt 372 QUEUED 2026-07-27 — BUG: Quoter's InsuranceToolkits embed shows "Invalid Token", quoting is fully broken
+
+Real bug, confirmed live by Brayden (screenshot, `Brayden11` admin account, `/agent/quoter`): the embedded InsuranceToolkits "FexToolkit Lite" widget loads its own UI (form fields render fine — Coverage Options, About the Client) but shows a red **"Invalid Token"** badge top-right *inside the embed itself*, and the results table underneath (Company Name/Monthly/Coverage Type/Actions) is empty — clicking "Get Quote" almost certainly does nothing useful right now. This is the real quoting tool every closer needs for live calls, so it's a real blocker, not cosmetic.
+
+**Investigate first, don't guess a fix:**
+1. Find how the Quoter page embeds InsuranceToolkits (iframe `src` with a token query param, a JS SDK init call, a postMessage handshake, etc. — whichever it actually is).
+2. Find where that token comes from — hardcoded in the frontend (shouldn't be, per this project's own "never hardcode credentials" rule), pulled from `.env.local`, or fetched from the `secrets` table / a Supabase edge function.
+3. Determine why it's invalid: expired, revoked, wrong format, wrong env var name, or a real InsuranceToolkits account/API issue on their end (their service, not code — check if InsuranceToolkits' own status/docs mention token rotation or embed-token generation requirements).
+
+**If the fix is a real code bug** (wrong param name, expired local token that just needs regenerating via a known API call, wrong env var referenced, etc.) — fix and ship it directly, verify with a real screenshot showing the widget with no "Invalid Token" badge and an actual quote returned for a test client.
+
+**If the fix requires a NEW credential/token from Brayden's own InsuranceToolkits account** (e.g. their embed tokens expire and need manual regeneration from their dashboard, or the current one was revoked) — do not guess or fabricate one. Report back through LIVE_STATE exactly what's needed (which credential, where in InsuranceToolkits' own dashboard to find/regenerate it) so Brayden can get it and either paste it back through this same route-back pattern (Prompt 362-style) or apply it himself, whichever is safer given whether it's a secret.
+
+---
 
 ### 🟩 Prompt 371 CLOSED 2026-07-27 — admin dashboard unified with closer view; nate44 isolated from company-wide rollups
 

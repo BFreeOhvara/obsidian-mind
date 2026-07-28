@@ -67,6 +67,21 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### [CC | 2026-07-27 — Prompt 375 SHIPPED] — Chubb/Combined logo bumped up (504×138), verified via DOM measurement not screenshot
+
+**Shipped:** [`9b894d2`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/9b894d2) on `ohvara-dashboard`. Top item off [[LIVE_STATE]]'s queue.
+
+Copied Falcon's already-re-cropped `chubb-combined.png` (504×138, confirmed on disk in the vault before copying) into `ohvara-dashboard/public/carrier-logos/`, replacing the 594×138 file from Prompt 358.
+
+Prompt 375's own text flagged unresolved ambiguity about which crop regime applied (cover vs. contain) since Falcon didn't have live code/DB access. Resolved it for real instead of guessing: queried the `carriers` table directly (`logo_fit_mode = 'cover'`, `logo_zoom_pct = 100`), then measured the actual rendered banner live as nate44 via `getBoundingClientRect()` — box 292.33×84 (aspect 3.48) vs. image 504×138 (aspect 3.65). Image aspect > box aspect confirms the horizontal-crop branch: cover-mode scales to fill height, crops ~11.9 real image-px off each side. Wordmark content bbox sits at x:102–401 of 504, giving ≈102–103px of margin each side — over 8x the actual crop, no clipping.
+
+**Note:** Browser pane's screenshot tool errored ("pane is not displayed") — same known compositing issue as recent prompts (see Prompt 363 entry below). Substituted precise `getBoundingClientRect` measurement on both the banner box and image element, which resolves the crop-regime question with certainty a screenshot alone wouldn't (screenshot shows the crop, not the box/image aspect math). Flagged to Brayden that an eyeball confirmation is still worth doing since no visual screenshot exists this time.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 375 (9b894d2) shipped — Chubb/Combined logo bumped to 504×138, verified via DOM measurement (cover-mode crop confirmed safe). Prompt 374 (Leaderboard default + zero-entries skeleton) is next in LIVE_STATE's queue.`
+
+---
+
 ### [CC | 2026-07-27 — Prompt 371 SHIPPED] — admin dashboard unified with closer view, nate44 isolated from company-wide rollups
 
 **Shipped:** [`d02cb9f`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/d02cb9f) on `ohvara-dashboard`. Ran this as the top item off [[LIVE_STATE]]'s queue.
