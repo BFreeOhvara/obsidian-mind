@@ -67,6 +67,10 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### [CC | 2026-07-28 — session close-out] — Prompts 379/378/380/381 log entry committed and pushed to Atlas
+
+Vault commit [`f97495a`](https://github.com/BFreeOhvara/obsidian-mind/commit/f97495a) (pushed to `main`) carries the full Memories entry below plus the LIVE_STATE close-outs for all 4 prompts, removes the stale Prompt-372 scratch doc, and adds `brain/commission-schedule-tier70.csv` (migration 086's referenced source data, previously untracked). No further code changes this session — this is purely the logging/commit step for the work already detailed below. Nothing left uncommitted in either repo (`ohvara-dashboard` at `7df122b`, `obsidian-mind` at `f97495a`).
+
 ### [CC | 2026-07-28 — Prompts 379, 378, 380, 381 SHIPPED] — admin data-leak fixed first (URGENT, out of queue order), then carrier/product dropdowns, form cleanup, bug-report button
 
 LIVE_STATE's queue had 4 items (381/380/379/378, newest-first in the file). Worked Prompt 379 first despite its file position because it was marked URGENT and is a real security bug (admin accounts leaking other users' data), then went 378 → 380 → 381 in that order since 378's schema change (product_name) is a prerequisite-adjacent to 380's field removals on the same form. All 4 closed, all pushed.
