@@ -67,6 +67,23 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### [CC | 2026-07-27 — Prompt 377 SHIPPED (as a different, real bug)] — Compensation Grid was silently truncated at 1000 of 2,860 rows, not showing MOO/NLG abbreviations
+
+**Shipped:** [`ede6b05`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/ede6b05) on `ohvara-dashboard`. Top item off [[LIVE_STATE]]'s queue.
+
+**Investigated the stated premise first, per the established pattern of not fabricating fixes** (same discipline as Prompt 372): Brayden's report was that Mutual of Omaha/National Life Group show as raw `MOO`/`NLG` abbreviations. Queried `commission_schedule` and `carriers` directly — both already store the full names for all 12 carriers, no abbreviations anywhere, and `SELECT DISTINCT carrier FROM commission_schedule WHERE carrier NOT IN (SELECT name FROM carriers)` returned empty. The literal ask (an `UPDATE ... SET carrier = 'Mutual of Omaha' WHERE carrier = 'MOO'`) would have been a no-op.
+
+**Found the real bug instead of stopping at "premise doesn't hold":** live DOM check of the Compensation Grid's carrier filter showed only 8 of 12 carriers — dropdown stopped dead at "Fidelity Life", with Foresters/Mutual of Omaha/National Life Group/Transamerica (everything alphabetically after Fidelity Life) missing entirely. Confirmed via direct in-page Supabase query (`{ count: 'exact' }` alongside the actual fetch): `count: 2860` total rows, but `returned: 1000`. `useCommissionSchedule.js`'s single `.range(0, 4999)` request was silently clamped by PostgREST's server-side `db.max_rows` project setting (the same 1000-row cap Prompt 370's own build notes explicitly called out and thought it had ranged past — `.range()` on the client can't override a server-enforced cap, it can only request less than it). This is exactly what Brayden actually saw and misdiagnosed as an abbreviation — the carriers weren't relabeled, they were invisible.
+
+**Fix:** rewrote `useCommissionSchedule.js`'s queryFn to page through in 1000-row chunks (loop `.range(from, from+999)`, concatenate, stop on a short page) instead of one oversized `.range()` call. No infra/settings-tool access was available to raise `db.max_rows` itself (Supabase MCP tools here are schema/data-oriented, no project-settings write), so this is the correct client-side fix rather than a workaround.
+
+**Verified live** (nate44, real data): reloaded the grid — carrier dropdown now lists all 12 (Foresters, Mutual of Omaha, National Life Group, Transamerica all present, full names), type dropdown grew from 8 to 12 types (CWL/FE/TLE/GUL now visible, same truncation had hit them too). Filtered to "Mutual of Omaha" — 13 real products render (Term Life Answers, Whole Life Conversion, etc.), fully spelled out, no abbreviation anywhere. Re-ran the orphan-carrier SQL check post-fix — still empty. `npx vite build` clean.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 377 (ede6b05) shipped — but as a row-cap pagination fix, not the MOO/NLG rename Brayden described (that data was already correct; the real issue was the last 4 of 12 carriers being silently cut off by PostgREST's 1000-row cap). LIVE_STATE's queue is empty — check North Star Current Focus for next direction.`
+
+---
+
 ### [CC | 2026-07-27 — Prompt 376 SHIPPED] — Compensation Grid folded into Commissions as a sub-tab
 
 **Shipped:** [`17a0d5b`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/17a0d5b) on `ohvara-dashboard`. Top (only) item off [[LIVE_STATE]]'s queue.
