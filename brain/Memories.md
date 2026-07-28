@@ -67,6 +67,19 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### [CC | 2026-07-27 — Quoter token VERIFIED live] — closes the visual-verification gap from Prompt 372
+
+Brayden pasted the exact URL he'd confirmed working (`app.insurancetoolkits.com/fex/lite?token=...`) and asked if it was the token CC needed. Diffed it against `.env.local`'s `VITE_INSURANCETOOLKITS_EMBED_TOKEN` (value never printed to chat/logs) — exact match, already shipped in `645ff6c` (Prompt 372). No code change needed.
+
+**What this actually closes:** Prompt 372's SHIPPED entry flagged it couldn't visually confirm the "Invalid Token" badge was gone (cross-origin iframe, Browser pane screenshot broken). This time navigated top-level to the real URL directly — renders "FEX Quoter Lite" with real form fields (Coverage Type: Level/Graded/Guaranteed/Limited Pay/SPWL), zero "Invalid Token" text, zero console errors. Also confirmed in-app: `/agent/quoter`'s actual iframe `src` matches this exact URL, no console errors on that page either. Local dev is fully live and working.
+
+**Still open, unchanged from Prompt 372:** production Vercel deploy needs `VITE_INSURANCETOOLKITS_EMBED_TOKEN` added to the `ohvara-dashboard` Vercel project's env vars — no Vercel MCP tool here can set/update env vars (read-only: get/list project, deployments, logs). Brayden needs to add it himself and redeploy.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Quoter token is confirmed live and working in local dev (Prompt 372's fix verified end-to-end). Only remaining gap: Brayden needs to add VITE_INSURANCETOOLKITS_EMBED_TOKEN to Vercel's production env vars and redeploy — CC has no tool access to do that. LIVE_STATE's queue is empty otherwise.`
+
+---
+
 ### [CC | 2026-07-27 — Prompt 377 SHIPPED (as a different, real bug)] — Compensation Grid was silently truncated at 1000 of 2,860 rows, not showing MOO/NLG abbreviations
 
 **Shipped:** [`ede6b05`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/ede6b05) on `ohvara-dashboard`. Top item off [[LIVE_STATE]]'s queue.
