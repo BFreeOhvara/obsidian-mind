@@ -1,5 +1,5 @@
 ---
-date: 2026-07-26
+date: 2026-07-27
 description: "Single current-state doc for all Ohvara sessions — overwritten on update, never appended. Read this + /reload convention to become fully operational."
 tags:
   - brain
@@ -16,7 +16,12 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26, Prompt 358 shipped 2026-07-26, Prompt 357 fully closed 2026-07-26 (frontend + migration 084), Prompt 356 shipped 2026-07-26, Prompt 362 closed 2026-07-26, Prompt 365 closed 2026-07-26, Prompt 364 closed 2026-07-26, Prompt 363 closed 2026-07-26, Prompt 366 closed 2026-07-26, Prompt 367 closed 2026-07-26, Prompt 368 shipped 2026-07-26, Prompt 369 shipped 2026-07-26 (migration 085), Prompt 371 closed 2026-07-27, Prompt 375 closed 2026-07-27, Prompt 374 closed 2026-07-27, Prompt 373 closed 2026-07-27, Prompt 370 closed 2026-07-27, Prompt 372 closed 2026-07-27 — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26, Prompt 358 shipped 2026-07-26, Prompt 357 fully closed 2026-07-26 (frontend + migration 084), Prompt 356 shipped 2026-07-26, Prompt 362 closed 2026-07-26, Prompt 365 closed 2026-07-26, Prompt 364 closed 2026-07-26, Prompt 363 closed 2026-07-26, Prompt 366 closed 2026-07-26, Prompt 367 closed 2026-07-26, Prompt 368 shipped 2026-07-26, Prompt 369 shipped 2026-07-26 (migration 085), Prompt 371 closed 2026-07-27, Prompt 375 closed 2026-07-27, Prompt 374 closed 2026-07-27, Prompt 373 closed 2026-07-27, Prompt 370 closed 2026-07-27, Prompt 372 closed 2026-07-27, Prompt 376 closed 2026-07-27 — see [[Memories]] for the full trail.)*
+
+**Queue is empty** — nothing pending from Eagle/Falcon. Check [[North Star]]'s Current Focus for next direction.
+
+---
+
 
 ### 🟩 Prompt 375 CLOSED 2026-07-27 — Chubb/Combined logo bumped back up (504×138 re-crop copied in, verified no clipping)
 

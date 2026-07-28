@@ -67,6 +67,21 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### [CC | 2026-07-27 — Prompt 376 SHIPPED] — Compensation Grid folded into Commissions as a sub-tab
+
+**Shipped:** [`17a0d5b`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/17a0d5b) on `ohvara-dashboard`. Top (only) item off [[LIVE_STATE]]'s queue.
+
+Brayden's ask: Compensation Grid (Prompt 370) had landed as its own top-level Growth sidebar item next to Commissions — he wanted one money-related nav entry, not two. Checked Commissions' real state first per the prompt's own instruction: `/agent/commissions` was still rendering `CommissionsPlaceholder` (bare ComingSoon, never built past the placeholder), so Compensation Grid became the first real content tab inside it exactly as the prompt anticipated.
+
+New `src/pages/agent/Commissions.jsx` — `Segmented` pill toggle (same shared component Performance/Submissions use), two tabs: "Compensation Grid" (default, renders the existing `CompensationGrid` component unmodified — kept as a placement change, not a rebuild) and "Balance & Reserve" (new `ComingSoon` placeholder for the actual payout/accrual data, which is a separate still-unbuilt source from the comp-grid's static rate table). Removed the standalone `/agent/compensation-grid` sidebar entries (`closer` + `admin` NAV arrays) and the now-unused `Calculator` icon import from `Sidebar.jsx`. Route folded: `/agent/compensation-grid` now `<Navigate to="/agent/commissions" replace />` so old bookmarks still land somewhere real (same convention as the existing `/closer` → `/agent` redirect). Updated `DashboardLayout.jsx`'s `TITLES` map subtitle for `/agent/commissions` to reflect the new tabbed content instead of the old "comp model is a placeholder" line.
+
+**Verified live** (nate44, real data, no screenshot — same Browser-pane compositing error as recent prompts, used `get_page_text`/`read_page`/`javascript_tool` instead): `/agent/commissions` loads straight into the real Compensation Grid (tier 70 highlighted, live carrier data). Clicked the "Balance & Reserve" tab — switches cleanly to the new placeholder text. Sidebar `read_page` confirmed only one "Commissions" link exists, no separate Compensation Grid entry. Navigated directly to `/agent/compensation-grid` (full page load, not client-side) — redirected to `/agent/commissions` (`location.pathname` confirmed). `npx vite build` clean.
+
+**Resume prompt:**
+`Read brain/Memories.md and brain/LIVE_STATE.md — continuing Ohvara work. Prompt 376 (17a0d5b) shipped — Compensation Grid is now a tab inside Commissions, standalone nav entry removed, old URL redirects. LIVE_STATE's queue is empty — check North Star Current Focus for next direction.`
+
+---
+
 ### [CC | 2026-07-27 — Prompt 372 SHIPPED] — Quoter Invalid Token fixed with Brayden's real embed token; production Vercel env var still needed
 
 **Shipped:** [`645ff6c`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/645ff6c) on `ohvara-dashboard`. Follow-up to this session's own earlier investigation (logged below) — Brayden got the real token from InsuranceToolkits directly rather than continuing the self-serve UI hunt, and dropped it into LIVE_STATE for CC to consume.
