@@ -67,6 +67,19 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### [CC | 2026-07-28 — verification gap closed] — all 4 prompts live-click-tested on real accounts, Brayden supplied the current password
+
+Brayden gave the current password mid-session, closing the "couldn't screenshot-verify" gap flagged for Prompts 379 and 381. Logged in as `brayden11` (admin) and `testagent11` (closer, the account informally called "nate44"/"Test Agent" in older entries) and drove the actual UI instead of just SQL:
+
+- **379**: My Policies as admin loaded to "0 of 0 policies" (was leaking Test Agent's 19) — clicking Everyone correctly showed all 18/19. Notification bell showed exactly 1 row (Brayden's own), not 4.
+- **378**: New Submission's carrier dropdown lists all 12 real carriers; picking F&G populated Product Type with its 5 real products (ExecuDex 61-99 correctly absent, no rate data); picking Chubb fell back to the free-text "No comp data yet" input.
+- **380**: form shows the reworded underwriting question (Approved/In Underwriting), no Insurance Type field, no Notes field.
+- **381**: submitted a real bug report as Test Agent, confirmed the row in `bug_reports` (description + auto-captured `page_url`), switched to Brayden's admin account, saw it in the inbox with the NEW badge, clicked Mark resolved, confirmed `status` flipped in the DB, deleted the test row after.
+
+No further code changes — this was pure verification. LIVE_STATE's 4 close-out entries updated to reflect live confirmation instead of "SQL-only, screenshot gap." Password itself is NOT written anywhere in the vault (never store credentials in git-tracked files) — if a future session needs to log in again, ask Brayden directly rather than assuming last session's memory has it.
+
+---
+
 ### [CC | 2026-07-28 — session close-out] — Prompts 379/378/380/381 log entry committed and pushed to Atlas
 
 Vault commit [`f97495a`](https://github.com/BFreeOhvara/obsidian-mind/commit/f97495a) (pushed to `main`) carries the full Memories entry below plus the LIVE_STATE close-outs for all 4 prompts, removes the stale Prompt-372 scratch doc, and adds `brain/commission-schedule-tier70.csv` (migration 086's referenced source data, previously untracked). No further code changes this session — this is purely the logging/commit step for the work already detailed below. Nothing left uncommitted in either repo (`ohvara-dashboard` at `7df122b`, `obsidian-mind` at `f97495a`).

@@ -26,7 +26,7 @@ tags:
 
 **Bug B:** admin's `useNotifications`/`useUnreadCount` had zero `profile_id` filter, relying entirely on the `"Admins manage notifications"` RLS policy's broad `ALL` access. Migration 087 drops that policy, replaces with INSERT/UPDATE/DELETE-only admin policies (verified via `pg_policies` — only `"Reps read own notifications"` SELECT policy remains). Hooks + `NotificationBell.jsx` + `DashboardLayout.jsx` now thread `profileId` through explicitly as defense in depth.
 
-**Verification gap, flagged not hidden:** couldn't get pixel screenshots on Brayden's real admin account (`brayden11` / the password on file in `work/active/ohvara-dashboard.md` returned "Invalid login credentials" — stale doc, pre-pivot). Fix is verified at the SQL/RLS layer instead (exact row counts, exact policy list) plus a clean `npx vite build`. Brayden: next time you're in, a quick look at My Policies (should be empty) and the bell (should show just your 1 team-message row) would close this out visually — or drop the current `brayden11` password in Atlas so future sessions can self-verify.
+**Live-verified 2026-07-28** on Brayden's real admin account (`brayden11`, current password confirmed working — `work/active/ohvara-dashboard.md`'s old password was stale, updated separately) — My Policies defaulted to empty ("0 of 0 policies") instead of Test Agent's 19, clicking Everyone correctly surfaced all 18/19; notification bell showed exactly 1 row (Brayden's own team-message notification), not 4.
 
 ---
 
@@ -38,6 +38,8 @@ Insurance provider is now a real `SelectField` sourced from the `carriers` table
 
 Added `policies.product_name` (migration 088) for the specific product string; `product_type` keeps its short-category role, now auto-derived from the selected product instead of typed by hand. Surfaced `product_name` in `PolicyModal` and folded it into My Policies' search/badge fallback so the new data isn't invisible. `npx vite build` clean, no new lint errors.
 
+**Live-verified 2026-07-28** (Test Agent, closer role): Insurance Provider renders as a real dropdown; selecting F&G populates Product Type with its 5 real products (ExecuDex 61-99 correctly excluded, no real rate data); selecting Chubb falls back to the free-text "No comp data yet" input as designed.
+
 ---
 
 ### 🟩 Prompt 380 CLOSED 2026-07-28 — Underwriting question reworded, Insurance Type + Notes fields dropped
@@ -45,6 +47,8 @@ Added `policies.product_name` (migration 088) for the specific product string; `
 **Shipped:** [`1df97c2`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/1df97c2) on `ohvara-dashboard`.
 
 Underwriting label changed to "Is this policy already approved or in underwriting?" with **Approved** / **In Underwriting** options — same `pending_underwriting` logic, copy only. Insurance Type field removed; `insurance_type` is now hardcoded to `"Life"` at submission (column stays nullable, but real data still lands so `PolicyModal` doesn't go blank). Notes field removed from the form; `notes` column left alone, unused for now.
+
+**Live-verified 2026-07-28**: New Submission form shows the reworded question with Approved/In Underwriting options, no Insurance Type field, no Notes field.
 
 ---
 
@@ -54,7 +58,7 @@ Underwriting label changed to "Is this policy already approved or in underwritin
 
 New `bug_reports` table + private `bug-screenshots` storage bucket (migration 089), floating circular button bottom-right on every authenticated page. Non-admins get a submit form (description + optional screenshot → one row, no email/tab). Admins get a company-wide inbox — newest first, reporter name, description, page URL, screenshot thumbnail via short-lived signed URL, Mark resolved action, unresolved-count badge on the button itself. Admin SELECT-all on this table is intentional (unlike Prompt 379's bug) since there's no "my own stuff" page for it to leak into.
 
-**Verification gap, same as 379:** schema/RLS/build all confirmed (FK name, policies, clean `npx vite build`), but no working login to click through both role flows live — blocked on the same stale-password issue.
+**Live-verified 2026-07-28**, both roles: submitted a real report as Test Agent (closer) — description + auto-captured `page_url` landed correctly; switched to Brayden's admin account, inbox showed it with reporter name/description/page URL/timestamp and a NEW badge; clicked Mark resolved — `status` flipped to `resolved` in the DB. Test row deleted after confirming.
 
 ---
 
