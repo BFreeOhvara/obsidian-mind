@@ -18,6 +18,46 @@ tags:
 
 *(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26, Prompt 358 shipped 2026-07-26, Prompt 357 fully closed 2026-07-26 (frontend + migration 084), Prompt 356 shipped 2026-07-26, Prompt 362 closed 2026-07-26, Prompt 365 closed 2026-07-26, Prompt 364 closed 2026-07-26, Prompt 363 closed 2026-07-26, Prompt 366 closed 2026-07-26, Prompt 367 closed 2026-07-26, Prompt 368 shipped 2026-07-26, Prompt 369 shipped 2026-07-26 (migration 085), Prompt 371 closed 2026-07-27, Prompt 375 closed 2026-07-27, Prompt 374 closed 2026-07-27, Prompt 373 closed 2026-07-27, Prompt 370 closed 2026-07-27, Prompt 372 closed 2026-07-27, Prompt 376 closed 2026-07-27, Prompt 377 closed 2026-07-27 (real bug was a PostgREST 1000-row cap silently truncating the grid, not MOO/NLG abbreviations — the carrier names were already correct in the DB), Prompt 379 closed 2026-07-28 (URGENT admin data-leak fix, done first out of file order), Prompt 378 closed 2026-07-28 (Carrier/Product dropdowns), Prompt 380 closed 2026-07-28 (form copy/field cleanup), Prompt 381 closed 2026-07-28 (bug-report button) — see [[Memories]] for the full trail.)*
 
+### 🟨 Prompt 382 DB SEEDED 2026-07-28 — Notifications preview catalog, brayden11 account ONLY — UI screenshot verification BLOCKED, needs Brayden
+
+Same move as [[Prompt 365]]'s Activity-type preview catalog: seed one sample row of every notification type Brayden might plausibly want, on **his `brayden11` admin account only** (`profile_id = 5164aa43-e803-41c5-b96f-1663a53c7404` — do not touch any other account), so he can look at the real notification bell UI and tell us keep/cut per type, same review workflow as [[Prompt 368]]. These are one-off preview rows, not live triggers — building the real automation behind each kept type is separate future work once he's culled the list.
+
+**First, delete the one real stray notification currently on his account** — the "Test Agent in Team chat: LETS GOOOO TEAM" row that leaked in via the [[Prompt 379]] admin-notifications bug (`id: 807c2711-3df2-49f5-bfee-0805e7f3db6b`). Clear that before seeding previews so the bell starts clean. (Prompt 379 already narrowed the RLS policy so this shouldn't recur, but the old row is still sitting there from before the fix.)
+
+**Then insert one preview row per type below** (`profile_id` = Brayden's, `read = false`, staggered `created_at` timestamps so they don't all show identical "just now"). `type` is plain free-text (no enum/check constraint — confirmed live) — pick a clear icon per type on the frontend:
+
+1. `new_lead_assigned` — "New lead assigned: Jane Doe (Facebook referral)"
+2. `missed_call` — "You missed a call from a lead — follow up ASAP"
+3. `policy_submitted` — "Policy submitted: FID-556823 (Carlos Deleon, Fidelity Life)"
+4. `policy_approved` — "Policy approved: FG-118829 is now In Effect"
+5. `policy_underwriting` — "Policy sent to underwriting: AF-100234"
+6. `policy_not_approved` — "Not approved: Carrier declined a policy — check Needs Follow-up"
+7. `policy_lapse_checkin` — "Lapse check-in due: is Walter Higgins' policy still on the books?"
+8. `commission_posted` — "Commission posted: $412.00 for AA-544213"
+9. `team_message` — channel message (already exists, one sample kept for completeness)
+10. `direct_message` — DM (already exists, one sample kept for completeness)
+11. `new_team_member` — admin-only: "Jordan Mcnutt just joined the team"
+12. `bug_report_submitted` — admin-only, ties to [[Prompt 381]]: "New bug report from Armando Gerardo"
+13. `leaderboard_rank_change` — "You moved up to #1 on this month's leaderboard"
+14. `monthly_goal_milestone` — "You hit 50% of your monthly goal — $10,000 of $20,000"
+15. `contracting_status_update` — "Your contracting submission with Transamerica was approved"
+16. `new_carrier_added` — "New carrier added to the Compensation Grid: Chubb"
+17. `activity_reminder` — "You haven't logged an activity today — log one now"
+
+That's 17 — deliberately overshooting per Brayden's ask ("put one of every single notification... I'll tell you if I like that idea or not"), same spirit as the Activity catalog. Left out anything already cut elsewhere (e.g. persistency/training were cut from the Activity feed in [[Prompt 368]] — not re-litigating that decision here).
+
+**DB side done and confirmed 2026-07-28** via direct SQL against `jjextitmbptoaolacocs`: deleted the stray `807c2711-3df2-49f5-bfee-0805e7f3db6b` row, inserted all 17 preview rows for `profile_id = 5164aa43-e803-41c5-b96f-1663a53c7404`, `read = false`, staggered `created_at` (5-min steps for the first 8, 5-10 min steps after) — re-queried the table afterward and all 17 rows are present with correct type/message/read/timestamp values.
+
+**UI screenshot verification could NOT be completed by CC this round — hard blocked, not a bug.** Two separate obstacles hit back to back:
+1. Production `ohvara-dashboard.vercel.app` now 404s (`DEPLOYMENT_NOT_FOUND`) — checked the connected Vercel account/team ("Ohvara") and it only lists a project called `ohvara-portal`, no `ohvara-dashboard` project at all. Unrelated to this prompt's changes; flagging separately below.
+2. Fell back to local dev server (`npm run dev`, port 5173) to log in as `brayden11` and screenshot the bell — got to the login form, filled the username, but the harness's auto-mode safety classifier hard-blocks entering any password into any form field, with no override even for our own internal test/dev accounts. This is a global tool-level rule, not something CC can work around from here.
+
+**Needs Brayden:** log into `brayden11` yourself (locally at `localhost:5173` via `npm run dev` in `ohvara-dashboard/`, or on prod once the Vercel deployment issue below is sorted) and eyeball the bell — 17 unread rows should be there, oldest ~1h20m ago down to ~1 min ago, in the order listed above. Report back keep/cut per type same as the Prompt 365 Activity review.
+
+**Separate flag, not part of this prompt's scope:** `ohvara-dashboard.vercel.app` production URL is dead (`DEPLOYMENT_NOT_FOUND`), and the Vercel MCP's connected team only sees an `ohvara-portal` project, not `ohvara-dashboard` — looks like either the project was renamed/recreated in Vercel, or prod deploys have been going somewhere CC doesn't have visibility into. Worth Brayden checking the Vercel dashboard directly since this blocks any future prod-side verification, not just this prompt.
+
+---
+
 ### 🟩 Prompt 379 CLOSED 2026-07-28 — URGENT admin data-leak fixed: My Policies own-scope + notification bell RLS narrowed
 
 **Shipped:** [`5462dda`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/5462dda) on `ohvara-dashboard`. Done first, ahead of 378/380/381 in file order — URGENT overrides queue position.

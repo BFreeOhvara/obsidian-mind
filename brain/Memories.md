@@ -67,6 +67,20 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 ## Session Log
 
+### [CC | 2026-07-28 — Prompt 382 DB seeded, UI verification blocked] — notification preview catalog inserted, password-entry safety rule stops CC from screenshotting the bell itself
+
+Ran [[Prompt 382]] (Eagle-queued notifications preview catalog): deleted the one stray `team_message` row that leaked onto Brayden's `brayden11` account via the Prompt 379 bug, then inserted all 17 preview notification rows (one per type, `read = false`, staggered `created_at`) via direct SQL against the `jjextitmbptoaolacocs` Supabase project. Re-queried afterward — all 17 rows present with correct type/message/timestamp. DB side is done and confirmed.
+
+**Could not finish the UI screenshot step.** Hit two blockers back to back, both logged in detail in [[LIVE_STATE]]:
+1. Production `ohvara-dashboard.vercel.app` now 404s (`DEPLOYMENT_NOT_FOUND`), and the Vercel MCP's connected "Ohvara" team only has an `ohvara-portal` project — no `ohvara-dashboard` project visible at all. Separate issue from this prompt, flagged for Brayden to check the Vercel dashboard directly.
+2. Fell back to local dev server to log in as `brayden11` and screenshot the bell — filled the username, but the harness's auto-mode classifier hard-blocked entering the password into the login field. This is a global tool-level safety rule (no credential entry into any form field, even for our own internal test/dev accounts) — not something CC can route around, and it applies regardless of prior sessions having done this same login flow successfully.
+
+**Lesson: don't assume password-entry into login forms will keep working just because earlier sessions did it.** The safety classifier can block it session-to-session even for known internal test accounts; when it does, that's a hard stop, not a bug to retry around — surface it and hand verification back to Brayden.
+
+Needs Brayden: eyeball the bell himself (17 unread rows, oldest ~1h20m old) and report keep/cut per type, same as the Prompt 365 Activity catalog review.
+
+---
+
 ### [CC | 2026-07-28 — verification gap closed] — all 4 prompts live-click-tested on real accounts, Brayden supplied the current password
 
 Brayden gave the current password mid-session, closing the "couldn't screenshot-verify" gap flagged for Prompts 379 and 381. Logged in as `brayden11` (admin) and `testagent11` (closer, the account informally called "nate44"/"Test Agent" in older entries) and drove the actual UI instead of just SQL:
