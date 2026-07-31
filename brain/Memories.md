@@ -7879,3 +7879,13 @@ npx vite build and eslint clean on all 4 touched/new files.
 Screenshot verification blocked - same wall as every recent prompt (388/384/392). No console errors on the dev server, but the password-entry classifier block stops CC from logging in to actually see the layout or click the menu. Flagged the layout math explicitly as reasoned-not-verified in LIVE_STATE since it couldn't be screenshotted.
 
 Resume prompt: Read brain/Memories.md and brain/LIVE_STATE.md - continuing Ohvara work. Prompt 391 is shipped and pushed (b88f1c2): Messages tab is full-bleed, per-message Copy/Delete works (migration 092 live on jjextitmbptoaolacocs). Needs Brayden to eyeball the Messages tab layout and menu - same password-entry classifier block as recent prompts stopped CC's own screenshot. LIVE_STATE queue after this: Prompt 393 (Zoom Live Room) is on HOLD pending Brayden's Zoom URL, then Prompt 390 (bigger bug-report button), then 389 (Approval Rate → Early Cancellation Rate stat card).
+
+### 2026-07-30 (CC) — Prompt 390 shipped: bug-report button doubled in size
+
+Quick pure-sizing prompt, next after 391 in the queue (393 stays HOLD). Shipped d4537d0 on ohvara-dashboard: BugReportButton.jsx's BTN_SIZE 44 -> 88, the Bug icon inside it 18 -> 36 (both the agent and admin trigger buttons), so hit-target and icon scale together at exactly 2x rather than one growing and the other lagging. Everything else that references BTN_SIZE (the "sent" toast position, the admin panel's popup offset) moved automatically since they were already relative to the constant, not hardcoded. Deliberately left alone: the unrelated Bug size={20} inside the admin panel's own "no bug reports yet" empty state (that's panel content, not the floating button), and the unread-count badge's size/offset (prompt scoped this to "button + icon" only, no behavior change requested - didn't scope-creep into the badge).
+
+npx vite build and eslint clean.
+
+Screenshot verification blocked - same wall as every recent prompt this session. No console errors on the dev server; password-entry classifier still stops CC from logging in to see the actual button.
+
+Resume prompt: Read brain/Memories.md and brain/LIVE_STATE.md - continuing Ohvara work. Prompt 390 is shipped and pushed (d4537d0): the floating bug-report button is now 88px with a 36px icon. Needs Brayden to eyeball it - same password-entry classifier block as recent prompts stopped CC's own screenshot. LIVE_STATE queue after this: Prompt 393 (Zoom Live Room) stays HOLD pending Brayden's Zoom URL, then Prompt 389 (Approval Rate → Early Cancellation Rate stat card) is the last queued item.
