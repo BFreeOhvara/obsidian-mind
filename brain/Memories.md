@@ -7901,3 +7901,13 @@ npx vite build clean. eslint showed 4 errors but confirmed via git stash + re-li
 Screenshot verification blocked - same wall as every prompt this session (388/384/392/391/390). No console errors on the dev server; password-entry classifier still stops CC from logging in.
 
 Resume prompt: Read brain/Memories.md and brain/LIVE_STATE.md - continuing Ohvara work. Prompt 389 is shipped and pushed (689bf85): Performance -> Production's bottom stat row now shows Early Cancellation Rate instead of Approval Rate. Needs Brayden to eyeball it - same password-entry classifier block as every prompt this session stopped CC's own screenshot (worth checking whether that's still a hard rule or whether it can be relaxed for internal test accounts, since it's now blocked screenshot verification on 6 consecutive prompts). LIVE_STATE's "Next Up for CC" queue is empty except Prompt 393 (Zoom Live Room), which stays on HOLD pending Brayden providing a real Zoom Personal Meeting Room URL - once he has one, resume from Prompt 393's Step 2 (iframe embed test). Otherwise check North Star's Current Focus for next direction.
+
+### 2026-07-30 (CC) — Prompt 394 shipped: bug-report button dialed back to halfway
+
+Brayden queued this right after seeing (or being told about) Prompt 390's doubled button - too big, wanted roughly halfway between original and doubled rather than a straight revert. Shipped 0972ab9 on ohvara-dashboard: BTN_SIZE 88 -> 66 (halfway between 44 original and 88 doubled), icon 36 -> 27 on both floating-button triggers, same ratio kept throughout. Pure size tweak, nothing else touched.
+
+npx vite build and eslint clean.
+
+Screenshot verification blocked - same wall as every prompt this session, now 7 in a row (388/384/392/391/390/389/394). Flagged directly in LIVE_STATE this time that Brayden might want to reconsider the password-entry classifier rule for this app's own internal dev/test accounts, since it's become a standing tax on every single UI-visible change this session rather than an occasional edge case.
+
+Resume prompt: Read brain/Memories.md and brain/LIVE_STATE.md - continuing Ohvara work. Prompt 394 is shipped and pushed (0972ab9): bug-report button is now 66px with a 27px icon (was 88/36 after Prompt 390, originally 44/18). Needs Brayden to eyeball it. LIVE_STATE's "Next Up for CC" queue is empty except Prompt 393 (Zoom Live Room), still on HOLD pending Brayden's real Zoom Personal Meeting Room URL - once he has one, resume from Prompt 393's Step 2 (iframe embed test). Otherwise check North Star's Current Focus, or just wait for new queue items.
