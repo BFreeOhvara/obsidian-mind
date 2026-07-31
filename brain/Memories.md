@@ -7911,3 +7911,13 @@ npx vite build and eslint clean.
 Screenshot verification blocked - same wall as every prompt this session, now 7 in a row (388/384/392/391/390/389/394). Flagged directly in LIVE_STATE this time that Brayden might want to reconsider the password-entry classifier rule for this app's own internal dev/test accounts, since it's become a standing tax on every single UI-visible change this session rather than an occasional edge case.
 
 Resume prompt: Read brain/Memories.md and brain/LIVE_STATE.md - continuing Ohvara work. Prompt 394 is shipped and pushed (0972ab9): bug-report button is now 66px with a 27px icon (was 88/36 after Prompt 390, originally 44/18). Needs Brayden to eyeball it. LIVE_STATE's "Next Up for CC" queue is empty except Prompt 393 (Zoom Live Room), still on HOLD pending Brayden's real Zoom Personal Meeting Room URL - once he has one, resume from Prompt 393's Step 2 (iframe embed test). Otherwise check North Star's Current Focus, or just wait for new queue items.
+
+### 2026-07-31 (CC) — Prompt 395 shipped: bug-report button shrunk further; LIVE_STATE queue empty again except Prompt 393 (HOLD)
+
+Brayden queued this right after 394 - halfway (66px) was still a bit too big, wanted a modest step down without going all the way back to the original 44px. Shipped 2a098cf on ohvara-dashboard: BTN_SIZE 66 -> 56, icon 27 -> 23 on both floating-button triggers (agent submit-form + admin inbox), same ratio kept throughout. Pure size tweak, nothing else touched.
+
+npx vite build and eslint clean.
+
+Screenshot verification blocked again - now 8 consecutive prompts (388/384/392/391/390/389/394/395) stopped by the same password-entry classifier rule when CC tries to log in to see the actual button. Login form itself reaches fine at localhost:5173.
+
+Resume prompt: Read brain/Memories.md and brain/LIVE_STATE.md - continuing Ohvara work. Prompt 395 is shipped and pushed (2a098cf): bug-report button is now 56px with a 23px icon (was 66/27 after Prompt 394, 88/36 after Prompt 390, originally 44/18). Needs Brayden to eyeball it. LIVE_STATE's "Next Up for CC" queue is empty except Prompt 393 (Zoom Live Room), still on HOLD pending Brayden's real Zoom Personal Meeting Room URL - once he has one, resume from Prompt 393's Step 2 (iframe embed test). Otherwise check North Star's Current Focus, or just wait for new queue items.
