@@ -16,7 +16,27 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26, Prompt 358 shipped 2026-07-26, Prompt 357 fully closed 2026-07-26 (frontend + migration 084), Prompt 356 shipped 2026-07-26, Prompt 362 closed 2026-07-26, Prompt 365 closed 2026-07-26, Prompt 364 closed 2026-07-26, Prompt 363 closed 2026-07-26, Prompt 366 closed 2026-07-26, Prompt 367 closed 2026-07-26, Prompt 368 shipped 2026-07-26, Prompt 369 shipped 2026-07-26 (migration 085), Prompt 371 closed 2026-07-27, Prompt 375 closed 2026-07-27, Prompt 374 closed 2026-07-27, Prompt 373 closed 2026-07-27, Prompt 370 closed 2026-07-27, Prompt 372 closed 2026-07-27, Prompt 376 closed 2026-07-27, Prompt 377 closed 2026-07-27 (real bug was a PostgREST 1000-row cap silently truncating the grid, not MOO/NLG abbreviations — the carrier names were already correct in the DB), Prompt 379 closed 2026-07-28 (URGENT admin data-leak fix, done first out of file order), Prompt 378 closed 2026-07-28 (Carrier/Product dropdowns), Prompt 380 closed 2026-07-28 (form copy/field cleanup), Prompt 381 closed 2026-07-28 (bug-report button), Prompt 383 closed 2026-07-29 (notification bell per-type icons), Prompt 386 closed 2026-07-29 (Performance toggle/date-nav layout shift), Prompt 385 closed 2026-07-29 (First Premium Applied Rate card), Prompt 387 closed 2026-07-29 (State dropdown opens downward now), Prompt 384 migration 090 applied by Falcon direct-MCP 2026-07-29 (bug-report/new-team-member/lapse-check-in/leaderboard+goal-milestone triggers now live; missed-call trigger still flagged as needing a design call, not built) — notifications table still needs Brayden's 17 preview rows cleared, see Prompt 384 note below, Prompt 388 closed 2026-07-29 (every dropdown app-wide unified on AnchoredSelectField), Prompt 392 closed 2026-07-30 (Settings: Notifications tab removed, Licensing & Appointments + Integrations added, migration 091), Prompt 393 held 2026-07-30 pending Brayden's Zoom URL, Prompt 391 closed 2026-07-30 (Messages tab full-bleed + per-message copy/delete, migration 092), Prompt 390 closed 2026-07-30 (bug-report button doubled in size), Prompt 389 closed 2026-07-30 (Approval Rate → Early Cancellation Rate stat card), Prompt 394 closed 2026-07-30 (bug-report button dialed back to halfway), Prompt 395 closed 2026-07-31 (bug-report button shrunk further), Prompt 396 closed 2026-07-31 (Team toggle + Leaderboard RLS visibility fix, migration 093), Prompt 397 closed 2026-07-31 (Early Cancellation Rate card removed, 5-and-5 layout), Prompt 400 closed 2026-07-31 (Team Chat delete: admin override removed, migration 094), Prompt 399 closed 2026-07-31 (underwriting banner aligned to effectuation banner + Yes/No locked to submitting agent), Prompt 398 closed 2026-07-31 (Test Agent nate44 hidden from company-wide views), Prompt 401 closed 2026-07-31 (New Submission form: phone mask, name title-case, required-field validation, approval dropdown unselected by default) — queue now empty except Prompt 393 HOLD — see [[Memories]] for the full trail.)*
+*(Prompts 1, 2, 5–17, 26, 28–181 shipped — Prompt 42 superseded by 44 Fix 2, Prompt 108 superseded by 109, Prompt 110 superseded by 111, Prompt 113 superseded by 114, Prompt 324 shipped 2026-07-21, Prompt 360 shipped 2026-07-26, Prompt 361 shipped 2026-07-26, Prompt 359 shipped 2026-07-26, Prompt 358 shipped 2026-07-26, Prompt 357 fully closed 2026-07-26 (frontend + migration 084), Prompt 356 shipped 2026-07-26, Prompt 362 closed 2026-07-26, Prompt 365 closed 2026-07-26, Prompt 364 closed 2026-07-26, Prompt 363 closed 2026-07-26, Prompt 366 closed 2026-07-26, Prompt 367 closed 2026-07-26, Prompt 368 shipped 2026-07-26, Prompt 369 shipped 2026-07-26 (migration 085), Prompt 371 closed 2026-07-27, Prompt 375 closed 2026-07-27, Prompt 374 closed 2026-07-27, Prompt 373 closed 2026-07-27, Prompt 370 closed 2026-07-27, Prompt 372 closed 2026-07-27, Prompt 376 closed 2026-07-27, Prompt 377 closed 2026-07-27 (real bug was a PostgREST 1000-row cap silently truncating the grid, not MOO/NLG abbreviations — the carrier names were already correct in the DB), Prompt 379 closed 2026-07-28 (URGENT admin data-leak fix, done first out of file order), Prompt 378 closed 2026-07-28 (Carrier/Product dropdowns), Prompt 380 closed 2026-07-28 (form copy/field cleanup), Prompt 381 closed 2026-07-28 (bug-report button), Prompt 383 closed 2026-07-29 (notification bell per-type icons), Prompt 386 closed 2026-07-29 (Performance toggle/date-nav layout shift), Prompt 385 closed 2026-07-29 (First Premium Applied Rate card), Prompt 387 closed 2026-07-29 (State dropdown opens downward now), Prompt 384 migration 090 applied by Falcon direct-MCP 2026-07-29 (bug-report/new-team-member/lapse-check-in/leaderboard+goal-milestone triggers now live; missed-call trigger still flagged as needing a design call, not built) — notifications table still needs Brayden's 17 preview rows cleared, see Prompt 384 note below, Prompt 388 closed 2026-07-29 (every dropdown app-wide unified on AnchoredSelectField), Prompt 392 closed 2026-07-30 (Settings: Notifications tab removed, Licensing & Appointments + Integrations added, migration 091), Prompt 393 held 2026-07-30 pending Brayden's Zoom URL, Prompt 391 closed 2026-07-30 (Messages tab full-bleed + per-message copy/delete, migration 092), Prompt 390 closed 2026-07-30 (bug-report button doubled in size), Prompt 389 closed 2026-07-30 (Approval Rate → Early Cancellation Rate stat card), Prompt 394 closed 2026-07-30 (bug-report button dialed back to halfway), Prompt 395 closed 2026-07-31 (bug-report button shrunk further), Prompt 396 closed 2026-07-31 (Team toggle + Leaderboard RLS visibility fix, migration 093), Prompt 397 closed 2026-07-31 (Early Cancellation Rate card removed, 5-and-5 layout), Prompt 400 closed 2026-07-31 (Team Chat delete: admin override removed, migration 094), Prompt 399 closed 2026-07-31 (underwriting banner aligned to effectuation banner + Yes/No locked to submitting agent), Prompt 398 closed 2026-07-31 (Test Agent nate44 hidden from company-wide views), Prompt 401 closed 2026-07-31 (New Submission form: phone mask, name title-case, required-field validation, approval dropdown unselected by default) — Prompt 404 closed 2026-08-01 (Overview You/Everyone toggle reusing Prompt 396's aggregate + role-aware "Needs your attention" + month-scoped monthly goals, migration 095), queue now empty except Prompt 393 HOLD — see [[Memories]] for the full trail.)*
+
+### 🆕 Prompt 403 QUEUED 2026-07-31 — Overview clock must read the account's saved timezone, not the device's local clock
+
+Confirmed live by Brayden: he changed his timezone in Settings → Regional and saved, but the Overview clock didn't change — it's still driven by the browser/device's local time, not the account's own setting. Confirmed in the DB that the data model already supports this correctly — `profiles.timezone` (text) and `timezone_confirmed_at` already exist — so this is purely a frontend bug, not a schema gap.
+
+**Fix:** the Overview clock component must compute and render the current time using the logged-in profile's saved `timezone` value (e.g. via `Intl.DateTimeFormat` with an explicit `timeZone` option, or whatever date library the codebase already uses elsewhere for `timezone_confirmed_at`-related logic) — not `new Date()`'s implicit local/device timezone. The account's configured timezone should fully own what the dashboard displays as "now," regardless of what device or system timezone the browser itself is running under. Changing the timezone in Settings should immediately change what the clock shows on Overview, no other action needed.
+
+Verify by changing the timezone in Settings, confirming the Overview clock updates to match, and — if feasible to check — confirming two different accounts with two different saved timezones each see their own account's time, not the shared device's.
+
+---
+
+### 🆕 Prompt 402 QUEUED 2026-07-31 — Leaderboard: add the same date nav Production has, so past days/months are browsable
+
+Performance → Leaderboard's Daily/Monthly toggle currently only ever shows the current day/month ("Aug 2026 · ranked by submitted AP") with no way to look at past periods. Add the same "‹ Aug 2026 ›" prev/next date nav that Production already has, so Brayden (or anyone) can step back through previous months (for Monthly) or previous days (for Daily) and see historical leaderboard standings, not just the current one.
+
+Use the exact same fixed two-row layout [[Prompt 386]] already built for Production — Daily/Monthly toggle stays fixed in place, date nav sits in its own row below it — so this doesn't reintroduce the same layout-shift bug on a second page.
+
+Verify with a screenshot showing the date nav on Leaderboard and confirm stepping back a month/day actually pulls that period's real historical standings, not just re-rendering the current one.
+
+---
 
 ### 🟩 Prompt 401 CLOSED 2026-07-31 — New Submission form data-quality fixes
 
@@ -303,7 +323,6 @@ New `bug_reports` table + private `bug-screenshots` storage bucket (migration 08
 
 ---
 
-
 ### 🟩 Prompt 375 CLOSED 2026-07-27 — Chubb/Combined logo bumped back up (504×138 re-crop copied in, verified no clipping)
 
 **Shipped:** [`9b894d2`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/9b894d2) on `ohvara-dashboard`.
@@ -316,7 +335,6 @@ Copied Falcon's re-cropped `chubb-combined.png` (504×138, vault-confirmed) into
 
 ---
 
-
 ### 🟩 Prompt 374 CLOSED 2026-07-27 — Leaderboard defaults to Monthly, zero-entries renders full podium+standings skeleton
 
 **Shipped:** [`9cc3fe8`](https://github.com/BFreeOhvara/ohvara-dashboard/commit/9cc3fe8) on `ohvara-dashboard`.
@@ -328,7 +346,6 @@ Copied Falcon's re-cropped `chubb-combined.png` (504×138, vault-confirmed) into
 **Verified live** (nate44, real data, no screenshot — same Browser-pane compositing issue as Prompt 375, used `get_page_text` instead): switching to the Leaderboard tab defaulted straight to Monthly (`Jul 2026 · ranked by submitted AP`, Test Agent's real $6,612 showing as Top Performer). Switching to Daily (today, zero real submissions) showed all 3 podium slots as N/A/"No closer yet" plus the Full Standings table with headers and no rows — old "No submissions in this window yet." text is gone. `npx vite build` clean.
 
 ---
-
 
 ### 🟩 Prompt 373 CLOSED 2026-07-27 — "Projected Commission" block removed from New Submission form
 
@@ -3651,7 +3668,6 @@ Examples: raw $974 → $999, raw $620 → $599, raw $410 → $399, raw $1990 →
 
 ---
 
-
 ### ✅ Prompt 93 SHIPPED 2026-06-25 (`16f346f`) — MyAppointments fixed-height box
 
 `MyAppointments.jsx` inner scrollable div was `maxHeight: 560` — box shrank to content height when empty. Changed to `height: 560`. Box now holds its size at all fill levels; `overflowY: 'auto'` already present so scrollbar only appears when rows exceed 560px. **Not Chrome-verified.**
@@ -4189,7 +4205,6 @@ Three files in sync. **`useProfiles.js` `useBadgeActivity`:** `longestStreak` re
 Build clean (`npx vite build`), lint clean on changed files (only 2 pre-existing `exhaustive-deps` warnings in the notifier's effects, unrelated to the badge-array edit). **Not live-verified** — no Chrome browser connected. **DB note:** any old streak badge rows (`streak_7` etc.) already inserted for a rep stay as harmless orphans in the `notifications` table — they just never re-earn; only test data (apex11) is affected.
 
 ---
-
 
 ### ✅ Prompt 48 SHIPPED 2026-06-23 (`a7b346c`) — interactive React Flow script canvas (built on Opus per the prompt's model flag)
 
