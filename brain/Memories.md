@@ -69,6 +69,6 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 
 > Full entries live in per-quarter files (split out 2026-08-01 — this file had grown to ~1.6MB). Newest quarter first.
 
-- [[2026-Q3]] — 2026-07-01 to 2026-08-01, 346 entries (includes the 2026-07-21 insurance pivot)
+- [[2026-Q3]] — 2026-07-01 to 2026-08-01, 347 entries (includes the 2026-07-21 insurance pivot)
 - [[2026-Q2]] — 2026-06-07 to 2026-06-30, 173 entries (business decisions, initial SMB-era dashboard build)
 
