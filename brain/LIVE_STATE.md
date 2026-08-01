@@ -16,17 +16,7 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1-403 all shipped/closed/superseded — full detail moved to [[LIVE_STATE Prompt History (2026-06 to 2026-07)]], terser session-by-session notes in [[Memories]]. Queue is empty except Prompt 393 HOLD below.)*
-
-### 🆕 Prompt 402 QUEUED 2026-07-31 — Leaderboard: add the same date nav Production has, so past days/months are browsable
-
-Performance → Leaderboard's Daily/Monthly toggle currently only ever shows the current day/month ("Aug 2026 · ranked by submitted AP") with no way to look at past periods. Add the same "‹ Aug 2026 ›" prev/next date nav that Production already has, so Brayden (or anyone) can step back through previous months (for Monthly) or previous days (for Daily) and see historical leaderboard standings, not just the current one.
-
-Use the exact same fixed two-row layout [[Prompt 386]] already built for Production — Daily/Monthly toggle stays fixed in place, date nav sits in its own row below it — so this doesn't reintroduce the same layout-shift bug on a second page.
-
-Verify with a screenshot showing the date nav on Leaderboard and confirm stepping back a month/day actually pulls that period's real historical standings, not just re-rendering the current one.
-
----
+*(Prompts 1-404 all shipped/closed/superseded — full detail moved to [[LIVE_STATE Prompt History (2026-06 to 2026-07)]], terser session-by-session notes in [[Memories]]. Queue is empty except Prompt 393 HOLD below.)*
 
 ### ⏸️ Prompt 393 HOLD 2026-07-30 — Team → Meetings: pilot ONE always-open Zoom Live Room (not a scheduler) — paused pending Brayden's Zoom URL
 
