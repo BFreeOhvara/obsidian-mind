@@ -72,3 +72,7 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 - [[2026-Q3]] — 2026-07-01 to 2026-08-01, 347 entries (includes the 2026-07-21 insurance pivot)
 - [[2026-Q2]] — 2026-06-07 to 2026-06-30, 173 entries (business decisions, initial SMB-era dashboard build)
 
+**Recent (pointer only — full write-ups in [[2026-Q3]]):**
+
+- [CC | 2026-08-01 — Prompts 402/403/404 shipped, queue empty except HOLD] Overview You/Everyone toggle + role-aware attention (404, `84a91ce`), Overview clock now reads account timezone not device local (403, `0d542e7`), Leaderboard gets Production's date-nav stepper for browsing past periods (402, `0ed6702`). LIVE_STATE's "Next Up for CC" queue is empty except Prompt 393 (Zoom Live Room), still on HOLD pending Brayden's real Zoom URL. Full detail, verification notes, and resume prompts in [[2026-Q3]].
+
