@@ -75,4 +75,5 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 **Recent (pointer only — full write-ups in [[2026-Q3]]):**
 
 - [CC | 2026-08-01 — Prompts 402/403/404 shipped, queue empty except HOLD] Overview You/Everyone toggle + role-aware attention (404, `84a91ce`), Overview clock now reads account timezone not device local (403, `0d542e7`), Leaderboard gets Production's date-nav stepper for browsing past periods (402, `0ed6702`). LIVE_STATE's "Next Up for CC" queue is empty except Prompt 393 (Zoom Live Room), still on HOLD pending Brayden's real Zoom URL. Full detail, verification notes, and resume prompts in [[2026-Q3]].
+- [CC | 2026-08-01 — Prompt 407 picked up, recon in progress] New session, took Prompt 407 (avatar upload + two-initial colored fallback) first per LIVE_STATE queue order. Dispatched recon on avatar call sites/profiles schema/handle_new_user/bug-screenshots bucket pattern; no build yet. Full detail + resume prompt in [[2026-Q3]].
 
