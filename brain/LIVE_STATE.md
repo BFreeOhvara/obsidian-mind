@@ -16,17 +16,7 @@ tags:
 >
 > **⚠️ CRITICAL — always `git pull` before reading or editing this file.** Both CC and Falcon (Cowork) edit LIVE_STATE. Without a pull first, CC overwrites Falcon's updates and Falcon reads CC's stale state. `git pull` is the first command every session, before any file read.
 
-*(Prompts 1-401 all shipped/closed/superseded — full detail moved to [[LIVE_STATE Prompt History (2026-06 to 2026-07)]], terser session-by-session notes in [[Memories]]. Queue is empty except Prompt 393 HOLD below.)*
-
-### 🆕 Prompt 403 QUEUED 2026-07-31 — Overview clock must read the account's saved timezone, not the device's local clock
-
-Confirmed live by Brayden: he changed his timezone in Settings → Regional and saved, but the Overview clock didn't change — it's still driven by the browser/device's local time, not the account's own setting. Confirmed in the DB that the data model already supports this correctly — `profiles.timezone` (text) and `timezone_confirmed_at` already exist — so this is purely a frontend bug, not a schema gap.
-
-**Fix:** the Overview clock component must compute and render the current time using the logged-in profile's saved `timezone` value (e.g. via `Intl.DateTimeFormat` with an explicit `timeZone` option, or whatever date library the codebase already uses elsewhere for `timezone_confirmed_at`-related logic) — not `new Date()`'s implicit local/device timezone. The account's configured timezone should fully own what the dashboard displays as "now," regardless of what device or system timezone the browser itself is running under. Changing the timezone in Settings should immediately change what the clock shows on Overview, no other action needed.
-
-Verify by changing the timezone in Settings, confirming the Overview clock updates to match, and — if feasible to check — confirming two different accounts with two different saved timezones each see their own account's time, not the shared device's.
-
----
+*(Prompts 1-403 all shipped/closed/superseded — full detail moved to [[LIVE_STATE Prompt History (2026-06 to 2026-07)]], terser session-by-session notes in [[Memories]]. Queue is empty except Prompt 393 HOLD below.)*
 
 ### 🆕 Prompt 402 QUEUED 2026-07-31 — Leaderboard: add the same date nav Production has, so past days/months are browsable
 
