@@ -65,7 +65,8 @@ tags:
 | Service | Notes |
 |---|---|
 | **Twilio** | Needed for SMS reminders + client AI number provisioning. Not set up yet — gated until first real client. |
+| **Daily.co** | Powers Team → Meetings Live Room (Prompt 393, pivoted from Zoom). Free tier covers this pilot's "just one room" scope. Code is fully built and waiting on `daily_room_url` — Brayden needs to sign up at daily.co himself (CC can't create accounts), create one room, and paste its URL into Settings → Integrations. Not spending until that room exists. |
 
 ---
 
-*Last updated: 2026-06-21 (Falcon)*
+*Last updated: 2026-08-01 (CC, Prompt 393)*
