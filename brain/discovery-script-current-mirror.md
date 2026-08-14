@@ -363,7 +363,7 @@ function shorten(s) {
 }
 
 // Turn one trimmed marker line into a step.
-// A trailing `[[BREAK]]` (Prompt 215) forces a screen split in a say-chain
+// A trailing `BREAK` (Prompt 215) forces a screen split in a say-chain
 // that would otherwise auto-merge with whatever follows it — used when a
 // chain is long enough that one continuous block reads as too much at once
 // (Handoff's bridge+pitch vs. its ask). Stripped before the text is filled;

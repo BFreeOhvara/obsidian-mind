@@ -199,7 +199,7 @@ SAY: "No worries — is there a better time to try them, or should I just leave 
 
 *(Falcon's direct answer to Brayden's question: yes, I like the `transfer-reintro` line — ship it as dictated with just the `[job title]` token swap and tail trim above.)*
 
-[[setter-transcripts-camden-cash]] · [[setter-script-v2-flow]] · [[ohvara-setter-discovery-script]] · [[LIVE_STATE]]
+[[setter-transcripts-camden-cash]] · [[setter-transcripts-full-calls]] · [[setter-transcripts-s2-vitals]] · [[setter-transcripts-s3-pain]] · [[setter-transcripts-s4-handoff]] · [[setter-transcripts-s5-objections]] · [[setter-script-v2-flow]] · [[ohvara-setter-discovery-script]] · [[LIVE_STATE]]
 
 ---
 
@@ -459,4 +459,4 @@ SAY: "The range is wide depending on what you need, which is exactly why the cal
 
 **Status: both the base v3 script (Prompt 205, `b4d9cf3`) and the v3.1 warm-lead opener patch (Prompt 209, `8df9bfa`) are shipped live.** The Script tab's canvas view (the reason Prompt 206/208 existed) has since been replaced twice over — first with a text outline (Prompt 208), then with a direct Practice-mode landing (Prompt 209) — see [[LIVE_STATE]].
 
-[[setter-transcripts-camden-cash]] · [[setter-script-v2-flow]] · [[ohvara-setter-discovery-script]] · [[LIVE_STATE]]
+[[setter-transcripts-camden-cash]] · [[setter-transcripts-full-calls]] · [[setter-transcripts-s2-vitals]] · [[setter-transcripts-s3-pain]] · [[setter-transcripts-s4-handoff]] · [[setter-transcripts-s5-objections]] · [[setter-script-v2-flow]] · [[ohvara-setter-discovery-script]] · [[LIVE_STATE]]

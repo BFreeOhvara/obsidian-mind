@@ -36,6 +36,14 @@ status: active
 
 ---
 
+## Ohvara Brand Assets
+
+Generation prompts for the Ohvara Portal app's splash/loading animation (the bird), kept for reprocessing if the asset ever needs regenerating:
+
+- [[claude-design-bird-splash-brief]] — animated brand splash brief
+- [[higgsfield-image-storyboard-prompt]] — storyboard stills prompt
+- [[higgsfield-bird-flyin-prompt]] — video generation prompt
+
 ## Related
 
 - [[skills/Index]] — all skills extracted from these videos

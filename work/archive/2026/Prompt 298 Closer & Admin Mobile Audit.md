@@ -5,7 +5,7 @@ tags:
   - work-note
   - mobile
 quarter: Q3-2026
-status: active
+status: completed
 ---
 
 # Prompt 298 — Closer & Admin Mobile Audit

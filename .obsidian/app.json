@@ -11,6 +11,14 @@
     ".claude-plugin/",
     ".codex/",
     ".gemini/",
-    ".shardmind/"
+    ".shardmind/",
+    "archive/template-cruft/.claude/",
+    "archive/template-cruft/bases/",
+    "archive/template-cruft/brain/",
+    "archive/template-cruft/org/",
+    "archive/template-cruft/perf/",
+    "archive/template-cruft/root-docs/",
+    "archive/template-cruft/scaffold/",
+    "archive/template-cruft/templates/"
   ]
 }

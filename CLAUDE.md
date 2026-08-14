@@ -1,6 +1,12 @@
+# Atlas Vault — Two Verticals
+
+This vault hosts **two independent businesses**: **Ohvara** (below, rooted at `brain/`) and **Restorix** (`restorix/`, AI infrastructure for behavioral health treatment centers). Same operator (Brayden), same vault for shared tooling/conventions, otherwise unconnected — Restorix has its own current-state doc, memory log, and goals file, and never needs Ohvara's.
+
+**Before doing anything else, determine which vertical the session's request is about.** If it's Restorix (or genuinely ambiguous), stop reading here and read `restorix/CLAUDE.md` instead — everything below this point (Session Start/End, Pricing, Infrastructure, Rules) is Ohvara-specific and does not apply to Restorix work. If it's Ohvara, continue below as normal.
+
 # Ohvara Vault
 
-External brain for **Ohvara** — SMB automation business. This file loads on top of the global `~/.claude/CLAUDE.md` when Claude Code is run from this vault.
+External brain for **Ohvara** — SMB automation business turned inbound insurance operation (see [[North Star]] for the pivot). This file loads on top of the global `~/.claude/CLAUDE.md` when Claude Code is run from this vault.
 
 ## Identity
 

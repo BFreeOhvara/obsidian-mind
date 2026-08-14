@@ -78,4 +78,4 @@ Suggested direction:
 - Frame each automation as solving a named problem, not a feature description
 - Lead into price with a cost-of-inaction question before the ROI anchor
 
-[[LIVE_STATE]] · [[Memories]]
+[[closer-script-rewrite]] · [[say-this-text-style-check]] · [[LIVE_STATE]] · [[Memories]]

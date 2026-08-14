@@ -70,7 +70,7 @@ Line 241, the single longest line in the file: "...that's money slipping through
 
 ## Next step
 
-Nothing in `discoveryScript.js` changed yet — items 1–7 above are proposed rewrites, not applied fixes. Waiting on Brayden to confirm which of these to actually ship (same judgment-call-needs-signoff pattern as [[Prompt 312]]'s Follow-Up classification, since this is subjective sales-language editing, not a bug).
+Nothing in `discoveryScript.js` changed yet — items 1–7 above are proposed rewrites, not applied fixes. Waiting on Brayden to confirm which of these to actually ship (same judgment-call-needs-signoff pattern as Prompt 312's Follow-Up classification, since this is subjective sales-language editing, not a bug).
 
 ## Related
 
