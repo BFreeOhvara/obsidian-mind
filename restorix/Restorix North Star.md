@@ -33,7 +33,7 @@ Treatment centers lose admissions to slow/missed intake response. Restorix insta
 
 ## Reference Site
 
-**regenix.io** — Brayden wants the marketing site's page structure AND visual caliber to match closely (dark theme, gradient accents, big bold type, scroll-triggered reveals, custom iconography/glow effects), explicitly not a generic AI-page-builder look. Wording/content differs (different niche).
+**regenix.io** — Brayden wants the marketing site's page structure AND visual caliber to match closely, explicitly not a generic AI-page-builder look. Wording/content differs (different niche). **Corrected 2026-08-14 (Prompt 427):** the site is actually a light sage/mint theme (`#e5ecea` bg, near-black text) with a teal accent (`#07775f`/`#2fd6b4`/`#055c49`), Space Grotesk + Manrope + JetBrains Mono, soft radial glow blobs, pill buttons — not the dark/neon theme originally assumed here. Confirmed against the live site's actual computed styles, and confirmed with Brayden to match it exactly rather than keep the dark-theme assumption.
 
 ## Current Focus
 

@@ -6,6 +6,12 @@
       "runtimeExecutable": "cmd",
       "runtimeArgs": ["/c", "cd /d C:\\Users\\freem\\ohvara-dashboard && npm run dev"],
       "port": 5173
+    },
+    {
+      "name": "restorix-marketing",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "cd /d C:\\Users\\freem\\restorix-marketing && npm run dev -- --port 5174"],
+      "port": 5174
     }
   ]
 }

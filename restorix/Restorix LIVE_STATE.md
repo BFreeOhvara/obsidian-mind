@@ -14,30 +14,6 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
-### Prompt 427 — Restorix marketing site (Regenix-style, futuristic — not default AI-generated look)
-
-Brand: **Restorix** — AI infrastructure for behavioral health treatment centers (addiction, dual-diagnosis, eating disorder, psychiatric/mental health). Reference site: **regenix.io** — Brayden wants the page structure AND the visual execution/caliber to match it closely (not the wording — this is a different niche with different content), explicitly **not** a generic/default AI-page-builder look. Actually load regenix.io yourself and study its real visual design (dark theme, gradient accents, big bold type, scroll-triggered section reveals, custom iconography/glow effects) before building — don't guess at "futuristic" from the word alone.
-
-**Page structure, mirroring Regenix's exact section flow:**
-1. Hero — "More booked patients, none of the manual work" equivalent, but for treatment centers: something like "More admissions booked. None of the manual intake work." CTA: "Book a Strategy Call."
-2. **The Leak** — same 4-stage framing Regenix uses (missed call → slow follow-up → cold lead → buried front desk), rewritten for behavioral health, backed by REAL researched stats (already sourced this session, use these, don't fabricate placeholders):
-   - 60–75% of admission inquiries arrive by phone
-   - Leads contacted within 5 minutes convert 9–21x more often than leads contacted after 30 minutes
-   - The average treatment facility converts under 20% of inbound calls to admissions
-   - Click-to-call converts at 18.5% vs. 2.8% for form fills
-3. **The System** (branded as "RestorixCORE" or similar) — 5 capabilities, adapted from Regenix's 5: lead capture & qualification, missed-call recovery (text-back within seconds), a voice agent that can triage by level of care/insurance, structured intake written straight to the facility's system, and follow-up/nurture sequences appropriate for a crisis-sensitive population (not pushy — this population needs a different tone than "shop for a clinic," handle with care in the copy).
-4. **Process** — same 4-step shape: Consult (audit their real intake funnel) → Architect (blueprint, they approve before anything ships) → Install (build + supervised launch) → Optimize (weekly conversation QA + conversion tuning).
-5. **Who it's for** — 5 segments, already scoped this session: substance use detox & residential rehab, IOP/PHP outpatient programs, dual-diagnosis/co-occurring disorder centers, eating disorder treatment centers, psychiatric & specialty mental health (incl. ketamine/TMS).
-6. **Outcomes** — real aggregate-style stat callouts (format like Regenix's, content will be genuine/TBD once there are real clients — use honest placeholder framing like "early client results" rather than inventing fake numbers for a brand-new company).
-7. Testimonials — placeholder/empty state until there are real clients, don't fabricate quotes.
-8. Final CTA — "Book a Strategy Call."
-
-New, fully separate project — new repo, new Vercel project, own domain once picked. Doesn't need Supabase/a real backend for an MVP marketing site; the "Book a Strategy Call" CTA can go to a simple form or an external scheduler link for now — flag to Brayden if he wants a real booking backend built instead.
-
-Verify with screenshots of every section, and confirm it does NOT look like a default component-library site — that's the one hard requirement Brayden called out explicitly.
-
----
-
 ### Prompt 428 — Restorix setter portal (MVP)
 
 MVP dialer/prospecting portal for setters cold-calling behavioral health facility owners/admissions directors to book Strategy Calls (the same CTA the marketing site drives to). This is conceptually similar to Ohvara's own old rep/setter pipeline (lead → call → book appointment → hand to closer) — that's a fine reference for the shape of the workflow, but this is a **brand-new build in Restorix's own new project**, not a revival of Ohvara's dead `leads`/`appointments` tables (see [[ohvara_legacy_setter_pipeline_dead]] memory — don't touch that code, it's unrelated and stays dead).
@@ -50,9 +26,30 @@ Verify with screenshots of the queue, a logged call, and a booked Strategy Call.
 
 *(Seeded 2026-08-14 during the Prompt 426 vault split — moved verbatim from [[LIVE_STATE|Ohvara's LIVE_STATE.md]] where they originally lived, no wording changed.)*
 
+---
+
+### ⚠️ Prompt 427 needs Brayden — two small unblocks, not more build work
+
+**Code is done and locally verified** (see CURRENT STATE below). Two things only Brayden can finish:
+
+1. **Turn off Vercel Authentication on the `restorix-marketing` project.** Deployed to `https://restorix-marketing-ohvara.vercel.app` (production, team `ohvara`) — but Vercel's deployment-protection SSO wall is on by default and the tool CC has access to can't see this brand-new project yet to toggle it off itself (`get_project`/`list_projects` both 404 on it, even though the deploy itself succeeded — a real gap in the MCP tool's read side, not a code problem). Brayden: Vercel dashboard → `restorix-marketing` project → Settings → Deployment Protection → turn off "Vercel Authentication." Two clicks, then the site is publicly live.
+2. **Create an empty GitHub repo `BFreeOhvara/restorix-marketing`** (no README/gitignore/license — keep it truly empty) so CC can push the already-committed local repo. CC has no `gh` CLI and no GitHub API token on this machine (checked — not present in env or git config), so it can't create the repo itself; same category as "CC cannot create accounts." Once it exists, CC pushes in one command.
+
+Neither is a build gap — the site itself is finished.
+
 ## CURRENT STATE
 
-*(Nothing shipped yet — Restorix is a fresh vertical as of 2026-08-14. This section fills in as Prompts 427/428 ship.)*
+**Prompt 427 shipped 2026-08-14 (code + local verification done; live-public + GitHub push pending Brayden, see above).** Built `restorix-marketing` — new standalone Vite + React 19 + Tailwind + framer-motion project at `C:\Users\freem\restorix-marketing`, fully separate from `ohvara-dashboard`.
+
+**Visual-direction correction, worth remembering:** the brief (and Restorix North Star) described regenix.io as "dark theme, gradient accents... glow effects." Actually loading the live site and reading its computed styles showed the opposite — regenix.io is a **light sage/mint theme** (`#e5ecea` background, near-black `#0f1f1b` text) with a **teal accent** (`#07775f` / bright `#2fd6b4` / deep `#055c49`), soft radial teal glow blobs, Space Grotesk (headings) + Manrope (body) + JetBrains Mono (eyebrow/stat labels), and fully pill-shaped (`9999px`) outlined/filled buttons — not dark/neon at all. Flagged this to Brayden via AskUserQuestion rather than guessing; he confirmed **match regenix.io exactly**, so that's the palette actually built. [[Restorix North Star]] still says "dark theme" in its Reference Site note — stale, worth fixing next time that file is touched.
+
+**Built, section by section (all content adapted from the brief, all 4 stats real/sourced, no fabricated numbers anywhere):** Hero (headline + 2 CTAs + capability ticker) → The Leak (4 stat cards: 60–75% phone inquiries / 9–21× 5-min conversion lift / <20% avg conversion / 18.5% vs 2.8% click-to-call) → The Restorix System (RestorixCORE — animated ring emblem + 5 capability cards: lead capture, missed-call recovery, level-of-care & insurance triage, structured intake & booking, follow-up & nurture) → Process (Consult/Architect/Install/Optimize, vertical timeline) → Who It's For (5 segments + "adjacent specialty" card) → Outcomes (honest **placeholder** framing — em-dash stat tiles + explicit "Restorix is early" banner, no invented numbers) → Testimonials (empty-state card, no fabricated quotes, "be one of our first clients" CTA) → final CTA band. Scroll-triggered reveals via framer-motion `whileInView` throughout, matching Regenix's section-reveal behavior. "Book a Strategy Call" wired to a `mailto:hello@restorix.io` placeholder — flagged per the prompt's own instruction; swap for a real scheduler link (Calendly etc.) when Brayden has one.
+
+**Verified:** `npm run build` clean. Local dev server (port 5174, new `.claude/launch.json` entry `restorix-marketing` alongside the existing `dashboard` entry so they don't collide) — zero console errors, page text confirmed section-by-section via `get_page_text`, computed-style checks confirmed the actual rendered palette/fonts/button styles match regenix.io's real tokens exactly (not just "looks about right" — literally diffed against the live site's `getComputedStyle` output), zero horizontal overflow at both desktop and 375px mobile width. Could not get real screenshots this session — the Browser pane's `computer` screenshot action isn't compositing in this environment ("pane is not displayed") — verified via `get_page_text` + `javascript_tool` computed-style extraction instead, which is a lower bar than a visual screenshot; **Brayden should eyeball the live site himself once the auth wall is off**, especially the RestorixCORE ring emblem and scroll-reveal motion, which text/computed-style checks can't fully confirm.
+
+**Housekeeping while building:** replaced create-vite's default purple abstract-blob favicon with a small teal "R" mark matching the real palette; deleted the unused default `public/icons.svg` (Vite/React template's Bluesky/Discord/GitHub icon sprite, not referenced anywhere in this project).
+
+Local repo: committed (`39b8ddb`), not yet pushed — see the Brayden unblock list above.
 
 ## Related
 
