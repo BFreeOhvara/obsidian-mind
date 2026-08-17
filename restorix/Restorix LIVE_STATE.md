@@ -1,5 +1,5 @@
 ---
-date: 2026-08-16
+date: 2026-08-17
 description: "Single current-state doc for all Restorix sessions — overwritten on update, never appended. Restorix's own vertical, independent of Ohvara's brain/LIVE_STATE.md."
 tags:
   - restorix
@@ -14,7 +14,13 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
-*(queue empty — see "Also still queued, not urgent" below for open, non-blocking items)*
+### Prompt 460 — Overview clock: reposition + enlarge
+
+Follow-up to Prompt 458's clock. Two adjustments:
+1. **Move the date/clock block to the top-right** of the stat-card row — currently sits left-aligned above the cards, should be positioned above where "Follow-ups Due Today" sits (rightmost card).
+2. **Make the clock significantly larger** — the time display specifically, not just the date. Date can grow slightly too, but the clock is the part that needs to be much more prominent.
+
+Verify with a screenshot showing the repositioned, enlarged clock.
 
 **Also still queued, not urgent** — remaining audit items from the parity pass: **closer's own lead-pull workflow** (should closers cold-call an unbooked pool too, or only receive booked handoffs?) and **deal-outcome Pipeline tracking** (Closed/Lost/No Show/Reschedule states beyond the current 5-status enum). None of these block anything — surface to Brayden when there's room, not before.
 
@@ -46,6 +52,8 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 461 — SPA rewrite fix for non-root-route 404s, shipped 2026-08-17, verified live.** Committed `9aa26a8` on top of `e805faf`, pushed and auto-deployed. Confirmed no `vercel.json` existed at all (matching the side-finding flagged back in Prompt 441). Added one with the standard SPA catch-all rewrite (`{ "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }] }`) — no special-casing needed for `/join/:token`, it's client-routed like everything else. `npm run build`/`npm run lint` clean (same pre-existing fast-refresh warnings only, unrelated to this change). **Verified live against production, not just locally:** polled `restorix-portal-ohvara.vercel.app/overview` via `curl` until the deploy picked up the change (200, was 404 pre-fix), then confirmed `/stats`, `/goals`, `/messages`, `/settings`, `/join/testtoken123`, and a genuinely nonexistent path all return 200 at the HTTP layer. Went further than a status-code check — opened each in a real browser tab via direct URL load (not sidebar navigation) and confirmed the actual app content rendered, not a blank shell: `/overview` showed the real authenticated Overview page (148-lead pool, stat tiles, full lead table), `/stats` showed real Stats page content (5 calls logged, weekly chart), and `/join/testtoken123` correctly rendered the client-side "This invite link is invalid" state for a fake token — proof the client router mounted and ran its own logic post-refresh rather than just serving a static shell. This closes the last known deep-link/refresh gap flagged back in Prompt 441's side-finding.
 
 **Prompt 456 — sidebar headers restored + Messages full-bleed layout + auto-conversations, shipped 2026-08-17, verified thoroughly. This closes the queue Brayden had built up this session (448 through 456) — "Next Up for CC" is empty.** Committed `e805faf` on top of `e273b5b`, pushed and auto-deployed.
 
