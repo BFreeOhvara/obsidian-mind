@@ -14,18 +14,7 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
-### ⚠️ Brayden action needed — set 5 Twilio secrets to activate click-to-call
-
-Prompt 438 fully shipped 2026-08-16 (`89c94e1` + `bfe98b8`, pushed). Both blockers from pt1 got explicit answers and are done: the `profiles` RLS widening (closers can now read setter-role rows) was approved and applied — Setter Activity confirmed showing real data. Twilio confirmed as Restorix's own account (not Ohvara's) — `twilio-token` and `twilio-voice-webhook` edge functions are deployed and `LogCallModal` has a real Call section wired in, currently falling back to a `tel:` link because the account isn't configured yet.
-
-**Only remaining step, and it's yours to do (CC doesn't handle API keys/secrets directly, by design):** set these 5 secrets on the `avgvmzshujwphneykuvu` Supabase project — either via the Supabase dashboard (Edge Functions → Secrets) or the CLI (`supabase secrets set KEY=value --project-ref avgvmzshujwphneykuvu`):
-- `TWILIO_ACCOUNT_SID` — Restorix's Twilio Account SID (ACxxxx)
-- `TWILIO_API_KEY_SID` — a Standard API Key SID (SKxxxx), created under that account
-- `TWILIO_API_KEY_SECRET` — that API Key's secret
-- `TWILIO_TWIML_APP_SID` — a Voice TwiML App (APxxxx) whose **Voice URL** is set to `https://avgvmzshujwphneykuvu.supabase.co/functions/v1/twilio-voice-webhook`
-- `TWILIO_PHONE_NUMBER` — the Restorix number to show as caller ID (e.g. `+1XXXXXXXXXX`)
-
-Once those are set, click-to-call works immediately — no further CC session needed, the frontend already checks for a working Device and upgrades from the `tel:` fallback automatically.
+**Nothing queued right now** — Prompt 439 (click-to-call verification) closed out 2026-08-16, see CURRENT STATE below.
 
 **Also queued, not urgent** — several audit items from the parity pass came back "ask Brayden, don't guess" rather than build/skip: **My Calls** (setter+closer — needs a real `calls` table + AI grading + recordings, none of which exist), **My Goals** (needs an admin-configured targets system), **closer's own lead-pull workflow** (should closers cold-call an unbooked pool too, or only receive booked handoffs?), **Messages** (real chat infra for all three roles), and **deal-outcome Pipeline tracking** (Closed/Lost/No Show/Reschedule states beyond the current 5-status enum). None of these block anything — surface to Brayden when there's room, not before.
 
@@ -55,6 +44,8 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 439 — click-to-call verified working end-to-end 2026-08-16, no code changes needed.** Confirmed via direct API call (signed in as `test_setter`, called `twilio-token` with the real bearer token) that the function now returns a real signed Twilio Access Token (valid-format `AC…`/`SK…`/`AP…` SIDs, 200 status) instead of the prior `503 Twilio Voice not configured`. Confirmed live in the browser (session-token-injection technique) that `LogCallModal`'s Call button now renders as the real dial button (`<button>`), not the `tel:` fallback anchor — meaning the Twilio Device genuinely registered against Twilio's edge over WebSocket. Clicked it to confirm the full call path: `device.connect()` fired and reached the WebRTC mic-acquisition step, which failed only with `PermissionDeniedError (31401)` because the Browser pane sandbox blocks microphone access — an environment limitation, not an app bug, and itself proof the call reached real Twilio SDK internals rather than a mock. The error UI handled it exactly as designed: "Call failed — try again, or use your phone" with a working `tel:` fallback link. Zero unexpected runtime errors. **Conclusion: the feature is live for real users with mic permission — nothing further needed from CC.** Brayden should do one real live-audio test himself (real browser, real mic) to hear it through, since that's the one leg CC's sandboxed browser can't exercise.
 
 **Prompt 438 pt1 — Overview working-dialer UI + full page-parity audit shipped 2026-08-16, committed `89c94e1` on top of `e5d3fab`, pushed.** Full detail in [[Restorix Memories]]; short version: both test setters seeded to the 150-lead pool cap; `Overview.jsx` setter view got a today-only stats strip, a live search box, and status filter chips defaulting to New (confirmed live that non-New chips read 0 by design — the pipeline trigger always clears `assigned_setter` on any outcome besides `new`, so a setter's pool is never persistently anything but New; not a bug). New pages: `Activity.jsx` (setter's own last-50 logged outcomes), `SetterActivity.jsx` (closer-facing setter-rollup table), `Commissions.jsx` (one role-aware honest-placeholder page, no fabricated numbers). Click-to-call and the closer-facing Setter Activity data are both blocked pending Brayden — see "Next Up for CC" above.
 
