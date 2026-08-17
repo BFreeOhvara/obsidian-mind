@@ -14,14 +14,20 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
-### Prompt 438 pt2 — blocked on two of Brayden's answers, nothing else queued
+### ⚠️ Brayden action needed — set 5 Twilio secrets to activate click-to-call
 
-Part A (seed data, today-strip, search, status chips) and Part B (full page-parity audit — Activity, Setter Activity, Commissions built; several items correctly punted to "ask Brayden" rather than guessed) shipped 2026-08-16, committed `89c94e1`, pushed. Full detail in [[Restorix Memories]]. Two items left, both need Brayden's explicit answer before CC can finish:
+Prompt 438 fully shipped 2026-08-16 (`89c94e1` + `bfe98b8`, pushed). Both blockers from pt1 got explicit answers and are done: the `profiles` RLS widening (closers can now read setter-role rows) was approved and applied — Setter Activity confirmed showing real data. Twilio confirmed as Restorix's own account (not Ohvara's) — `twilio-token` and `twilio-voice-webhook` edge functions are deployed and `LogCallModal` has a real Call section wired in, currently falling back to a `tel:` link because the account isn't configured yet.
 
-1. **Twilio account/credentials for Restorix.** Click-to-call isn't wired yet. `ohvara-dashboard`'s real pattern needs `TWILIO_ACCOUNT_SID`, `TWILIO_API_KEY_SID`, `TWILIO_API_KEY_SECRET`, `TWILIO_TWIML_APP_SID`, and `TWILIO_PHONE_NUMBER` as Supabase secrets on the `avgvmzshujwphneykuvu` project — does Restorix have its own Twilio account/number (separate from Ohvara's), and if so what are they? Once answered, CC ports `CallModal.jsx` + `twilio-token`/`twilio-voice-webhook` edge functions into the portal's Log Call action.
-2. **Approve a `profiles` RLS widening.** Setter Activity (closer-facing "who's feeding my pipeline" page) is built and correct, but shows "No setters yet" for every closer because `profiles_select`'s RLS only allows `auth.uid() = id OR my_role() = 'admin'` — a closer can't read a setter's name. The fix is a one-line policy addition (`OR (my_role() = 'closer' AND role = 'setter')`), tightly scoped to setter-role rows only, but `apply_migration` was correctly blocked by the auto-mode classifier as a real permission-widening change and needs Brayden's yes before it lands.
+**Only remaining step, and it's yours to do (CC doesn't handle API keys/secrets directly, by design):** set these 5 secrets on the `avgvmzshujwphneykuvu` Supabase project — either via the Supabase dashboard (Edge Functions → Secrets) or the CLI (`supabase secrets set KEY=value --project-ref avgvmzshujwphneykuvu`):
+- `TWILIO_ACCOUNT_SID` — Restorix's Twilio Account SID (ACxxxx)
+- `TWILIO_API_KEY_SID` — a Standard API Key SID (SKxxxx), created under that account
+- `TWILIO_API_KEY_SECRET` — that API Key's secret
+- `TWILIO_TWIML_APP_SID` — a Voice TwiML App (APxxxx) whose **Voice URL** is set to `https://avgvmzshujwphneykuvu.supabase.co/functions/v1/twilio-voice-webhook`
+- `TWILIO_PHONE_NUMBER` — the Restorix number to show as caller ID (e.g. `+1XXXXXXXXXX`)
 
-Also queued but not urgent — several audit items came back "ask Brayden, don't guess" rather than build/skip: **My Calls** (setter+closer — needs a real `calls` table + AI grading + recordings, none of which exist), **My Goals** (needs an admin-configured targets system), **closer's own lead-pull workflow** (should closers cold-call an unbooked pool too, or only receive booked handoffs?), **Messages** (real chat infra for all three roles), and **deal-outcome Pipeline tracking** (Closed/Lost/No Show/Reschedule states beyond the current 5-status enum). None of these block anything — surface to Brayden when there's room, not before.
+Once those are set, click-to-call works immediately — no further CC session needed, the frontend already checks for a working Device and upgrades from the `tel:` fallback automatically.
+
+**Also queued, not urgent** — several audit items from the parity pass came back "ask Brayden, don't guess" rather than build/skip: **My Calls** (setter+closer — needs a real `calls` table + AI grading + recordings, none of which exist), **My Goals** (needs an admin-configured targets system), **closer's own lead-pull workflow** (should closers cold-call an unbooked pool too, or only receive booked handoffs?), **Messages** (real chat infra for all three roles), and **deal-outcome Pipeline tracking** (Closed/Lost/No Show/Reschedule states beyond the current 5-status enum). None of these block anything — surface to Brayden when there's room, not before.
 
 ---
 
