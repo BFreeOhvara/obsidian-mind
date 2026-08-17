@@ -31,9 +31,24 @@ Treatment centers lose admissions to slow/missed intake response. Restorix insta
 
 **Tone note:** this population is crisis-sensitive — copy should never read as "shop for a clinic." Handle with care throughout, distinct from Ohvara's direct-response sales tone.
 
+## The Stack
+
+The actual AI infrastructure Restorix installs per client — same model Ohvara originally used (1-2 front-runner agents that solve the core problem + supporting sub-agents), not a fixed package. Confirmed with Brayden 2026-08-17.
+
+**Front-runners:**
+- **Inbound Intake & Triage agent** — answers every call/form/text instantly, does level-of-care and insurance pre-screening, books or routes to a human.
+- **Missed-Call Recovery agent** — unanswered call triggers an auto text/call-back within minutes.
+
+**Sub-agents:**
+- Insurance/payer verification, in real time during intake.
+- Follow-up & nurture sequence for leads that don't convert same-day (common in this niche — decision often isn't immediate).
+- Bed/program availability sync before booking an intake appointment.
+- After-hours crisis-language routing — detects high-risk language and bails out of automation straight to a human/on-call clinician rather than continuing the automated flow.
+- Referral-source reporting for the facility's business development side.
+
 ## Reference Site
 
-**regenix.io** — Brayden wants the marketing site's page structure AND visual caliber to match closely, explicitly not a generic AI-page-builder look. Wording/content differs (different niche). **Corrected 2026-08-14 (Prompt 427):** the site is actually a light sage/mint theme (`#e5ecea` bg, near-black text) with a teal accent (`#07775f`/`#2fd6b4`/`#055c49`), Space Grotesk + Manrope + JetBrains Mono, soft radial glow blobs, pill buttons — not the dark/neon theme originally assumed here. Confirmed against the live site's actual computed styles, and confirmed with Brayden to match it exactly rather than keep the dark-theme assumption.
+**regenix.io** — starting point only, not the final look. Brayden originally wanted the marketing site's structure AND visual caliber to match closely (**corrected 2026-08-14, Prompt 427:** it's a light sage/mint theme, `#e5ecea` bg, near-black text, teal accent `#07775f`/`#2fd6b4`/`#055c49`, Space Grotesk + Manrope + JetBrains Mono, soft radial glow blobs, pill buttons — not the dark/neon theme originally assumed). **Updated 2026-08-16, Prompt 430:** Brayden then had it deliberately differentiated so it doesn't read as a copy — accent shifted to cornflower blue (`#3a63d6`/`#7c9eff`/`#24469e`), animation timing/easing reworked, and every section's layout/composition rebuilt (not just restyled) while keeping the same content. Regenix is now a structural/quality reference only, not a visual match target.
 
 ## Current Focus
 
@@ -43,4 +58,4 @@ See [[Restorix LIVE_STATE]] "Next Up for CC" for the live build queue.
 
 - [[Restorix LIVE_STATE]] — current state + build queue
 - [[Restorix Memories]] — session log
-- [[ohvara_legacy_setter_pipeline_dead]] — Ohvara's dead setter pipeline; reference for the *shape* of a dialer workflow only, not code to revive
+- [[ohvara_legacy_setter_pipeline_dead]] — Ohvara's dead pre-pivot setter pipeline. **Updated 2026-08-17:** this isn't just a shape-reference anymore — Ohvara's original pre-pivot product (general AI-automation agency) is what Restorix now *is*, in this niche. Its old lead-batch/pipeline logic is being ported and rebuilt live inside Restorix's own Supabase project (see [[Restorix LIVE_STATE]] Prompt 437), and its pre-pivot dashboard (via git history, not current live Ohvara) is the reference for portal features current Ohvara doesn't have anymore (Activity, Commission, etc. — current Ohvara is insurance-only and stripped down).
