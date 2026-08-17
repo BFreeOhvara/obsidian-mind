@@ -14,7 +14,45 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
-*(queue empty — see "Also still queued, not urgent" below for open, non-blocking items)*
+### Prompt 453 — Account popover (Profile + Sign out) + new Profile and Settings pages
+
+Reference: `ohvara-dashboard`'s bottom-left sidebar account block — clicking the name/avatar opens a small popover above it with "Profile" and "Sign out" as menu items (read that component directly for the exact interaction pattern, same porting approach as everything else this session).
+
+1. **Make the bottom-left account block clickable**, opening a popover with two items: **Profile** (navigates to a new Profile page) and **Sign out** (existing logout action, just relocated into the popover instead of the current bare logout icon next to the name).
+2. **Build a real Profile page** — doesn't exist yet. Reasonable default scope: view/edit own name, see own role, maybe change password (there's currently no change-password UI anywhere in the app per Prompt 428's original notes — this could be the natural place for it). Ask Brayden directly if the exact scope is unclear rather than over-building.
+3. **Add a Settings page as its own sidebar nav item** (not inside the popover — separate from Profile/Sign out, a full nav entry like Ohvara has under its ACCOUNT group). Brayden didn't specify exact placement or section — use judgment (WORK section is a reasonable fit) or ask him directly if genuinely unclear once you're looking at the real nav. Scope for Settings itself is also undefined — check what Ohvara's own Settings page actually contains as a starting reference, then confirm with Brayden what's relevant for Restorix before over-building.
+
+Verify with screenshots: the account popover open, the new Profile page, and the new Settings page.
+
+### Prompt 452 — My Goals: badges redesign, one box + game-like feel
+
+Follow-up to Prompt 443's badge build. Two changes:
+
+1. **Consolidate all badges into a single box**, not the current 4 separate cards (Dials/Bookings/Perfect Days/Commission) plus Back-to-Back/Hat Trick floating outside any box entirely. One container, with each category (Dials, Bookings, Perfect Days, Commission, and a new **Special** category for Back-to-Back + Hat Trick) as a labeled row/section inside it — Special should look the same as the other category rows (in-box pill badges), not the current card-with-description treatment those two have now.
+2. **More game-like visual treatment** — Brayden's words: badges should feel like you're actually *unlocking* something, achievement-style (think game/console achievement panels), not plain gray locked pills. Add an icon or emoji per badge, and some kind of visual distinction between locked/unlocked state beyond just the lock icon + grayscale currently used (e.g. unlocked badges could get color/glow/fill, locked ones stay muted — use judgment on the specific treatment, doesn't need Brayden's sign-off on exact styling).
+
+Verify with a screenshot of the redesigned single badge box.
+
+### Prompt 451 — Activity + My Calls: scrollable box + day-by-day filter
+
+Applies to both `Activity.jsx` and `My Calls` (Prompt 447) — same pattern requested for both pages:
+
+1. **Internally-scrollable list container**, same treatment as the Overview lead table from Prompt 440 item 6 — fixed-height box with its own scrollbar, not the whole page scrolling.
+2. **Day-by-day filter/paginator above the box**, top-right: shows the currently-viewed date (e.g. "August 17"), with left/right arrows to step to the previous/next day (Aug 16 ← Aug 17 → Aug 18). Replaces the current "last 50 logged outcomes" flat list on Activity — list shows only that day's items, paginated by day instead of a flat recency-capped feed. Default to today on page load.
+
+Verify with a screenshot showing the date paginator and scrollable box on both pages, and confirm clicking the arrows actually changes which day's items are shown (may need a couple more days of seeded test activity if everything's currently on one or two days).
+
+### Prompt 450 — Stats page: weekly line chart + 21-day activity heatmap
+
+Two new visualizations on `Stats.jsx`, both need a new per-day data query (dials + bookings grouped by day) that doesn't exist yet — the page currently only has date-range aggregate totals, not a daily breakdown.
+
+**1. Line chart — current work week (Monday through Friday only, not weekend).** Two lines: blue = dials/calls logged that day, green = bookings that day. Standard line/area chart, x-axis = the 5 weekdays. Ask Brayden directly if it's ambiguous once building whether this should always show the *current* week only, or be navigable to past weeks — he didn't specify.
+
+**2. 21-day activity heatmap — 3 rows × 7 columns, GitHub-contribution-graph style, most recent 21 calendar days (including weekends, unlike the line chart above).** Color logic per day, in this exact priority order:
+- If that day hit **both** 150 dials AND 2 bookings (the existing "Perfect Day" definition from the badge system in Prompt 443 — reuse that same logic/constant, don't redefine it) → the box is **green**, full stop.
+- Otherwise → the box is a **white-to-dark-gray gradient based on dial count alone** (0 dials = white, 150 dials = darkest gray, proportional in between), **regardless of whether bookings happened that day**. A day with 2 bookings but only 145/150 dials does NOT turn green — it stays in the gray gradient at whatever intensity 145 dials maps to. Booking count only matters for the green override, not for the gray gradient's intensity.
+
+Verify with a screenshot of both new elements on Stats, using the seeded test data (may need a few more days of varied test activity logged across different days if the current test data is all same-day, to make the heatmap/chart actually show variation).
 
 **Also still queued, not urgent** — remaining audit items from the parity pass: **closer's own lead-pull workflow** (should closers cold-call an unbooked pool too, or only receive booked handoffs?) and **deal-outcome Pipeline tracking** (Closed/Lost/No Show/Reschedule states beyond the current 5-status enum). None of these block anything — surface to Brayden when there's room, not before.
 
@@ -46,6 +84,8 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 449 — sidebar section order changed, shipped 2026-08-17, verified locally and live for setter.** Committed `b7b8740` on top of `f642c5c`, pushed and auto-deployed. `NAV_GROUPS` in `Layout.jsx` reordered to TODAY → RESOURCES → PERFORMANCE → WORK (was TODAY → WORK → PERFORMANCE → RESOURCES); group contents unchanged, ADMIN left last (position wasn't specified). Verified via `read_page` for `test_setter` — new order renders exactly as requested. Screenshot verification attempted and failed the same way as every prior session (Browser pane can't composite frames here) — DOM order check substituted.
 
 **Prompt 448 — sidebar grouped into labeled sections, shipped 2026-08-17, verified locally and live for setter.** Committed `f642c5c` on top of `41f9a2f`, pushed and auto-deployed. Flat nav → 5 labeled groups (TODAY/WORK/PERFORMANCE/RESOURCES/ADMIN) in `Layout.jsx`, matching `ohvara-dashboard`'s grouped-sidebar pattern; header style reuses the app's existing `.eyebrow` class (`!text-fg-faint` for the muted tone) rather than new CSS. Verified via `read_page` + `getComputedStyle` for `test_setter` (correct grouping, correct role-filtering, real uppercase/muted/letter-spaced header styling) — see [[Restorix Memories]] for full detail. **Admin's ADMIN group unverified live** — see "Flag for Brayden" above.
 
