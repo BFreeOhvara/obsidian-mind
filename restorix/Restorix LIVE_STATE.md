@@ -14,18 +14,13 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
-### Prompt 489 — Harden the public marketing-chat endpoint against abuse/cost attacks
+**Empty as of 2026-08-18** — Prompt 489 (marketing-chat endpoint hardened: RLS, a real RPC-bypass gap found along the way, CORS, payload validation) shipped this session. See CURRENT STATE below for what's live.
 
-Brayden's explicit request 2026-08-18: the chatbot (Prompt 471) hits a real paid Anthropic API key from a fully public, unauthenticated endpoint — he wants confirmation it's not exposed to abuse/rate-limit attacks. Four concrete things, not a vague "review security" ask:
+---
 
-1. **Fix the already-flagged real gap first**: `public.marketing_chat_rate_limit` has RLS disabled (surfaced incidentally during Prompt 488, not yet fixed — see the flag left in this doc). Enable RLS and add real policies: the edge function itself uses the service-role client so it bypasses RLS entirely and keeps working; add a policy set that blocks `anon`/`authenticated` from reading or writing this table directly at all (no legitimate client-side reason to ever touch it directly — only the edge function should). Verify via `get_advisors` that the warning clears.
-2. **Restrict CORS on the `marketing-chat` edge function to the real site origin only** (`https://restorix.co` and whatever preview/staging origins are legitimate) — right now nothing stops a different website from calling this endpoint directly and burning the API key on Restorix's dime.
-3. **Add basic payload validation** — cap `message` length and `history` array size/length server-side before it ever reaches the Anthropic API call, so a malicious oversized payload can't run up token cost or degrade the function. Reject with a clean error, don't silently truncate.
-4. **Run a full `get_advisors` pass on the whole project while in here**, not just the one table — catch anything else exposed that hasn't surfaced yet, same standing practice this project already follows after schema/function changes.
+### ⚠️ Also surfaced, out of scope for Prompt 489 — pre-existing advisories unrelated to marketing-chat
 
-**Not in scope for CC — flag back to Brayden, don't attempt:** setting an actual spend/usage cap on the Anthropic account itself is an account-billing setting only Brayden can set directly in the Anthropic Console (Settings → Billing/limits) — recommend he do this regardless of what ships here, since a hard spend ceiling is the real backstop if every other layer somehow gets bypassed.
-
-**Verify:** confirm a direct `anon`-key request to `marketing_chat_rate_limit` (bypassing the edge function) is now rejected; confirm a request from a non-restorix.co origin is rejected by CORS; confirm an oversized payload is rejected cleanly rather than processed; confirm the real chat widget still works end-to-end afterward (don't break the legitimate path while locking down the illegitimate ones); confirm `get_advisors` is clean.
+Ran the full `get_advisors` pass Prompt 489's item 4 asked for. Two items it fixed (RLS-disabled `marketing_chat_rate_limit`, the `check_marketing_chat_rate_limit` RPC being directly callable by `anon`) are confirmed clear — see CURRENT STATE. Everything else the pass surfaced is pre-existing and has nothing to do with the public marketing chat, not touched this session: `public.app_secrets` has RLS enabled with no policies (INFO — may well be intentional, not investigated); the `pg_net` extension is installed in the `public` schema instead of its own (WARN); `my_role()`/`update_own_full_name()`/`update_own_timezone()` are `SECURITY DEFINER` functions callable by any `authenticated` user (WARN — these are the portal's own logged-in-user self-service RPCs, very likely intentional by design, not re-verified); leaked-password protection is disabled at the Auth level (WARN, account-wide setting). Also a full page of `PERFORMANCE` advisories (unindexed FKs on `leads`/`invites`/`no_answer_queue`/`follow_up_queue`, several RLS policies re-evaluating `auth.<fn>()` per-row instead of `(select auth.<fn>())`) — none introduced by this session's changes. Flagging for a future prompt if Brayden wants any of these addressed.
 
 ---
 
@@ -35,9 +30,9 @@ Prompt 488 (delete `test_setter2`/`test_closer2` entirely) is done except for th
 
 ---
 
-### ⚠️ Also surfaced, unrelated to Prompt 488 — RLS disabled on `public.marketing_chat_rate_limit`
+### ✅ Resolved in Prompt 489 — RLS disabled on `public.marketing_chat_rate_limit`
 
-Noticed incidentally while investigating Prompt 488 (via a `list_tables` call on the `restorix-portal` Supabase project, which is where Prompt 471 deployed the `marketing-chat` edge function's rate-limit table even though it serves the marketing site). The Supabase advisor flagged: Row Level Security is disabled on `public.marketing_chat_rate_limit` — it's fully exposed to the `anon`/`authenticated` roles, meaning anyone with the public anon key could read or write every row (in practice: see or forge rate-limit counters for the public chat widget). Not fixed — the standard remediation (`ALTER TABLE public.marketing_chat_rate_limit ENABLE ROW LEVEL SECURITY;`) would need real policies added alongside it or it silently blocks all access (including the edge function's own legitimate writes), and that's a real design decision, not a blind one-liner to auto-apply. **Prompt 489 (above) is the fix for this specific item — its item 1.**
+Flagged incidentally during Prompt 488, fixed in Prompt 489 — see CURRENT STATE.
 
 ---
 
@@ -64,6 +59,19 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 489 — Public `marketing-chat` endpoint hardened against abuse/cost attacks, shipped and verified live 2026-08-18 on the `restorix-portal` Supabase project (`avgvmzshujwphneykuvu`).** Four things, all confirmed via real requests, not just code review:
+
+1. **`public.marketing_chat_rate_limit` RLS enabled, zero policies** (`ALTER TABLE ... ENABLE ROW LEVEL SECURITY`) — the edge function's `service_role` client bypasses RLS entirely and keeps working; `anon`/`authenticated` get default-deny. Confirmed live: a direct anon-key `GET` against the table now returns `[]` instead of real rows.
+2. **A real bypass gap found while verifying item 1, not part of the original ask:** `check_marketing_chat_rate_limit` is `SECURITY DEFINER` and was directly callable via `/rest/v1/rpc/check_marketing_chat_rate_limit` with arbitrary `p_ip`/`p_limit` — meaning anyone could call it directly (bypassing the edge function and RLS, since `SECURITY DEFINER` runs as the owner) to corrupt *other real visitors'* rate-limit counters. First `REVOKE EXECUTE ... FROM anon, authenticated` didn't actually work — a live test still succeeded — traced to `PUBLIC` still holding `EXECUTE` (Postgres's default grant on new functions, which every role inherits regardless of a per-role revoke). Fixed with a second migration explicitly revoking from `PUBLIC`; re-tested and confirmed a direct anon-key RPC call now correctly returns `42501 permission denied`.
+3. **CORS restricted from a wildcard `*` to a real per-request origin allowlist** (`https://restorix.co` + local dev ports, since `ChatWidget.jsx` calls this function's absolute production URL directly even from local dev) — computed per-request in `corsHeadersFor()`, plus an explicit server-side 403 for any present-but-disallowed `Origin` (stronger than plain CORS, which only stops browsers, not a spoofed direct request). Confirmed live: request with `Origin: https://evil-site.example.com` → `403 {"error":"Origin not allowed"}`; preflight `OPTIONS` from a disallowed origin comes back with no `Access-Control-Allow-Origin` header at all (browser-blocked); from `restorix.co` it correctly echoes that origin.
+4. **Payload validation, rejecting rather than silently truncating** (Brayden's own explicit instruction): `message` still capped at 2000 chars; `history` now rejected outright with a clean 400 if it exceeds 10 turns or any turn's `content` exceeds 2000 chars, replacing the old silent `.slice(-10)`. Confirmed live: an 11-turn history → `400 {"error":"history exceeds max 10 turns"}`; a 2500-char message → `400` with a clear error.
+
+**The legitimate path re-verified working end-to-end after all of the above**, not assumed still-fine: a real request from `Origin: https://restorix.co` asking about the Missed-Call Recovery sub-agent got a real, accurate, on-brand reply.
+
+**Full `get_advisors` pass run on the whole project (both `security` and `performance`), per item 4's own instruction, not just the one table.** Both fixed items confirmed cleared from the security advisor output. Everything else it surfaced is pre-existing and unrelated to marketing-chat — flagged separately above, not touched this session (not in scope, and several look like intentional design, e.g. the portal's own authenticated-only self-service RPCs).
+
+**Not in scope, flagged back to Brayden per the prompt's own explicit instruction:** an actual Anthropic spend/usage cap is an account-billing setting only he can set (Anthropic Console → Settings → Billing/limits) — recommended regardless of everything shipped here, since it's the real backstop if every other layer somehow gets bypassed.
 
 **Prompt 488 — `test_setter2`/`test_closer2` fully deleted from the database, shipped 2026-08-18, one manual step left for Brayden (see flag above).** Brayden confirmed he's done reviewing the round-robin/redistribution proof these two accounts existed for. Investigated dependencies first rather than deleting blind — found 155 leads assigned to them (confirmed 100% `TEST`/`TEST437`/`TEST438`-prefixed test fixtures, zero real SAMHSA-scraped facilities, safe to delete outright rather than just unassign), 5 completed historical `no_answer_queue` redistribution-audit rows, 2 `messages`, 2 `invites`. Ran one ordered transaction in the `restorix-portal` Supabase project (`avgvmzshujwphneykuvu`): cleaned queue/call rows referencing those leads, deleted the 155 test leads, cleaned messages/invites/queue rows referencing the accounts directly, deleted the two `profiles` rows. **`auth.users` deletion was blocked by this session's runtime safety classifier** (a platform-level control on top of Brayden's own already-recorded confirmation) — asked directly rather than trying to route around it; Brayden chose to delete the two auth users himself via the Supabase dashboard, a 30-second manual step, flagged above.
 
