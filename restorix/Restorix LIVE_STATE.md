@@ -14,6 +14,28 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
+### Prompt 487 — Closer Overview: match Setter's layout pattern, combine Log Outcome + Closer Survey in one popup
+
+Live review feedback 2026-08-18. Closer's own `Overview` currently renders as a flat stack of individual cards (per-lead, each with its own "Log outcome" button) — Brayden wants it restructured to match the visual pattern Setter's `Overview` already established: stat tiles at the top, then a bordered box containing the lead list with a real empty state, rows clickable to open a modal (not just a button inside each row).
+
+**Stat tiles at top** — mirror the shape of Setter Overview's tile row, scoped to this closer's own leads (`assigned_closer = auth.uid()`), not all closers (that's the admin Pipeline Closer tab's job). Reasonable default, use judgment if a cleaner grouping fits the existing data better: counts for **Pending / Needs Rescheduling / Lost / Closed** — the same four `closer_outcome` categories Prompt 464's Pipeline Closer tab already established, just scoped to one closer instead of all of them.
+
+**Lead list box** — same visual container pattern as Setter Overview's table (bordered box, real empty state like "No leads match this filter" when empty — closer's own equivalent, e.g. "No booked leads yet"). **Row click opens the popup** (same interaction as Prompt 440's Setter Overview row-click-opens-modal), not just the existing "Log outcome" button — keep the button too if useful, but clicking anywhere on the row should also work.
+
+**The popup itself needs to combine two things that are currently separate, both scoped to that specific lead:**
+1. The existing `LogOutcomeModal` fields (pick outcome, notes, the deal-value fields when Closed is selected per Prompt 468).
+2. Access to the **Closer Survey** (currently only reachable as its own standalone nav page) — Brayden wants closers able to run the survey for *this specific lead* from inside the same popup, not have to leave to a separate page mid-call. Exact layout is a judgment call (e.g. a tab/toggle within the modal switching between "Log outcome" and "Survey," or the survey expanding inline within the same modal) — the requirement is one popup giving access to both, launched from clicking the lead.
+
+**Keep the standalone Closer Survey nav page too** — this is additive, not a replacement; Brayden didn't ask to remove the general-purpose version, just wants it also reachable in-context per lead.
+
+**Verify:** confirm the stat tiles show correct counts for a real test closer's own leads only; confirm clicking a lead row opens the popup; confirm both Log Outcome and the Closer Survey are genuinely reachable from that one popup for that one lead; confirm the standalone Closer Survey page still works unchanged; confirm the empty state renders correctly for a closer with zero booked leads.
+
+---
+
+**Empty as of 2026-08-18** — Prompt 486 (hero wave SMIL `keyTimes` gap and filter-region clip fixed) shipped this session. See CURRENT STATE below for what's live.
+
+---
+
 **Empty as of 2026-08-18** — Prompt 485 (hero wave ported verbatim from the approved reference file, glass-card exact values applied, and the real white-text contrast bug Prompt 484 couldn't reproduce was found and fixed) shipped this session. See CURRENT STATE below for what's live.
 
 ---
@@ -56,6 +78,12 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 486 — Hero wave's two real bugs from 485 (no motion, hard cutoff line) fixed, shipped 2026-08-18, not yet confirmed live.** Commit `cb2d5ed` on top of `f642f1f`. Added explicit `keyTimes="0;0.33;0.67;1"` to both `<animate>` elements — `calcMode="spline"` requires `keyTimes` per the SMIL spec to define the interval boundaries `keySplines` eases between; the reference file omits it (relying on an implicit default), a real spec gap that can make a strict engine treat the whole animation as invalid and simply not run it. Switched the blur filter from the default `objectBoundingBox` percentage region to `filterUnits="userSpaceOnUse"` with an explicit, generous region (`x="-500" y="-400" width="2400" height="1600"`) — `objectBoundingBox` regions are a documented source of inconsistent cross-browser handling for stroked-but-unfilled paths specifically (implementations vary on whether the bounding box accounts for `stroke-width`, 230 on the outer path here), and an under-sized region clips the blur's soft falloff at a hard edge instead of letting it fade, matching the reported cutoff exactly.
+
+**Also investigated and reverted a third change** — tried removing the `h-full w-full` classes on the theory `inset-0` alone should be sufficient and more robust (the prompt's own suggested hypothesis). Verified experimentally that removing them makes the SVG (a replaced element with an intrinsic aspect ratio from its own viewBox) fall back to computing height from that 12:7 ratio instead of stretching to the section's real height — a confirmed, precisely measured 48.7px shortfall (predicted-from-ratio height matched the observed shortfall to five significant figures) that IS itself a container-height mismatch bug. Kept `h-full w-full`.
+
+**Verified:** `npm run build`/`npm run lint` clean, zero console errors at desktop and mobile. Confirmed the SVG's rendered box now matches the hero section's own box exactly (height AND width) at both desktop (1280×900) and mobile (375×812) viewports — measured via `getBoundingClientRect()`, not assumed. Confirmed `keyTimes` and the new filter attributes are present and correct in the live DOM. **Could not directly observe real motion** — SMIL, like every other frame-tied animation type logged this session (CSS `@keyframes`, framer-motion, `requestAnimationFrame`), never visibly advances past its first frame in this project's own verification pane, and screenshot tooling was unavailable again. Verified by construction (the spec gap is real and the fix is a standard, well-documented corrective) rather than claimed confirmed — **worth a direct look at restorix.co once deployed** to confirm the ripple is now actually visible and the cutoff is gone.
 
 **Prompt 485 — Hero wave ported verbatim from the Brayden-approved `restorix-hero-wave-approved.html` reference, glass-card exact values applied, real white-text contrast bug found and fixed, shipped 2026-08-18, not yet confirmed live.** Commit `f642f1f` on top of `5cd74bd`. Supersedes Prompts 479–483 entirely — every prior hero-background attempt was wrong and got reworked live with Brayden through several rounds against a standalone HTML mockup before this one was approved; ported that file's actual technique verbatim rather than reinterpreting. `HeroWave` is now two overlapping SVG `<path>` strokes inside a shared `feGaussianBlur(32)` filter, each animated via native SMIL `<animate>` between 4 keyframe `d` strings on an 18s spline-eased loop — `#7c9eff` width 230 opacity 0.7 (outer), `#3a63d6` width 100 opacity 0.6 (inner), geometry running left-wall-mid-height to off-canvas top-right, never touching the hero's bottom edge (avoids a scroll-cutoff artifact an earlier round hit). `prefers-reduced-motion` gates the `<animate>` children specifically since SMIL isn't controlled by that CSS media query the way `@keyframes` are. Live Intake card now uses the reference's exact `.glass-card` values via inline style (`rgba(255,255,255,0.55)` fill, `blur(20px)`, `1px solid rgba(255,255,255,0.8)` border, `16px` radius, `0 20px 60px rgba(58,99,214,0.15)` shadow), replacing 484's approximated values. All Prompt 479–483 CSS removed.
 
