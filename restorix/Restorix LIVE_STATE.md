@@ -14,14 +14,6 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
-### Prompt 474 — "My Calls" → "My Recordings" label, setter role only
-
-Live review feedback 2026-08-18. Rename the nav item and page `<h1>` from "My Calls" to "My Recordings" — **setter role only.** Closer and admin keep seeing "My Calls" exactly as-is, wherever they currently see it (check the actual current role-gating on this nav item/page before assuming — confirm whether closers/admin even see it today per Prompt 447's note that closers have no call-placing UI yet, don't guess). This is a label change only — no behavior, route, or data change, the page still shows the same call history it already does.
-
-**Verify:** log in as `test_setter`, confirm both the sidebar label and the page heading read "My Recordings". Log in as `test_closer` (and check admin if it's visible there too), confirm both still read "My Calls" unchanged.
-
----
-
 ### Prompt 471 — restorix-marketing: real AI chatbot, replaces the visual-placeholder from Prompt 467
 
 **Corrects Prompt 467's chat-widget scope.** Brayden clarified 2026-08-18: he wants a genuinely functional AI chatbot visitors can ask real questions to, not the visual-only placeholder that shipped (opens a static panel with a "Book a Strategy Call" link, no backend) — that was the wrong read of an intentionally-ambiguous question, correcting now with his real answer.
@@ -81,6 +73,10 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 474 — "My Calls" → "My Recordings" label, setter role only, shipped and verified 2026-08-18.** Commit `fc13110` on top of `e1ddaf0`, pushed and auto-deployed. Confirmed the actual role-gating before assuming, per the prompt's own instruction: `/my-calls` is visible to all three roles today (`roles: ['setter','admin','closer']`), no route restriction. Added a `labelByRole: { setter: 'My Recordings' }` field to the nav item in `Layout.jsx`, resolved at render time (`item.labelByRole?.[profile?.role] || item.label`); `MyCalls.jsx`'s `<h1>` does the equivalent role check directly. Same route, same data, label only — no behavior change.
+
+**Verified live with fresh logins for both roles:** `test_setter` shows "My Recordings" in both the sidebar nav and the page `<h1>`; `test_closer` shows "My Calls" unchanged in both places. Admin verified by construction (the `labelByRole` lookup only maps `setter`, so any other role — including admin — falls through to the unchanged default `'My Calls'` by the same deterministic code path already confirmed correct for closer) rather than using Brayden's real credentials. `npm run build`/`npm run lint` clean.
 
 **Prompt 475 — Stats heatmap dial-volume gradient recolored gray→blue accent, shipped and verified 2026-08-18.** Commit `e1ddaf0` on top of `9cbd3f9`, pushed and auto-deployed. `dialGrayColor` renamed `dialColor`, gradient end color changed from dark gray `(55,65,81)` to the portal's own accent blue `(58,99,214)` — same white-start, same `pct = min(1, dials/PERFECT_DAY_DIALS)` intensity math, only the end-color RGB triplet changed. Perfect Day green override (`var(--success)`) untouched — that conditional branch was never touched by this edit.
 
