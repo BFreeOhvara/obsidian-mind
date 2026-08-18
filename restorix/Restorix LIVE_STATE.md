@@ -14,6 +14,21 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
+### Prompt 489 — Harden the public marketing-chat endpoint against abuse/cost attacks
+
+Brayden's explicit request 2026-08-18: the chatbot (Prompt 471) hits a real paid Anthropic API key from a fully public, unauthenticated endpoint — he wants confirmation it's not exposed to abuse/rate-limit attacks. Four concrete things, not a vague "review security" ask:
+
+1. **Fix the already-flagged real gap first**: `public.marketing_chat_rate_limit` has RLS disabled (surfaced incidentally during Prompt 488, not yet fixed — see the flag left in this doc). Enable RLS and add real policies: the edge function itself uses the service-role client so it bypasses RLS entirely and keeps working; add a policy set that blocks `anon`/`authenticated` from reading or writing this table directly at all (no legitimate client-side reason to ever touch it directly — only the edge function should). Verify via `get_advisors` that the warning clears.
+2. **Restrict CORS on the `marketing-chat` edge function to the real site origin only** (`https://restorix.co` and whatever preview/staging origins are legitimate) — right now nothing stops a different website from calling this endpoint directly and burning the API key on Restorix's dime.
+3. **Add basic payload validation** — cap `message` length and `history` array size/length server-side before it ever reaches the Anthropic API call, so a malicious oversized payload can't run up token cost or degrade the function. Reject with a clean error, don't silently truncate.
+4. **Run a full `get_advisors` pass on the whole project while in here**, not just the one table — catch anything else exposed that hasn't surfaced yet, same standing practice this project already follows after schema/function changes.
+
+**Not in scope for CC — flag back to Brayden, don't attempt:** setting an actual spend/usage cap on the Anthropic account itself is an account-billing setting only Brayden can set directly in the Anthropic Console (Settings → Billing/limits) — recommend he do this regardless of what ships here, since a hard spend ceiling is the real backstop if every other layer somehow gets bypassed.
+
+**Verify:** confirm a direct `anon`-key request to `marketing_chat_rate_limit` (bypassing the edge function) is now rejected; confirm a request from a non-restorix.co origin is rejected by CORS; confirm an oversized payload is rejected cleanly rather than processed; confirm the real chat widget still works end-to-end afterward (don't break the legitimate path while locking down the illegitimate ones); confirm `get_advisors` is clean.
+
+---
+
 ### ⚠️ One manual step left for Brayden — Prompt 488's account deletion, auth.users blocked by the runtime classifier
 
 Prompt 488 (delete `test_setter2`/`test_closer2` entirely) is done except for the actual `auth.users` rows — see CURRENT STATE for full detail of what was cleaned up. Attempting `DELETE FROM auth.users` via the Supabase MCP's `execute_sql` was blocked by this session's own runtime safety classifier (a platform-level control, separate from and in addition to your own confirmation already recorded in the original task). Asked you directly rather than trying to route around it; you chose to handle the auth-user deletion yourself. **Still needed:** in the Supabase dashboard for the `restorix-portal` project (`avgvmzshujwphneykuvu`) → Authentication → Users, delete `test_setter2@restorix.internal` and `test_closer2@restorix.internal`. Everything else referencing them (public schema) is already gone — this is purely the auth-schema row, a 30-second manual step.
@@ -22,50 +37,17 @@ Prompt 488 (delete `test_setter2`/`test_closer2` entirely) is done except for th
 
 ### ⚠️ Also surfaced, unrelated to Prompt 488 — RLS disabled on `public.marketing_chat_rate_limit`
 
-Noticed incidentally while investigating Prompt 488 (via a `list_tables` call on the `restorix-portal` Supabase project, which is where Prompt 471 deployed the `marketing-chat` edge function's rate-limit table even though it serves the marketing site). The Supabase advisor flagged: Row Level Security is disabled on `public.marketing_chat_rate_limit` — it's fully exposed to the `anon`/`authenticated` roles, meaning anyone with the public anon key could read or write every row (in practice: see or forge rate-limit counters for the public chat widget). Not fixed — the standard remediation (`ALTER TABLE public.marketing_chat_rate_limit ENABLE ROW LEVEL SECURITY;`) would need real policies added alongside it or it silently blocks all access (including the edge function's own legitimate writes), and that's a real design decision, not a blind one-liner to auto-apply. Flagging for a future prompt, not touched this session.
-
-**Handle foreign keys carefully — this is test-account cleanup, not data loss.** Leads currently `assigned_setter`/`assigned_closer`/`last_action_by` pointing at either deleted account need to be reassigned or cleared rather than cascade-deleted along with the account — the leads themselves are real SAMHSA-sourced data (or legitimate seed data), not throwaway. Reasonable default: null out `assigned_setter`/`assigned_closer` on any lead pointing at a deleted account so the normal pipeline cron picks it back up into the pool/reassigns it, same as the existing no-answer/redistribution logic already does — don't leave orphaned FK references, and don't delete real lead rows just because a test account touched them. Same treatment for any `calls` rows tied to these accounts — decide whether to delete or keep for historical record, use judgment, but don't let a bad delete order break FK constraints.
-
-Update the 🔑 Test accounts section of this doc afterward to remove both entries, keeping only `test_setter`/`test_closer`.
-
-**Verify:** confirm both accounts are gone (auth + profiles), confirm `test_setter`/`test_closer` still work unaffected, confirm no orphaned leads/calls rows reference the deleted user IDs, confirm the pipeline crons still run cleanly afterward (no FK violations).
+Noticed incidentally while investigating Prompt 488 (via a `list_tables` call on the `restorix-portal` Supabase project, which is where Prompt 471 deployed the `marketing-chat` edge function's rate-limit table even though it serves the marketing site). The Supabase advisor flagged: Row Level Security is disabled on `public.marketing_chat_rate_limit` — it's fully exposed to the `anon`/`authenticated` roles, meaning anyone with the public anon key could read or write every row (in practice: see or forge rate-limit counters for the public chat widget). Not fixed — the standard remediation (`ALTER TABLE public.marketing_chat_rate_limit ENABLE ROW LEVEL SECURITY;`) would need real policies added alongside it or it silently blocks all access (including the edge function's own legitimate writes), and that's a real design decision, not a blind one-liner to auto-apply. **Prompt 489 (above) is the fix for this specific item — its item 1.**
 
 ---
 
-**Empty as of 2026-08-18** — Prompt 487 (Closer Overview restructured to match Setter's tile/table pattern, Log Outcome + Closer Survey combined into one modal) shipped this session. See CURRENT STATE below for what's live.
+### 🔑 Test accounts — live now, `test_setter2`/`test_closer2` fully cleaned up as of Prompt 488
 
----
-
-**Empty as of 2026-08-18** — Prompt 486 (hero wave SMIL `keyTimes` gap and filter-region clip fixed) shipped this session. See CURRENT STATE below for what's live.
-
----
-
-**Empty as of 2026-08-18** — Prompt 485 (hero wave ported verbatim from the approved reference file, glass-card exact values applied, and the real white-text contrast bug Prompt 484 couldn't reproduce was found and fixed) shipped this session. See CURRENT STATE below for what's live.
-
----
-
-### ✅ Resolved — the white/near-white text bug flagged in Prompt 484 was real, found and fixed in Prompt 485
-
-Prompt 484's contrast sweep against live `restorix.co` found nothing (0 elements below 3:1). Re-running the identical sweep in Prompt 485 found it: 4 paragraphs in `Leak.jsx` (the stage-body text) computing `color: rgb(229,236,234)` — exactly `--bg-base` — instead of `--text-secondary`, confirmed via `getComputedStyle` on live production. Root cause not fully pinned down (exactly one matching `.text-fg-secondary` CSS rule exists, the custom property itself resolves correctly when read directly, no duplicate elements, not tied to the Reveal wrapper's pre-animation opacity state) — fixed with a proven-effective explicit inline `style={{ color: 'var(--text-secondary)' }}` override, which always wins regardless of cause. Re-swept after the fix: zero low-contrast elements anywhere. See [[Restorix Memories]] for the full investigation trail.
-
----
-
-**Empty as of 2026-08-18** — Prompt 484 item 1 (Live Intake card glass panel restored, Nav's own glass-background bug found and fixed along the way) shipped this session. Item 2 (white-text audit) investigated, didn't reproduce, flagged above rather than guessed at. See CURRENT STATE below for what's live.
-
----
-
-**Empty as of 2026-08-18** — Prompt 482 (ambient glow flat fill + organic border-radius morphing) shipped this session. See CURRENT STATE below for what's live.
-
----
-
-### 🔑 Test accounts — live now, pipeline demo state, waiting on Brayden's review (not yet cleaned up)
-
-Real, working accounts on the live `restorix-portal` — **do not delete until Brayden says he's done reviewing.** All passwords `Test1234!`. Usernames use underscores, not the periods the original prompts suggested — the username validation regex (`[a-z0-9_-]+`, from Prompt 428) doesn't allow periods.
+Real, working accounts on the live `restorix-portal`. All passwords `Test1234!`. Usernames use underscores, not the periods the original prompts suggested — the username validation regex (`[a-z0-9_-]+`, from Prompt 428) doesn't allow periods.
 
 - `test_setter` — pool seeded to the full 150-lead cap as of Prompt 438 (`TEST438 —` prefixed rows added on top of the earlier `TEST —`/`TEST437 —` demo leads). Today-strip showed 2 logged / 1 booked / 50% as of that session.
-- `test_setter2` — also seeded to the full 150-lead cap as of Prompt 438. Originally created to prove redistribution spreads across people, not back to the same setter.
-- `test_closer` — 4 Appointment Booked leads assigned (3 from Prompt 436 + 1 round-robin from this session).
-- `test_closer2` — created fresh this session to prove round-robin; has 2 Appointment Booked leads assigned, confirming alternation actually happened (closer → closer2 → closer, not always the same one).
+- `test_closer` — 4 Appointment Booked leads assigned (3 from Prompt 436 + 1 round-robin from a prior session).
+- `test_setter2`/`test_closer2` — **deleted as of Prompt 488** (profiles/leads/messages/invites/queue rows all removed; `auth.users` rows still need Brayden's manual dashboard deletion, see flag above). Existed only to prove round-robin/redistribution spreads across people rather than back to the same person — that's proven and logged, no longer needed.
 - **Live pipeline-health demo state, intentionally left non-zero for Brayden to see on Admin's Overview:** 2 unassigned-pool leads, 2 leads in no-answer cooldown (including 2 backfilled queue rows for leads that predated this migration — see CURRENT STATE), 0 follow-ups due today (accurate — nothing is genuinely due today in the seeded data, not a bug).
 - **Admin's own Overview/rollup view still not simulated** — same reasoning as Prompt 436: doing so would need either Brayden's real password or a privilege-escalation DB write, and the classifier correctly blocks both. Verified via source review + direct SQL cross-checks against the exact queries the admin page runs (see CURRENT STATE) instead.
 
