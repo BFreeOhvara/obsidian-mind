@@ -1,5 +1,5 @@
 ---
-date: 2026-08-17
+date: 2026-08-18
 description: "Single current-state doc for all Restorix sessions — overwritten on update, never appended. Restorix's own vertical, independent of Ohvara's brain/LIVE_STATE.md."
 tags:
   - restorix
@@ -14,7 +14,51 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
-**Flag for Brayden — Prompt 464's admin Pipeline page (both Setter and Closer tabs) is unverified live:** same standing gap as every admin-only view in this project — no safe test-admin account exists (`invites` only allows `role in (setter, closer)`), so it's verified by construction (code review + a direct API call proving the Setter tab's exclusion filter is real server-side, not client-side) rather than rendered live. The closer-facing half (Log Outcome action, RLS boundary) *was* verified live end-to-end via `test_closer`.
+**Flag for Brayden — Prompt 464's admin Pipeline page (both Setter and Closer tabs) is unverified live:** ~~no safe test-admin account exists~~ **resolved 2026-08-18** — Brayden logged in live as `brayden`/ADMIN and reviewed both tabs directly (see Prompt 465 below, filed off that same live look).
+
+---
+
+### Prompt 466 — My Calls + Activity: never show an "In progress" row
+
+Live review feedback 2026-08-18 — Brayden looked at My Calls and saw rows sitting with outcome `In progress` / recording `Processing…` / no duration, for calls that were started but never got an outcome logged. He doesn't want these visible at all on either My Calls or Activity — **both pages should only ever show a call once a real outcome has been logged**, no "in progress" state should appear on either.
+
+Same fix on both pages (they already share the day-scoped-query pattern from Prompt 451/455). Investigate the actual `calls` table first, don't assume: it's likely a row gets inserted the moment a call attempt starts (before outcome logging), with `outcome` staying null until `LogCallModal`'s Save fires — this matches Prompt 443's badge system needing a real per-attempt dial count, so the row itself probably shouldn't be deleted (that would undercount Dials badges/Overview's Calls Made Today if it's counting rows rather than logged outcomes — check which it actually does before deciding). If that's the shape: **filter the display query on both pages to `outcome IS NOT NULL`**, same class of fix as Prompt 455's No Answer exclusion (a display-layer filter, not a schema change) — the underlying attempt data stays intact for anything that counts dials, it just stops surfacing as a dead-looking row on these two specific views.
+
+If investigation shows something different (e.g. dial-count badges pull from a separate source and don't actually need the unlogged row to exist), a cleaner delete-or-never-insert-until-logged approach may be simpler — use judgment, but confirm what actually depends on that row before removing it, since Prompt 443's badges were explicitly built off the `calls` table as "a genuinely more accurate all-time dial source."
+
+**Verify with real data:** the two `TEST437 — Facility I`/`Facility H` "In progress" rows visible in Brayden's screenshot are real live artifacts from Twilio-flow testing this session — confirm they either resolve (get a real outcome logged) or simply stop appearing on My Calls/Activity after the fix, and confirm Overview's Calls Made Today / badge Dials counts are unchanged by the fix (proving it's display-only, not a data loss).
+
+---
+
+### Prompt 467 — restorix-marketing: more visual motion/life (regenix.io as the caliber reference again), remove client-stories section
+
+Live review feedback 2026-08-18 — Brayden compared `restorix.co` side-by-side with regenix.io again (same reference site as Prompt 430, still **structural/quality reference only, not a visual-match target** — keep Restorix's own cornflower-blue/Space Grotesk/Manrope/JetBrains Mono language throughout everything below, don't pull in Regenix's teal). Four things:
+
+1. **Hero background ambient graphic.** Regenix's hero has a subtle animated dot/particle field with faint connecting lines and a soft colored glow/hue behind the headline. Restorix's hero is currently flat. Add an equivalent ambient background element — dots + connecting lines + soft glow — but tinted with Restorix's own accent (`#3a63d6`/`#7c9eff`), not Regenix's teal/green. Should read as ambient texture, not compete with the headline for attention.
+2. **Floating chat widget, bottom-right corner** — matching the visual treatment of Regenix's chat bubble (small circular floating button). **Ask Brayden directly before building the backend half**: is this a visual-only placeholder for now (opens nothing, or opens a simple "Book a Strategy Call" link/modal), or does he want it wired to something real (a live chat tool, a calendar embed, an actual AI agent)? Don't guess — a fake "chat with us" bubble that goes nowhere is worse than not having one, similar reasoning to why badges/commissions never show fabricated numbers.
+3. **Process section gets real motion, not just a static 5-item list.** Regenix's Process section has a circular diagram (5 nodes around a center hub) where the active step is highlighted and an arc/connector animates around the circle as you scroll through the corresponding text on the right — the diagram and the text list stay in sync. Build Restorix's own version of this interaction (own visual language, own node styling — same *behavior*, not a pixel copy): scroll-linked active-step highlighting, animated connector/arc motion between steps, applied to whatever Restorix's own process/system section already contains (5 steps per the existing Stack content, or however many the current section has — check the actual component before assuming the count matches Regenix's).
+4. **Remove the client-stories/testimonials section entirely.** Restorix has zero real clients yet — Brayden was explicit he doesn't want to imply otherwise. Find and delete that section from the marketing site (whichever of the original 8 sections from Prompt 427 it is), and adjust the surrounding section flow/spacing so it doesn't leave a gap. This is a hard rule already established for this project (no fabricated data/numbers/social proof anywhere) — this is that same rule applied to testimonials specifically.
+
+**Verify:** confirm the hero background renders and doesn't hurt Lighthouse/perf meaningfully (animated canvas/SVG backgrounds can be expensive — check), confirm the process section's scroll-sync actually works scrolling both directions, confirm the testimonials section is fully gone with no dead route/anchor link pointing at it (check nav links too, in case "Outcomes" or similar nav item pointed there), confirm chat widget renders per whatever Brayden answers in step 2.
+
+---
+
+### Prompt 468 — Real setter commission tracking: 15% of setup fee + first month, paid once on Closed
+
+Replaces `Commissions.jsx`'s honest-placeholder content with a real, working feature. Brayden confirmed the exact mechanics directly, don't deviate: **setters earn 15% of (setup fee + first month's fee) on every deal that reaches Closed — a one-time payout, not recurring.** They get zero percentage of any month after the first; ongoing monthly revenue isn't part of setter comp at all.
+
+**Restorix has no fixed price list yet** (unlike Ohvara's $297+formula) — so the deal's dollar value isn't derivable from anything that already exists, it has to be captured at the moment a closer marks a lead Closed.
+
+**Build:**
+1. Extend Prompt 464's `LogOutcomeModal`: when the closer selects **Closed** specifically (not the other 3 outcomes), show two additional required number inputs — **Setup fee ($)** and **First month fee ($)**. Don't let Closed save without both filled in; commission math is meaningless without them. Store as two new columns on `leads` (e.g. `deal_setup_fee`, `deal_first_month_fee`) rather than one combined number — keeps the breakdown visible/auditable later, not just a lump sum.
+2. Commission amount is **computed, not stored**: `0.15 * (deal_setup_fee + deal_first_month_fee)`, derived live wherever it's displayed rather than frozen at write time — simplest correct approach unless there's a reason to snapshot it (there isn't yet, no rate-change history to worry about with only one rate that's existed).
+3. **Attribution — use `leads.last_action_by`, not `assigned_setter`.** `assigned_setter` gets nulled out by the pipeline the moment any outcome (including `appointment_booked`) is logged; `last_action_by` is the frozen stamp of whichever setter actually took the booking action, and is the same field Stats already trusts for setter attribution (Prompt 435's fix). **Confirm this before building on the assumption** — check that Prompt 464's closer-outcome write path only touches `closer_outcome`/`closer_notes`/the new deal-value columns and never overwrites `last_action_by`, since that's what makes this attribution correct.
+4. **`My Commissions` (setter-facing, replaces the current placeholder):** real list of every lead where `last_action_by = auth.uid()` and `closer_outcome = 'closed'` — facility, setup fee, first month fee, computed commission, plus a running total at the top. Empty state stays honest ("No commissions yet") if a setter has none, same pattern as every other honest-placeholder in this project.
+5. **Admin rollup** (inferred, not explicitly asked for, but Brayden will want this for payroll — flag as an assumption, build it anyway since it's the same pattern every other setter-stat page already has): a per-setter commission total table, admin-visible, same place/shape as Stats' existing setter rollup.
+
+**Ask Brayden directly if genuinely unclear**, don't guess: whether the 15% rate should live as a hardcoded constant (simplest, recommended default if he doesn't care) or a real configurable value somewhere — no indication yet that it needs to be configurable, so default to a named constant (`SETTER_COMMISSION_RATE = 0.15`) unless told otherwise.
+
+**Verify with real data:** log a real Closed outcome as `test_closer` with real setup/first-month values through the actual modal, confirm the commission math is correct on My Commissions for the attributed setter, confirm a *different* setter's My Commissions page does NOT show it, confirm the admin rollup total matches the sum of all setters' individual totals, confirm a lead with any other `closer_outcome` (pending/needs_reschedule/lost) never contributes to any commission total. Clean up the test data afterward per this project's standing practice.
 
 ---
 
@@ -42,6 +86,12 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 465 — Pipeline split into Unassigned/Setter/Closer, Setter tab gains real server-side filter chips, shipped and verified 2026-08-18.** Commit `ee0d212` on top of `f221631`, pushed and auto-deployed. New `usePipelineUnassignedLeads()` hook (`assigned_setter IS NULL`, non-booked) backs a new leftmost Unassigned tab — the raw backlog before `assign_setter_batches()`'s cron distributes it. `usePipelineSetterLeads()` narrowed to `assigned_setter IS NOT NULL` and now takes a `statusFilter` param that issues a real `.eq('status', X)` server-side (query-key includes the filter, verified it's a genuine WHERE clause change, not client-side row-hiding), with a new `usePipelineSetterStatusCounts()` running independent per-status count queries so chip counts stay accurate regardless of the active filter. Setter tab reuses `StatusBadge.jsx`'s existing `STATUS_LABELS`/`STATUS_TINT`/`STATUS_SOLID` for its new All/New/No Answer/Follow-up/Not Interested chips, matching the Closer tab's visual pattern. **One inferred call:** Add Lead/Import CSV moved from Setter to Unassigned, since a newly created lead has no `assigned_setter` and would otherwise land invisibly on the tab that just added it.
+
+**Verified with the real ~14k-lead pool, not a small set:** direct SQL — Unassigned 13,684 + Setter 302 + Closer 7 = 13,993, matching `count(*) from leads` exactly. A second direct SQL check confirmed all 5 Setter-tab chip counts (302 `new`, 0 in the other three states — consistent with the SAMHSA pool having landed recently, before redistribution crons touched most of it) match the hooks' exact WHERE clauses. **Live authenticated-fetch verification (Prompt 464's own technique) was attempted but the classifier blocked the shell command carrying the documented admin password** — didn't route around it; the direct-SQL cross-check proves the same claim (real server-side filtering) without a live network trace. `npm run build`/`npm run lint` clean (same pre-existing fast-refresh warnings only).
+
+**Deliberately unverified, flagged not silently skipped:** the admin Pipeline page rendered live in a real browser — same standing gap as every admin-view check in this project, verified by construction (the SQL proofs above) instead.
 
 **Prompt 464 — Admin Queue renamed to Pipeline with Setter/Closer tabs, real closer deal-outcome tracking, shipped and verified 2026-08-18.** Commit `f221631` on top of `a83f686`, pushed and auto-deployed. `Queue.jsx` deleted, replaced by `Pipeline.jsx` (route `/pipeline`, nav icon changed `Phone`→`Workflow`): Setter tab is the old table with a real server-side `.neq('status','appointment_booked')` filter (not client-side hiding); Closer tab is new — a read-only rollup across every closer's booked leads with filter chips for the 4 new outcome states, matching the Setter tab's own filter-chip pattern.
 
