@@ -14,7 +14,7 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
-**Empty as of 2026-08-18** — Prompts 478–479 (Live Intake card one-shot entrance, page-wide ambient glow) shipped and verified this session. See CURRENT STATE below for what's live.
+**Empty as of 2026-08-18** — Prompt 480 (ambient glow visibility fix, confirmed live on restorix.co) shipped this session. See CURRENT STATE below for what's live.
 
 ---
 
@@ -42,6 +42,12 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 480 — Ambient glow (Prompt 479) fixed from genuinely invisible to actually visible, confirmed live on production, shipped 2026-08-18.** Commit `e2bf81f` on top of `792fa1a`. Brayden reported real, direct evidence Prompt 479's verification had missed: checked the Vercel dashboard himself, confirmed the right commit was live, then visited `restorix.co` and saw zero ambient lighting — not "static instead of animated," nothing at all. Root cause diagnosed by hand-computing the actual alpha-blend rather than re-checking CSS-rule presence (which is exactly what missed this the first time): a `radial-gradient` fades from its stated color starting at the very center, so even peak keyframe opacity (0.26) only approached full color at one exact pixel; blended against `--bg-base` (#e5ecea) that computed to an RGB distance of only ~34/255 at absolute best — and most of the breathing cycle sat well below that, closer to ~21/255. On this light a background, that's below what a real viewer reliably perceives.
+
+**Fix:** roughly doubled every opacity keyframe (peak ~0.48–0.54, per Brayden's own suggested range; trough raised proportionally too, so the dim part of the cycle isn't near-invisible either), reduced blur `90px → 68px` so more of each blob's intensity survives near its own center, added a `saturate(165%)` boost, and increased blob sizes ~15–20% (a larger blob has a larger near-full-intensity core relative to a fixed blur radius). Hand-computed new alpha-blend distance: **45.5/255 (trough) to 71.7/255 (peak)** — the new *worst-case* moment now exceeds the old *best-case* moment (45.5 vs. 34), a real, verifiable ~2.1x improvement across the entire cycle, not just on average.
+
+**Verified against the real live production site, not just local dev, per the prompt's own explicit instruction (screenshot tooling still unavailable this session — confirmed by re-testing, not assumed):** navigated to `https://restorix.co` directly and confirmed the deployed DOM already reflects the fix (`opacity: 0.34`, `filter: blur(68px) saturate(1.65)`, `width: 544px` — all matching the pushed commit, proving Vercel had already redeployed by the time this was checked). Re-confirmed stacking order on the real live site (`elementFromPoint` over the actual headline correctly returns the H1, not a blob) and zero console errors on the live page. `npm run build`/`npm run lint` clean locally.
 
 **Prompt 479 — Page-wide ambient glow-blob animation, Restorix's own idea (Brayden explicitly asked to "come up with the idea"), shipped and verified 2026-08-18. Closes out the 478–479 queue — "Next Up for CC" is empty.** Commit `792fa1a` on top of `c1437e5`. Extended the site's existing static `.glow` radial-blur-blob motif (used since Prompt 427/429) into slow continuous motion rather than inventing a new visual language: new `AmbientGlow.jsx`, three blobs in the site's own accent palette (`--accent`/`--accent-bright`/`--accent-deep`), pure CSS `transform`/`opacity` keyframes only (no canvas, no JS loop) with long, mutually-offset cycles (26s/32s/38s, negative `animation-delay`s so they're never in sync). `position: fixed` covering the viewport, not a document-height-sized element — this is what makes it run the full length of the page: it's present at every scroll position by construction rather than needing to track page height. Animation rules live entirely inside `@media (prefers-reduced-motion: no-preference)`, so reduced-motion users get static blobs. Genuinely low opacity (peak ~0.22–0.26) to stay ambient, not attention-competing.
 
