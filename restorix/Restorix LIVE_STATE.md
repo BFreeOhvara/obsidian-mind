@@ -14,16 +14,6 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
-### Prompt 475 — Stats heatmap: dial-volume gradient from gray to the portal's blue accent
-
-Live review feedback 2026-08-18 on the "Last 21 Days" heatmap (Prompt 450). The non-Perfect-Day cells currently shade white-to-dark-gray based on dial count — Brayden wants that gradient recolored to the portal's own blue accent instead of gray, so it matches the rest of the UI's color language. **Leave the green Perfect Day override untouched** (`150 dials + 2 bookings` cells stay solid green, that's intentional and distinct, not part of this change) — this is only about the gray dial-volume gradient specifically.
-
-Use the same blue already established everywhere else in the portal (the accent used on Call buttons, selected filter chips, etc.) as the gradient's dark end, white/near-white as the light end — same intensity math as today (purely dial count, unaffected by bookings), just a different hue.
-
-**Verify:** confirm via `getComputedStyle` that a real cell's background color actually changed from a gray value to a blue-tinted one at the correct intensity for its dial count, confirm the Perfect Day green cells are unaffected, confirm the "Dial volume" legend swatch updates to match the new gradient's color.
-
----
-
 ### Prompt 474 — "My Calls" → "My Recordings" label, setter role only
 
 Live review feedback 2026-08-18. Rename the nav item and page `<h1>` from "My Calls" to "My Recordings" — **setter role only.** Closer and admin keep seeing "My Calls" exactly as-is, wherever they currently see it (check the actual current role-gating on this nav item/page before assuming — confirm whether closers/admin even see it today per Prompt 447's note that closers have no call-placing UI yet, don't guess). This is a label change only — no behavior, route, or data change, the page still shows the same call history it already does.
@@ -91,6 +81,10 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 475 — Stats heatmap dial-volume gradient recolored gray→blue accent, shipped and verified 2026-08-18.** Commit `e1ddaf0` on top of `9cbd3f9`, pushed and auto-deployed. `dialGrayColor` renamed `dialColor`, gradient end color changed from dark gray `(55,65,81)` to the portal's own accent blue `(58,99,214)` — same white-start, same `pct = min(1, dials/PERFECT_DAY_DIALS)` intensity math, only the end-color RGB triplet changed. Perfect Day green override (`var(--success)`) untouched — that conditional branch was never touched by this edit.
+
+**Verified with exact hand-computed math against real data, not just visual inspection:** a real cell for `test_setter`'s 2026-08-17 (11 dials, 2 bookings — not a Perfect Day) computed to `rgb(241, 244, 252)` live; hand-computing `pct = 11/150 = 0.0733` against the new gradient gives `rgb(241, 244, 252)` to the exact integer after rounding — exact match. Legend swatch (`dialColor(75)`, pct=0.5) computed to `rgb(157, 177, 235)` live, hand-computed expectation `rgb(157, 177, 235)` — exact match. Confirmed the 11-dial cell rendered blue-tinted, not green (correctly not a Perfect Day). `npm run build`/`npm run lint` clean.
 
 **Prompt 476 — Overview filter chips: New/No Answer unselected-tint colors swapped, shipped and verified 2026-08-18.** Commit `9cbd3f9` on top of `62c906f`, pushed and auto-deployed. Edited the shared `STATUS_TINT` map in `StatusBadge.jsx` (not a per-page fork) — New's unselected tint is now `bg-[#e3e9ff] !text-accent-deep` (the exact color `STATUS_BADGE.new` already uses for the per-row table badge), No Answer's unselected tint takes over New's old `bg-muted !text-fg-secondary`. SOLID (selected) states untouched. **Deliberate scope call beyond the prompt's literal "Overview" wording:** since Pipeline's Setter tab (Prompt 465) reuses this exact same shared `STATUS_TINT` map for its own filter chips, editing the shared source correctly (and intentionally) also updates Pipeline's chips to match — kept as one shared definition rather than forking Overview a separate copy, since diverging the two surfaces' New/No-Answer colors would read as an inconsistency, not a feature.
 
