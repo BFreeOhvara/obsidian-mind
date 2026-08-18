@@ -14,6 +14,21 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
+### Prompt 484 — Restore glass-panel card feel + fix white-text-on-light-background contrast
+
+Live review feedback 2026-08-18, two related legibility issues surfaced by the background-animation churn of Prompts 467/472/479–483:
+
+1. **Glass/frosted-panel feel is gone from the Live Intake card (and check any other cards sitting over the hero/animated area).** Brayden wants it back — it made the card's own content easier to read against whatever's moving behind it. Standard glassmorphism treatment: semi-transparent white background (not fully opaque) + `backdrop-filter: blur(...)` so the card reads as a distinct frosted layer sitting above the background rather than a flat opaque box. Check git history for when this card last had that treatment (likely present in an earlier version before the background iterations, e.g. around Prompt 427/429/430) and use that as a reference for the right opacity/blur values rather than guessing from scratch.
+2. **Audit the whole page for white/near-white text sitting on a light background — genuinely unreadable, not just low-contrast.** Brayden spotted this directly; likely leftover styling from an earlier iteration that assumed a darker background in that area (a side effect of the repeated background changes this session). Find every instance — check pill badges, section headers, any text near where the background animations have lived — and fix by darkening the text color to something legible against the actual light background it sits on now, using the site's existing text-color tokens rather than a one-off value.
+
+**Verify:** confirm the Live Intake card (and any other affected cards) now has a real, visible backdrop-blur/translucency effect via computed styles, not just a class name; confirm every previously-white-on-light text instance found in the audit is now genuinely readable (real contrast-ratio improvement, not just "technically different"); take this as a full-page pass, not a single spot-fix, since Brayden's report implies more than one instance.
+
+---
+
+**Empty as of 2026-08-18** — Prompt 483 (scrapped page-wide lava-lamp blobs, shipped a hero-only wave gradient) shipped this session. See CURRENT STATE below for what's live.
+
+---
+
 **Empty as of 2026-08-18** — Prompt 482 (ambient glow flat fill + organic border-radius morphing) shipped this session. See CURRENT STATE below for what's live.
 
 ---
@@ -42,6 +57,10 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 483 — Page-wide lava-lamp ambient glow (Prompts 479–482) scrapped entirely, replaced with a calm hero-only wave gradient, shipped 2026-08-18, not yet confirmed live.** Commit `b762b8b` on top of `bb0effb`. Brayden saw the goo-merge blob result live and rejected the whole direction — too bold/blobby. Confirmed the replacement with him directly (shown a reference image, picked layered CSS gradients over a heavier noise/shader build). Deleted `AmbientGlow.jsx` and every associated `.ambient-*` CSS rule/keyframe/SVG filter outright, not left commented out. New `HeroWave` in `Hero.jsx`: three large, blurred, elongated `radial-gradient` bands in the accent-blue family, confined to the Hero section only (no `position: fixed` page-wide layer), each at a different base rotation, drifting slowly via `translate`/`rotate`/`scale` (not opacity) so their overlaps create a shifting "waving" impression. Color inverted from Brayden's reference per his instruction — light background stays dominant, blue is the subtle accent.
+
+**Verified:** `npm run build`/`npm run lint` clean. Hand-computed real peak-center alpha-blend distance against `--bg-base` for all three bands (~45/255, ~57/255, ~58/255 respectively) before shipping, carrying forward the Prompt 480 lesson directly — all three clear the ~34/255 "edge of perceptible" threshold that prompt established, while staying well under the blob attempt's post-fix peak (~72/255). Confirmed live via DOM query: zero `position:fixed` ambient layers remain, zero `.ambient-*` classes remain anywhere in the DOM or built CSS, all three wave elements are DOM-scoped inside `#top` (Hero) specifically. Confirmed computed `background`/`opacity`/`filter` on each band matches the design exactly. Confirmed the reduced-motion media query still gates all three drift animations in the built CSS. Zero console errors, correct stacking at both desktop and mobile viewports. Not yet confirmed live — no Vercel deploy-status tool available this session, same standing gap as every prior push.
 
 **Prompt 482 — Ambient glow blobs get flat fill + organic border-radius morphing, shipped 2026-08-18, not yet confirmed live.** Commit `bb0effb` on top of `b51a11f`. Live review on 481: goo-merge motion landed correctly, but the blob shapes themselves still read wrong — a visible brighter core from each blob's `radial-gradient` fill ("I want everything to feel the same") and rigid circles that only translate/scale, not organic lava-lamp shapes. Fixed both without touching the 481 motion/merge mechanism: (1) each blob's fill switched from `radial-gradient` to a flat solid `background-color` — softness now comes only from the blur/goo filter softening the boundary, not an internal color ramp; (2) added a second, independently-timed `border-radius` keyframe set per blob (13-21s, offset from both the 29-41s drift cycles and each other) layered onto the same element via the multi-value `animation` shorthand, so each blob drifts, morphs, and goo-merges simultaneously. Base `.ambient-blob` border-radius changed from a perfect circle to an organic morph waypoint, so reduced-motion users still see an asymmetric shape.
 
