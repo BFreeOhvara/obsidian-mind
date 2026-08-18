@@ -14,16 +14,6 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
-### Prompt 472 — restorix-marketing hero: replace dot-network background with an animated Live Intake card
-
-**Corrects part of Prompt 467.** Brayden's actual ask was "give the page more life with subtle animation," not "copy Regenix's specific dot/particle-network background" — that's what shipped, and he flagged it reads as too close to Regenix's own hero treatment. Remove the dot/line network entirely.
-
-**Replace it with motion on the "Live Intake" card that's already in the hero** (the one showing Inquiry received → Text-back sent → Consult booked with timestamps): have its three rows fade/slide in one at a time in sequence, like the intake is happening live in front of the visitor, looping on a timer. Give the small blue status dot next to "LIVE INTAKE" a slow, subtle pulse — a live-recording-indicator feel. This animates something that's actually about the product instead of a generic tech-background graphic, which is the real reason it won't read as a Regenix copy.
-
-**Verify:** confirm the sequence loops cleanly (doesn't just play once and freeze), confirm it's subtle enough not to be distracting next to the headline, confirm no perf regression.
-
----
-
 ### Prompt 473 — restorix-marketing Process section: replace circular diagram with a scroll-filling progress line
 
 **Corrects the other part of Prompt 467.** The circular orbiting diagram with a step "blacking out" as active reads as a near-literal copy of Regenix's own Process section. Remove it.
@@ -58,6 +48,10 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 472 — restorix-marketing hero motion moved to the Live Intake card, dot/particle network removed entirely, shipped 2026-08-18.** Commit `9eb7e23` on top of `5130995`. Corrects Prompt 467's over-literal read of "give the page more life with subtle animation" as a Regenix-style dot-network background — removed `ParticleField.jsx` and its usage entirely (deleted the now-dead file, not left orphaned). Motion moved onto the actual product content instead: the Live Intake card's three timeline rows (Inquiry received / Text-back sent / Consult booked) now replay their fade/slide-in on a repeating 3s cycle, staggered 1s apart per row (`delay: 0.7 + i * 1`, same `repeat: Infinity` period for all three so the relative one-row-behind stagger holds indefinitely, not just on the first page-load reveal). The status dot swapped Tailwind's fast default `animate-pulse` for a slower, explicit framer-motion opacity pulse (`[1, 0.35, 1]` over 2.6s) for more of a "live recording indicator" feel per Brayden's own description.
+
+**Verification hit this session's now well-established rAF/compositing limitation directly** — confirmed via `document.querySelectorAll('canvas').length === 0` that the particle network is genuinely gone and the three timeline rows render correctly, and confirmed zero console errors, but couldn't watch the loop actually play out in this pane (same standing gap: `requestAnimationFrame`-driven work doesn't advance here, established repeatedly this session for framer-motion). Verified the looping behavior by construction instead — the transition math (shared period across all three rows + one-time-only `delay` offset per row = a stable, permanently-staggered repeat, not a one-shot reveal) is the same class of animation as a standard "loading dots" indicator and doesn't depend on anything this pane can't run. "No perf regression" is also true by construction: replacing a continuous canvas rAF loop (42 dots, O(n²) pairwise distance checks every frame) with four simple CSS transform/opacity tweens is a net reduction in animation cost, not a regression — confirmed the built bundle also dropped Vite's prior chunk-size warning after the removal. `npm run build`/`npm run lint` clean.
 
 **Prompt 471 — restorix-marketing: real AI chatbot, replaces Prompt 467's visual-only placeholder, shipped and verified end-to-end 2026-08-18.** Frontend commit `5130995` on `restorix-marketing` (on top of `23dcb3a`), backend `818df07` on `restorix-setter-portal` (on top of `fc13110`, source version-controlled at `supabase/functions/marketing-chat/index.ts` even though it serves the marketing site — deployed to the same shared Supabase project `avgvmzshujwphneykuvu`). New `check_marketing_chat_rate_limit` migration + table.
 
