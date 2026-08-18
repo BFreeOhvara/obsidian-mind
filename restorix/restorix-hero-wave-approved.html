@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Restorix hero wave — APPROVED reference, 2026-08-18</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Manrope', -apple-system, sans-serif; background: #e9edf0; }
+  .hero { position: relative; min-height: 100vh; overflow: hidden; background: #e9edf0; }
+  .wave-svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+  .content { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 48px 40px; }
+  nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 90px; }
+  .logo { font-size: 22px; font-weight: 700; color: #14161a; }
+  .navlinks { display: flex; gap: 32px; font-size: 14px; color: #6b7280; }
+  .cta-btn { background: #3a63d6; color: white; border: none; padding: 12px 24px; border-radius: 999px; font-size: 14px; font-weight: 600; }
+  .main-grid { display: flex; justify-content: space-between; align-items: center; gap: 40px; }
+  .copy { max-width: 560px; }
+  .eyebrow { font-family: 'JetBrains Mono', monospace; color: #3a63d6; font-size: 13px; letter-spacing: 0.05em; margin-bottom: 20px; }
+  h1 { font-size: 52px; line-height: 1.1; color: #14161a; margin-bottom: 20px; font-weight: 700; }
+  .sub { color: #6b7280; font-size: 16px; line-height: 1.6; margin-bottom: 28px; }
+  .btn-row { display: flex; gap: 12px; margin-bottom: 32px; }
+  .btn-outline { background: rgba(255,255,255,0.6); border: 1px solid #d1d5db; padding: 12px 24px; border-radius: 999px; font-size: 14px; color: #14161a; }
+  .pills { display: flex; gap: 10px; flex-wrap: wrap; }
+  .pill { border: 1px solid #d1d5db; background: rgba(255,255,255,0.6); padding: 6px 14px; border-radius: 999px; font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #6b7280; }
+  .glass-card { background: rgba(255,255,255,0.55); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.8); border-radius: 16px; padding: 24px; width: 340px; box-shadow: 0 20px 60px rgba(58,99,214,0.15); }
+  .card-title { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #3a63d6; letter-spacing: 0.05em; margin-bottom: 16px; }
+  .row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.06); font-size: 14px; color: #14161a; }
+  .row:last-of-type { border-bottom: none; }
+  .time { color: #9ca3af; font-size: 12px; }
+</style>
+</head>
+<body>
+  <div class="hero">
+    <svg class="wave-svg" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <filter id="softblur" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="32" />
+        </filter>
+      </defs>
+      <g filter="url(#softblur)">
+        <path fill="none" stroke="#7c9eff" stroke-width="230" stroke-linecap="round" opacity="0.7">
+          <animate attributeName="d"
+            values="
+              M -100 400 C 150 520, 230 340, 560 300 C 870 260, 900 60, 1250 -80;
+              M -100 420 C 180 500, 260 360, 540 320 C 850 280, 930 40, 1250 -60;
+              M -100 380 C 130 540, 210 320, 580 290 C 890 250, 880 80, 1250 -100;
+              M -100 400 C 150 520, 230 340, 560 300 C 870 260, 900 60, 1250 -80"
+            dur="18s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1" />
+        </path>
+        <path fill="none" stroke="#3a63d6" stroke-width="100" stroke-linecap="round" opacity="0.6">
+          <animate attributeName="d"
+            values="
+              M -100 420 C 170 530, 280 350, 570 310 C 860 270, 890 70, 1240 -70;
+              M -100 440 C 200 510, 310 370, 550 330 C 840 290, 920 50, 1240 -50;
+              M -100 400 C 150 550, 260 330, 590 300 C 880 260, 870 90, 1240 -90;
+              M -100 420 C 170 530, 280 350, 570 310 C 860 270, 890 70, 1240 -70"
+            dur="18s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1" />
+        </path>
+      </g>
+    </svg>
+    <div class="content">
+      <nav>
+        <div class="logo">Restorix</div>
+        <div class="navlinks"><span>The Leak</span><span>The System</span><span>Process</span><span>Who It's For</span></div>
+        <button class="cta-btn">Book a Strategy Call</button>
+      </nav>
+      <div class="main-grid">
+        <div class="copy">
+          <div class="eyebrow">AI INFRASTRUCTURE FOR BEHAVIORAL HEALTH TREATMENT CENTERS</div>
+          <h1>More admissions booked. None of the manual intake work.</h1>
+          <p class="sub">Restorix installs AI systems that capture, qualify, and follow up with every inquiry — so your center books more of the admissions it's already earning, without adding front-desk staff.</p>
+          <div class="btn-row">
+            <button class="cta-btn">Book a Strategy Call</button>
+            <button class="btn-outline">See how the system works</button>
+          </div>
+          <div class="pills">
+            <span class="pill">24/7 INQUIRY CAPTURE</span>
+            <span class="pill">LEVEL-OF-CARE TRIAGE</span>
+            <span class="pill">AUTOMATIC BOOKING</span>
+          </div>
+        </div>
+        <div class="glass-card">
+          <div class="card-title">LIVE INTAKE</div>
+          <div class="row"><span>Inquiry received</span><span class="time">0:00</span></div>
+          <div class="row"><span>Text-back sent</span><span class="time">0:04</span></div>
+          <div class="row"><span>Consult booked</span><span class="time">2:17</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
