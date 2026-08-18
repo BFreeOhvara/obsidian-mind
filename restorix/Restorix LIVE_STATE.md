@@ -14,7 +14,7 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
-**Empty as of 2026-08-18** — Prompt 481 (ambient glow real lava-lamp motion: vw/vh sweeps + SVG goo merge filter) shipped this session. See CURRENT STATE below for what's live.
+**Empty as of 2026-08-18** — Prompt 482 (ambient glow flat fill + organic border-radius morphing) shipped this session. See CURRENT STATE below for what's live.
 
 ---
 
@@ -42,6 +42,10 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 482 — Ambient glow blobs get flat fill + organic border-radius morphing, shipped 2026-08-18, not yet confirmed live.** Commit `bb0effb` on top of `b51a11f`. Live review on 481: goo-merge motion landed correctly, but the blob shapes themselves still read wrong — a visible brighter core from each blob's `radial-gradient` fill ("I want everything to feel the same") and rigid circles that only translate/scale, not organic lava-lamp shapes. Fixed both without touching the 481 motion/merge mechanism: (1) each blob's fill switched from `radial-gradient` to a flat solid `background-color` — softness now comes only from the blur/goo filter softening the boundary, not an internal color ramp; (2) added a second, independently-timed `border-radius` keyframe set per blob (13-21s, offset from both the 29-41s drift cycles and each other) layered onto the same element via the multi-value `animation` shorthand, so each blob drifts, morphs, and goo-merges simultaneously. Base `.ambient-blob` border-radius changed from a perfect circle to an organic morph waypoint, so reduced-motion users still see an asymmetric shape.
+
+**Verified live:** `npm run build`/`npm run lint` clean. `getComputedStyle` confirmed `backgroundImage: none` with a flat `backgroundColor` for all three blobs (no gradient left). Confirmed both drift and morph animations are correctly attached (`animationName` lists both per blob, durations/delays match design exactly) — and, real proof the morph is actively engaged rather than frozen at one frame, blob-b/c's live computed `border-radius` came back as non-keyframe-exact interpolated percentages (e.g. `33.2258% 66.7742%...`), not one of the three authored waypoint values. Confirmed stacking/clickability unaffected and zero console errors at both desktop and mobile viewports. Not yet confirmed live — no Vercel deploy-status tool available this session, same standing gap as every prior push.
 
 **Prompt 481 — Ambient glow gets real "lava lamp" motion: vw/vh sweeps + SVG goo merge filter, shipped 2026-08-18, not yet confirmed live.** Commit `b51a11f` on top of `e2bf81f`. Direct follow-up to Prompt 480's now-visible-but-static blobs — Brayden wanted the blobs to actually travel and visibly clump/merge/separate when close, not just breathe in place. Drift keyframes rewritten from small percent-of-own-box wobble to real `vw`/`vh` translation (up to ~36vw/33vh) on independent 34s/41s/29s offset cycles. Blur/saturate moved off individual blobs onto a new `.ambient-goo-group` wrapper using the classic SVG goo technique (`feGaussianBlur` stdDeviation 34 → high-contrast `feColorMatrix` on alpha, identity on RGB → `feBlend` with SourceGraphic) — has to be on the shared parent, not per-blob, since a filter rasterizes its target as one bitmap first and only a shared filter lets two overlapping blobs' alpha actually cross the merge threshold together. `<filter>` lives in an inline zero-size `<svg>` (not `display:none`, which Safari drops filter refs from).
 
