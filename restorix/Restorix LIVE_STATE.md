@@ -14,25 +14,7 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
-### Prompt 464 — Admin Queue → Pipeline: Setter/Closer tabs + closer deal-outcome tracking
-
-Directly requested by Brayden 2026-08-17 after looking at the live admin Queue page (1000 leads flat, no breakdown). **This supersedes the "closer's own lead-pull workflow" and "deal-outcome Pipeline tracking" items previously sitting in this doc as "not urgent" — both are now in scope, not deferred.**
-
-**Rename** the admin nav item/page "Queue" → "Pipeline". Add two tabs at the top: **Setter** and **Closer**.
-
-**Setter tab** — the existing Queue table, but filtered to setter-facing statuses only: New, No Answer, Follow-up, Not Interested. **Exclude Appointment Booked entirely** — Brayden's explicit call: once a lead is booked, it's no longer a setter concern, it belongs to the closer from that point on.
-
-**Closer tab — new territory, not just a filter on existing data.** Today `appointment_booked` is a terminal status with zero tracking of what happens after a closer gets it. Brayden wants real deal-outcome tracking, four states in his own words: **Pending, Needs Rescheduling, Lost, Closed.**
-
-1. New outcome field on `leads` (e.g. `closer_outcome` enum: `pending`/`needs_reschedule`/`lost`/`closed`) — set to `pending` automatically the moment `appointment_booked` fires (the existing trigger already does the round-robin closer assignment inline, this is the natural place to also stamp the default outcome).
-2. **Closers need a real way to change this, not a static label** — build a "Log Outcome" action on the closer's own booked-leads view, same interaction shape as setters' existing LogCallModal (pick outcome, optional notes) but for deal outcomes instead of call outcomes.
-3. Admin's Pipeline **Closer tab** is a read-only rollup across all closers' booked leads, grouped/filterable by these 4 outcomes — same relationship the existing Setter tab already has to individual setters' own call-logging.
-
-**Resolves two standing questions, confirmed by this request rather than guessed:** closers only ever work booked handoffs, they don't pull from an unassigned pool themselves — no separate cold-call workflow needed for closers. And this prompt itself is the deal-outcome tracking that was flagged as future scope.
-
-**Ask Brayden directly if genuinely unclear** (don't guess): exact column layout for the Closer tab table (facility/contact/phone/assigned closer/outcome/next-action-date is the obvious minimum, matching the Setter tab's shape); whether Lost/Needs Rescheduling need a reason or notes field on the outcome log; whether Commissions.jsx should eventually key off "Closed" outcomes — that's very likely a separate future prompt once real commission structure exists, flag it but don't build it now.
-
-**Verify with real data, not just built:** confirm the 1000+ SAMHSA-seeded leads split correctly across the two tabs by their current status; confirm a real closer can log an outcome (e.g. mark a lead "Closed") and it shows up immediately on admin's Closer tab; confirm the Setter tab's exclusion of Appointment Booked is a real query filter, not just hidden client-side (check via direct API call the same way Prompt 437's RLS boundary was verified).
+**Flag for Brayden — Prompt 464's admin Pipeline page (both Setter and Closer tabs) is unverified live:** same standing gap as every admin-only view in this project — no safe test-admin account exists (`invites` only allows `role in (setter, closer)`), so it's verified by construction (code review + a direct API call proving the Setter tab's exclusion filter is real server-side, not client-side) rather than rendered live. The closer-facing half (Log Outcome action, RLS boundary) *was* verified live end-to-end via `test_closer`.
 
 ---
 
@@ -60,6 +42,18 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 464 — Admin Queue renamed to Pipeline with Setter/Closer tabs, real closer deal-outcome tracking, shipped and verified 2026-08-18.** Commit `f221631` on top of `a83f686`, pushed and auto-deployed. `Queue.jsx` deleted, replaced by `Pipeline.jsx` (route `/pipeline`, nav icon changed `Phone`→`Workflow`): Setter tab is the old table with a real server-side `.neq('status','appointment_booked')` filter (not client-side hiding); Closer tab is new — a read-only rollup across every closer's booked leads with filter chips for the 4 new outcome states, matching the Setter tab's own filter-chip pattern.
+
+**Schema:** new `closer_outcome` enum (`pending`/`needs_reschedule`/`lost`/`closed`) and a separate `closer_notes` column on `leads` — deliberately not reusing the existing `notes` column, since a closer logging "Lost, went with a competitor" would otherwise silently overwrite the setter's own original call notes from before booking. `handle_lead_pipeline()`'s `appointment_booked` branch now also stamps `closer_outcome := 'pending'` the moment a lead gets booked, right alongside the existing round-robin closer assignment. **Real RLS widening, not a guess:** closers had zero write access to `leads` before this — widened `leads_update_setter_admin` to also allow `my_role() = 'closer' AND assigned_closer = auth.uid()`, the same ownership-scoped shape setters already have for their own assigned leads (matches the prompt's own "same interaction shape as LogCallModal" instruction, which relies on a direct RLS-gated table update).
+
+**New `LogOutcomeModal.jsx`** mirrors `LogCallModal`'s interaction shape (pick one of 4 outcomes, freeform notes, Save) but for deal outcomes — wired into both the closer's own Overview (booked-lead cards each get an outcome badge + "Log outcome" button) and admin's Closer tab rollup.
+
+**Two of the prompt's three "ask if unclear" items resolved without asking, one genuinely answered by precedent:** column layout used the prompt's own suggested minimum (facility/contact/phone/assigned closer/outcome/next-action-date) since it was already reasonable, not actually ambiguous. Whether Lost/Needs Rescheduling need a notes field — matched the setter pattern instead of asking: `LogCallModal` already shows a freeform notes field for every outcome unconditionally, so `LogOutcomeModal` does the same rather than only for two of the four outcomes, for interaction-shape consistency. Commissions.jsx keying off "Closed" — flagged as explicitly out of scope per the prompt's own instruction, not built.
+
+**Verified with real data and a real end-to-end write, not just built:** logged in live as `test_closer`, opened a real booked lead (`TEST — Willowbend Psychiatric Group`, showing `PENDING` — confirming the trigger's auto-stamp is real), clicked Log Outcome, selected Closed with a note, saved — confirmed via direct SQL the DB row actually changed (`closer_outcome: 'closed'`, real `closer_notes` text) and the UI badge updated live to `CLOSED` with zero reload, proving the write path and the React Query cache invalidation both work. **Re-confirmed the security boundary immediately after, not assumed:** a raw PATCH attempt via `fetch` as `test_closer` against a lead assigned to nobody returned `200` with an empty result array — RLS's USING clause silently excluded the row before the UPDATE could touch it (0 rows affected), confirmed unchanged via direct SQL afterward. **Confirmed the Setter tab's filter is real, not cosmetic:** a direct authenticated API call with the exact `.neq()` filter the hook uses returned 13,986 leads with zero `appointment_booked` rows among them, while a separate unfiltered query confirmed 7 booked leads genuinely exist and were correctly excluded — real proof of a server-side WHERE clause. Reverted the verification lead back to `pending`/null notes afterward so no test artifact was left in Brayden's real demo data. Re-ran the closer login/render check against the live production URL after confirming the Vercel deploy landed — identical result. `npm run build`/`npm run lint` both clean throughout (same pre-existing fast-refresh warnings only).
+
+**Deliberately unverified, flagged not silently skipped:** the admin Pipeline page itself (both tabs, as an admin actually sees them) — same standing no-safe-admin-account gap as every admin-view check in this project. Verified by construction (the query/RLS proofs above) rather than rendered live.
 
 **Prompt 463 — Nationwide SAMHSA lead scraper, shipped and completed 2026-08-18. Real infrastructure build, not a UI prompt — Supabase edge function + pg_cron, three real bugs found and fixed along the way, landed 13,681 real facilities nationwide.** Commits `8ee2bb1` (initial function) and `a83f686` (bulk-upsert fix) on `restorix-setter-portal`, pushed. Migrations: `samhsa_scraper_infra`, `samhsa_upsert_helper`, `move_pg_net_out_of_public`, `fix_samhsa_upsert_partial_index`, `samhsa_scraper_tick_cron`, `samhsa_scraper_smaller_batch`, `samhsa_scraper_fix_pg_net_timeout`, `samhsa_bulk_upsert`.
 
