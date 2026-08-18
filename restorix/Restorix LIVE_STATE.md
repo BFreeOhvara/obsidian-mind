@@ -14,21 +14,7 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
-### Prompt 487 — Closer Overview: match Setter's layout pattern, combine Log Outcome + Closer Survey in one popup
-
-Live review feedback 2026-08-18. Closer's own `Overview` currently renders as a flat stack of individual cards (per-lead, each with its own "Log outcome" button) — Brayden wants it restructured to match the visual pattern Setter's `Overview` already established: stat tiles at the top, then a bordered box containing the lead list with a real empty state, rows clickable to open a modal (not just a button inside each row).
-
-**Stat tiles at top** — mirror the shape of Setter Overview's tile row, scoped to this closer's own leads (`assigned_closer = auth.uid()`), not all closers (that's the admin Pipeline Closer tab's job). Reasonable default, use judgment if a cleaner grouping fits the existing data better: counts for **Pending / Needs Rescheduling / Lost / Closed** — the same four `closer_outcome` categories Prompt 464's Pipeline Closer tab already established, just scoped to one closer instead of all of them.
-
-**Lead list box** — same visual container pattern as Setter Overview's table (bordered box, real empty state like "No leads match this filter" when empty — closer's own equivalent, e.g. "No booked leads yet"). **Row click opens the popup** (same interaction as Prompt 440's Setter Overview row-click-opens-modal), not just the existing "Log outcome" button — keep the button too if useful, but clicking anywhere on the row should also work.
-
-**The popup itself needs to combine two things that are currently separate, both scoped to that specific lead:**
-1. The existing `LogOutcomeModal` fields (pick outcome, notes, the deal-value fields when Closed is selected per Prompt 468).
-2. Access to the **Closer Survey** (currently only reachable as its own standalone nav page) — Brayden wants closers able to run the survey for *this specific lead* from inside the same popup, not have to leave to a separate page mid-call. Exact layout is a judgment call (e.g. a tab/toggle within the modal switching between "Log outcome" and "Survey," or the survey expanding inline within the same modal) — the requirement is one popup giving access to both, launched from clicking the lead.
-
-**Keep the standalone Closer Survey nav page too** — this is additive, not a replacement; Brayden didn't ask to remove the general-purpose version, just wants it also reachable in-context per lead.
-
-**Verify:** confirm the stat tiles show correct counts for a real test closer's own leads only; confirm clicking a lead row opens the popup; confirm both Log Outcome and the Closer Survey are genuinely reachable from that one popup for that one lead; confirm the standalone Closer Survey page still works unchanged; confirm the empty state renders correctly for a closer with zero booked leads.
+**Empty as of 2026-08-18** — Prompt 487 (Closer Overview restructured to match Setter's tile/table pattern, Log Outcome + Closer Survey combined into one modal) shipped this session. See CURRENT STATE below for what's live.
 
 ---
 
@@ -78,6 +64,10 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 487 — Closer Overview restructured to match Setter Overview's own pattern; Log Outcome + Closer Survey combined into one modal, shipped 2026-08-18 on `restorix-portal` (main repo, not `restorix-marketing`).** Commit `70d7005` on top of `8555a36`. Closer's Overview was a flat stack of individually-actioned cards — now has 4 stat tiles (Pending/Needs Rescheduling/Lost/Closed) scoped to that closer's own leads (`useMyBooked`, already filtered on `assigned_closer = auth.uid()`), then the same bordered-box + table shape Setter Overview uses, with a real empty state and rows clickable (plus a kept "Open" button) to open a new `CloserLeadModal`. That modal has a Log Outcome / Closer Survey tab switch — split `LogOutcomeModal` into a bare `LogOutcomeForm` (Pipeline.jsx's existing standalone `LogOutcomeModal` usage unchanged) and split `Survey` into a bare `SurveyBody` (the standalone `/survey` nav route unchanged), so the combined modal reuses the exact same components with zero duplicated logic.
+
+**Verified live as `test_closer`:** stat tiles showed correct real counts (5 Pending, 0 for the other three, matching all 5 real booked leads). Bordered table rendered all 5 rows correctly. Clicking a row opened the combined modal on the "Log Outcome" tab with the real form; switching to "Closer Survey" rendered the full question wizard scoped to that lead (confirmed via the modal's own title showing the facility name). Confirmed the standalone `/survey` route renders identically. Confirmed via a clean build (which would fail on a broken import) that Pipeline.jsx's existing `LogOutcomeModal` usage is unaffected — that admin-only surface itself wasn't re-verified live, same standing practice of not using Brayden's real admin credentials. Empty state verified by code review rather than provisioning a throwaway zero-lead closer account. Zero console errors at desktop and mobile. `npm run build`/`npm run lint` clean (same pre-existing fast-refresh warnings only).
 
 **Prompt 486 — Hero wave's two real bugs from 485 (no motion, hard cutoff line) fixed, shipped 2026-08-18, not yet confirmed live.** Commit `cb2d5ed` on top of `f642f1f`. Added explicit `keyTimes="0;0.33;0.67;1"` to both `<animate>` elements — `calcMode="spline"` requires `keyTimes` per the SMIL spec to define the interval boundaries `keySplines` eases between; the reference file omits it (relying on an implicit default), a real spec gap that can make a strict engine treat the whole animation as invalid and simply not run it. Switched the blur filter from the default `objectBoundingBox` percentage region to `filterUnits="userSpaceOnUse"` with an explicit, generous region (`x="-500" y="-400" width="2400" height="1600"`) — `objectBoundingBox` regions are a documented source of inconsistent cross-browser handling for stroked-but-unfilled paths specifically (implementations vary on whether the bounding box accounts for `stroke-width`, 230 on the outer path here), and an under-sized region clips the blur's soft falloff at a hard edge instead of letting it fade, matching the reported cutoff exactly.
 
