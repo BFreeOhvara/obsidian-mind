@@ -18,18 +18,6 @@ tags:
 
 ---
 
-### Prompt 466 — My Calls + Activity: never show an "In progress" row
-
-Live review feedback 2026-08-18 — Brayden looked at My Calls and saw rows sitting with outcome `In progress` / recording `Processing…` / no duration, for calls that were started but never got an outcome logged. He doesn't want these visible at all on either My Calls or Activity — **both pages should only ever show a call once a real outcome has been logged**, no "in progress" state should appear on either.
-
-Same fix on both pages (they already share the day-scoped-query pattern from Prompt 451/455). Investigate the actual `calls` table first, don't assume: it's likely a row gets inserted the moment a call attempt starts (before outcome logging), with `outcome` staying null until `LogCallModal`'s Save fires — this matches Prompt 443's badge system needing a real per-attempt dial count, so the row itself probably shouldn't be deleted (that would undercount Dials badges/Overview's Calls Made Today if it's counting rows rather than logged outcomes — check which it actually does before deciding). If that's the shape: **filter the display query on both pages to `outcome IS NOT NULL`**, same class of fix as Prompt 455's No Answer exclusion (a display-layer filter, not a schema change) — the underlying attempt data stays intact for anything that counts dials, it just stops surfacing as a dead-looking row on these two specific views.
-
-If investigation shows something different (e.g. dial-count badges pull from a separate source and don't actually need the unlogged row to exist), a cleaner delete-or-never-insert-until-logged approach may be simpler — use judgment, but confirm what actually depends on that row before removing it, since Prompt 443's badges were explicitly built off the `calls` table as "a genuinely more accurate all-time dial source."
-
-**Verify with real data:** the two `TEST437 — Facility I`/`Facility H` "In progress" rows visible in Brayden's screenshot are real live artifacts from Twilio-flow testing this session — confirm they either resolve (get a real outcome logged) or simply stop appearing on My Calls/Activity after the fix, and confirm Overview's Calls Made Today / badge Dials counts are unchanged by the fix (proving it's display-only, not a data loss).
-
----
-
 ### Prompt 467 — restorix-marketing: more visual motion/life (regenix.io as the caliber reference again), remove client-stories section
 
 Live review feedback 2026-08-18 — Brayden compared `restorix.co` side-by-side with regenix.io again (same reference site as Prompt 430, still **structural/quality reference only, not a visual-match target** — keep Restorix's own cornflower-blue/Space Grotesk/Manrope/JetBrains Mono language throughout everything below, don't pull in Regenix's teal). Four things:
@@ -62,6 +50,22 @@ Replaces `Commissions.jsx`'s honest-placeholder content with a real, working fea
 
 ---
 
+### Prompt 469 — Interactive closer survey tool: branching Stack-qualification questions
+
+Real content already written — see [[Restorix Closer Survey]] (new vault note, read it in full before building, it's the actual question tree, not a placeholder). Brayden's ask, 2026-08-18: packages aren't fixed, so closers need a live, in-call tool — not a static script — that walks a branching set of questions and tells them which Stack components (front-runners/sub-agents) actually fit this specific prospect.
+
+**Build a new closer-facing page/flow** (own route, e.g. `/survey` or embedded as a modal/panel closers can pull up mid-call — use judgment on the exact entry point, it should be fast to open while on a live call, not buried) that walks [[Restorix Closer Survey]]'s tree exactly as written — **updated 2026-08-18 after Brayden caught a real redundancy** (a full 24/7-answering agent and a "missed-call recovery" agent are contradictory for the same client) and the survey doc got restructured accordingly. Current shape: **Q0 first, always** — a single either/or question deciding which front-runner applies (Intake & Triage for a client ready for full AI answering, Missed-Call Recovery for one keeping human staff primary — never both to the same client), then Sections 1-7, each with a root question and conditional follow-ups gated on the prior answer and on which Q0 path the prospect is on (Section 1 skips entirely on the Intake & Triage path, for example). Free-text/numeric inputs where the doc captures a number (calls/week, response-time gap, no-show rate, etc.) are explicitly flagged "pricing input" in the doc.
+
+**Output at the end:** a summary screen showing the single front-runner Q0 selected (never both), a note that after-hours crisis-routing is automatically included if Intake & Triage was picked (not something qualified for separately), which sub-agents scored as real fits (only "strong signal" branches from Sections 3/4/5/6/7, not just "was asked about"), plus a clean recap of every captured input number.
+
+**Explicitly do NOT build an auto-pricing calculator this pass** — [[Restorix Closer Survey]]'s own "Open item" section flags that Restorix has no locked pricing formula yet (unlike Ohvara's), and the actual setup-fee/first-month numbers get entered manually by the closer at close time anyway (Prompt 468's LogOutcomeModal). This tool's job is qualification and talk-track support, not computing a dollar figure. If Brayden wants an auto-pricing formula later, that's a separate future prompt once the formula itself is decided — don't invent one now.
+
+**Persistence:** should a closer's in-progress or completed survey answers for a given lead be saved (so they can reference it again later, or so it shows up alongside that lead elsewhere in the portal), or is this a stateless in-the-moment tool that resets each time? **Ask Brayden directly** — genuinely unclear from the request, and the answer changes the build meaningfully (a stateless tool is much simpler than one that persists per-lead survey state).
+
+**Verify:** walk the tree live as a test closer for at least two different answer paths (one where Section 1's missed-calls comes back "hardly any" and skips its follow-ups, one where it comes back "a lot" and digs into the deep-dive questions) — confirm the skip logic actually skips, not just visually collapses; confirm the end summary correctly reflects only the sections that scored a real signal.
+
+---
+
 ### 🔑 Test accounts — live now, pipeline demo state, waiting on Brayden's review (not yet cleaned up)
 
 Real, working accounts on the live `restorix-portal` — **do not delete until Brayden says he's done reviewing.** All passwords `Test1234!`. Usernames use underscores, not the periods the original prompts suggested — the username validation regex (`[a-z0-9_-]+`, from Prompt 428) doesn't allow periods.
@@ -86,6 +90,10 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 466 — My Calls + Activity hide unlogged-outcome ("In progress") rows, shipped and verified 2026-08-18.** Commit `80a9798` on top of `ee0d212`, pushed and auto-deployed. `useMyCallsForDay` (My Calls) and Activity's own inline `useMyActivityForDay` both gained `.not('outcome', 'is', null)` — display-only, the underlying `calls` row is never deleted or altered, since `useBadges.js`'s `useMyAllCalls`/`computeBadgeProgress` count dials via `calls.length` with no outcome filter at all and would undercount if rows were removed. My Calls keeps its existing `no_answer` exclusion (Prompt 455) alongside the new null-outcome one — two separate predicates rather than one combined `.or()`, since both need to hold (AND). Activity intentionally still shows `no_answer` rows (unchanged, pre-existing difference from My Calls). Removed the now-unreachable "In progress" ternary fallback on both pages' outcome cells, since every displayed row is guaranteed to have a real outcome post-filter.
+
+**Verified against real data, not just built:** confirmed via direct SQL the two flagged artifacts from Twilio-flow testing (`TEST437 — Facility I`, `TEST437 — Facility H`, both `test_setter`, both `outcome IS NULL`) still exist as real rows in `calls` — the fix doesn't touch them, just stops surfacing them. Replicated both pages' exact query predicates directly in SQL for `test_setter`'s real 2026-08-17 Chicago-timezone day: raw day total 11 rows (2 null-outcome) → My Calls' filter (`outcome IS NOT NULL AND <> no_answer`) returns 8, Activity's filter (`outcome IS NOT NULL` only) returns 9 — the arithmetic reconciles exactly (11 = 8 real-connected + 1 no_answer + 2 null), proving the filter excludes precisely the intended rows and nothing else. Overview's Calls Made Today (built off `leads.last_action_at`, a completely separate table/code path never touched) and badges' Dials count (a separate untouched query) are unaffected by construction, not just by inference. `npm run build`/`npm run lint` clean (same pre-existing fast-refresh warnings only).
 
 **Prompt 465 — Pipeline split into Unassigned/Setter/Closer, Setter tab gains real server-side filter chips, shipped and verified 2026-08-18.** Commit `ee0d212` on top of `f221631`, pushed and auto-deployed. New `usePipelineUnassignedLeads()` hook (`assigned_setter IS NULL`, non-booked) backs a new leftmost Unassigned tab — the raw backlog before `assign_setter_batches()`'s cron distributes it. `usePipelineSetterLeads()` narrowed to `assigned_setter IS NOT NULL` and now takes a `statusFilter` param that issues a real `.eq('status', X)` server-side (query-key includes the filter, verified it's a genuine WHERE clause change, not client-side row-hiding), with a new `usePipelineSetterStatusCounts()` running independent per-status count queries so chip counts stay accurate regardless of the active filter. Setter tab reuses `StatusBadge.jsx`'s existing `STATUS_LABELS`/`STATUS_TINT`/`STATUS_SOLID` for its new All/New/No Answer/Follow-up/Not Interested chips, matching the Closer tab's visual pattern. **One inferred call:** Add Lead/Import CSV moved from Setter to Unassigned, since a newly created lead has no `assigned_setter` and would otherwise land invisibly on the tab that just added it.
 
