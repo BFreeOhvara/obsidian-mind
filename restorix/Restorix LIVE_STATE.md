@@ -14,7 +14,69 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
-**Empty as of 2026-08-18** — Prompts 465–469 (Pipeline Unassigned/Setter/Closer split, My Calls/Activity unlogged-row fix, restorix-marketing motion pass, real setter commission tracking, closer survey tool) all shipped and verified this session. See CURRENT STATE below for what's live.
+### Prompt 476 — Overview filter chips: swap New's and No Answer's unselected (tint) colors
+
+Live review feedback 2026-08-18, described by comparing two screenshots — read carefully, this is a color swap between two specific chips' *unselected* states only, nothing about their selected states changes.
+
+1. **New's filter chip, when NOT selected,** currently renders in a plain gray tint. Change it to the light-blue tint already used for the "NEW" status badge shown per-row in the lead table itself (the `#e3e9ff` bg / accent-deep text pairing from Prompt 442's `StatusBadge` TINT map — reuse that exact existing color, don't invent a new one).
+2. **No Answer's filter chip, when NOT selected,** should take over the plain gray tint New's chip is giving up in step 1 — i.e. the two chips' unselected colors are swapping, not just New changing.
+
+**Leave every selected (SOLID) state untouched** — this is only about the TINT/unselected color of these two specific chips. Follow/Not Interested/Appointment Booked chips are unaffected entirely.
+
+**Verify:** via `getComputedStyle`, confirm New's unselected chip background now matches the exact same color as a New status badge in the table (not just visually similar), confirm No Answer's unselected chip now renders in the gray New used to have, confirm both chips' selected/solid states are pixel-identical to before this change.
+
+---
+
+### Prompt 475 — Stats heatmap: dial-volume gradient from gray to the portal's blue accent
+
+Live review feedback 2026-08-18 on the "Last 21 Days" heatmap (Prompt 450). The non-Perfect-Day cells currently shade white-to-dark-gray based on dial count — Brayden wants that gradient recolored to the portal's own blue accent instead of gray, so it matches the rest of the UI's color language. **Leave the green Perfect Day override untouched** (`150 dials + 2 bookings` cells stay solid green, that's intentional and distinct, not part of this change) — this is only about the gray dial-volume gradient specifically.
+
+Use the same blue already established everywhere else in the portal (the accent used on Call buttons, selected filter chips, etc.) as the gradient's dark end, white/near-white as the light end — same intensity math as today (purely dial count, unaffected by bookings), just a different hue.
+
+**Verify:** confirm via `getComputedStyle` that a real cell's background color actually changed from a gray value to a blue-tinted one at the correct intensity for its dial count, confirm the Perfect Day green cells are unaffected, confirm the "Dial volume" legend swatch updates to match the new gradient's color.
+
+---
+
+### Prompt 474 — "My Calls" → "My Recordings" label, setter role only
+
+Live review feedback 2026-08-18. Rename the nav item and page `<h1>` from "My Calls" to "My Recordings" — **setter role only.** Closer and admin keep seeing "My Calls" exactly as-is, wherever they currently see it (check the actual current role-gating on this nav item/page before assuming — confirm whether closers/admin even see it today per Prompt 447's note that closers have no call-placing UI yet, don't guess). This is a label change only — no behavior, route, or data change, the page still shows the same call history it already does.
+
+**Verify:** log in as `test_setter`, confirm both the sidebar label and the page heading read "My Recordings". Log in as `test_closer` (and check admin if it's visible there too), confirm both still read "My Calls" unchanged.
+
+---
+
+### Prompt 471 — restorix-marketing: real AI chatbot, replaces the visual-placeholder from Prompt 467
+
+**Corrects Prompt 467's chat-widget scope.** Brayden clarified 2026-08-18: he wants a genuinely functional AI chatbot visitors can ask real questions to, not the visual-only placeholder that shipped (opens a static panel with a "Book a Strategy Call" link, no backend) — that was the wrong read of an intentionally-ambiguous question, correcting now with his real answer.
+
+**Blocked on a real secret Brayden is retrieving himself — do not build/guess a fake key.** He's getting a real Anthropic API key via Claude Chrome (console.anthropic.com → Settings → API Keys) and will set it as a Supabase secret himself (e.g. `ANTHROPIC_API_KEY`) on the `avgvmzshujwphneykuvu` project, same pattern as the 5 Twilio secrets earlier this project. **Check whether that secret exists before starting** — if it's not there yet, stop and flag it rather than inventing a placeholder/mock response system.
+
+**Build, once the secret exists:**
+1. New Supabase edge function (e.g. `marketing-chat`) that takes the visitor's message + short conversation history, calls the Anthropic Messages API with a system prompt describing Restorix — who it's for (behavioral health treatment centers), the pitch (missed/slow intake response costs admissions), the Stack (front-runners + sub-agents, pull the real descriptions from [[Restorix Closer Survey]]'s "Content for the results screen" section rather than re-summarizing), and the researched pitch stats already established in [[Restorix North Star]]. **Explicit instruction in the system prompt: never quote a specific price** — Restorix has no fixed pricing, deals are custom-quoted by a closer; the bot should always route pricing questions to "book a strategy call for a real quote," never invent a number. Also instruct it to stay in the crisis-sensitive tone already established for this niche (never "shop for a clinic" framing) and to gently steer toward booking a call as the natural next step, without being pushy.
+2. Wire the existing chat-bubble UI (Prompt 467's placeholder shell) to this function — real message list, input box, loading state while waiting on a response. Streaming is a nice-to-have if straightforward with the existing setup, not required for v1.
+3. Rate-limit or otherwise guard the endpoint minimally (e.g. a basic per-IP or per-session throttle) — it's a public, unauthenticated marketing page, don't ship it wide open to abuse that runs up API cost.
+
+**Verify:** send a handful of real test messages through the actual deployed widget — a Stack/services question (confirm it answers using real content, not fabricated details), a direct pricing question (confirm it deflects to booking a call, never states a number), and something off-topic (confirm it stays on-brand rather than answering as a generic assistant). Confirm the secret is read from Supabase's secret store, never hardcoded or logged anywhere.
+
+---
+
+### Prompt 472 — restorix-marketing hero: replace dot-network background with an animated Live Intake card
+
+**Corrects part of Prompt 467.** Brayden's actual ask was "give the page more life with subtle animation," not "copy Regenix's specific dot/particle-network background" — that's what shipped, and he flagged it reads as too close to Regenix's own hero treatment. Remove the dot/line network entirely.
+
+**Replace it with motion on the "Live Intake" card that's already in the hero** (the one showing Inquiry received → Text-back sent → Consult booked with timestamps): have its three rows fade/slide in one at a time in sequence, like the intake is happening live in front of the visitor, looping on a timer. Give the small blue status dot next to "LIVE INTAKE" a slow, subtle pulse — a live-recording-indicator feel. This animates something that's actually about the product instead of a generic tech-background graphic, which is the real reason it won't read as a Regenix copy.
+
+**Verify:** confirm the sequence loops cleanly (doesn't just play once and freeze), confirm it's subtle enough not to be distracting next to the headline, confirm no perf regression.
+
+---
+
+### Prompt 473 — restorix-marketing Process section: replace circular diagram with a scroll-filling progress line
+
+**Corrects the other part of Prompt 467.** The circular orbiting diagram with a step "blacking out" as active reads as a near-literal copy of Regenix's own Process section. Remove it.
+
+**Replace with:** a vertical line running down the left side of the already-existing stacked step cards (01-05). As the visitor scrolls past each card, the line fills in with the accent blue up to that point — a scroll-progress indicator, not a radial diagram. The active step's icon badge gets a soft glow/pulse instead of any circle turning solid black; inactive steps stay a plain light-gray outline. Same scroll-synced "active step has motion" behavior Brayden liked conceptually, different, original execution.
+
+**Verify:** confirm the line-fill and active-icon-glow both track scroll position accurately in both directions (scrolling up should un-fill the line, not just always fill down), confirm it reads correctly on the number of steps the section actually has (check the real count in `Process.jsx`, don't assume it's still 5).
 
 ---
 
@@ -42,6 +104,16 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 477 — Sidebar account block gets a clickable-looking background, shipped and verified 2026-08-18.** Commit `62c906f` on top of `a4ee3a8`, pushed and auto-deployed. Read `ohvara-dashboard/src/components/layout/Sidebar.jsx`'s `AccountMenu` per the prompt's own instruction — its row uses a permanent `background: var(--bg-elevated)` to stand out against its own (darker) sidebar. Copying that literal token here would have done nothing, since Restorix's own sidebar `<aside>` already IS `bg-elevated` (white) — the account block and its background would've matched exactly. Used `bg-[#e3e9ff]` instead — the same light-blue tint already established in `StatusBadge.jsx`'s "new" state, reused rather than inventing a new color — with `hover:brightness-95` for the hover state (a filter, not a second invented tint).
+
+**Found a real, previously-unnoticed bug while implementing the first attempt, not shipped blind:** tried `bg-accent/10`/`hover:bg-accent/20` first (the more obvious Tailwind approach), and `getComputedStyle` showed it computed to fully transparent. Traced it to `tailwind.config.js`: `accent`/`accent-bright`/`accent-deep`/`success`/`danger`/`line` are all defined as plain `var(--x)` strings, not the `rgb(var(--x) / <alpha-value>)` form Tailwind needs to generate opacity-modifier CSS — confirmed by grepping the built stylesheet, which contains **zero** `/N`-opacity rules for any of these tokens anywhere in the whole compiled CSS. This means every existing `border-accent/30`, `border-accent/40`, `fill-accent-bright/25`, etc. elsewhere in this codebase (System.jsx-era components, SystemDiagram.jsx, Survey.jsx's ExpandableCard, likely others) has been silently rendering with **no color at all** instead of the intended translucent tint — a real, app-wide cosmetic bug that predates this session and was never caught because it fails silently (no console error, no visual crash, just a missing tint). **Flagged as a separate background task (`task_569e9ca8`) rather than fixed here** — real scope, many files, not something to fold silently into a sidebar-button prompt.
+
+**Verified live, not just built:** `getComputedStyle` on the account button confirmed `rgb(227, 233, 255)` (`#e3e9ff`) against the sidebar's `rgb(255, 255, 255)` — genuinely distinct. Couldn't trigger real `:hover` via synthetic DOM events in this session's pane (same standing compositing-pipeline limitation noted in Prompt 467's log), so verified the hover rule a different way: grepped the compiled CSS directly and confirmed `.hover\:brightness-95:hover{filter:...brightness(.95)...}` is a real, correctly-generated rule that will apply on actual pointer hover in any real browser. Confirmed no functional regression — the popover still opens (shows Profile/Sign out) and closes cleanly on a second click. `npm run build`/`npm run lint` clean.
+
+**Prompt 470 — Closer Survey results screen gets click-to-expand cards (front-runner + all 5 sub-agents), shipped and verified 2026-08-18.** Commit `a4ee3a8` on top of `a575f2a`, pushed and auto-deployed. New shared `ExpandableCard` component (`pages/Survey.jsx`) used for both the front-runner card and every sub-agent row — whole box is the click trigger, no separate button, exactly as specified. Content pulled verbatim from the vault note's "Content for the results screen" section into a `RESULTS_CONTENT` map in `lib/survey.js`, keyed to the existing front-runner/sub-agent keys.
+
+**Verified with real geometry, not visual inspection:** measured every card's `top`/`height` via `getBoundingClientRect()` before/after expanding a mid-list row — confirmed the clicked card grew in place, every card below it shifted down by exactly the growth amount, zero overlap. Confirmed exact position restoration on re-collapse. Walked both front-runner paths (Intake & Triage, Missed-Call Recovery) and confirmed the correct copy shows for each with no cross-contamination. **Hit a viewport-not-sized artifact mid-verification** (an early geometry check returned an implausible ~4,539px card height — `window.innerWidth` was genuinely `0` since the pane's viewport was never explicitly set this session) — resolved with `resize_window`, worth checking first any time `getBoundingClientRect()` looks physically implausible in this environment. `npm run build`/`npm run lint` clean, zero console errors (aside from one confirmed pre-existing, unrelated 400 that also reproduces on `/overview`).
 
 **Prompt 469 — Interactive closer survey tool, branching Stack qualification, shipped and verified live 2026-08-18. Closes out the full 465–469 queue — "Next Up for CC" is empty.** Commit `a575f2a` on top of `5c2eb0c`, pushed and auto-deployed. New `/survey` route (`roles: ['closer', 'admin']`, WORK nav group beside My Calls). Content sourced directly from the [[Restorix Closer Survey]] vault note's question tree — Q0 (front-runner: Intake & Triage vs. Missed-Call Recovery, never both) always first, Section 1 (missed calls) only applies on the Missed-Call Recovery path, Sections 2–7 always asked regardless of path per the doc's own language. Asked Brayden directly per the prompt's own explicit instruction rather than guessing: **stateless, no persistence** — confirmed, matching his recommended default and the doc's own "qualification and talk track, not a record-keeping system" framing.
 

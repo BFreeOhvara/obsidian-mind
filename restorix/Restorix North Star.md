@@ -33,18 +33,20 @@ Treatment centers lose admissions to slow/missed intake response. Restorix insta
 
 ## The Stack
 
-The actual AI infrastructure Restorix installs per client — same model Ohvara originally used (1-2 front-runner agents that solve the core problem + supporting sub-agents), not a fixed package. Confirmed with Brayden 2026-08-17.
+The actual AI infrastructure Restorix installs per client — same model Ohvara originally used (1-2 front-runner agents that solve the core problem + supporting sub-agents), not a fixed package. Confirmed with Brayden 2026-08-17. **Restructured 2026-08-18** after Brayden caught a real redundancy (full-answering Intake agent + a "missed-call" recovery agent for a business that isn't missing calls anymore) — audited the rest of the stack for the same failure mode at the same time.
 
-**Front-runners:**
-- **Inbound Intake & Triage agent** — answers every call/form/text instantly, does level-of-care and insurance pre-screening, books or routes to a human.
-- **Missed-Call Recovery agent** — unanswered call triggers an auto text/call-back within minutes.
+**Front-runners — one or the other, not both, decided by the client's automation readiness (a survey question in [[Restorix Closer Survey]], not a default):**
+- **Inbound Intake & Triage agent** — for a client ready to let AI answer every call/form/text live. Does level-of-care and insurance pre-screening, books or routes to a human. **Always includes mandatory after-hours crisis-language detection and live-human bailout as a core, non-optional safety feature** — never sold or priced as a separate add-on a client could decline, this niche can't afford that gap.
+- **Missed-Call Recovery agent** — for a client not ready to hand off live answering (keeps human staff primary). A lighter safety net: only activates on what humans actually miss, auto text/call-back within minutes. Redundant *alongside* Intake & Triage for the same client (nothing to recover if nothing's missed) — pitch whichever one fits, not both.
 
 **Sub-agents:**
-- Insurance/payer verification, in real time during intake.
+- **Insurance/payer verification** — the deeper, real-time eligibility/benefits check with the payer. Distinct from the front-runner's own lighter conversational pre-screen ("what insurance do you have?") — that distinction matters, don't conflate the two when pitching.
 - Follow-up & nurture sequence for leads that don't convert same-day (common in this niche — decision often isn't immediate).
 - Bed/program availability sync before booking an intake appointment.
-- After-hours crisis-language routing — detects high-risk language and bails out of automation straight to a human/on-call clinician rather than continuing the automated flow.
+- **Appointment Reminder & No-Show Prevention** (added 2026-08-18, a real gap Brayden's redundancy question surfaced) — automated reminders in the lead-up to a booked intake, re-engagement if the person doesn't confirm. A booked appointment only has value if they show up; nothing in the stack covered that leak point before this.
 - Referral-source reporting for the facility's business development side.
+
+~~After-hours crisis-language routing as a standalone sub-agent~~ — folded into Intake & Triage as a mandatory core feature (see above), no longer its own line item.
 
 ## Reference Site
 
