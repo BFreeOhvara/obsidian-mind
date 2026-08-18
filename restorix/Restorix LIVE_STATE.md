@@ -14,6 +14,24 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
+### ⚠️ One manual step left for Brayden — Prompt 488's account deletion, auth.users blocked by the runtime classifier
+
+Prompt 488 (delete `test_setter2`/`test_closer2` entirely) is done except for the actual `auth.users` rows — see CURRENT STATE for full detail of what was cleaned up. Attempting `DELETE FROM auth.users` via the Supabase MCP's `execute_sql` was blocked by this session's own runtime safety classifier (a platform-level control, separate from and in addition to your own confirmation already recorded in the original task). Asked you directly rather than trying to route around it; you chose to handle the auth-user deletion yourself. **Still needed:** in the Supabase dashboard for the `restorix-portal` project (`avgvmzshujwphneykuvu`) → Authentication → Users, delete `test_setter2@restorix.internal` and `test_closer2@restorix.internal`. Everything else referencing them (public schema) is already gone — this is purely the auth-schema row, a 30-second manual step.
+
+---
+
+### ⚠️ Also surfaced, unrelated to Prompt 488 — RLS disabled on `public.marketing_chat_rate_limit`
+
+Noticed incidentally while investigating Prompt 488 (via a `list_tables` call on the `restorix-portal` Supabase project, which is where Prompt 471 deployed the `marketing-chat` edge function's rate-limit table even though it serves the marketing site). The Supabase advisor flagged: Row Level Security is disabled on `public.marketing_chat_rate_limit` — it's fully exposed to the `anon`/`authenticated` roles, meaning anyone with the public anon key could read or write every row (in practice: see or forge rate-limit counters for the public chat widget). Not fixed — the standard remediation (`ALTER TABLE public.marketing_chat_rate_limit ENABLE ROW LEVEL SECURITY;`) would need real policies added alongside it or it silently blocks all access (including the edge function's own legitimate writes), and that's a real design decision, not a blind one-liner to auto-apply. Flagging for a future prompt, not touched this session.
+
+**Handle foreign keys carefully — this is test-account cleanup, not data loss.** Leads currently `assigned_setter`/`assigned_closer`/`last_action_by` pointing at either deleted account need to be reassigned or cleared rather than cascade-deleted along with the account — the leads themselves are real SAMHSA-sourced data (or legitimate seed data), not throwaway. Reasonable default: null out `assigned_setter`/`assigned_closer` on any lead pointing at a deleted account so the normal pipeline cron picks it back up into the pool/reassigns it, same as the existing no-answer/redistribution logic already does — don't leave orphaned FK references, and don't delete real lead rows just because a test account touched them. Same treatment for any `calls` rows tied to these accounts — decide whether to delete or keep for historical record, use judgment, but don't let a bad delete order break FK constraints.
+
+Update the 🔑 Test accounts section of this doc afterward to remove both entries, keeping only `test_setter`/`test_closer`.
+
+**Verify:** confirm both accounts are gone (auth + profiles), confirm `test_setter`/`test_closer` still work unaffected, confirm no orphaned leads/calls rows reference the deleted user IDs, confirm the pipeline crons still run cleanly afterward (no FK violations).
+
+---
+
 **Empty as of 2026-08-18** — Prompt 487 (Closer Overview restructured to match Setter's tile/table pattern, Log Outcome + Closer Survey combined into one modal) shipped this session. See CURRENT STATE below for what's live.
 
 ---
@@ -64,6 +82,10 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 488 — `test_setter2`/`test_closer2` fully deleted from the database, shipped 2026-08-18, one manual step left for Brayden (see flag above).** Brayden confirmed he's done reviewing the round-robin/redistribution proof these two accounts existed for. Investigated dependencies first rather than deleting blind — found 155 leads assigned to them (confirmed 100% `TEST`/`TEST437`/`TEST438`-prefixed test fixtures, zero real SAMHSA-scraped facilities, safe to delete outright rather than just unassign), 5 completed historical `no_answer_queue` redistribution-audit rows, 2 `messages`, 2 `invites`. Ran one ordered transaction in the `restorix-portal` Supabase project (`avgvmzshujwphneykuvu`): cleaned queue/call rows referencing those leads, deleted the 155 test leads, cleaned messages/invites/queue rows referencing the accounts directly, deleted the two `profiles` rows. **`auth.users` deletion was blocked by this session's runtime safety classifier** (a platform-level control on top of Brayden's own already-recorded confirmation) — asked directly rather than trying to route around it; Brayden chose to delete the two auth users himself via the Supabase dashboard, a 30-second manual step, flagged above.
+
+**Verified:** re-queried every table that had referenced these two IDs — `profiles`/`leads`/`messages`/`invites`/`no_answer_queue` all show zero remaining references. `profiles` count dropped from 7 to 5 (exactly the 2 removed); `leads` count dropped from 13,993 to 13,838 (exactly the 155 test leads removed). Remaining 5 profiles confirmed as exactly the expected real accounts: `test_setter`, `test_closer`, `n8closes`, `roosens1`, `brayden`.
 
 **Prompt 487 — Closer Overview restructured to match Setter Overview's own pattern; Log Outcome + Closer Survey combined into one modal, shipped 2026-08-18 on `restorix-portal` (main repo, not `restorix-marketing`).** Commit `70d7005` on top of `8555a36`. Closer's Overview was a flat stack of individually-actioned cards — now has 4 stat tiles (Pending/Needs Rescheduling/Lost/Closed) scoped to that closer's own leads (`useMyBooked`, already filtered on `assigned_closer = auth.uid()`), then the same bordered-box + table shape Setter Overview uses, with a real empty state and rows clickable (plus a kept "Open" button) to open a new `CloserLeadModal`. That modal has a Log Outcome / Closer Survey tab switch — split `LogOutcomeModal` into a bare `LogOutcomeForm` (Pipeline.jsx's existing standalone `LogOutcomeModal` usage unchanged) and split `Survey` into a bare `SurveyBody` (the standalone `/survey` nav route unchanged), so the combined modal reuses the exact same components with zero duplicated logic.
 
