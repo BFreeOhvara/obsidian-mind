@@ -14,17 +14,7 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
-### Prompt 479 — New page-wide ambient background animation, Restorix's own (not Regenix's dots)
-
-Brayden explicitly asked for an original idea here, not a spec to follow — his words: "I want you to come up with the idea." Direction below is that idea, reasoned from what's already established for this project rather than invented from nothing.
-
-**The concept:** soft, slowly drifting/breathing radial glow blobs, in Restorix's own established cornflower-blue palette (`#3a63d6`/`#7c9eff`/`#24469e`) — extending something already native to this site's own visual language rather than borrowing Regenix's dot-network idea. The original Restorix theme (Prompt 427/429) already used static "soft radial glow blobs" as a background element; this prompt is about giving that existing motif real, continuous, very subtle motion — blobs slowly shift position/scale/opacity over a long cycle (tens of seconds per cycle, not fast), like a slow-breathing ambient glow, never fast or attention-grabbing. This should run **the full length of the page, not just the hero** — Brayden was explicit he wants it throughout, not confined to one section.
-
-**Implementation guidance:** pure CSS (transform/opacity keyframe animations on a few large blurred radial-gradient shapes), not canvas or a JS animation loop — keeps it cheap performance-wise for something running continuously across the whole page. Respect `prefers-reduced-motion` (pause/simplify the animation for users who've set that). Keep it genuinely subtle — this is ambient texture behind content, never something that competes with the copy or CTAs for attention.
-
-**Ask Brayden directly if genuinely unclear** once mid-build: whether this should be the same blob positions/count throughout the whole page (simplest, one continuous background layer) or vary per-section (more work, more visually rich, but bigger scope) — default to one continuous layer unless told otherwise, matching the "come up with something, keep it simple and tasteful" spirit of the ask.
-
-**Verify:** confirm the animation runs continuously and subtly across at least 3 different sections of the page (not just the hero), confirm it respects `prefers-reduced-motion`, confirm no meaningful Lighthouse/perf regression, confirm it reads as visually distinct from Regenix's own background treatment (no dots, no connecting lines, no particle-network feel).
+**Empty as of 2026-08-18** — Prompts 478–479 (Live Intake card one-shot entrance, page-wide ambient glow) shipped and verified this session. See CURRENT STATE below for what's live.
 
 ---
 
@@ -52,6 +42,12 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 479 — Page-wide ambient glow-blob animation, Restorix's own idea (Brayden explicitly asked to "come up with the idea"), shipped and verified 2026-08-18. Closes out the 478–479 queue — "Next Up for CC" is empty.** Commit `792fa1a` on top of `c1437e5`. Extended the site's existing static `.glow` radial-blur-blob motif (used since Prompt 427/429) into slow continuous motion rather than inventing a new visual language: new `AmbientGlow.jsx`, three blobs in the site's own accent palette (`--accent`/`--accent-bright`/`--accent-deep`), pure CSS `transform`/`opacity` keyframes only (no canvas, no JS loop) with long, mutually-offset cycles (26s/32s/38s, negative `animation-delay`s so they're never in sync). `position: fixed` covering the viewport, not a document-height-sized element — this is what makes it run the full length of the page: it's present at every scroll position by construction rather than needing to track page height. Animation rules live entirely inside `@media (prefers-reduced-motion: no-preference)`, so reduced-motion users get static blobs. Genuinely low opacity (peak ~0.22–0.26) to stay ambient, not attention-competing.
+
+**One real CSS stacking-order risk resolved proactively rather than left to chance:** a `position:fixed z-index:0` layer painted before all other content could in principle end up visually on top of un-positioned (`z-index:auto`) page sections depending on exact browser stacking rules — rather than guess, gave `<main>` and the `<Footer>` wrapper explicit `relative z-10` in `App.jsx` so correct stacking is guaranteed by construction, then verified live with `document.elementFromPoint()` at the Hero headline and (after scrolling) the System section's own heading — both correctly returned the real heading element, not a blob, confirming content is genuinely clickable/on top at multiple scroll depths, not just visually plausible.
+
+**Verification hit and worked around a real scroll limitation in this pane, distinct from the session's other rAF findings:** `window.scrollTo()` had zero effect under this site's `scroll-behavior: smooth` (itself rAF-driven, so blocked the same way every other framer-motion transition has been all session) — worked around by setting `scroll-behavior: auto` first, then `scrollTo({behavior:'instant'})`, which did work reliably. Worth remembering as a fix, not just a limitation, for any future prompt needing to verify scroll-dependent behavior in this environment. Confirmed via direct CSSOM inspection that exactly one `prefers-reduced-motion: no-preference` media rule wraps all three blob animations (3 inner rules) — verified by construction rather than by actually toggling the OS-level preference, which isn't controllable through this tooling. `npm run build`/`npm run lint` clean, zero console errors.
 
 **Prompt 478 — Live Intake card entrance plays once on load, no longer loops, shipped and verified 2026-08-18.** Commit `c1437e5` on top of `884971b`. Corrects Prompt 478's own predecessor (Prompt 472) — Brayden's actual ask was a one-time slide-in on load, not the continuously-repeating cycle that shipped. Reverted the three timeline rows from the repeat-driven keyframe animation back to a plain `initial`/`animate` one-shot reveal (matching the original pre-472 pattern exactly — same stagger math, `delay: 0.7 + i * 0.18`, no `repeat`). Status dot's slow pulse (`repeat: Infinity`) left untouched per the prompt's own explicit default, since that wasn't the complaint.
 
