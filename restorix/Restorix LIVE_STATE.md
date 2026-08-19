@@ -14,7 +14,7 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
-**As of 2026-08-19** — Prompts 495, 494, and 496 all shipped (495 was already committed in a prior session but hadn't been logged/cleared — reconciled this session, see [[Restorix Memories]]). Two items remain genuinely pending below: Prompt 492 (chat greeting bubble) and Prompt 493 (hero/next-section spacing). See CURRENT STATE for what's live.
+**As of 2026-08-19** — Prompts 495, 494, 492, and 496 all shipped (495 was already committed in a prior session but hadn't been logged/cleared — reconciled 2026-08-19, see [[Restorix Memories]]). One item remains genuinely pending below: Prompt 493 (hero/next-section spacing). See CURRENT STATE for what's live.
 
 ---
 
@@ -23,14 +23,6 @@ tags:
 ---
 
 **Empty as of 2026-08-18** — Prompt 490 (hero wave scrapped again, dot-network + mouse-repulsion + blue wash restored) shipped this session. See CURRENT STATE below for what's live.
-
----
-
-### Prompt 492 — Chat widget: proactive greeting bubble before it's opened
-
-Live review feedback 2026-08-18, referencing Regenix's own chat bubble which shows a small greeting popup ("Hi there! Have a question? Chat with us!") near the chat icon before the visitor has clicked it. Add the same pattern to Restorix's chat widget (Prompt 471): a small greeting bubble appears near/above the floating chat icon after some reasonable delay (use judgment — a few seconds after page load, or on first scroll, not instant), with real copy in Restorix's own voice (not a verbatim copy of Regenix's line). **Once the visitor clicks the chat icon and the actual chat panel opens, the greeting bubble disappears** and doesn't reappear for that session. Should also be dismissible on its own (a small close/x on the bubble itself) without needing to open the full chat.
-
-**Verify:** confirm the greeting bubble appears on page load per whatever delay/trigger was chosen, confirm clicking the chat icon opens the real chat AND dismisses the greeting bubble, confirm dismissing the bubble directly (its own close control) doesn't also open the chat panel, confirm it doesn't reappear after being dismissed within the same session.
 
 ---
 
@@ -87,6 +79,8 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 492 — Chat widget gets a proactive greeting bubble, shipped 2026-08-19 on `restorix-marketing`, not yet confirmed live.** Commit `9859cd3` on top of `7d111f7`. Ported the pattern from Regenix's own chat widget (a small greeting popup before the visitor opens the panel), not the copy — real Restorix voice ("Have a question about how this works for your facility? Happy to walk you through it."). Appears 4s after page load via a plain `setTimeout` (unaffected by this pane's known rAF/ResizeObserver limitations). A ref tracks dismissal so the one-shot timer can't resurrect the bubble after either dismissal path: opening the chat (marks dismissed before flipping `open`) or the bubble's own close X (fully independent of chat state). Verified via real DOM/state checks: bubble appears with the real copy after the delay; clicking the launcher genuinely opens the chat panel (confirmed "Chat with Restorix" mounted) and drops the bubble to `opacity:0`; clicking the bubble's own X drops it to `opacity:0` while the launcher's `aria-label` stays "Open chat" — proving direct dismissal never opens chat; re-checked after an extra wait and on a fresh reload-and-dismiss that it doesn't reappear. Fits cleanly at 375px mobile width. Zero console errors, `npm run build`/`npm run lint` clean. Hit the same framer-motion exit-animation-never-completes pane limitation Prompt 490 first established (dismissed bubble's DOM node lingers at `opacity:0` instead of unmounting) — verified via computed opacity rather than screenshot, consistent with that established workaround.
 
 **Prompt 494 — Process section: 4 step cards now equal height, shipped 2026-08-19 on `restorix-marketing`, not yet confirmed live.** Commit `7d111f7` on top of `793ec3a`. Optimize's card was taller than the other three (3-line tag list vs. 2). Fixed via the standard `align-items: stretch` technique — made it explicit on the grid and threaded `h-full` down through `Reveal`'s wrapper and the inner flex column so the existing `flex-1` on the bordered card box had a real stretched height to grow against (it was previously collapsing to content size despite the grid's default stretch, since nothing between the grid row and the `flex-1` box carried the height down). Verified via real bounding-box measurements at 1440px: all 4 outer wrappers and all 4 card boxes pixel-identical (418.77px / 268.37px); confirmed the fix only applies at the `lg` breakpoint, tablet/mobile correctly fall back to natural per-row heights in the single-column stack. Zero console errors, `npm run build`/`npm run lint` clean.
 
