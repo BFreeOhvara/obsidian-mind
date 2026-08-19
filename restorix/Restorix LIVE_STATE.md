@@ -14,7 +14,7 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
-**As of 2026-08-19** — Prompts 495, 494, 492, and 496 all shipped (495 was already committed in a prior session but hadn't been logged/cleared — reconciled 2026-08-19, see [[Restorix Memories]]). One item remains genuinely pending below: Prompt 493 (hero/next-section spacing). See CURRENT STATE for what's live.
+**Empty as of 2026-08-19** — Prompts 495, 494, 492, and 493 all shipped this session (495 was already committed in a prior session but hadn't been logged/cleared — reconciled 2026-08-19, see [[Restorix Memories]]). Queue fully cleared. See CURRENT STATE for what's live.
 
 ---
 
@@ -23,14 +23,6 @@ tags:
 ---
 
 **Empty as of 2026-08-18** — Prompt 490 (hero wave scrapped again, dot-network + mouse-repulsion + blue wash restored) shipped this session. See CURRENT STATE below for what's live.
-
----
-
-### Prompt 493 — Hero section: fix cramped boundary with the next section
-
-Live review feedback 2026-08-18. The next section's heading ("THE LEAK") currently sits too close to the bottom of the hero — visible right at the hero's lower edge in a way that reads as cramped/abrupt rather than a clean section break. Two changes: (1) add more bottom spacing/padding to the hero section so its content isn't crowded against the next section, and (2) add a distinct thin gray divider line at the bottom edge of the hero, marking a clean, intentional section boundary — same spirit as wanting the earlier wave/dot background to fade out cleanly rather than cut off abruptly, but this time it's a spacing/layout fix, not a background-effect fix.
-
-**Verify:** confirm there's genuine visual breathing room between the hero's own content and "The Leak" heading below it, confirm the new divider line renders as a clean, subtle boundary (not heavy/harsh), confirm this doesn't conflict with or get overlapped by Prompt 490's hero-only dot background (dot field should still end where the hero ends, at or above this new divider).
 
 ---
 
@@ -79,6 +71,8 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 493 — Hero gets more bottom spacing plus a clean section divider, shipped 2026-08-19 on `restorix-marketing`, not yet confirmed live.** Commit `f992a5c` on top of `9859cd3`. "The Leak" heading was sitting right at the hero's lower edge, reading as cramped/abrupt. Doubled the hero's bottom padding to mirror its own top padding (`pb-20` → `pb-28`/`md:pb-36`, matching the existing `pt-28`/`md:pt-36`), and added a 1px `bg-line`/`--border` divider at the hero's bottom edge — the same technique Process.jsx already established for its own step-card divider, not a new pattern. Verified with real measurements: gap between the hero's box-bottom and Leak's actual heading is 192px at 1440×900 (was ~80px of padding alone before), 160px at 375px mobile. Confirmed the dot-network canvas (Prompt 490/496) ends at the exact same edge as the divider, not past it, with the divider's `z-10` keeping it visible on top at that shared edge. Zero console errors, `npm run build`/`npm run lint` clean.
 
 **Prompt 492 — Chat widget gets a proactive greeting bubble, shipped 2026-08-19 on `restorix-marketing`, not yet confirmed live.** Commit `9859cd3` on top of `7d111f7`. Ported the pattern from Regenix's own chat widget (a small greeting popup before the visitor opens the panel), not the copy — real Restorix voice ("Have a question about how this works for your facility? Happy to walk you through it."). Appears 4s after page load via a plain `setTimeout` (unaffected by this pane's known rAF/ResizeObserver limitations). A ref tracks dismissal so the one-shot timer can't resurrect the bubble after either dismissal path: opening the chat (marks dismissed before flipping `open`) or the bubble's own close X (fully independent of chat state). Verified via real DOM/state checks: bubble appears with the real copy after the delay; clicking the launcher genuinely opens the chat panel (confirmed "Chat with Restorix" mounted) and drops the bubble to `opacity:0`; clicking the bubble's own X drops it to `opacity:0` while the launcher's `aria-label` stays "Open chat" — proving direct dismissal never opens chat; re-checked after an extra wait and on a fresh reload-and-dismiss that it doesn't reappear. Fits cleanly at 375px mobile width. Zero console errors, `npm run build`/`npm run lint` clean. Hit the same framer-motion exit-animation-never-completes pane limitation Prompt 490 first established (dismissed bubble's DOM node lingers at `opacity:0` instead of unmounting) — verified via computed opacity rather than screenshot, consistent with that established workaround.
 
