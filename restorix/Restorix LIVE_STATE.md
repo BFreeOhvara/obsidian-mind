@@ -1,5 +1,5 @@
 ---
-date: 2026-08-18
+date: 2026-08-19
 description: "Single current-state doc for all Restorix sessions — overwritten on update, never appended. Restorix's own vertical, independent of Ohvara's brain/LIVE_STATE.md."
 tags:
   - restorix
@@ -14,27 +14,7 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
-**Empty as of 2026-08-19** — Prompt 496 (dot network corrected against Regenix side-by-side: localized glow, full-viewport hero, bigger/denser dots) shipped this session. See CURRENT STATE below for what's live.
-
----
-
-### Prompt 495 — Profile avatar: remove the color picker, add a remove-photo X, fix the camera badge alignment
-
-Live review feedback 2026-08-18 on Prompt 491's just-shipped avatar work. Three changes:
-
-1. **Remove the pastel color-picker swatches entirely — users should no longer be able to pick their own initials-fallback color.** Reversal of part of Prompt 491, deliberate, don't question it. Keep the underlying `avatar_color` column/concept (still useful for giving initials-avatars some visual variety instead of one flat default color for everyone) but stop exposing the picker UI. **Not specified how color gets set instead — ask Brayden directly if genuinely unclear**, but a reasonable default: auto-assign deterministically at account creation (e.g. hash the user id into one of the same 6 approved pastel values) rather than leaving it picker-less-but-still-manually-editable somewhere else.
-2. **Add a remove-photo "X"** — check Prompt 491's existing "Remove photo" implementation first (ported from Ohvara, may currently be a text link elsewhere rather than an icon on the avatar itself); Brayden wants a small X visible on/near the avatar image to clear it, not just a separate link.
-3. **Fix the camera-badge icon's alignment** — the small blue circular camera-upload badge overlapping the bottom-right of the avatar circle is visibly offset/misaligned, not sitting cleanly on the avatar's edge. Correct its positioning.
-
-**Verify:** confirm the color swatches are gone from the UI; confirm existing users' already-saved `avatar_color` values aren't wiped by this change (only the picker UI goes away, not the data); confirm the remove-photo X actually clears the photo when clicked; confirm the camera badge is now properly aligned via computed position/bounding-box check, not just eyeballed.
-
----
-
-### Prompt 494 — Process section: 4 step cards need equal height
-
-Live review feedback 2026-08-18. The 4 cards (Consult/Architect/Install/Optimize) are inconsistent heights — Optimize's card is taller than the other three because its tag list (`CONVERSATION QA` / `CONVERSION TUNING` / `REPORTING`) wraps to 3 lines while the others only have 2. Brayden wants all four uniform — his preference is unclear on which direction (grow the other three vs shrink Optimize), so use standard equal-height card technique: put all 4 in a `grid`/`flex` container with `align-items: stretch` so every card fills the same height as its tallest sibling automatically, rather than hardcoding a fixed height that could clip future copy changes.
-
-**Verify:** confirm all 4 cards render at identical heights at the current content lengths, confirm the layout still holds correctly at a couple of different viewport widths (not just desktop), confirm no card's internal content looks awkwardly stretched/empty as a result.
+**As of 2026-08-19** — Prompts 495, 494, and 496 all shipped (495 was already committed in a prior session but hadn't been logged/cleared — reconciled this session, see [[Restorix Memories]]). Two items remain genuinely pending below: Prompt 492 (chat greeting bubble) and Prompt 493 (hero/next-section spacing). See CURRENT STATE for what's live.
 
 ---
 
@@ -107,6 +87,10 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 494 — Process section: 4 step cards now equal height, shipped 2026-08-19 on `restorix-marketing`, not yet confirmed live.** Commit `7d111f7` on top of `793ec3a`. Optimize's card was taller than the other three (3-line tag list vs. 2). Fixed via the standard `align-items: stretch` technique — made it explicit on the grid and threaded `h-full` down through `Reveal`'s wrapper and the inner flex column so the existing `flex-1` on the bordered card box had a real stretched height to grow against (it was previously collapsing to content size despite the grid's default stretch, since nothing between the grid row and the `flex-1` box carried the height down). Verified via real bounding-box measurements at 1440px: all 4 outer wrappers and all 4 card boxes pixel-identical (418.77px / 268.37px); confirmed the fix only applies at the `lg` breakpoint, tablet/mobile correctly fall back to natural per-row heights in the single-column stack. Zero console errors, `npm run build`/`npm run lint` clean.
+
+**Prompt 495 — Profile avatar: color picker removed, remove-photo X added, camera badge alignment fixed, shipped in a prior session, confirmed and reconciled into this doc 2026-08-19.** Commit `c7bc9ad` on `restorix-setter-portal`, already on `main`/pushed. Verified against the original prompt's 3 requirements by reading the commit directly rather than re-doing the work: `AvatarColorPicker.jsx` deleted, `avatar_color` now assigned deterministically (hashed from user id) at signup with existing profiles backfilled the same way — column/concept preserved per the prompt's own instruction, only the picker UI is gone; "Remove photo" is now a small X badge on the avatar; camera-badge misalignment's actual root cause (wrapping button with no explicit size) fixed with explicit width/height matching the 56px avatar. This item sat in the "Next Up for CC" queue undeleted despite being done — a doc-sync gap, not a code gap; see [[Restorix Memories]] for the standing lesson.
 
 **Prompt 496 — Dot network corrected against Regenix side-by-side, shipped 2026-08-19, not yet confirmed live.** Commit `793ec3a` on top of `fec1b64`. Four real fixes to Prompt 490's just-shipped result: (1) the flat `rgba(58,99,214,0.18)` full-hero wash replaced with a single soft radial glow (`rgba(58,99,214,0.4)` fading to transparent by 65%, `blur(40px)`) sized/positioned to stay well clear of the hero's actual corners — Regenix's own background stays genuinely light everywhere with only a localized accent, not a wholesale tint; (2) hero gets `min-h-screen` so it fills the full viewport on load; (3) dot radius range roughly doubled (`0.6-2.0` → `1.1-3.7`: min +83%, max +85%, inside the requested 75-100%); (4) `LINK_DISTANCE` roughly doubled (`130` → `250`) plus line opacity/width bumped (`0.18`→`0.28`, `1`→`1.25`) so the denser network reads distinctly.
 
