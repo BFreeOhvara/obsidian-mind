@@ -14,22 +14,47 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
+### Prompt 495 — Profile avatar: remove the color picker, add a remove-photo X, fix the camera badge alignment
+
+Live review feedback 2026-08-18 on Prompt 491's just-shipped avatar work. Three changes:
+
+1. **Remove the pastel color-picker swatches entirely — users should no longer be able to pick their own initials-fallback color.** Reversal of part of Prompt 491, deliberate, don't question it. Keep the underlying `avatar_color` column/concept (still useful for giving initials-avatars some visual variety instead of one flat default color for everyone) but stop exposing the picker UI. **Not specified how color gets set instead — ask Brayden directly if genuinely unclear**, but a reasonable default: auto-assign deterministically at account creation (e.g. hash the user id into one of the same 6 approved pastel values) rather than leaving it picker-less-but-still-manually-editable somewhere else.
+2. **Add a remove-photo "X"** — check Prompt 491's existing "Remove photo" implementation first (ported from Ohvara, may currently be a text link elsewhere rather than an icon on the avatar itself); Brayden wants a small X visible on/near the avatar image to clear it, not just a separate link.
+3. **Fix the camera-badge icon's alignment** — the small blue circular camera-upload badge overlapping the bottom-right of the avatar circle is visibly offset/misaligned, not sitting cleanly on the avatar's edge. Correct its positioning.
+
+**Verify:** confirm the color swatches are gone from the UI; confirm existing users' already-saved `avatar_color` values aren't wiped by this change (only the picker UI goes away, not the data); confirm the remove-photo X actually clears the photo when clicked; confirm the camera badge is now properly aligned via computed position/bounding-box check, not just eyeballed.
+
+---
+
+### Prompt 494 — Process section: 4 step cards need equal height
+
+Live review feedback 2026-08-18. The 4 cards (Consult/Architect/Install/Optimize) are inconsistent heights — Optimize's card is taller than the other three because its tag list (`CONVERSATION QA` / `CONVERSION TUNING` / `REPORTING`) wraps to 3 lines while the others only have 2. Brayden wants all four uniform — his preference is unclear on which direction (grow the other three vs shrink Optimize), so use standard equal-height card technique: put all 4 in a `grid`/`flex` container with `align-items: stretch` so every card fills the same height as its tallest sibling automatically, rather than hardcoding a fixed height that could clip future copy changes.
+
+**Verify:** confirm all 4 cards render at identical heights at the current content lengths, confirm the layout still holds correctly at a couple of different viewport widths (not just desktop), confirm no card's internal content looks awkwardly stretched/empty as a result.
+
+---
+
 **Empty as of 2026-08-18** — Prompt 491 (photo avatar upload/crop ported from Ohvara + a new pastel color picker for the initials fallback) shipped this session. See CURRENT STATE below for what's live.
 
 ---
 
-### Prompt 490 — Scrap the hero wave, bring back an interactive dot-network background, full page, mouse-repulse
+**Empty as of 2026-08-18** — Prompt 490 (hero wave scrapped again, dot-network + mouse-repulsion + blue wash restored) shipped this session. See CURRENT STATE below for what's live.
 
-**Full reversal of Prompts 483–486, confirmed deliberately by Brayden after more thought — not a mistake to question, just execute it.** His reasoning: a connected-dot particle network isn't uniquely Regenix's, it's a generic tech-aesthetic pattern reused everywhere, so reusing the *concept* is fine — the earlier objection was about the specific wave/blob attempts reading as too derivative, not about dots as a category. Remove the hero wave SVG entirely (`restorix-hero-wave-approved.html`'s ported version from Prompt 485/486).
+---
 
-**Rebuild a dot/particle-network background** — connected dots with lines drawn between nearby particles, in Restorix's own accent-blue tint (not Regenix's teal). **Prompt 467 already built this once** (`ParticleField.jsx`, canvas-based constellation effect) before it got removed in Prompt 472 — check git history for that component and use it as a real starting reference rather than rebuilding from zero, though it needs two real upgrades beyond what existed then:
+### Prompt 492 — Chat widget: proactive greeting bubble before it's opened
 
-1. **Full-page coverage, not hero-only** — explicit scope reversal from every prior version of this feature. Runs the entire length of the page now.
-2. **Mouse-repulsion interactivity** — dots (and their connecting lines) should visibly get pushed away from the cursor as it moves nearby, the way Regenix's own version behaves. Standard technique: track cursor position, and for particles within some radius of it, apply an outward displacement/force proportional to proximity, easing back to their normal drift position once the cursor moves away. This is the one genuinely new piece of engineering here — the original `ParticleField.jsx` didn't have this.
+Live review feedback 2026-08-18, referencing Regenix's own chat bubble which shows a small greeting popup ("Hi there! Have a question? Chat with us!") near the chat icon before the visitor has clicked it. Add the same pattern to Restorix's chat widget (Prompt 471): a small greeting bubble appears near/above the floating chat icon after some reasonable delay (use judgment — a few seconds after page load, or on first scroll, not instant), with real copy in Restorix's own voice (not a verbatim copy of Regenix's line). **Once the visitor clicks the chat icon and the actual chat panel opens, the greeting bubble disappears** and doesn't reappear for that session. Should also be dismissible on its own (a small close/x on the bubble itself) without needing to open the full chat.
 
-**Keep sensible performance/accessibility practices from the original build**: `prefers-reduced-motion` handling (skip or heavily simplify motion), capped particle count so it stays cheap even across a full page, and don't let it interfere with click targets/content (background layer, correct z-index/stacking — same stacking-order care Prompt 479 already had to get right once with `elementFromPoint()` verification, repeat that check here since full-page + mouse-tracking raises the stakes on stacking bugs).
+**Verify:** confirm the greeting bubble appears on page load per whatever delay/trigger was chosen, confirm clicking the chat icon opens the real chat AND dismisses the greeting bubble, confirm dismissing the bubble directly (its own close control) doesn't also open the chat panel, confirm it doesn't reappear after being dismissed within the same session.
 
-**Verify:** confirm dots/lines render across multiple sections of the page, not just the hero; confirm moving the mouse near particles visibly displaces them and they ease back afterward; confirm real content is still clickable at multiple scroll depths (`elementFromPoint()` check, same rigor as Prompt 479); confirm `prefers-reduced-motion` is respected; confirm no meaningful perf regression running full-page versus the original hero-only version.
+---
+
+### Prompt 493 — Hero section: fix cramped boundary with the next section
+
+Live review feedback 2026-08-18. The next section's heading ("THE LEAK") currently sits too close to the bottom of the hero — visible right at the hero's lower edge in a way that reads as cramped/abrupt rather than a clean section break. Two changes: (1) add more bottom spacing/padding to the hero section so its content isn't crowded against the next section, and (2) add a distinct thin gray divider line at the bottom edge of the hero, marking a clean, intentional section boundary — same spirit as wanting the earlier wave/dot background to fade out cleanly rather than cut off abruptly, but this time it's a spacing/layout fix, not a background-effect fix.
+
+**Verify:** confirm there's genuine visual breathing room between the hero's own content and "The Leak" heading below it, confirm the new divider line renders as a clean, subtle boundary (not heavy/harsh), confirm this doesn't conflict with or get overlapped by Prompt 490's hero-only dot background (dot field should still end where the hero ends, at or above this new divider).
 
 ---
 
@@ -78,6 +103,10 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 490 — Hero wave scrapped again (full reversal of Prompts 483–486, confirmed deliberately after more thought), dot-network background restored with mouse-repulsion and a blue wash, shipped 2026-08-18, not yet confirmed live.** Commit `fec1b64` on top of `cb2d5ed`. Brayden's reasoning: a connected-dot network isn't uniquely Regenix's, it's a generic tech-aesthetic pattern — the earlier objection was about the wave/blob attempts reading as derivative, not about dots as a category. Restored `ParticleField.jsx` from its own git history (commit `23dcb3a`, Prompt 467 — removed in 472) as the real starting point rather than rebuilt from scratch, plus two real upgrades: **mouse-repulsion** (each dot tracks a "home" drift position separately from its rendered position; every frame the rendered position eases toward home plus an outward push when the cursor is within `REPEL_RADIUS`, scaled by proximity — moving the cursor away lets the push fall to zero and the same easing pulls dots back, no separate "return" state needed; listeners live on the parent section since the canvas itself is `pointer-events-none`), and confirmed **hero-only scope** (an earlier draft of this same prompt said full-page; Brayden explicitly reverted to hero-only, final). Added a flat, uniform low-opacity blue wash (`rgba(58,99,214,0.18)`) behind the dot field rather than a radial-gradient, carrying Prompt 480's lesson forward directly — hand-computed the blend against `--bg-base`: ~39.6/255, comfortably above the ~34/255 "edge of perceptible" threshold while still reading as subtle.
+
+**Verified:** canvas correctly sized to and scoped inside the hero only, zero leftover fixed layers or wave/ambient classes, real content still clickable at multiple scroll depths via `elementFromPoint()`. Hit this session's own established `ResizeObserver`-never-fires pane limitation (confirmed independently with a fresh dummy observer on an unrelated element — not a component bug) — isolated the actual drawing + repulsion algorithm from that broken wiring by replicating the exact same formulas against a manually-sized canvas: 473 pixels genuinely changed between a baseline frame and one with the mouse at canvas center, real proof the repulsion math produces real displacement, not a no-op. Confirmed the wash's computed background matches the intended value exactly. `prefers-reduced-motion` gates both the pointer listeners and the animation loop, verified by construction. Zero console errors at desktop and mobile. `npm run build`/`npm run lint` clean. Not yet confirmed live.
 
 **Prompt 491 — Profile gets a real photo avatar (ported from `ohvara-dashboard`'s Prompt 422) plus a new pastel color picker for the initials fallback, shipped and verified live 2026-08-18.** Commit `484840b` on top of `946b233`. Read Ohvara's actual Prompt 422 implementation directly (`Avatar.jsx`, `AvatarCropModal.jsx`, `imageCrop.js`, `useSettings.js`'s upload/remove hooks) rather than working from a description — ported the upload → crop/zoom (`react-easy-crop`, lazy-loaded) → save flow and the "Remove photo" action (deletes the stored file, not just the column) verbatim, adapted to two real differences in this codebase: `profiles` has no general self-update RLS policy (only whitelisted RPCs, per `update_own_full_name`'s own precedent), so added `update_own_avatar_url`/`update_own_avatar_color` RPCs instead of a direct table update; and `AvatarCropModal` reuses this project's own `Modal` component instead of Ohvara's bespoke overlay. New `avatars` storage bucket, same public-read/folder-scoped-write shape as Ohvara's migration 096.
 
