@@ -14,6 +14,25 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
+**Empty as of 2026-08-18** — Prompt 491 (photo avatar upload/crop ported from Ohvara + a new pastel color picker for the initials fallback) shipped this session. See CURRENT STATE below for what's live.
+
+---
+
+### Prompt 490 — Scrap the hero wave, bring back an interactive dot-network background, full page, mouse-repulse
+
+**Full reversal of Prompts 483–486, confirmed deliberately by Brayden after more thought — not a mistake to question, just execute it.** His reasoning: a connected-dot particle network isn't uniquely Regenix's, it's a generic tech-aesthetic pattern reused everywhere, so reusing the *concept* is fine — the earlier objection was about the specific wave/blob attempts reading as too derivative, not about dots as a category. Remove the hero wave SVG entirely (`restorix-hero-wave-approved.html`'s ported version from Prompt 485/486).
+
+**Rebuild a dot/particle-network background** — connected dots with lines drawn between nearby particles, in Restorix's own accent-blue tint (not Regenix's teal). **Prompt 467 already built this once** (`ParticleField.jsx`, canvas-based constellation effect) before it got removed in Prompt 472 — check git history for that component and use it as a real starting reference rather than rebuilding from zero, though it needs two real upgrades beyond what existed then:
+
+1. **Full-page coverage, not hero-only** — explicit scope reversal from every prior version of this feature. Runs the entire length of the page now.
+2. **Mouse-repulsion interactivity** — dots (and their connecting lines) should visibly get pushed away from the cursor as it moves nearby, the way Regenix's own version behaves. Standard technique: track cursor position, and for particles within some radius of it, apply an outward displacement/force proportional to proximity, easing back to their normal drift position once the cursor moves away. This is the one genuinely new piece of engineering here — the original `ParticleField.jsx` didn't have this.
+
+**Keep sensible performance/accessibility practices from the original build**: `prefers-reduced-motion` handling (skip or heavily simplify motion), capped particle count so it stays cheap even across a full page, and don't let it interfere with click targets/content (background layer, correct z-index/stacking — same stacking-order care Prompt 479 already had to get right once with `elementFromPoint()` verification, repeat that check here since full-page + mouse-tracking raises the stakes on stacking bugs).
+
+**Verify:** confirm dots/lines render across multiple sections of the page, not just the hero; confirm moving the mouse near particles visibly displaces them and they ease back afterward; confirm real content is still clickable at multiple scroll depths (`elementFromPoint()` check, same rigor as Prompt 479); confirm `prefers-reduced-motion` is respected; confirm no meaningful perf regression running full-page versus the original hero-only version.
+
+---
+
 **Empty as of 2026-08-18** — Prompt 489 (marketing-chat endpoint hardened: RLS, a real RPC-bypass gap found along the way, CORS, payload validation) shipped this session. See CURRENT STATE below for what's live.
 
 ---
@@ -59,6 +78,14 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 491 — Profile gets a real photo avatar (ported from `ohvara-dashboard`'s Prompt 422) plus a new pastel color picker for the initials fallback, shipped and verified live 2026-08-18.** Commit `484840b` on top of `946b233`. Read Ohvara's actual Prompt 422 implementation directly (`Avatar.jsx`, `AvatarCropModal.jsx`, `imageCrop.js`, `useSettings.js`'s upload/remove hooks) rather than working from a description — ported the upload → crop/zoom (`react-easy-crop`, lazy-loaded) → save flow and the "Remove photo" action (deletes the stored file, not just the column) verbatim, adapted to two real differences in this codebase: `profiles` has no general self-update RLS policy (only whitelisted RPCs, per `update_own_full_name`'s own precedent), so added `update_own_avatar_url`/`update_own_avatar_color` RPCs instead of a direct table update; and `AvatarCropModal` reuses this project's own `Modal` component instead of Ohvara's bespoke overlay. New `avatars` storage bucket, same public-read/folder-scoped-write shape as Ohvara's migration 096.
+
+**New for Restorix, not part of Ohvara's version:** a 6-swatch pastel color picker (blush/peach/sand/mint/sky/lilac) for the initials fallback — user-chosen and persisted, not random-once-at-signup like Ohvara's 4 fixed vivid colors. Dark text on the pastels instead of Ohvara's white-on-vivid (hand-computed WCAG contrast for all 6: 12.2–14.4:1, well above AAA). Removing a photo only ever touches `avatar_url`, never `avatar_color`, so a chosen color survives a photo removal instead of reverting to a default.
+
+**Found and fixed the same PUBLIC/anon default-grant gap Prompt 489 already established for this project**, this time on the two new RPCs: the first `revoke all ... from public` left `anon` with an explicit EXECUTE grant (Supabase's schema-level default privileges auto-grant new functions to anon/authenticated/service_role independently of PUBLIC) — confirmed via a live `information_schema` query, fixed with an explicit revoke from `anon`, re-verified the grant list now matches `update_own_full_name`'s own exact shape.
+
+**Verified live as `test_setter`, real end-to-end actions:** uploaded a real generated image through the actual crop modal (simulated file selection since no native file-picker access in this tooling), confirmed it persisted across a fresh reload with the correct storage URL. Picked a pastel color, confirmed `aria-pressed` state was correct and persisted across reload. Removed the photo, confirmed it reverted to the initials fallback showing the *previously-chosen* color (not a default), and confirmed the storage file was genuinely deleted (queried `storage.objects` directly, zero rows left) rather than just the column nulled. Reverted the test account's `avatar_color` back to its original default afterward so no test artifact was left in Brayden's real demo data. Zero new console errors (one pre-existing, unrelated 400 that also reproduces on `/overview`, untouched this session). `npm run build`/`npm run lint` clean. Not yet confirmed live on the deployed site — no Vercel deploy-status tool this session.
 
 **Prompt 489 — Public `marketing-chat` endpoint hardened against abuse/cost attacks, shipped and verified live 2026-08-18 on the `restorix-portal` Supabase project (`avgvmzshujwphneykuvu`).** Four things, all confirmed via real requests, not just code review:
 
