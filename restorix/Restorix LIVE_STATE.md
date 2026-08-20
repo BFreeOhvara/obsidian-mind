@@ -14,6 +14,10 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
+**Empty as of 2026-08-20** — Prompt 502 (dark mode built end-to-end on `restorix-portal`, per Prompt 501's approved scoping doc) delivered this session. Queue fully cleared. See CURRENT STATE for what's live.
+
+---
+
 **Empty as of 2026-08-20** — Prompts 501 (dark mode scoping doc, planning only, awaiting Brayden's review) and 500 (animated dot-network background shipped to `restorix-portal`) both delivered this session. Queue fully cleared. See CURRENT STATE for what's live.
 
 ---
@@ -87,6 +91,8 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 502 — Dark mode shipped end-to-end on `restorix-portal`, 2026-08-20, not yet confirmed live.** Commit `d3d9747` on top of `1f79683`. Built per Prompt 501's approved scoping doc — no re-derivation. `darkMode: 'class'` in `tailwind.config.js`, dark values for the same 13 root `index.css` tokens (real WCAG-contrast-checked values, not inverted lightness — see Memories for the `--accent`/`--accent-deep`/`--danger`/`--success` dual-role conflict this surfaced and how it was resolved), `theme_preference` column + `update_own_theme_preference` RPC on `profiles` (same shape as `update_own_timezone`), a `useTheme` hook (system/light/dark, live `prefers-color-scheme` listener), and a real 3-way toggle in `Settings.jsx`. Both scoping-doc landmines fixed (`Avatar.jsx` initials pinned to a fixed near-black regardless of theme; `Stats.jsx`'s heatmap low-end anchor now matches whichever theme's `bg-elevated` is current instead of hardcoded white) plus dark-appropriate values for every hardcoded palette/hex string found via a full grep sweep — the doc's original 6 in `OutcomeBadge`/`StatusBadge`, plus 3 more found along the way (`Layout.jsx`'s `AccountPopover`, `StatusBadge`'s duplicate `STATUS_BADGE.new`, and `Messages.jsx`'s own separate `Avatar` component's `bg-accent-deep` tint, the last one found only via live QA, not grep — see Memories for detail). Self-caught and fixed one real gap via `get_advisors`: the new RPC was missing the `anon`/`public` revoke its siblings have, fixed with a follow-up migration, re-verified. Verified via real `getComputedStyle`/DOM checks (this pane's Browser tab wasn't visually displayed this session, screenshots unavailable) across Settings, Stats, Pipeline, Profile, Messages, Overview, and the pre-auth `/join` route, plus confirmed the persisted override survives a full reload while the OS-level dark preference stays constant throughout (proving it's a real override, not a coincidence). `ParticleField.jsx`'s hardcoded canvas colors deliberately left untouched — checked via real contrast math that they read fine in both themes already, not silently skipped. Brayden's own `theme_preference` reset to `'system'` after testing. `npm run build`/`npm run lint` clean.
 
 **Prompt 500 — Animated dot-network background shipped to `restorix-portal`, 2026-08-20, not yet confirmed live.** Commit `1f79683` on top of `c7bc9ad`. Ported `ParticleField.jsx` verbatim from `restorix-marketing` (Prompt 467/490/496 lineage) — same dot/line/mouse-repulsion algorithm — plus one genuine addition: pauses on `document.visibilitychange` (backgrounded tab) in addition to the existing `IntersectionObserver` pause, since a dashboard tab left open for hours is a real case the marketing hero never had to handle. Mounted once in `Layout.jsx` (not per-page — Layout persists across route changes, confirmed via a DOM-node identity marker surviving real in-app navigation Overview → Stats → Messages → My Calls → Commissions), `position: fixed inset-y-0 left-60 right-0 z-0` matching the sidebar's real 240px width, content column bumped to `relative z-10` — same explicit z-0/z-10 split `Hero.jsx` already uses on the marketing site.
 
