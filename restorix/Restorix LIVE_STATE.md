@@ -1,5 +1,5 @@
 ---
-date: 2026-08-19
+date: 2026-08-20
 description: "Single current-state doc for all Restorix sessions — overwritten on update, never appended. Restorix's own vertical, independent of Ohvara's brain/LIVE_STATE.md."
 tags:
   - restorix
@@ -13,6 +13,10 @@ tags:
 ## Next Up for CC
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
+
+**Empty as of 2026-08-20** — Prompt 499 (favicon files swapped in place to the transparent-background versions, same filenames/link tags) shipped this session. **Flag for Brayden, not silently resolved:** the 180px apple-touch-icon now uses the transparent version too, per his own explicit instruction, even though iOS convention normally wants an opaque background there — worth a real iOS home-screen add to judge whether it looks right; can't be verified from this tooling. See CURRENT STATE for what's live.
+
+---
 
 **Empty as of 2026-08-19** — Prompt 498 (real logo icon + wordmark in Nav.jsx, real 16/32/48/512/apple-touch favicon set replacing the Vite placeholder) shipped this session. Queue fully cleared. See CURRENT STATE for what's live.
 
@@ -79,6 +83,8 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 499 — Favicon swapped to the transparent-background version, shipped 2026-08-20 on `restorix-marketing`, not yet confirmed live.** Commit `5c15dd3` on top of `271d870`. Brayden compared against other browser tabs and none show a white box around their favicon — Prompt 498's set was white-square-background (correct at the time, that's what was approved then). Replaced all 5 files in `public/` in place with the new alpha-channel versions from `restorix/logo-assets/restorix-favicon-transparent-*.png` — same filenames, same `index.html` link hrefs, no markup changes needed. Verified transparency at the byte level twice: parsed each source PNG's own IHDR (`colorType=6`/RGBA on all 5) and fully decoded one file's raw pixel data (zlib inflate + PNG unfilter) confirming real corner alpha=0 before touching any code; re-verified the same way against the dev-server-served files via `fetch → createImageBitmap → canvas → getImageData` — all 5 real HTTP 200s, near-zero corner alpha, full-alpha icon color at center. Zero console errors, `npm run build`/`npm run lint` clean. **Flag, not silently resolved:** used the transparent version for the 180px apple-touch-icon too per Brayden's own explicit instruction, even though iOS convention normally wants an opaque background there (the OS composites it with no fill of its own) — this one genuinely can't be judged from this tooling, needs a real iOS home-screen add to confirm it looks right.
 
 **Prompt 498 — Real logo icon in the nav + a real favicon set, shipped 2026-08-19 on `restorix-marketing`, not yet confirmed live.** Commit `271d870` on top of `68150b9`. First raster image assets in this codebase (everything before this was lucide-react icons / CSS). Copied Brayden's final approved assets from the vault (`restorix/logo-assets/`) into `public/`, byte-identical (verified via live fetch — served size matches source size exactly for all 6 files). Nav.jsx now pairs the icon with the existing "Restorix" text wordmark (`gap-2.5`, matching the codebase's existing icon+label spacing convention). Sized via `h-8 w-auto` rather than `h-8 w-8` after catching that the source PNG isn't perfectly square (510×543, ~0.94 aspect) — a fixed square box would have silently squished it ~6% on one axis; caught via a real `naturalWidth`/`naturalHeight` vs. displayed-size measurement, not assumed fine on sight. `index.html` replaced the placeholder Vite `favicon.svg` with real 16/32/48/512px icon links plus a 180px apple-touch-icon. Verified: nav icon's native aspect ratio (0.9392) matches its displayed aspect ratio (0.9390); all 6 assets fetch 200 with correct `image/png` content-type; all `<link rel="icon"/apple-touch-icon>` tags present and correctly resolved in the live DOM; fits cleanly at 375px mobile with no CTA overlap. Zero console errors, `npm run build`/`npm run lint` clean. **One honest caveat:** couldn't visually confirm the favicon rendering in the actual browser tab strip itself — that's outside any DOM/canvas this pane's tools can inspect — so that specific claim rests on construction (correct tags, correct files, correct HTTP responses), not a direct visual check; worth a quick human glance at a real tab to close the loop.
 
