@@ -14,6 +14,10 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
+**Empty as of 2026-08-19** — Prompt 498 (real logo icon + wordmark in Nav.jsx, real 16/32/48/512/apple-touch favicon set replacing the Vite placeholder) shipped this session. Queue fully cleared. See CURRENT STATE for what's live.
+
+---
+
 **Empty as of 2026-08-19** — Prompt 497 (hero glow repositioned to 74% horizontal, Live Intake pill contrast fixed, chat bubble connector added) shipped this session. Queue fully cleared. See CURRENT STATE for what's live.
 
 ---
@@ -75,6 +79,8 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 498 — Real logo icon in the nav + a real favicon set, shipped 2026-08-19 on `restorix-marketing`, not yet confirmed live.** Commit `271d870` on top of `68150b9`. First raster image assets in this codebase (everything before this was lucide-react icons / CSS). Copied Brayden's final approved assets from the vault (`restorix/logo-assets/`) into `public/`, byte-identical (verified via live fetch — served size matches source size exactly for all 6 files). Nav.jsx now pairs the icon with the existing "Restorix" text wordmark (`gap-2.5`, matching the codebase's existing icon+label spacing convention). Sized via `h-8 w-auto` rather than `h-8 w-8` after catching that the source PNG isn't perfectly square (510×543, ~0.94 aspect) — a fixed square box would have silently squished it ~6% on one axis; caught via a real `naturalWidth`/`naturalHeight` vs. displayed-size measurement, not assumed fine on sight. `index.html` replaced the placeholder Vite `favicon.svg` with real 16/32/48/512px icon links plus a 180px apple-touch-icon. Verified: nav icon's native aspect ratio (0.9392) matches its displayed aspect ratio (0.9390); all 6 assets fetch 200 with correct `image/png` content-type; all `<link rel="icon"/apple-touch-icon>` tags present and correctly resolved in the live DOM; fits cleanly at 375px mobile with no CTA overlap. Zero console errors, `npm run build`/`npm run lint` clean. **One honest caveat:** couldn't visually confirm the favicon rendering in the actual browser tab strip itself — that's outside any DOM/canvas this pane's tools can inspect — so that specific claim rests on construction (correct tags, correct files, correct HTTP responses), not a direct visual check; worth a quick human glance at a real tab to close the loop.
 
 **Prompt 497 — Three polish fixes vs. a live regenix.io side-by-side, shipped 2026-08-19 on `restorix-marketing`, not yet confirmed live.** Commit `68150b9` on top of `f992a5c`. (1) Hero glow (Prompt 496) repositioned from dead-center to 74% horizontal / 50% vertical — read Regenix's own equivalent directly from its computed `background-image` (`radial-gradient(80% 60% at 78% 30%, ...)`), didn't copy 78% 1:1 since our box's default farthest-corner circle sizing keeps the fade radius fixed by width/height (unchanged, per the prompt's own "keep it intact" instruction) rather than recomputed per position; verified live the nearest hero corner sits at 1.26x the fade radius at 1440×900 and 1.28x at 375px mobile — real margin held. (2) Live Intake card's "No inquiry left waiting" pill switched from `bg-base` (nearly identical lightness to the glass card's own translucent fill) to `bg-muted` plus a hairline border; text color (`accent-deep`) confirmed unchanged via computed style. (3) Added a small rotated-square connector between the greeting bubble (Prompt 492) and the launcher button, verified within 6px of the launcher's true horizontal center with its bottom edge landing right at the launcher's top edge. Confirmed zero regressions: dot-network canvas (Prompt 490/496) still renders at the hero's exact dimensions, Prompt 492's bubble-dismissal logic (both paths) re-verified working. Zero console errors, `npm run build`/`npm run lint` clean.
 
