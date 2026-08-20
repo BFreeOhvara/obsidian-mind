@@ -14,6 +14,10 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
+**Empty as of 2026-08-19** — Prompt 497 (hero glow repositioned to 74% horizontal, Live Intake pill contrast fixed, chat bubble connector added) shipped this session. Queue fully cleared. See CURRENT STATE for what's live.
+
+---
+
 **Empty as of 2026-08-19** — Prompts 495, 494, 492, and 493 all shipped this session (495 was already committed in a prior session but hadn't been logged/cleared — reconciled 2026-08-19, see [[Restorix Memories]]). Queue fully cleared. See CURRENT STATE for what's live.
 
 ---
@@ -71,6 +75,8 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 497 — Three polish fixes vs. a live regenix.io side-by-side, shipped 2026-08-19 on `restorix-marketing`, not yet confirmed live.** Commit `68150b9` on top of `f992a5c`. (1) Hero glow (Prompt 496) repositioned from dead-center to 74% horizontal / 50% vertical — read Regenix's own equivalent directly from its computed `background-image` (`radial-gradient(80% 60% at 78% 30%, ...)`), didn't copy 78% 1:1 since our box's default farthest-corner circle sizing keeps the fade radius fixed by width/height (unchanged, per the prompt's own "keep it intact" instruction) rather than recomputed per position; verified live the nearest hero corner sits at 1.26x the fade radius at 1440×900 and 1.28x at 375px mobile — real margin held. (2) Live Intake card's "No inquiry left waiting" pill switched from `bg-base` (nearly identical lightness to the glass card's own translucent fill) to `bg-muted` plus a hairline border; text color (`accent-deep`) confirmed unchanged via computed style. (3) Added a small rotated-square connector between the greeting bubble (Prompt 492) and the launcher button, verified within 6px of the launcher's true horizontal center with its bottom edge landing right at the launcher's top edge. Confirmed zero regressions: dot-network canvas (Prompt 490/496) still renders at the hero's exact dimensions, Prompt 492's bubble-dismissal logic (both paths) re-verified working. Zero console errors, `npm run build`/`npm run lint` clean.
 
 **Prompt 493 — Hero gets more bottom spacing plus a clean section divider, shipped 2026-08-19 on `restorix-marketing`, not yet confirmed live.** Commit `f992a5c` on top of `9859cd3`. "The Leak" heading was sitting right at the hero's lower edge, reading as cramped/abrupt. Doubled the hero's bottom padding to mirror its own top padding (`pb-20` → `pb-28`/`md:pb-36`, matching the existing `pt-28`/`md:pt-36`), and added a 1px `bg-line`/`--border` divider at the hero's bottom edge — the same technique Process.jsx already established for its own step-card divider, not a new pattern. Verified with real measurements: gap between the hero's box-bottom and Leak's actual heading is 192px at 1440×900 (was ~80px of padding alone before), 160px at 375px mobile. Confirmed the dot-network canvas (Prompt 490/496) ends at the exact same edge as the divider, not past it, with the divider's `z-10` keeping it visible on top at that shared edge. Zero console errors, `npm run build`/`npm run lint` clean.
 
