@@ -14,7 +14,7 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
-**Prompt 511 — Restyle `restorix-portal`'s login page, run after Prompt 510.** Currently a bare default form (username/password/Sign in, no branding treatment) against a flat black background. Bring it in line with the rest of the portal: add the same animated dot-network background (Prompt 500/502's `ParticleField.jsx`, already used across every other portal page) behind the login card, and add real welcome copy above the form (e.g. "Welcome to Restorix Portal" or similar — Brayden didn't specify exact wording, use judgment for something short and on-brand, not a placeholder-sounding line). Keep the actual form functional and unchanged (username/password/Sign in button, the "accounts are created by an admin" note) — this is a visual treatment pass, not a login-flow change. Verify in both light and dark mode, and confirm the dot-network canvas doesn't interfere with clicking into the username/password fields (`elementFromPoint()` check, same standing practice as Prompt 500).
+**Empty as of 2026-08-21** — Prompt 511 (login page restyle for `restorix-portal`) delivered this session. Queue empty except Prompt 506's still-blocked data-seeding half (below). See CURRENT STATE for what's live.
 
 ---
 
@@ -103,6 +103,8 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 511 — Login page restyled on `restorix-portal`, 2026-08-21, not yet confirmed live.** Commit `2e0509b` on top of `9fd2f8c`. Added the same `ParticleField.jsx` dot-network background every other portal page already has (Prompt 500/502) — its own full-viewport fixed wrapper here rather than Layout's `left-60`-offset one, since Login renders outside `<Layout/>` entirely (pre-auth, no sidebar). Added a one-line welcome subtitle ("Sign in to manage your leads, calls, and pipeline.") under the existing heading; form itself untouched. Verified with real `elementFromPoint()` checks that clicks land on the actual input elements, not the canvas, and that a real sign-in still completes through the restyled page. Checked both themes — since this page has no profile yet to read a persisted `theme_preference` from, it correctly follows the OS-level `prefers-color-scheme` (forced via the browser tool's own color-scheme override to confirm both light and dark render correctly, rather than only ever seeing whichever the test environment defaults to). Zero console errors, `npm run build`/`npm run lint` clean.
 
 **Prompt 510 — Public self-service booking funnel scoping doc for `restorix-marketing`, delivered 2026-08-21, planning only — nothing implemented, awaiting Brayden's review.** Framing locked in before this doc was written: the online step is a warm-up (2-4 pain-surfacing questions, cold-call-opener depth), not a shortened Closer Survey — real diagnostic depth stays exclusively on the live closer call, [[Restorix Closer Survey]] unchanged. Every recommendation below is grounded in the actual codebase, not generic scheduling-system advice.
 
