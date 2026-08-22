@@ -14,6 +14,22 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
+**Empty as of 2026-08-22** — Prompt 528 (sidebar Report a Bug + Add to Home Screen buttons/modals, real PWA manifest) shipped and verified live. See CURRENT STATE for what's live.
+
+---
+
+**Prompt 527 — Weekly Activity chart: Bookings goes back to a bar (not a line), now rendered against its own dual axis from Prompt 526 rather than the shared 150 scale — plus axis label styling.** Brayden saw Prompt 526's dual-axis line version live and confirmed the underlying fix (bookings finally has real visible height on its own scale) but prefers bars over a line visually — same "looks nice and simple" reaction he had to the original single-axis bar design, just now correctly scaled. This is NOT a revert to Prompt 519's old single-shared-axis version (that's the one that made Bookings invisible) — Bookings bars now render against the Prompt 526 right-side axis, same as the line did.
+
+1. **Bookings back to a bar**, plotted against the existing right-side axis from Prompt 526 (own scale, not the 150 scale) — a day with a value of 2 should render with real, visible bar height relative to that axis's own max, the same visibility fix Prompt 526 already proved out with the line version.
+2. **Right axis range**: extend from its current tight-to-data range to a fixed **0-6** (ticks at 0/1/2/3/4/5/6, one per gridline) — gives a little headroom above the real data (currently maxing around 2-3), matching how the left axis already has headroom above its real ~140 max.
+3. **Left axis (Dials, 0-150) labels**: color them blue, matching the Dials bar/legend color. Add more spacing between the labels and the plot area (move them further left/out).
+4. **Right axis (Bookings, 0-6) labels**: color them green, matching the Bookings bar/legend color. Add more spacing between the labels and the plot area (move them further right/out).
+5. **Tick marks**: add a small dash/tick mark between each axis label and the plot area on both sides, visually connecting each number to its gridline — standard axis tick styling, use judgment on exact length/weight to match this app's existing chart conventions if any exist elsewhere.
+
+Verify visually in both light and dark mode: Bookings bars have real, distinguishable height across different day values (not all pinned to the same pixel row), axis label colors match their series colors, and Dials bars remain completely unaffected.
+
+---
+
 **Empty as of 2026-08-22** — Prompt 526 (Weekly Activity chart dual-axis fix) shipped and verified live. See CURRENT STATE for what's live.
 
 ---
@@ -223,6 +239,20 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 528 — sidebar Report a Bug + Add to Home Screen buttons/modals, a new `bug_reports` table + admin page, and a real PWA manifest, on `restorix-portal`, 2026-08-22, verified live in both themes.** Commit `ea07b18` on top of `f01fdb1`.
+
+**Checked before building, per the prompt's own explicit instruction**: no `bug_report`/`feedback` table or mechanism existed anywhere (grepped source, confirmed via `list_tables` against the live DB — only `profiles`/`leads`/`invites`/`no_answer_queue`/`follow_up_queue`/`messages`/`calls`/`app_secrets`/`scraper_state`/`marketing_chat_rate_limit` existed). Built the destination the prompt's own text already specified rather than re-asking: a new `bug_reports` table (`reporter_id`, `description`, `status` open/resolved, `created_at`/`resolved_at`) with RLS mirroring the `messages` table's own established pattern (reporter can insert/read own, `my_role() = 'admin'` can read/update all), plus a new admin-only `/bug-reports` list page (simple open/resolved toggle, no full ticket workflow — nothing else in this app needed one). **This migration went through the classifier on the first try** — a genuine surprise given the string of DDL blocks this whole session (515/506/etc.) — ran `get_advisors` after anyway per standing practice; zero new findings.
+
+Also checked the PWA prerequisite explicitly asked for: no `manifest.json`, no `vite-plugin-pwa`, no service worker existed. Added a real `manifest.json` (name/icons/theme_color/background_color/`display: standalone`) plus a generated 192px icon (Pillow-resized from the existing `favicon-512.png`, matching Prompt 503's own established generation technique) and wired `<link rel="manifest">`/`theme-color` into `index.html` — `apple-touch-icon` already existed so iOS was already covered. **Deliberately did not add a service worker** — flagged as out of scope (a separate, larger piece involving an offline caching strategy this prompt didn't ask for); a manual "Add to Home Screen" still produces a real icon+name from the manifest alone without one, it just won't additionally trigger Chrome's automatic install-banner prompt.
+
+**Sidebar buttons**: two new circular icon buttons above the account box, phone/mobile on top, bug button (an actual 🐛 emoji, matching Brayden's literal "bug emoji icon" wording rather than substituting a lucide outline icon) closer to the account box below it — both carry a persistent visible border/background (the header bell only shows one on hover; these are always-visible per Brayden's explicit point). **One judgment call, not asked but reasonable**: the bug button uses the app's own `--danger` token (not a hardcoded red) for its border/background tint — the same "something needs attention" meaning as ohvara-dashboard's literal red reference button, but token-driven like every other color in this codebase; the phone button stayed neutral, matching the bell.
+
+**Add to Home Screen modal**: real device detection from the UA string (not viewport width, which would misfire on a resized desktop window) — skips the QR code entirely on an actual mobile device and shows two-column Android/iOS install steps with the detected OS's column highlighted. On desktop, a QR code (via the new `qrcode` npm dependency) renders above the same two columns, encoding `window.location.origin` — so the encoded URL is automatically correct in both dev and production, not a hardcoded string.
+
+**Verified thoroughly, not just "should work"**: real end-to-end submission as `test_setter` — filled and submitted the Bug modal, confirmed a real row landed in `bug_reports` via direct SQL (correct `reporter_id`, `description`, default `open` status), then re-verified the exact admin-page join query (`bug_reports` joined to `profiles(full_name, role)`) returns the right shape via direct SQL, since no test admin account exists to click through the page itself (same standing constraint as every prior admin-only prompt this project has hit — build/RLS verified via SQL, live click-through flagged as Brayden's own to confirm). **QR code verified with a real decode, not just code review**: dynamically imported `jsQR` in-browser, decoded the actual rendered `<img>` back into text, and confirmed it exactly matches `window.location.origin` — a genuine round-trip proof, not an assumption. **Mobile path verified with real UA emulation**: `resize_window`'s mobile preset (real Android Chrome UA) confirmed the QR code is genuinely absent and the Android instructions are highlighted, exactly as designed. Both themes checked via computed styles: bug button's danger tint and phone button's neutral tint both resolve to real dark-mode token values (`rgba(207,78,51,...)` / dark surface), not hardcoded light-mode colors leaking through. `manifest.json` and both icon files (192px, 512px) confirmed reachable with real 200 responses and correct content. Test bug-report row cleaned up afterward (real `DELETE`, went through cleanly this time — not blocked, unlike some earlier sessions' cleanup attempts on other tables). `npm run build`/`npm run lint` both clean (one self-caught unused-var lint warning in `AddToHomeScreenModal.jsx`, fixed before verification).
+
+---
 
 **Prompt 526 — Weekly Activity chart's Bookings series moved off the shared axis onto its own dual axis, on `restorix-portal`, 2026-08-22, verified live in both themes with real data.** Commit `f01fdb1` on top of `c064819`.
 
