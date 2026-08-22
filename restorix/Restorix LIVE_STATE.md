@@ -18,15 +18,7 @@ tags:
 
 ---
 
-**Prompt 527 — Weekly Activity chart: Bookings goes back to a bar (not a line), now rendered against its own dual axis from Prompt 526 rather than the shared 150 scale — plus axis label styling.** Brayden saw Prompt 526's dual-axis line version live and confirmed the underlying fix (bookings finally has real visible height on its own scale) but prefers bars over a line visually — same "looks nice and simple" reaction he had to the original single-axis bar design, just now correctly scaled. This is NOT a revert to Prompt 519's old single-shared-axis version (that's the one that made Bookings invisible) — Bookings bars now render against the Prompt 526 right-side axis, same as the line did.
-
-1. **Bookings back to a bar**, plotted against the existing right-side axis from Prompt 526 (own scale, not the 150 scale) — a day with a value of 2 should render with real, visible bar height relative to that axis's own max, the same visibility fix Prompt 526 already proved out with the line version.
-2. **Right axis range**: extend from its current tight-to-data range to a fixed **0-6** (ticks at 0/1/2/3/4/5/6, one per gridline) — gives a little headroom above the real data (currently maxing around 2-3), matching how the left axis already has headroom above its real ~140 max.
-3. **Left axis (Dials, 0-150) labels**: color them blue, matching the Dials bar/legend color. Add more spacing between the labels and the plot area (move them further left/out).
-4. **Right axis (Bookings, 0-6) labels**: color them green, matching the Bookings bar/legend color. Add more spacing between the labels and the plot area (move them further right/out).
-5. **Tick marks**: add a small dash/tick mark between each axis label and the plot area on both sides, visually connecting each number to its gridline — standard axis tick styling, use judgment on exact length/weight to match this app's existing chart conventions if any exist elsewhere.
-
-Verify visually in both light and dark mode: Bookings bars have real, distinguishable height across different day values (not all pinned to the same pixel row), axis label colors match their series colors, and Dials bars remain completely unaffected.
+**Empty as of 2026-08-22** — Prompt 527 (Bookings back to a bar on its own fixed 0-6 axis + axis label styling) shipped and verified live. See CURRENT STATE for what's live.
 
 ---
 
@@ -239,6 +231,14 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 527 — Weekly Activity chart's Bookings series moved back from a line to a bar, still on its own axis (now a fixed 0-6 range) from Prompt 526, plus colored/spaced axis labels with tick marks, on `restorix-portal`, 2026-08-22, verified live in both themes.** Commit `71f09bd` on top of `ea07b18`.
+
+Brayden confirmed Prompt 526's dual-axis fix itself was correct (Bookings finally has real visible height) but preferred bars visually over the line. Restored the two-bar-per-group layout from before Prompt 526 (Dials bar + Bookings bar side by side per day), but Bookings now plots against `yForBookings` (its own axis) instead of the shared `yForDials` scale that made it invisible pre-526 — genuinely different from the Prompt 519 shared-axis version, not a revert to it. Right axis changed from Prompt 526's tight `niceTicks()`-derived range to a hardcoded `[0,1,2,3,4,5,6]` per Brayden's explicit ask, giving the same kind of headroom above real data (~2-3 max) that the left axis already has above its real ~140 max. Left axis labels switched from `fill-fg-faint` to `fill-accent` (blue, matching the Dials bar); right axis labels already used `fill-success` (green, matching Bookings) from Prompt 526, unchanged. Added a short tick-mark `<line>` dash between each label and its axis line on both sides (new, wasn't there before), and increased `padXLeft`/`padXRight` (34→44, 26→40) for more breathing room between labels and the plot area.
+
+**Verified live with real data in both themes** via the SVG's actual rendered attributes (same technique as 526 — this pane still can't composite screenshots): confirmed 10 real `<rect>` elements (5 Dials + 5 Bookings, was 5 rects + a path/circles in 526's line version), right-axis ticks read exactly `0/1/2/3/4/5/6`, left-axis ticks unchanged (`0/25/50/75/100/125/150`), 14 total tick-mark dashes (7 per side). Bar heights checked against the math directly: Thu's 3 bookings rendered at exactly half the plot height (76px of 152px), Fri's 2 bookings at exactly a third (50.67px) — both correctly proportional to the new fixed 6-max axis, not the old data-tight max. Dials bars confirmed byte-identical to before (same 5 real values/heights). Dark mode re-checked via `resize_window`'s `colorScheme` param: left-axis label color computed to the same real blue (`rgb(72,112,216)`) as the Dials bar itself, right-axis label color to the same real green (`rgb(39,143,97)`) as the Bookings bar — genuine color-matching confirmed, not assumed from the class names alone. `npm run build`/`npm run lint` clean.
+
+---
 
 **Prompt 528 — sidebar Report a Bug + Add to Home Screen buttons/modals, a new `bug_reports` table + admin page, and a real PWA manifest, on `restorix-portal`, 2026-08-22, verified live in both themes.** Commit `ea07b18` on top of `f01fdb1`.
 
