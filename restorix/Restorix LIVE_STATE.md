@@ -14,13 +14,7 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
-**Prompt 526 — Weekly Activity chart's Bookings series is unreadable on the shared 0-150 axis (Dials run 100-150, Bookings run 0-3, so Bookings bars are visually flattened to nothing) — confirmed live by Brayden, real numbers, not a bug in the shared-axis math itself (Prompt 519 already verified that math is correct), just the wrong visual encoding for two metrics this far apart in magnitude.**
-
-**The fix, confirmed with Brayden**: keep Dials as bars on the existing primary/left axis (0-150, unchanged). Change Bookings from a bar to a **line with visible dot markers at each day**, plotted against its own secondary/right axis scaled to Bookings' own real range (e.g. 0-5, whatever fits the actual data — use the existing `niceTicks()`-style logic for this axis too, don't hardcode). A line with dots doesn't need real pixel height to read clearly — a trend moving 0→2→1 across the week stays visible on a small-range axis, unlike a bar which needs real height to register at all. Keep both series in the one chart (don't split into two separate charts — Brayden considered that and preferred keeping them together).
-
-This is a genuine reversal of part of Prompt 516's original design (which deliberately put both on one shared axis with no rescaling, per Brayden's own instruction at the time) — that's fine, it's an informed correction now that real data revealed the problem, not a mistake to second-guess. Read `WeeklyBarChart` (Prompt 516/519's own component) first and extend/modify it rather than rewriting from scratch — the Dials-bar rendering and the primary-axis logic can likely stay mostly as-is, this is really about adding a second right-side axis and switching Bookings' render from `<rect>`/bar to a `<line>`/`<path>` + dot markers.
-
-Verify visually with real live data (both light and dark mode) that Bookings' trend is now actually visible (dots at distinguishable heights for different day values, not all pinned to the same pixel row), and that Dials' bars are completely unaffected by the change.
+**Empty as of 2026-08-22** — Prompt 526 (Weekly Activity chart dual-axis fix) shipped and verified live. See CURRENT STATE for what's live.
 
 ---
 
@@ -229,6 +223,16 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 526 — Weekly Activity chart's Bookings series moved off the shared axis onto its own dual axis, on `restorix-portal`, 2026-08-22, verified live in both themes with real data.** Commit `f01fdb1` on top of `c064819`.
+
+Brayden confirmed live that the Prompt 516 shared-axis design (both Dials and Bookings plotted as bars on one 0-150 scale) made Bookings visually unreadable — not a math bug (Prompt 519 already verified `niceTicks` itself is correct), just the wrong encoding for two series this far apart in magnitude. **Fix, confirmed with Brayden first**: Dials stays a bar on the original left/primary axis, unchanged. Bookings became a **line with dot markers**, plotted on its own right/secondary axis independently scaled via a second `niceTicks()` call over Bookings' own real range (not the combined max like before). A line+dots doesn't need real pixel height to register, so a small-range trend (0→3→2) stays fully legible even on a tiny axis. Both series stayed in one chart, per Brayden's own preference against splitting into two.
+
+Extended `WeeklyBarChart` rather than rewriting it — kept the existing gridlines driven by the left (Dials) axis only, since drawing a second full gridline set from a differently-scaled right axis would draw non-aligned lines that read as visual noise; the right axis gets its own tick *labels* (in the Bookings green) without duplicate gridlines. Removed the old side-by-side two-bar-per-day layout (each day group now has one full-width Dials bar plus one Bookings dot at the group's horizontal center, connected by a `<path>` line across days).
+
+**Verified live with real data, both themes** (this pane's screenshot tool still can't composite frames — same standing gap — so verification went through the SVG's own real rendered attributes instead, arguably more precise for what was being checked): read the actual `<rect>`/`<circle>`/`<path>` coordinates from the live DOM. Real week: Mon/Tue/Wed all genuinely 0 bookings → all three dots correctly at the same y (176, chart bottom) — not a bug, an accurate reflection of equal values; Thu (3 bookings) → y=24 (near the top); Fri (2 bookings) → y=74.7 (clearly between) — a real, large, easily-distinguishable vertical spread, exactly the fix's goal. Dials bars unaffected: same 5 real values (146/96/144/99/130), same left axis (0/25/50/75/100/125/150 ticks), same heights as before this change. Right-axis ticks read a clean `0/1/2/3`, matching Bookings' real range. Re-checked in forced dark mode via `resize_window`'s `colorScheme` param: `fill-accent` computed to a real blue `rgb(72,112,216)`, `fill-success` (both the dots and the right-axis tick text) computed to a real green `rgb(39,143,97)`, geometry (rect/circle/path coordinates) byte-identical to light mode as expected since layout is theme-independent — only color tokens differ. `npm run build` clean.
+
+---
 
 **Prompt 522 — root-caused and fixed BOTH Twilio bugs Brayden found (false browser-side disconnect while the real phone call stayed live, and inconsistent Device registration), on `restorix-portal`, 2026-08-21. Root cause came from Twilio's own documented SDK behavior, not a raw call-log pull — no authenticated Twilio REST API access or live-audio capability existed in this session's tooling to fetch Brayden's actual call SIDs; flagged honestly rather than guessed past that gap.** Commit `34971ad` on top of `37970e3`.
 
