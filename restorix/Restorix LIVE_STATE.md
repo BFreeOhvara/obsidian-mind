@@ -14,6 +14,10 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
+**Empty as of 2026-08-24** — Prompt 521 Dials recolored green → red (green got reassigned to Commission the prior round). Asset swap + one glow color constant, no structural change. Verified the served bytes directly (pixel-sampled the actual production PNG, not just a screenshot) to rule out a stale-cache false-positive. Real screenshots at `restorix/qa-screenshots/prompt521-dials-red-v1.png` (row) and `-unlocked-preview.png` (glow). See CURRENT STATE for the full detail.
+
+---
+
 **Empty as of 2026-08-24** — Prompt 521 extended to Commission: same real-illustrated-PNG-art system Dials/Bookings/Perfect Days use, its own 7 tiers (one more than every other category), green glow matching Dials, dollar formatting on both the header and tile labels. `TierBadgeRow` removed entirely (Commission was its last consumer). Special is the only category left on the SVG template. Real screenshots at `restorix/qa-screenshots/prompt521-commission-v1.png` (row) and `-v1-full.png` (whole card). See CURRENT STATE for the full build + verification detail.
 
 ---
@@ -256,6 +260,20 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 521 (Dials recolored green → red) — asset swap + one glow color constant, no structural change.** `restorix-portal`, 2026-08-24. Commit `eb9edbf` on top of `743ca49`.
+
+**Why**: Dials' original green got reassigned to Commission (previous round), so the two categories were no longer visually distinct — Dials moved to red so they read apart again at a glance.
+
+**Source art**: 6 replacement files at `restorix/logo-assets/badge-icons/badge-dials-tier{1-6}.png` (same filenames, overwritten in place) — MD5-verified byte-identical to the hashes specified before use, real RGBA alpha confirmed, same 835px canvas height / per-tier varying width as the prior green set, same escalating ornament pattern and phone glyph — only the shield trim/icon color changed (green → red), gold crown/wings/wreath/gems untouched.
+
+**Resize pipeline**: identical to every prior round — Pillow, `LANCZOS`, preserve each tier's own aspect ratio, fixed 262px HEIGHT only, overwrote the old green files in `public/badges/`.
+
+**Code**: one glow value changed in `PNG_BADGE_CATEGORIES.dials` (`src/pages/MyGoals.jsx`), `rgba(31,138,95,0.6)` → `rgba(220,43,36,0.6)` (sampled directly from the new red art). Commission's own green glow is untouched — updated its comment from "same green Dials uses" to make clear that's now historical only, not a shared color. Nothing else changed — no layout, no sizing, no other category touched.
+
+**Verified live on real production**: build/lint clean, pushed, polled GitHub's commit-status API to `success`, then session-token-injection + headless-Playwright. **Went one step further than a visual check to rule out a stale-cache false-positive**: fetched the actual served `badge-dials-tier6.png` bytes directly, decoded them client-side, and sampled a pixel from the shield trim — got `rgb(164,50,41)` (red-dominant) with a `content-length` matching the new file's exact byte size, confirming the red art is genuinely what's being served, not a cached copy of the old green. `getBoundingClientRect()` confirmed the layout is unaffected: still all 6 tiles on one row, one `top`, 140px images. Dials currently has 0 unlocked tiers on the live test account (24 all-time vs. a 150 threshold), so the same non-persisted-DOM-swap technique confirmed the unlocked glow renders `drop-shadow(rgba(220, 43, 36, 0.6) 0px 0px 10px)` exactly as coded. Real screenshots saved: `restorix/qa-screenshots/prompt521-dials-red-v1.png` (row, locked state), `-unlocked-preview.png` (single tile showing the red glow).
+
+---
 
 **Prompt 521 (extended to Commission) — Commission moved off the flat SVG shield template onto the same real-illustrated-PNG-art system Dials/Bookings/Perfect Days already use, its own 7 tiers (one more than every other category), green glow.** `restorix-portal`, 2026-08-24. Commit `743ca49` on top of `c68b457`.
 
