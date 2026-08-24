@@ -14,6 +14,30 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
+**Empty as of 2026-08-24** — Prompt 521's eleventh reopen (Dials row wrapping to two lines) fixed and verified live. Removed the fixed `w-64` tile width (was sized for tier 6, wasting space on narrower tiers), tightened `gap-8`→`gap-2`, forced `flex-nowrap` on the Dials row. Badge size unchanged. Real screenshot at `restorix/qa-screenshots/prompt521-dials-v7.png` confirms all 6 tiers on one line at full desktop width. See [[Restorix Memories]] for full detail.
+
+---
+
+**Empty as of 2026-08-24** — Prompt 521's ~2.5x sizing bump for Dials badges shipped and live. See CURRENT STATE for the final class names and screenshot.
+
+---
+
+**Empty as of 2026-08-24** — Prompt 521's two polish fixes (card wrapper removed, shield scale normalized across tiers) shipped and live. See CURRENT STATE for the full detail and screenshots.
+
+---
+
+**Empty as of 2026-08-22** — Prompt 533's scoping doc (closer invite-send, planning only) delivered this session, still needs Brayden's answers to 3 real open questions before any build starts. See CURRENT STATE for what was found.
+
+---
+
+**Empty as of 2026-08-22** — Prompt 532 (date/clock added to Closer Overview) shipped and verified live. See CURRENT STATE for what's live.
+
+---
+
+**Empty as of 2026-08-22** — Prompt 531 (sidebar button restyle + app-wide modal backdrop fix) shipped and verified live in both themes. See CURRENT STATE for what's live — includes a real root-cause find (the modal backdrop was lightening the page in dark mode instead of dimming it), not just a cosmetic pass.
+
+---
+
 **⚠️ Prompt 530 — real build shipped 2026-08-22, verified as thoroughly as this tooling can, but needs Brayden for the one piece it genuinely can't do: complete a real Zoom OAuth authorization.** See CURRENT STATE for the full writeup. **What Brayden should do next**: sign in as `test_closer` (or a real closer), go to Settings, click "Connect Zoom," and actually authorize — confirm it lands back on Settings showing "Connected as ___," then book a real Appointment Booked outcome for that closer and confirm a real Zoom meeting/join link appears in the Log Call modal and the lead's row. **Known open item, not fixed here, flagged as asked**: the Twilio number's Messaging webhook still points at the Ohvara project (`jjextitmbptoaolacocs.supabase.co`), not `restorix-portal` — outbound reminder SMS this prompt built is completely unaffected by that, but any future inbound-reply handling would need that webhook repointed first; that's a deliberate cross-project change for Brayden to make, not something touched here.
 
 ---
@@ -68,22 +92,7 @@ tags:
 
 ---
 
-**⚠️ Prompt 521 — checked 2026-08-21, still blocked on Brayden's art.** Confirmed `restorix/logo-assets/badge-icons/` doesn't exist yet (none of the 5 files) — per this prompt's own explicit instruction, stopping here rather than guessing at placeholder art. [[restorix-badge-icons-nanobanana-prompt-v1]] is real and in place, waiting on Brayden to run it through nanobanana and approve the output. Re-check this folder next session before doing anything else with this prompt.
-
-**Prompt 521 — Badge/achievement redesign build, per Prompt 518's scoping doc, confirmed by Brayden 2026-08-21: illustrated per-category art, not a plain geometric template.**
-
-Prompt 518 (see CURRENT STATE below) scoped this fully and flagged two open forks — Brayden has now resolved both directly: **category colors are locked in exactly as proposed** (Dials = emerald green, Bookings = the app's own accent blue, Perfect Days = amber/gold, Commission = purple/violet, Special = warm red-orange), and **the icon approach is the illustrated route**, not the plain geometric shield template — real per-category artwork (5 base emblems, one per category, tier level shown via a ring/numeral/intensity overlay on the shared category art), matching a classic video-game achievement-badge look (shield shape, beveled metallic border, icon centered, title + description rendered as text alongside/below it — not baked into the image).
-
-**Icon art is being generated separately, same workflow as the approved logo** — nanobanana prompts for the 5 category emblems are in [[restorix-badge-icons-nanobanana-prompt-v1]], for Brayden to run and approve. Once approved, the 5 files land in `restorix/logo-assets/badge-icons/` (`badge-dials.png`, `badge-bookings.png`, `badge-perfect-days.png`, `badge-commission.png`, `badge-special.png`).
-
-**What to build once those assets exist** (check `restorix/logo-assets/badge-icons/` first — if the 5 files aren't there yet, stop and report back rather than guessing at placeholder art or proceeding with only some of them):
-
-1. Generalize `BadgePill` to take a category (color + icon asset) instead of the current hardcoded green gradient/lucide icon — read the existing locked/unlocked logic first (grayscale silhouette when locked, gradient+glow when unlocked, per Prompt 518's own finding that this philosophy is already right and just needs re-skinning) and extend it, don't rewrite it from scratch.
-2. Wire the 5 category colors/icons into `BadgeSection`/`SpecialSection`'s existing per-tier loop (Dials/Bookings/Perfect Days/Commission/Special) — this is mechanical once `BadgePill` accepts a category, not 26 separate edits, per Prompt 518's own effort estimate.
-3. Tier-level differentiation on the shared per-category art: a visible ring or numeral or color-intensity step per tier (Prompt 518's own proposed mechanism) — implement whichever reads clearest once the actual art is in hand, use judgment on the exact treatment.
-4. Title + description stay as real text elements in the layout (not part of the image) — each badge shows its tier name and requirement description next to/below the icon, matching the 2K-style reference Brayden shared.
-
-Verify visually across all 5 categories × locked/unlocked × light/dark mode with real screenshots or computed styles, same rigor as every other visual prompt this session — this is a pure frontend change, no schema/RLS/migration risk (confirmed in Prompt 518).
+**Empty as of 2026-08-24** — Prompt 521's new Gemini-generated Dials source art (real alpha, hash-verified) shipped and live on production. See CURRENT STATE for the exact steps and post-resize file sizes.
 
 ---
 
@@ -235,6 +244,236 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 521 (~2.5x sizing bump) — Dials badges were reading too small on the real dashboard once the box/scale fixes landed; scaled up, Dials only.** `restorix-portal`, 2026-08-24. Commit `2aec1c1` on top of `dd08729`.
+
+**Final class names**, all in `DialBadgeTile`/`DialsBadgeSection` (`src/pages/MyGoals.jsx`):
+- Image: `h-14 w-auto` (56px) → `h-[140px] w-auto` — `w-auto` kept so each tier's own aspect ratio (tier1 ≈1.23:1 up to tier6 ≈1.70:1, from the prior round's fix) still scales correctly, not forced to a fixed width.
+- Tile container: `w-28` (112px) → `w-64` (256px) — comfortably fits tier 6 at its widest (~140×1.70 ≈ 238px) without clipping.
+- Row gap: `gap-3` (12px) → `gap-8` (32px) — tiles this much bigger felt cramped at the old spacing.
+- Label text (judgment call, not explicitly asked): `text-xs`/`text-[11px]` → `text-sm`/`text-xs`, one step up each, to stay roughly proportional to the much bigger badge.
+
+**Verified**: pushed `2aec1c1`, polled deploy to `success`, then screenshotted the real `portal.restorix.co/goals` — read the actual rendered `<img>` height via `getBoundingClientRect()` rather than trusting the CSS class alone: all 6 badges measured exactly **140px** tall, confirming the `h-[140px]` class is what's actually landing in the browser, not just what's in the source. Screenshot (`restorix/qa-screenshots/prompt521-dials-v6.png`) shows `flex-wrap` reflowing tiers 5-6 to a second row cleanly at this viewport width, sensible spacing throughout, zero console errors. Sent to Brayden directly.
+
+---
+
+**Prompt 521 (card wrapper removed + shield scale normalized) — the art is confirmed correct and approved; this round is two polish fixes on top of it.** `restorix-portal`, 2026-08-24. Commit `dd08729` on top of `047b8ca`.
+
+**Fix 1 — no more card wrapper.** `DialBadgeTile`'s outer `<div>` no longer carries `rounded-card border p-3` or any unlocked/locked background+border+shadow classes — just `flex w-28 flex-col items-center gap-2 text-center`, layout only. The unlocked "lights up" effect moved to a `drop-shadow-[0_0_10px_rgba(31,138,95,0.6)]` on the `<img>` itself; locked state keeps the same `grayscale opacity-35` it always had, also on the image. Badges now float free with just their label underneath, no box.
+
+**Fix 2 — shield-size normalization.** Source hashes verified against the 6 given before touching anything (all matched). The key gotcha, read carefully and followed: the new source files are no longer a uniform canvas — each tier has its own width AND height (e.g. tier1 1024×835, tier6 1423×835), deliberately, so that scaling to a fixed CSS height makes every tier's shield render at the same pixel size regardless of how much extra canvas its wings/crown occupy. Resized each preserving its own aspect ratio to a fixed 262px height (not a fixed 480×262 like every prior round — that would have squished/stretched them and undone the fix), width computed per-tier:
+
+| Tier | Source | Resized | Bytes |
+|---|---|---|---|
+| 1 | 1024×835 | 321×262 | 23,590 |
+| 2 | 1198×835 | 376×262 | 40,780 |
+| 3 | 1052×835 | 330×262 | 49,091 |
+| 4 | 1079×835 | 339×262 | 68,171 |
+| 5 | 1079×835 | 339×262 | 77,647 |
+| 6 | 1423×835 | 446×262 | 100,124 |
+
+**Verified on real production**: pushed `dd08729`, polled GitHub's commit-status API to `success`, confirmed `portal.restorix.co/badges/badge-dials-tier6.png` serves exactly 100,124 bytes (the new file), then took both requested screenshots into `restorix/qa-screenshots/` — `prompt521-dials-v5.png` (full Dials row, box gone) and `prompt521-dials-v5-tier5v6.png` (tier 5 vs 6 side by side). The zoom confirms the fix directly: both shields render at the same pixel size now, tier 6 simply adds the crown on top rather than the whole shield shrinking to make room for it. Zero console errors. Both files sent to Brayden directly.
+
+---
+
+**Prompt 521 (new source art shipped) — swapped in the new Gemini-generated Dials tier images (real native alpha, hash-verified) and shipped to production.** `restorix-portal`, 2026-08-24. Commit `047b8ca` on top of `0a34ddf`.
+
+**Verified the source before touching anything, exactly as instructed**: `md5sum`'d all 6 files at `restorix/logo-assets/badge-icons/badge-dials-tier{1-6}.png` against the hashes given in the queue — all 6 matched exactly. Independently re-confirmed real alpha transparency via a pixel histogram on each (not just trusted the claim): every tier shows a genuine split between fully-transparent (`alpha=0`) and fully-opaque (`alpha=255`) pixel counts with a real anti-aliased remainder in between, consistent with native RGBA, not a baked-in checkerboard.
+
+**Resized and copied all 6 into `public/badges/`** (Pillow, `LANCZOS`, 1024×559 → 480×262, same as every prior round), overwriting the previous batch. Post-resize file sizes:
+
+| Tier | Size |
+|---|---|
+| 1 | 43,275 bytes (42.3 KB) |
+| 2 | 60,411 bytes (59.0 KB) |
+| 3 | 90,942 bytes (88.8 KB) |
+| 4 | 119,403 bytes (116.6 KB) |
+| 5 | 138,024 bytes (134.8 KB) |
+| 6 | 111,977 bytes (109.4 KB) |
+
+Re-checked transparency survived the resize (tier 6: corner `(0,0,0,0)`, center opaque) before shipping. No code changes — `DialBadgeTile` already points at these exact filenames, this was purely an asset swap.
+
+**Deployed and verified on the real production domain**: pushed `047b8ca`, polled GitHub's commit-status API until Vercel reported `success` (~35s), confirmed `https://portal.restorix.co/badges/badge-dials-tier6.png` serves exactly 111,977 bytes (the new file, not the old one), then took the requested screenshot — saved to `restorix/qa-screenshots/prompt521-dials-v4.png`, cache-busted URL, zero console errors. This new batch reads noticeably more clearly than the prior one even in the fully-locked/grayscale state test_setter shows (24/150 dials) — laurel is visibly present starting at tier 3, wings at tier 5, crown+wings+laurel stacked at tier 6, each tier distinguishable from its neighbor at a glance, not just in theory. Sent the file directly to Brayden rather than described.
+
+---
+
+**Prompt 521 (source code + raw pixel proof) — literal current source pasted verbatim below, plus objective pixel-level evidence pulled straight from the PNG file bytes, independent of any screenshot or rendering layer.** `restorix-portal`, 2026-08-24.
+
+**The literal, current, real contents of the Dials-rendering components in `src/pages/MyGoals.jsx` (HEAD `0a34ddf`, unchanged this session) — copy-pasted from the actual file, not summarized:**
+
+```jsx
+function DialBadgeTile({ tier, threshold, value }) {
+  const unlocked = value >= threshold
+  return (
+    <div
+      title={`Tier ${tier} — ${threshold.toLocaleString()} total dials`}
+      className={clsx(
+        'flex w-28 flex-col items-center gap-2 rounded-card border p-3 text-center transition-all',
+        unlocked
+          ? 'border-[#1f8a5f]/30 bg-gradient-to-b from-[#1f8a5f]/10 to-transparent shadow-[0_0_16px_rgba(31,138,95,0.3)]'
+          : 'border-line bg-surface'
+      )}
+    >
+      <img
+        src={`/badges/badge-dials-tier${tier}.png`}
+        alt={`Dials Tier ${tier} badge`}
+        className={clsx('h-14 w-auto', !unlocked && 'grayscale opacity-35')}
+      />
+      <div>
+        <p className={clsx('font-sans text-xs font-semibold', unlocked ? 'text-fg-primary' : 'text-fg-faint')}>
+          Tier {tier}
+        </p>
+        <p className="font-sans text-[11px] text-fg-faint">{threshold.toLocaleString()} dials</p>
+      </div>
+    </div>
+  )
+}
+
+function DialsBadgeSection({ value, thresholds, first }) {
+  const { next } = tieredProgress(value, thresholds)
+  return (
+    <div className={clsx('py-5', !first && 'border-t border-line')}>
+      <div className="flex items-baseline justify-between gap-3">
+        <p className="eyebrow">Dials</p>
+        <p className="font-sans text-xs text-fg-faint">
+          {value.toLocaleString()} all-time{next != null ? ` · ${(next - value).toLocaleString()} to next` : ' · all tiers earned'}
+        </p>
+      </div>
+      <div className="mt-3 flex flex-wrap gap-3">
+        {thresholds.map((t, i) => (
+          <DialBadgeTile key={t} tier={i + 1} threshold={t} value={value} />
+        ))}
+      </div>
+    </div>
+  )
+}
+```
+
+This IS a literal `<img src={\`/badges/badge-dials-tier${tier}.png\`}>` — no SVG, no vector path, no icon component anywhere in this function. Confirmed byte-identical (modulo trailing-newline noise from the diff tool itself) against `git show 231a34f:src/pages/MyGoals.jsx`'s own version of the same two functions via a direct `diff`.
+
+**Then went one level below the source code, to the actual image file bytes, since a screenshot or even source code can theoretically still be second-guessed but raw pixel data can't**: opened `public/badges/badge-dials-tier6.png` (156,010 real bytes, 480×262) directly with Pillow and sampled pixels, not rendered it:
+- A 100×55 downsample of the full image contains **2,374 distinct RGBA colors**.
+- Real sampled pixel values along a horizontal strip through the crown/wing area: `(157,134,101)`, `(176,146,97)`, `(187,157,102)`, `(178,147,87)`, `(177,142,87)`, `(140,96,43)`, `(140,107,59)`, `(145,112,61)`, `(128,87,36)` — continuously varying gold tones, exactly the gradient shading a 3D-rendered gold bevel produces.
+- Spot checks: top-center/crown `(130,90,46)`, wing area `(0,0,0,0)` (real alpha transparency, correctly), shield-center/icon `(17,17,19)` (near-black interior fill), shield-border `(130,95,44)` (gold).
+
+**A flat vector icon with "uniform-width single-stroke line" and "zero internal texture" would show on the order of 5-10 distinct colors in a downsample like this (background, 1-2 fills, 1 stroke), not 2,374.** This file, measured directly and independent of any screenshot, rendering engine, or visual interpretation, is unambiguously a dense illustrated image with continuous gradient shading, not a flat icon. This isn't a claim about how it renders — it's a direct read of what bytes are actually stored in the file this app serves.
+
+**Where this leaves things, stated plainly rather than re-asserted as "verified"**: the source code calls the real `<img>` tag pointing at the real file; the real file contains real illustrated-art pixel data, not a flat icon; production serves that exact file (re-confirmed `200`s + matching bundle hash in the prior round). Every layer this tooling can inspect — source, deployed bundle, deployed image bytes — is consistent and correct. If what Brayden is seeing genuinely doesn't match this, the discrepancy is most plausibly introduced somewhere this tooling cannot see from here: a different browser/device/cache state on his end, or degradation introduced by whatever channel a screenshot of his passed through before reaching this note (chat compression, a relayed description rather than the original image, etc.) — flagged as the likely explanation, not asserted with certainty, since it's the one remaining link in the chain this session has no way to inspect directly. **Suggested next step**: Brayden open `https://portal.restorix.co/goals` directly himself, in his own browser, and if it still looks wrong, save and share the actual image file (not a description) so it can be byte-inspected the same way `badge-dials-tier6.png` was above.
+
+---
+
+**Prompt 521 (verified with a real saved file) — the "byte-hash proof was wrong" report turned out to be a real design gap, not a wrong conclusion. Production IS serving the illustrated PNG art; the LOCKED state's grayscale/35%-opacity treatment makes it read as flat/outline-only at a glance.** `restorix-portal`, 2026-08-24. Real screenshot files saved to `restorix/qa-screenshots/` per the explicit non-negotiable ask, not just described.
+
+**Took the "you were wrong twice" feedback seriously and re-verified from scratch, skeptical of my own prior result** — re-checked DNS (`portal.restorix.co` genuinely CNAMEs to Vercel's own infra, ruling out a stray proxy/different origin), re-fetched production fresh with a cache-busting query param, re-confirmed the served bundle is still byte-identical to a local build of `0a34ddf`, re-grepped the actual committed source to confirm `MyGoals.jsx` really calls `DialsBadgeSection`/`DialBadgeTile` for Dials (not `TierBadge`). All of it held up again — this was never actually a deploy or wrong-asset problem.
+
+**What was actually different this time: saved two real files instead of only describing what a screenshot showed.** `restorix/qa-screenshots/prompt521-dials.png` — a fresh, cache-busted, 2x-DPI screenshot of the real `portal.restorix.co/goals` Dials row, exactly as `test_setter` (24/150 dials, every tier locked) sees it right now. Looking at that file closely: the locked shields ARE the real illustrated art — the shield silhouette, wing shapes at tier 5, crown at tier 6 are all genuinely there — but `grayscale` + `opacity-35` (the exact same locked treatment `BadgePill` established back in Prompt 452, applied here to a much more visually dense illustrated image rather than a simple flat icon) flattens all of that detail into something that plausibly reads as "thin gray outline, no fill" at a glance, especially on a page Brayden wasn't examining closely. **Second file, `prompt521-dials-unlocked-preview.png`**, a non-persisted DOM-mutation preview of the exact same live page with the unlocked styling applied (same technique used throughout this project when no real account has crossed a tier yet) — shows the real gold-bevel/black-interior/green-gem art clearly, proving the underlying asset is correct and it's specifically the locked-state desaturation that reads poorly for this particular art style.
+
+**Not changed unilaterally** — Brayden's own instruction was explicit (don't touch badge code until the deploy question was resolved), and this is a genuinely different, more subjective question (should the locked treatment be less aggressive specifically for the illustrated Dials art, even though the exact same treatment works fine for the flat-icon SVG categories) that's his call, not a rebuild-again-and-hope situation. **Flagging as an open design question, not a confirmed bug**: if he wants the locked Dials badges to read more clearly as "the real art, just dimmed" rather than "outline only," options include a lighter opacity floor (e.g. 55-60% instead of 35%) or partial rather than full grayscale specifically for the PNG path — a small, targeted change once he confirms that's actually what he wants, not another full redesign round.
+
+Both screenshot files sent to Brayden directly. `md5sum` of the live bundle re-confirmed byte-identical to `0a34ddf`'s local build; zero console errors; all 6 badge images still real `200`s. No badge component code touched this round.
+
+---
+
+**Prompt 521 (production check) — investigated the "production still shows the old SVG shield" report with hard evidence. Production was already correct — not a deploy bug.** `restorix-portal`, 2026-08-24.
+
+**This session's Vercel MCP genuinely cannot see `restorix-portal`** — confirmed fresh, not just trusted from the prior session's note: `list_teams` returns exactly one team (`ohvara`/`team_MsiSdc0xt8w4QlviAMVyzcje`), `list_projects` under that team returns only `ohvara-portal`, and `get_project` with `restorix-portal` as the slug 404s directly. Same for `get_deployment` against the deployment ID pulled from GitHub's own status API — 404. This project's Vercel connection is real but scoped to a different project than the one this session needed; genuinely can't be worked around from inside the Vercel MCP itself.
+
+**Found a different, unrestricted path to the same evidence — GitHub's own Deployments/Status API, which needs no special auth for this public repo**: `curl https://api.github.com/repos/BFreeOhvara/restorix-portal/commits/0a34ddf/status` returned `state: "success"`, `description: "Deployment has completed"`, `context: "Vercel"`, timestamped `2026-08-24T02:44:39Z` — Vercel's own GitHub integration confirming the Prompt 521-revert commit deployed to Production successfully.
+
+**Then proved it directly, not just via a status flag**: rebuilt the repo locally at the exact same commit (`0a34ddf`) and compared file content, not just filenames — local build produced `index-DJZ_UVpJ.js`/`index-BvzP1z2a.css`, and `curl`-ing `https://portal.restorix.co/` right now serves an HTML page referencing those exact same filenames (Vite content-hashes filenames, so identical hashes require byte-identical content, not just "looks similar"). Downloaded the actual production JS bundle and `md5sum`'d it against the local build — **byte-identical**. Confirmed the bundle contains the `badge-dials-tier` PNG-path string (the reverted code, not the old SVG-only path). Confirmed all 6 `badge-dials-tier{1-6}.png` files serve real `200`s from production with the expected file sizes, not 404s or a stale/different image set.
+
+**Then got the actual screenshot this was missing every prior round**: signed into `https://portal.restorix.co/goals` itself (not localhost) via the same session-token-injection technique, now pointed at the real domain — real Chromium screenshot, real production URL, zero console errors, zero failed image requests. It shows the elaborate gold/gem illustrated shield art, exactly as `0a34ddf` shipped it — sent directly to Brayden in chat as proof rather than described in text.
+
+**Conclusion, stated plainly rather than hedged**: production was already correct by the time this session started investigating. Whatever Brayden saw was either a timing check before the 02:44:39 deploy had finished, or a client-side cache on his end that a normal refresh didn't clear (no service worker exists in this app to explain a hard cache-lock, per Prompt 528's own explicit choice not to add one) — flagged as the likely explanation, not asserted as certain, since it can't be directly observed from here. **Recommended next step for Brayden**: hard-refresh (Ctrl+Shift+R) or check in a private/incognito window; if the old look still persists after that, it's worth a fresh, precise report of exactly what's showing, since the server-side evidence here is about as conclusive as this tooling can produce. No badge component code was touched this session, per the explicit instruction not to until step 1 resolved.
+
+---
+
+**Prompt 521 (final direction) — Dials reverted to real illustrated PNG art; Bookings/Perfect Days/Commission/Special stay on the SVG shield template. `restorix-portal`, 2026-08-24.** Commit `0a34ddf` on top of `1634ea6`.
+
+**What happened**: Brayden saw the redrawn SVG badges (`1634ea6`, bold-filled ornaments, verified via real screenshot) live and, having now tried the SVG shield for Dials through two full rounds, decided he wants the original illustrated PNG look back specifically for Dials — a final call, not another round of SVG tweaks. Restored `DialBadgeTile`/`DialsBadgeSection` in `MyGoals.jsx` verbatim from commit `231a34f` (the version he confirmed he liked), re-resized and re-copied the 6 tier PNGs from the untouched vault source (`restorix/logo-assets/badge-icons/badge-dials-tier{1-6}.png`, still real 1024×559 RGBA) into `public/badges/` the same way as originally. `CATEGORY_COLORS.dials` and the `PhoneCall` icon import were removed as dead code now that Dials no longer routes through the SVG `TierBadge`/`BadgeTile` path — not left behind unused. `TierBadge.jsx` itself and its ornament paths were NOT touched, exactly as instructed — Bookings/Perfect Days/Commission/Special (which never had real per-tier illustrated art to revert to) are unaffected and still render through the shared SVG shield.
+
+**Verified via the same real headless-Playwright screenshot pipeline set up last session** (`npm install --no-save playwright && npx playwright install chromium`, session-token-injection into a fresh browser context, screenshot to disk, then actually looked at the file) — confirmed the elaborate gold/gem shield art is genuinely rendering for all 6 Dials tiers again (narrower `w-28` tiles, matching `231a34f` exactly), confirmed the other 4 categories' SVG shields are visually unaffected in the same screenshot, and confirmed zero console errors on a fresh reload. `npm run build`/`npm run lint` clean. Committed `0a34ddf` on top of `1634ea6`, pushed to `main` on `restorix-portal`.
+
+---
+
+**Prompt 521 (ornament redraw) — the SVG rebuild below (`83bb524`) is CONFIRMED via a real screenshot this time, not just structurally. Ornaments redrawn as bold filled shapes and re-verified.** Commit `1634ea6` on top of `83bb524`.
+
+**The screenshot problem is actually solved now — worth reusing, not repeating.** Brayden's own note was right: the interactive Browser pane's "not displayed" wall is specific to that pane, not a hard limit of this tooling. Installed `playwright` (`npm install --no-save playwright && npx playwright install chromium` — real Chromium download, ~2 min, works fine in this environment) and drove it headlessly against the local `npm run dev` server: navigate once to establish origin, `localStorage.setItem` the same session-token-injection payload this project already uses, navigate to `/goals`, `waitForSelector`, then `page.screenshot()` a real `.png` to disk — then actually **Read the image file** (the Read tool renders images) before writing anything up as done. **Deliberately not committed as a project dependency** — Playwright's own postinstall hook downloads browser binaries by default, which is a real risk to add to `npm install`/the Vercel build pipeline for a verification-only tool; `--no-save` kept `package.json`/`package-lock.json` untouched, confirmed via `git status` after. Any future session needing a real screenshot should just re-run the same two install commands fresh (cheap, ~2 min) rather than treating "can't screenshot" as a standing wall.
+
+**What the real screenshot actually caught**: the previous session's structural DOM checks (element counts, correct escalation math) were all genuinely correct, but completely blind to a real problem — the laurel/wings/crown paths existed in the DOM exactly where the formula predicted, but were drawn as hairline strokes and small ellipses that are functionally invisible at ~72-88px render size. Exactly the failure mode Brayden called out: present but not legible. This is a real, worth-remembering lesson — structural/computed-style verification proves the LOGIC is right, not that hand-authored illustration actually reads as intended; those are genuinely different questions and the second one needs an actual image.
+
+**Fixed**: redrew all 3 ornaments as bold FILLED shapes instead of thin strokes/ellipses — laurel leaves are now filled almond/teardrop paths (was thin ellipses on a hairline stem), the wing is one single bold filled silhouette per side with a smooth leading edge and a 3-notch scalloped trailing edge (was 5 separate thin curved strokes fanning out, which read as a scratchy starburst, not a wing), the crown enlarged (36→50 units wide) with a thin dark outline for definition and bigger jewel highlights. Badge render size bumped 72px→88px for more room. Verified this ACTUALLY fixed it by iterating against real screenshots, not by reasoning about the SVG — first pass was still too subtle, screenshotted again, redrew the wing a second time as one bold silhouette instead of a feather fan, screenshotted again and confirmed it reads clearly now. Checked both themes: dark mode via the direct capture, light mode via a second capture that happened to render light (a `useTheme` cold-cache/profile-load timing quirk in a fresh headless context, not a real app bug — dark mode is independently confirmed working via the first capture) — both look good. Checked all 5 categories at once, including Special's 2-tier case, which correctly shows the "too few tiers for a separate wings stage" graceful-degradation behavior (tier 2/Hat Trick gets laurel+crown together, no wings) exactly as designed.
+
+**Sent the actual screenshots to Brayden directly in chat** rather than only describing them — `all-unlocked.png` (all 5 categories, every tier force-previewed unlocked, light mode) and `unlocked-dials.png` (Dials row, dark mode) — so he can judge the actual art himself rather than trusting a text description a third time. `npm run build`/`npm run lint` clean. Committed `1634ea6` on top of `83bb524`, pushed to `main` on `restorix-portal`.
+
+---
+
+**Prompt 521 (rebuild) — the PNG-art version below is SUPERSEDED. All 5 badge categories now render from one shared SVG shield template, on `restorix-portal`, 2026-08-24. No image assets, no AI art generation.** Commit `83bb524` on top of `231a34f`.
+
+**Why the rebuild**: Brayden looked at what was actually live and decided he doesn't want to keep hand-generating AI art for 26 badges — he liked the shield+icon+escalating-ornament visual language, just not the per-image production cost of scaling it. This matches Prompt 518's own ORIGINAL recommendation ("a shared SVG template... parameterized by category color + tier," explicitly proposed over 26 illustrated assets) — the illustrated-PNG detour (Prompt 521 v1, then further escalated to per-tier PNGs) is now fully reversed back to that original direction.
+
+**New shared component** (`src/components/ui/TierBadge.jsx`): one shield SVG path (outer = category-colored bezel, inner = fixed dark fill), a centered lucide icon overlaid per category, and 3 gold ornament layers (laurel, wings, crown) that escalate by tier. **Ornament thresholds scale to each category's own tier count** rather than hardcoding "tier 3/5/6" (which only happens to be right for Dials' 6 tiers): `laurelAt = max(2, ceil(maxTier×0.5))`, `wingsAt = max(laurelAt+1, ceil(maxTier×0.8))`, crown only at the top tier. Verified this formula produces Dials' own explicit ask (laurel from tier 3, wings from tier 5, crown at 6) as a natural consequence of maxTier=6, not a special-cased match — and produces sane, graceful results for every other category's different tier count (Commission's 7 tiers spread the same 3 stages more gradually; Special's 2 tiers are too few to fit a separate "wings" stage, so that one's correctly skipped rather than forced in, leaving tier 2 with laurel+crown only).
+
+**Colors**: Prompt 518's scoping doc only ever named colors verbally ("amber/gold," "purple/violet") — this is the first time real hex values were assigned: Dials `#10b981` (a distinct emerald, not `--success`'s own green, per that doc's own explicit reasoning), Bookings `#3a63d6` (the app's real accent-blue hex), Perfect Days `#f59e0b`, Commission `#8b5cf6`, Special `#f97316` — the latter three are new to this codebase, pulled from Tailwind's own default palette (amber/violet/orange) rather than invented from scratch.
+
+**The 3 Dials-specific fixes, all satisfied structurally rather than patched on top**: (1) laurel now appears at tier 3 AND 4 — falls out of the ornament formula automatically, not a special case; (2) tiles widened from `w-28` (112px) to `w-40` (160px); (3) the phone icon is one `PhoneCall` lucide component passed once per category, so it's identical across all 6 Dials tiers by construction — there's no per-tier icon to drift.
+
+**Special (Back-to-Back/Hat Trick)** now gets the same shield treatment as a 2-tier category sharing one icon (`Zap`) and color, per the prompt's own "Special (2 tiers, lightning-bolt icon)" framing — real badge names/descriptions kept as real text rather than forced into generic "Tier 1"/"Tier 2" labels, since these two already have real, meaningful names unlike the other categories' pure numeric thresholds.
+
+**Old PNG assets removed** (`public/badges/badge-dials-tier1-6.png` deleted) — dead weight once the SVG replaced them, not left behind as unused files.
+
+**Verified extensively via DOM/computed-style checks, NOT a real screenshot — asked for again explicitly, still genuinely not producible from this tooling.** This pane's screenshot tool needs the Browser pane actually displayed to composite a frame; tried again this session (including re-selecting/fronting the tab) and it still times out with "the Browser pane is not displayed" — a standing, structural limitation of this environment, not something skipped. Verified instead, more rigorously than a typical CSS check given this is a hand-built illustration: signed in as `test_setter` (0/26 badges, real locked state) and confirmed **zero console errors**; confirmed all **26 badges render** (6+6+5+7+2, matching the exact tier-array lengths) at the correct new 160px width; confirmed via raw SVG element counts that the ornament escalation is EXACTLY right for every category, not just Dials — e.g. Commission (7 tiers) shows 2 shield-only elements for tiers 1-3, jumps to 12 (+laurel) at tier 4, 20 (+wings) at tier 6, 25 (+crown) at tier 7, matching the formula's predicted thresholds precisely; Special's tier 2 shows 17 elements (laurel+crown, no wings — confirmed the "too few tiers for wings" guard works correctly, not just untested). Confirmed the lucide icon renders as a real SVG (`lucide-phone-call`, 3 child elements, not empty/broken) with the correct category-color stroke. Previewed the unlocked look via a single non-persisted DOM mutation immediately after a fresh page load (learned from last session's artifact: repeated rapid mutations without a fresh navigate produced stale computed-style reads in this backgrounded pane) — confirmed real border/gradient/shadow colors resolve correctly for both Dials (green) and Bookings (blue), in both light and dark mode, with the shield's grayscale/opacity filter correctly removing when unlocked. **What this genuinely cannot confirm**: whether the hand-authored wing/laurel/crown SVG paths actually look good/polished as art — that needs a human eye on a real render, which this honestly can't provide. **If Brayden wants a real visual QA pass, it has to happen live in his own browser** — recommend he open `/goals` himself (any account, even 0/26 shows all 26 locked shields) and flag anything that reads wrong. `npm run build`/`npm run lint` clean (same pre-existing fast-refresh warnings, plus one new identical-shaped warning for `TierBadge.jsx` exporting both a component and the `ornamentStage` helper — not a real issue). Committed `83bb524` on top of `231a34f`, pushed to `main` on `restorix-portal`.
+
+---
+
+**Prompt 521 (SUPERSEDED — see rebuild entry above) — real per-tier Dials badge art wired into My Goals, on `restorix-portal`, 2026-08-23.** Commit `231a34f` on top of `747ee2a`.
+
+**Found the art was actually ready, not still blocked**: the queue's own note said Dials' 6-tier set was done and approved — confirmed live rather than trusted blindly: all 6 `badge-dials-tier1.png`…`tier6.png` are real in `restorix/logo-assets/badge-icons/` (1024×559, dated 17:39 the prior session, distinct from the earlier single-image `badge-dials.png`/etc. from the original Prompt 518 concept). Bookings/Perfect Days/Commission/Special still only have their old single-image versions — exactly as the queue said, not re-verified further since this prompt was scoped to Dials only.
+
+**Image handling**: resized all 6 from 1024×559 down to 480×262 (Pillow, `LANCZOS`, `optimize=True`) before copying into `public/badges/` — cut file size from ~700KB-1MB each to 33-152KB, real alpha transparency confirmed preserved post-resize (`getpixel` check: fully transparent corner, opaque center). This wasn't explicitly asked for, but shipping 1MB+ images for small in-app badges was worth avoiding — flagging the judgment call rather than doing it silently.
+
+**Component**: added `DialBadgeTile`/`DialsBadgeSection` in `MyGoals.jsx` rather than forcing the existing `BadgePill`/`BadgeSection` (icon+label chip) to also handle image-based tiles through a branching prop — the two render fundamentally different shapes (small pill vs. an achievement-card tile with image + name + description), so a clean new component reads better than one component doing two jobs. Reused `BadgePill`'s own locked/unlocked philosophy (grayscale+dim when locked, color+glow when unlocked) and its exact established green (`#26b37a`/`#1f8a5f`) rather than inventing a second "success" color for the same badge system. Bookings/Perfect Days/Commission/Special untouched, still rendering through the original `BadgeSection`, exactly as scoped.
+
+**Tier naming — a real gap, flagged rather than guessed**: no named tier scheme (e.g. Bronze/Silver/Gold) exists anywhere in this codebase or the art-generation docs. Used the plain ordinal the asset filenames themselves already use ("Tier 1" … "Tier 6") plus the literal requirement ("150 dials") as the real text elements the prompt asked for, rather than inventing lore-style names that might not match whatever Brayden actually had in mind from the "2K-style reference" he mentioned but didn't attach here.
+
+**Verified via computed styles in both themes, not a real screenshot — flagged honestly, not glossed over**: this pane's screenshot tool needs the Browser pane actually displayed to composite a frame, and it wasn't this session (same standing limitation prior sessions have hit) — asked for in the prompt but genuinely not producible here. Verified instead the way this project's own established alternative works: signed in as `test_setter` (real dials count: 24, all 6 tiers correctly locked — real, not staged) and read real computed styles. For the unlocked look specifically (no real account currently has 150+ dials to trigger it naturally), previewed it via a direct, non-persisted DOM class swap on the live rendered tile — confirmed real Tailwind CSS rules exist and correctly resolve for the unlocked class set (green `border-color: rgba(31,138,95,0.3)`, matching gradient background, `0 0 16px` glow shadow, image `filter: none`/`opacity: 1`) in BOTH light and dark mode, checked via `getComputedStyle` after a clean page load each time (an early attempt chasing repeated rapid mutations without a fresh navigate produced a stale/inconsistent read in this specific backgrounded pane — resolved by re-testing clean, not a real app issue). No database writes were needed for any of this — the DOM-preview technique avoided touching `test_setter`'s real call history at all, cleaner than options that would've needed 150 fabricated `calls` rows and a cleanup pass. `npm run build`/`npm run lint` clean. Committed `231a34f` on top of `747ee2a`, pushed to `main` on `restorix-portal`.
+
+---
+
+**Prompt 531 — sidebar Report a Bug/Add to Home Screen button restyle + an app-wide modal backdrop fix, on `restorix-portal`, 2026-08-22. Verified live in both themes.** Commit `747ee2a` on top of `9fc8a64`.
+
+**Sidebar buttons**: swapped the literal 🐛 emoji for lucide's own `Bug` icon (already imported in `Layout.jsx`, no new dependency); dropped the `--danger` red tint entirely so both buttons share one neutral treatment; doubled from `h-8 w-8`/icon `14` to `h-16 w-16`/icon `28`; moved from stacked to opposite edges of the same bottom-sidebar row (`flex justify-between px-5`, `px-5` matching the logo block's own edge padding above so both buttons align to the sidebar's real left/right edges — Bug on the left, Add to Home Screen on the right, an arbitrary but consistent choice since Brayden didn't specify which side). `SidebarIconButton`'s now-dead `tone`/`emoji` props were removed rather than left unused.
+
+**Modal polish — found the real, specific cause rather than guessing at a fix**: every real modal in this app (`LogCallModal`, `CloserLeadModal`, `BugReportModal`, `AddToHomeScreenModal`, `AddLeadModal`, `CsvImportModal`, `LogOutcomeModal`, `AvatarCropModal`, the invite modal in `Users.jsx`) already funnels through one shared `ui/Modal.jsx` — confirmed by grep before touching anything, so the fix genuinely only needed to happen once, exactly as the prompt itself hoped. Read the actual backdrop color rather than eyeballing it: `bg-fg-primary/30` is `--text-primary` at 30% opacity — a **theme-relative** color used for a supposedly-neutral dimming layer. In light mode `--text-primary` is near-black, so it darkens correctly; in dark mode it's near-white (`#eef4f1`), so the "dim" layer was actually **lightening** the page behind the modal instead of darkening it — confirmed via real computed-style checks in both themes, not assumed from reading the hex alone. This is almost certainly the specific, findable cause behind Brayden's "looks kinda ugly" reaction in the exact case he flagged (Add to Home Screen, most likely viewed in dark mode), not a vague aesthetic miss. **Fixed**: backdrop switched to a fixed `bg-black/55` (theme-invariant, darkens correctly either way — reuses the same `bg-black/*` overlay pattern `Profile.jsx`'s own avatar-hover treatment already established elsewhere in this app, not a new invented pattern) and the panel border upgraded from `border-line` (`--border`, ~14% opacity) to `border-line-strong` (`--border-strong`, ~22% opacity) — a real design token that's existed since Prompt 501/502's dark-mode pass but had never actually been consumed by any component until now, added to `tailwind.config.js` as `line.strong` rather than a one-off hardcoded value. Shadow bumped `shadow-xl` → `shadow-2xl` for a bit more lift against the now-genuinely-dark backdrop. Corner radius (`rounded-card`) was already consistent app-wide, no change needed there.
+
+**Verified live, not just code-reviewed**: signed in as `test_setter` via the established session-token-injection technique against a local dev server; confirmed via real `getBoundingClientRect()` math both sidebar buttons render at exactly 64×64px, at opposite left/right edges of the same row (not stacked), with real `<svg>` children and zero emoji text content. Opened the Report a Bug modal and read real computed styles in both themes: dark mode showed `backdropBg: rgba(0,0,0,0.55)` and `panelBorder: rgba(238,244,241,0.22)` (the dark `--border-strong` value resolving correctly); light mode (flipped `test_setter`'s `theme_preference` to `'light'` via the app's own `update_own_theme_preference` RPC for the check, then reverted it back to its original `'dark'` value afterward — confirmed via a direct SQL read post-revert) showed the same `rgba(0,0,0,0.55)` backdrop and the light `--border-strong` value (`rgba(14,26,24,0.22)`) — proving the backdrop no longer flips between darkening and lightening depending on theme. `npm run build`/`npm run lint` clean (only the same pre-existing unrelated warnings). Committed `747ee2a` on top of `9fc8a64`, pushed to `main` on `restorix-portal`.
+
+---
+
+**Prompt 532 — date/clock added to Closer Overview's top-right header, on `restorix-portal`, 2026-08-22. Verified live in both themes.** Commit `9fc8a64` on top of `2528f9f`.
+
+**One thing worth flagging plainly**: the prompt's own framing assumed both closer AND admin were missing the date/clock, but reading `Overview.jsx` first (rather than trusting the framing) showed `AdminOverview` already had `<DateClockRow timezone={tz} />` in its header — unchanged since Prompt 462, well before this session. Only `CloserOverview` was genuinely missing it. Fixed just the real gap rather than touching code that was already correct.
+
+**Fix**: reused the existing `DateClockRow` component verbatim (no new date/clock logic written) — added a `tz` computation (`profile.timezone || DEFAULT_TIMEZONE`, same pattern already used in `SetterOverview`/`AdminOverview`) and wrapped `CloserOverview`'s header in the same `flex justify-between` row those two already use, with `DateClockRow` on the right. `MyPipeline.jsx` gets this for free since it mounts the same `CloserOverview` component (Prompt 509's reuse pattern) — no separate edit needed there.
+
+**Verified live, not just code-reviewed**: signed in as `test_closer` via a real Supabase Auth password-grant token (the established session-token-injection technique this project uses in place of typing a password into the browser — no UI login form was used) against a local `vite` dev server, confirmed via `getBoundingClientRect()` that the clock renders in the same row and same top-right position as the title (`display:flex; justify-content:space-between`, both elements at the same `y`, clock right-aligned) — not just present somewhere on the page. Re-checked with `resize_window`'s `colorScheme: dark` — `document.documentElement` correctly carries the `dark` class and the clock still renders correctly. Spot-checked `test_setter`'s Overview afterward to confirm the untouched code path still renders its own clock correctly (no regression). **Admin's Overview was not re-verified live** — no test admin account exists (only the real `brayden` account has that role), and typing a real account password into a login field is out of scope for this tooling regardless of whose account it is; not a gap introduced by this prompt, since `AdminOverview`'s code wasn't touched and was already confirmed working when it shipped originally (Prompt 462). `npm run build`/`npm run lint` clean (lint output has 10 pre-existing `react(only-export-components)` warnings unrelated to this change, same as every prior session). Committed `9fc8a64` on top of `2528f9f`, pushed to `main` on `restorix-portal`.
+
+---
+
+**Prompt 533 — scoping doc for closer invite-send (distinct from admin's existing invite-link flow), on `restorix-portal`, 2026-08-22. Planning only, no code touched — real open questions below need Brayden's answer before anything gets built.**
+
+**What already exists, confirmed by reading the real code/schema, not assumed** (Prompt 435's invite system): `invites` table (`token`, `role`, `created_by`, `created_at`, `expires_at`, `used_at`, `used_by` — no email/phone destination column at all). RLS is admin-only across the board — `invites_select_admin`/`invites_insert_admin`/`invites_delete_admin` all gate on `my_role() = 'admin'`, confirmed directly via `pg_policy`; a closer currently has zero DB-level access to this table, not just a hidden UI. Frontend: `Users.jsx`'s `InviteModal` generates a token client-side, inserts it, and shows a `/join/{token}` link for admin to copy and share manually — the closer sends nothing themselves today, the app never delivers anything on its own. The whole `/users` route (where this lives) is `RoleRoute roles={['admin']}` in `App.jsx` — closers have no access to this page at all today, so this is a net-new surface for that role, not an extension of one they already touch. `user_role` enum confirmed to have exactly 3 values: `setter`, `closer`, `admin`.
+
+**Delivery mechanism, grounded rather than guessed**: grepped the whole repo for `resend`/`sendgrid`/`nodemailer`/`smtp`/`mailgun`/`postmark` — zero hits. **No email-sending capability exists anywhere in this codebase.** Building email delivery means picking a provider, Brayden creating an account + API key, and a new edge function — real new infrastructure, not a small add, exactly as the prompt itself flagged as a possibility. SMS is a different story: `send-appointment-reminders` (Prompt 530) already proves outbound Twilio SMS works in production today, using the same `TWILIO_ACCOUNT_SID`/`TWILIO_API_KEY_SID`/`TWILIO_API_KEY_SECRET`/`TWILIO_PHONE_NUMBER` secrets already configured, via a direct `fetch` to Twilio's Messages REST API — no new credential needed to extend that pattern to invite delivery. **Proposed, not decided**: build SMS-only first since it's genuinely zero-new-infrastructure, and treat email as a separate follow-up prompt if Brayden wants that too — bundling both into one build turns "extend an existing flow" into "stand up a mail provider integration," which the prompt itself didn't commit to.
+
+**Real open questions, not guessed past** (same 3 the prompt named, with grounded context added for each rather than left blank):
+1. **What role does a closer-sent invite create?** `InviteModal`'s existing role dropdown already excludes `admin` (only offers setter/closer to the admin doing the inviting) — a closer inviting a peer-level `closer` account would be a bigger permission jump than inviting a subordinate `setter`, but nothing in the codebase signals which one Brayden actually wants. Needs a direct answer, not a default.
+2. **Delivery mechanism** — see above; leaning SMS-first as the buildable-now option, but confirm before locking in.
+3. **Limits/oversight** — `invites.created_by` already exists and admin's existing RLS already grants full `SELECT` on the table, so admin visibility into who a closer invited is close to free once the insert policy is extended — no new column needed for that part. Rate/spam limiting has no existing precedent anywhere in this codebase (no rate-limit pattern on any other closer-facing write) — would need genuinely new logic (a trigger or an edge-function-side check) if Brayden wants a cap, not something that falls out of the existing design for free.
+
+Deliberately not built: no migration, no edge function, no frontend change. Waiting on Brayden's answers to the 3 questions above (particularly #1 and the SMS-vs-email call) before queuing the real build.
+
+---
 
 **Prompt 530 — real build of Prompt 529's Zoom + SMS reminder design, on `restorix-portal`, 2026-08-22. Everything short of a real Zoom OAuth completion is verified live.** Commit `2528f9f` on top of `71f09bd`.
 
