@@ -14,6 +14,10 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
+**Empty as of 2026-08-24** — Prompt 521 extended to Bookings: same real-illustrated-PNG-art system Dials uses, same sizing/spacing/single-row behavior, Bookings' own blue glow. Perfect Days/Commission/Special untouched. Real screenshots at `restorix/qa-screenshots/prompt521-bookings-v1.png` (row) and `-v1-full.png` (whole card). See CURRENT STATE for the full build + verification detail.
+
+---
+
 **Empty as of 2026-08-24** — Prompt 521's eleventh reopen (Dials row wrapping to two lines) fixed and verified live. Removed the fixed `w-64` tile width (was sized for tier 6, wasting space on narrower tiers), tightened `gap-8`→`gap-2`, forced `flex-nowrap` on the Dials row. Badge size unchanged. Real screenshot at `restorix/qa-screenshots/prompt521-dials-v7.png` confirms all 6 tiers on one line at full desktop width. See [[Restorix Memories]] for full detail.
 
 ---
@@ -244,6 +248,18 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 521 (extended to Bookings) — Bookings moved off the flat SVG shield template onto the same real-illustrated-PNG-art system Dials already uses.** `restorix-portal`, 2026-08-24. Commit `4b74e82` on top of `65b2511`.
+
+**Source art**: 6 new files at `restorix/logo-assets/badge-icons/badge-bookings-tier{1-6}.png` — MD5-verified byte-identical to the hashes the prompt specified before use. Confirmed real RGBA alpha (not flat), same 835px canvas height as Dials' source set with per-tier varying width (wider for tiers with wings/crown), same escalating-ornament pattern (bare shield → laurel at tier 3+4 → wings at tier 5 → crown at tier 6) with a calendar glyph instead of Dials' phone glyph, on Bookings' own blue instead of Dials' gold/green.
+
+**Resize pipeline**: same as Dials' last round — Pillow, `LANCZOS`, preserve each tier's own aspect ratio, scale to a fixed 262px HEIGHT only (not forced to uniform WxH). Output sizes in `public/badges/`: tier1 322×262 (27KB), tier2 372×262 (43KB), tier3 376×262 (61KB), tier4 376×262 (79KB), tier5 358×262 (84KB), tier6 479×262 (110KB) — all real alpha confirmed preserved post-resize.
+
+**Code**: generalized `DialBadgeTile`/`DialsBadgeSection` into `PngBadgeTile`/`PngBadgeSection` keyed by a `category` prop, rather than duplicating a near-identical pair for Bookings — the only real per-category differences are the image path, the glow tint, and whether the tile's threshold label says "N dials" or just a bare number, all captured in one `PNG_BADGE_CATEGORIES` lookup object (`src/pages/MyGoals.jsx`). Bookings' glow is a separate literal Tailwind arbitrary-value class (`drop-shadow-[0_0_10px_rgba(58,99,214,0.6)]`, Bookings' own accent blue at the same 0.6 alpha Dials' green glow uses) rather than a runtime-interpolated one, for the same JIT-scanner reason `BadgeTile` below it already documents. Removed the now-unused `CalendarCheck` icon import and `CATEGORY_COLORS.bookings` entry (both dead once Bookings left the SVG-shield path). Perfect Days/Commission/Special untouched, still on the SVG `TierBadge` template as instructed.
+
+**Verified live on real production**, not just built: `npm run build`/`npm run lint` clean (same pre-existing fast-refresh warnings only), pushed, polled GitHub's commit-status API to `success`, then re-ran the same session-token-injection + headless-Playwright pipeline the Dials 11th-reopen fix used. `getBoundingClientRect()` on the real rendered page confirmed both rows independently: all 6 Dials tiles share one `top` (51px) and all 6 Bookings tiles share their own single `top` (306px), every image in both rows exactly 140px tall — single row, correct size, for both categories. Real screenshots saved: `restorix/qa-screenshots/prompt521-bookings-v1.png` (Bookings row alone) and `-v1-full.png` (whole badges card, Dials+Bookings+Perfect Days+Commission+Special together, confirming the other 3 categories' SVG-shield look is unaffected). No real account has 5+ bookings yet to show the unlocked state natively, so also did a non-persisted DOM-only class swap on a live tile (no DB/state touched) to confirm the actual computed `filter` renders `drop-shadow(rgba(58, 99, 214, 0.6) 0px 0px 10px)` exactly as coded — saved as `prompt521-bookings-unlocked-preview.png`.
+
+---
 
 **Prompt 521 (~2.5x sizing bump) — Dials badges were reading too small on the real dashboard once the box/scale fixes landed; scaled up, Dials only.** `restorix-portal`, 2026-08-24. Commit `2aec1c1` on top of `dd08729`.
 
