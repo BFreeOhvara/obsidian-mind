@@ -14,6 +14,10 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
+**Empty as of 2026-08-24** — Prompt 521 extended to Commission: same real-illustrated-PNG-art system Dials/Bookings/Perfect Days use, its own 7 tiers (one more than every other category), green glow matching Dials, dollar formatting on both the header and tile labels. `TierBadgeRow` removed entirely (Commission was its last consumer). Special is the only category left on the SVG template. Real screenshots at `restorix/qa-screenshots/prompt521-commission-v1.png` (row) and `-v1-full.png` (whole card). See CURRENT STATE for the full build + verification detail.
+
+---
+
 **Empty as of 2026-08-24** — Prompt 521 extended to Perfect Days: same real-illustrated-PNG-art system Dials/Bookings use, its own 5 tiers (not 6), orange glow, section-level sub-line ("150 dials + 2 bookings in the same day") preserved. Commission/Special are the only two categories left on the SVG template. Real screenshots at `restorix/qa-screenshots/prompt521-perfectdays-v1.png` (row) and `-v1-full.png` (whole card). See CURRENT STATE for the full build + verification detail.
 
 ---
@@ -252,6 +256,18 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 521 (extended to Commission) — Commission moved off the flat SVG shield template onto the same real-illustrated-PNG-art system Dials/Bookings/Perfect Days already use, its own 7 tiers (one more than every other category), green glow.** `restorix-portal`, 2026-08-24. Commit `743ca49` on top of `c68b457`.
+
+**Source art**: 7 new files at `restorix/logo-assets/badge-icons/badge-commission-tier{1-7}.png` — MD5-verified byte-identical to the hashes the prompt specified, canvas sizes (all 835px height, per-tier varying width from 1014px up to 1509px) confirmed matching the prompt's own table exactly, real RGBA alpha confirmed. Dollar-sign glyph on Commission's own green (same green Dials uses — Brayden moved Commission off its old purple before this art got generated). Tier 7 genuinely escalates past every other category's max: gold stars arcing above each wing, three gems added to the crown's first three points plus five more along its base band, all in the same gold finish as the rest of the crest — confirmed visually, not just from the prompt's own description.
+
+**Resize pipeline**: identical to the last three rounds — Pillow, `LANCZOS`, preserve each tier's own aspect ratio, fixed 262px HEIGHT only. Output in `public/badges/`: tier1 318×262 (28KB) through tier7 448×262 (113KB), real alpha confirmed preserved post-resize.
+
+**Code**: added a `commission` entry to `PNG_BADGE_CATEGORIES` (`src/pages/MyGoals.jsx`) with `slug: 'commission'`, the same green glow Dials uses, and a `format` function (`$${n.toLocaleString()}`) — this is the first PNG-art category needing currency formatting, so `format` was generalized to drive BOTH the section header's "$X all-time · $Y to next" text (previously hardcoded to `value.toLocaleString()` with no formatter hook) and the tile threshold labels (via `meta.tileLabel || meta.format`, so Dials' "N dials" suffix override still works unchanged). Tier count comes straight from `COMMISSION_TIERS.length` (confirmed 7 in `useBadges.js`) via the existing `.map()` — nothing hardcodes 6 or assumes every category matches. Commission's own sub-line ("15% of setup fee...") reuses the `sectionSub` field Perfect Days' round introduced. **Removed `TierBadgeRow` entirely** — Commission was its last remaining consumer after Dials/Bookings/Perfect Days each moved off it in turn, so the function was fully dead code, not just unused for one category; `BadgeTile` stays since `SpecialBadgeRow` still needs it for Special (the only category left on the SVG template). Also removed the now-unused `DollarSign` icon import and `CATEGORY_COLORS.commission` entry.
+
+**Verified live on real production**: build/lint clean (confirmed no unused-variable errors from the `TierBadgeRow` removal), pushed, polled GitHub's commit-status API to `success`, then the same session-token-injection + headless-Playwright pipeline as the last three rounds. `getBoundingClientRect()` confirmed exactly 7 tiles (not 6, not 8) sharing one row/one `top`, all images exactly 140px tall, tile text read back as `$100`/`$250`/.../`$10,000` confirming the dollar formatter renders correctly end-to-end, and the sub-line's presence confirmed in the DOM. Unlocked green glow confirmed via the same non-persisted-DOM-class-swap + computed-`filter`-read technique as Bookings/Perfect Days (no real setter has hit a real commission tier yet) — rendered `drop-shadow(rgba(31, 138, 95, 0.6) 0px 0px 10px)` exactly as coded. Real screenshots saved: `restorix/qa-screenshots/prompt521-commission-v1.png` (row alone, all 7 tiers + Tier 7's extra star/gem escalation clearly visible), `-v1-full.png` (whole badges card), `-unlocked-preview.png`.
+
+---
 
 **Prompt 521 (extended to Perfect Days) — Perfect Days moved off the flat SVG shield template onto the same real-illustrated-PNG-art system Dials and Bookings already use, its own 5 tiers (not 6).** `restorix-portal`, 2026-08-24. Commit `c68b457` on top of `4b74e82`.
 
