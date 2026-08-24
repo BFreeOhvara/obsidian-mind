@@ -14,6 +14,10 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
+**Empty as of 2026-08-24** — Prompt 521 extended to Perfect Days: same real-illustrated-PNG-art system Dials/Bookings use, its own 5 tiers (not 6), orange glow, section-level sub-line ("150 dials + 2 bookings in the same day") preserved. Commission/Special are the only two categories left on the SVG template. Real screenshots at `restorix/qa-screenshots/prompt521-perfectdays-v1.png` (row) and `-v1-full.png` (whole card). See CURRENT STATE for the full build + verification detail.
+
+---
+
 **Empty as of 2026-08-24** — Prompt 521 extended to Bookings: same real-illustrated-PNG-art system Dials uses, same sizing/spacing/single-row behavior, Bookings' own blue glow. Perfect Days/Commission/Special untouched. Real screenshots at `restorix/qa-screenshots/prompt521-bookings-v1.png` (row) and `-v1-full.png` (whole card). See CURRENT STATE for the full build + verification detail.
 
 ---
@@ -248,6 +252,18 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 521 (extended to Perfect Days) — Perfect Days moved off the flat SVG shield template onto the same real-illustrated-PNG-art system Dials and Bookings already use, its own 5 tiers (not 6).** `restorix-portal`, 2026-08-24. Commit `c68b457` on top of `4b74e82`.
+
+**Source art**: 5 new files at `restorix/logo-assets/badge-icons/badge-perfect-days-tier{1-5}.png` — MD5-verified byte-identical to the hashes the prompt specified before use, real RGBA alpha confirmed (not flat), same 835px source-canvas height as Dials/Bookings, flame glyph on Perfect Days' own orange, laurel+wings at tier 5 (its own top tier — no crown, since this category never reaches a 6th tier the way Dials/Bookings do).
+
+**Resize pipeline**: identical to the last two rounds — Pillow, `LANCZOS`, preserve each tier's own aspect ratio, fixed 262px HEIGHT only. Output in `public/badges/`: tier1 322×262 (28KB), tier2 377×262 (44KB), tier3 371×262 (60KB), tier4 371×262 (79KB), tier5 355×262 (83KB) — real alpha confirmed preserved post-resize.
+
+**Code**: added a `perfectDays` entry to `PNG_BADGE_CATEGORIES` (`src/pages/MyGoals.jsx`) with its own `slug: 'perfect-days'` (the object key is camelCase to match `badgeProgress`'s own key, but the asset filename is hyphenated — `PngBadgeTile` now reads `meta.slug || category` for the image path rather than assuming they're always the same string), orange glow (`rgba(245,158,11,0.6)`, Perfect Days' existing accent hex at Dials/Bookings' same 0.6 alpha), and a new `sectionSub` field so `PngBadgeSection` can render the category's one-line description ("150 dials + 2 bookings in the same day") the same way `TierBadgeRow` used to via its `sub` prop — a real behavior `PngBadgeSection` didn't need until this category. Tier count comes straight from `PERFECT_DAY_TIERS.length` (confirmed exactly 5 in `useBadges.js` before building) via the existing `.map()` — nothing hardcodes 6, so no risk of a phantom Tier 6 slot. Removed the now-unused `Sun` icon import and `CATEGORY_COLORS.perfectDays` entry. Commission/Special are the only two categories left on the SVG `TierBadge` template.
+
+**Verified live on real production**: build/lint clean, pushed, polled GitHub's commit-status API to `success`, then the same session-token-injection + headless-Playwright pipeline as the last two rounds. `getBoundingClientRect()` confirmed exactly 5 tiles in the row (not 6), all sharing one `top`, all images exactly 140px tall, and the section-level sub-line present in the DOM. Directly fetched `/badges/badge-perfect-days-tier6.png` as an explicit no-phantom-tier guard — got a 200, but confirmed via response headers (`Content-Disposition: inline; filename="index.html"`) that's Vercel's SPA catch-all serving `index.html`, not a real 6th badge file; no such asset exists in `public/badges/` or the repo. Unlocked orange glow confirmed the same way as Bookings' blue (no test account has hit a Perfect Day yet) — a non-persisted DOM class swap plus a direct read of the computed `filter` value, which rendered `drop-shadow(rgba(245, 158, 11, 0.6) 0px 0px 10px)` exactly as coded. Real screenshots saved: `restorix/qa-screenshots/prompt521-perfectdays-v1.png` (row alone), `-v1-full.png` (whole badges card), `-unlocked-preview.png`.
+
+---
 
 **Prompt 521 (extended to Bookings) — Bookings moved off the flat SVG shield template onto the same real-illustrated-PNG-art system Dials already uses.** `restorix-portal`, 2026-08-24. Commit `4b74e82` on top of `65b2511`.
 
