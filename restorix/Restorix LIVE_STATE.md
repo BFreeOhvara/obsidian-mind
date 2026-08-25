@@ -14,6 +14,16 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
+**⚠️ Prompt 521 reopen — both fixes are built, built/lint-clean, committed, and pushed to `main`, but production has NOT redeployed and this needs Brayden to look at Vercel directly — nothing left this session's tooling can do about it.** Commit `8a9c635` on top of `11584d0`, pushed to `main` on `restorix-portal` at 2026-08-25 ~20:00 UTC.
+
+**What shipped (code-verified, not yet production-verified)**: (1) `test_setter`'s Dials category now mocks a real partial state (1,500 dials — Tier 1-3 earned/lit, Tier 4 at 2,500 locked with the progress line, Tier 5-6 locked with no line) instead of maxed out, so the feature is checkable live rather than only via a DOM-only preview; every other category stays fully unlocked. (2) The progress-line `<p>` in `PngBadgeTile` is now always rendered (`invisible` class when not the next tier) instead of conditionally mounted, so it reserves the same one-line slot on every tile in a row — fixes "Tier N" shifting down only on the tile that has a visible line.
+
+**The real blocker**: polled `https://api.github.com/repos/BFreeOhvara/restorix-portal/commits/8a9c635/status` for ~15 minutes after pushing — `total_count` stayed `0` the entire time (Vercel never even registered a "pending" check for this commit), versus the immediately-prior commit (`11584d0`) which got a `success` Vercel status within seconds of its own push. Directly confirmed production is still serving the old bundle (`index-C4UHkTs0.js`, cache-busted fetch, not a caching illusion) rather than trusting the GitHub status alone. This isn't a "build is just slow" situation — it's Vercel's GitHub integration not triggering at all for this specific push, which this session has no tooling to diagnose further (the connected Vercel MCP only sees `ohvara-portal` under this account's team, not `restorix-portal` — that project must live under different Vercel access this session doesn't have).
+
+**What Brayden should do next**: open the Vercel dashboard for `restorix-portal` directly and check (a) whether a deployment for `8a9c635` exists at all — queued, failed, or silently skipped, (b) the GitHub integration/webhook status for the repo (a stuck or disconnected webhook would explain zero check registration), and (c) once a real deploy for this commit completes, re-verify `portal.restorix.co/goals` as `test_setter` shows Dials Tier 1-3 lit, Tier 4 with `1,500/2,500` in blue under it, Tier 5-6 locked/plain — a next-session CC pass can do the actual screenshot/`getBoundingClientRect()` verification once the deploy is confirmed live, no need to re-ask for the same build.
+
+---
+
 **Empty as of 2026-08-25** — Prompt 521's "progress to next tier" line shipped and verified live on real production. See CURRENT STATE for full detail.
 
 ---
