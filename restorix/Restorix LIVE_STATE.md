@@ -12,13 +12,7 @@ tags:
 
 ## Next Up for CC
 
-**⚠️ Prompt 521 reopen — root cause narrowed to exactly one branch: `8a9c635` is genuinely on `origin/main` (confirmed fresh via `git fetch`), so this is a real Vercel GitHub-integration/webhook problem on Brayden's side, not a failed push. Code is done; this needs Brayden in the Vercel dashboard, not more CC investigation.**
-
-**This session's first step per the queued instruction**: `git fetch origin && git log origin/main -5` — confirmed `8a9c635` sits at the exact tip of `origin/main` (`git status -sb` shows local and remote in sync, no ahead/behind), ruling out the "push silently failed" hypothesis. Combined with Brayden's own direct Vercel-dashboard finding (commit missing from the deployment list entirely — not Ready, Building, or Failed) and the prior session's finding (zero GitHub status checks registered for 15 minutes), all three independent checks now agree on the same conclusion: the commit reached GitHub fine, but Vercel's GitHub integration never picked it up to build at all. No local `.vercel/` project link and no Vercel CLI available in this environment to inspect or manually trigger a deploy from here — this really is the end of what CC's tooling can diagnose or fix.
-
-**What shipped (code-verified, still not production-verified — unchanged since last round)**: (1) `test_setter`'s Dials category mocks a real partial state (1,500 dials — Tier 1-3 earned/lit, Tier 4 at 2,500 locked with the progress line, Tier 5-6 locked with no line) instead of maxed out. (2) The progress-line `<p>` in `PngBadgeTile` is now always rendered (`invisible` when not the next tier) so it reserves a fixed one-line slot on every tile — fixes "Tier N" shifting down only on the tile with a visible line. Both already committed at `8a9c635` on top of `11584d0`, pushed, build/lint clean — nothing left to change in the code itself.
-
-**What Brayden should do next (his own action, not CC's)**: in the Vercel dashboard for `restorix-portal` → Settings → Git, check the GitHub integration/webhook is actually connected and delivering (a disconnected or revoked webhook would explain a commit landing on GitHub but never reaching Vercel at all). If it looks broken, disconnecting and reconnecting the GitHub integration is the usual fix. Once a real deployment for `8a9c635` (or a fresh commit after reconnecting) shows Ready in the dashboard, the next CC session can do the actual live screenshot + `getBoundingClientRect()` verification against the already-correct, already-shipped code — no rebuild needed, just re-point CC at it once the pipe is flowing again.
+**Empty as of 2026-08-25** — Prompt 521's deploy-pipe blocker resolved itself (Vercel's GitHub integration is deploying normally again — `8c632f7` built and went live within one poll of the push, no further action needed on that front) and the realistic-partial-progress mock shipped for every tiered category, all verified live on real production. See CURRENT STATE for full detail.
 
 ---
 
@@ -288,6 +282,16 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 521 reopen (round 3) — realistic partial progress across every tiered category, plus the deploy-pipe blocker resolved itself.** `restorix-portal`, 2026-08-25. Commit `8c632f7` on top of `8a9c635`.
+
+**Deploy pipe**: the Vercel GitHub-integration gap flagged the prior two rounds is gone — pushing `8c632f7` produced a `success` GitHub status on the very first poll (versus 15+ minutes of zero registered checks for `8a9c635`), and `portal.restorix.co`'s served bundle hash matched the local build exactly. Whatever was wrong with the webhook, it's self-resolved or Brayden fixed it without needing to report back — no further action needed on this front, but worth remembering it happened at all if it recurs.
+
+**Mock values**: `test_setter`'s `isMockAccount` block in `MyGoals.jsx` now gives Bookings (30), Perfect Days (15), and Commission ($750) the same "3 tiers earned, 4th tier locked-with-progress, rest locked-plain" shape Dials already had (1,500/2,500) — chosen to land exactly 3 tiers in for each category's own real thresholds (`BOOKING_TIERS`/`PERFECT_DAY_TIERS`/`COMMISSION_TIERS`), not copy-pasted from Dials' number. Special flipped from both-earned to one-earned-one-not (`backToBack: true`, `hatTrick: false`) — Brayden's own "either is fine," an arbitrary pick. Total badge count now reads `13/26` instead of the old `26/26`.
+
+**Verified live on real production**: build/lint clean, pushed, confirmed deploy success + bundle hash match before testing. Session-token-injection + headless-Playwright against `test_setter`'s real (not DOM-injected) rendered state — read every category's actual progress-line text (`1,500/2,500`, `30/50`, `15/25`, `$750/$1,000`, exactly one visible per row) and confirmed every "Tier N" label in each row shares one identical `getBoundingClientRect().top` regardless of which tile has the progress line (Dials/Bookings/Perfect Days/Commission all single-value `uniqueLabelTops`). Real screenshots: `restorix/qa-screenshots/prompt521-allcategories-partial-v1.png` (badges section, all 5 categories in one image — earned tiers lit, one blue progress line per tiered row, locked tiers dimmed, perfectly aligned labels), `-v1-full.png` (whole page).
+
+---
 
 **Prompt 521 (next-tier progress line) — a "current/threshold" line under the badge image, shown only on the single next locked tier a setter hasn't reached yet.** `restorix-portal`, 2026-08-25. Commit `11584d0` on top of `b8422e9`.
 
