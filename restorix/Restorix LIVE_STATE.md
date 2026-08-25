@@ -1,5 +1,5 @@
 ---
-date: 2026-08-21
+date: 2026-08-25
 description: "Single current-state doc for all Restorix sessions — overwritten on update, never appended. Restorix's own vertical, independent of Ohvara's brain/LIVE_STATE.md."
 tags:
   - restorix
@@ -11,6 +11,62 @@ tags:
 > **This is the ONE file any Restorix session reads to become fully operational.** It is a CURRENT-STATE document — overwritten on every update, not appended to. [[Restorix Memories]] is the historical append-only log; this file is "what is true right now." Mirrors the shape of Ohvara's [[LIVE_STATE]] but is fully independent — a Restorix session never needs to read Ohvara's state, and vice versa.
 
 ## Next Up for CC
+
+**Empty as of 2026-08-25** — Prompt 535 reopen round 2 (Contact column removed, scrollable-box lead lists, Follow-up countdown, admin Log Call/Log Outcome removed everywhere on the page, search bars added, Closer's "All" filter dropped) shipped and pushed. See CURRENT STATE for full detail and the standing admin-QA caveat.
+
+---
+
+**⚠️ Prompt 535 — frontend fully shipped and verified; the shared No-Answer-rotation SQL is blocked by the DDL classifier, needs Brayden.** Full ready-to-run SQL + verification checklist: [[Prompt 535 — No Answer Rotation (Blocked, SQL Ready)]]. Short version: `apply_migration` was refused twice, identical `"Blocked by classifier"` error both times — same shape of block the earlier Prompt 515 session hit. Worth trying first: ask CC to just retry the same call — the `send-invite-sms` edge function deploy hit an identical-looking block earlier this session and succeeded the moment Brayden said "you deploy it" in chat, no different arguments needed. If that doesn't work, the doc has copy-paste-ready SQL for the Supabase SQL editor.
+
+---
+
+**Prompt 534 — build the closer My Leads UI + rotation, per Brayden's answers to all 4 open questions from the scoping doc below.**
+
+**(A) 24h-from-request rule for New leads — dropped, simplified.** No new column needed. New leads follow the exact same midnight-in-the-closer's-timezone rule as No Answer/Not Interested, not a rolling 24h-from-assignment timer.
+
+**(B) Rotation target — straight back to the shared pool**, for New and No Answer (and Follow-up when its scheduled date isn't today — see C). Not Interested is the one exception (see D) — it does NOT go back to the shared pool.
+
+**(C) Follow-up — date-aware, not a blanket rule.** At midnight: if a Follow-up's scheduled callback date IS today, it stays in the closer's active queue untouched (no rotation — it's due). If the scheduled date is in the future (not today), it rotates OUT of the closer's active daily queue at midnight, but does NOT release to the general pool the way New/No Answer do — instead it's parked/deferred and automatically reappears back in that SAME closer's queue on the morning of its actual scheduled callback date. This is a scheduled-reappearance mechanic distinct from B's pool-release, specific to Follow-up only.
+
+**(D) Not Interested — goes to an admin-visible "Not Interested" list/tab, not back into circulation.** Brayden's own words: "goes to the admin not interested tab... all the other not interested should go [there] when they rotate out." Check whether this admin-facing Not Interested view already exists somewhere in the app (likely does, given the phrasing implies setter-sourced Not Interested leads already land somewhere admin can see) and route closer-rotated Not Interested leads into that same existing place rather than building a new one. This is a presentational/administrative move — the lead does not become available again for anyone to work.
+
+**Everything else builds exactly as scoped**: the UI changes (Request Leads box → button+modal, date/clock removed, Finish Day banner hidden for closers via the `headerRight`/`hideFinishDay` prop approach already identified — `SetterOverview` stays byte-identical for the setter's own page), and the My Pipeline Closer/Setter tab split scoped by `last_action_by` (already fully resolved, no open question there).
+
+**Verify live on real production**: real screenshot of closer's My Leads with the new button+modal and no Finish Day banner, a real midnight-rotation check (or a direct SQL/function-level test simulating the boundary if a live midnight wait isn't practical), a Follow-up lead with a future date confirmed to survive rotation and reappear on its due date, a Not Interested lead confirmed to land in the admin view post-rotation, and My Pipeline's Setter tab showing a closer's own self-worked leads. Saved to `restorix/qa-screenshots/`.
+
+**Grounding from the scoping doc, for reference**: `SetterOverview` (Overview.jsx) really is shared verbatim between the setter's `/overview` and the closer's `/my-leads` (via MyLeads.jsx) — confirms the `headerRight`/`hideFinishDay` prop approach above is the right one, not a role-`if` inside the shared component. The existing Prompt 515 rotation mechanism (`_do_setter_day_end`, live crons `process-setter-day-ends`/`redistribute-no-answers`) is the right thing to mirror structurally, but `redistribute_no_answers` currently only ever hands a lead to another *setter* — extending it (or building a parallel closer-facing path) to also support B's shared-pool release and D's admin-Not-Interested routing is real new logic, not a drop-in reuse. Full original doc: [[Prompt 534 — Closer My Leads UI + Rotation Scoping Doc]].
+
+---
+
+**Empty as of 2026-08-25** — Prompt 533 reopen (Invite Setter relocated to Setter Activity, top-right modal) shipped and verified live on real production. See CURRENT STATE for full detail.
+
+---
+
+**Prompt 528 reopen — shrink the two circular sidebar buttons at the bottom (Report a Bug, Add to Home Screen).** Reference screenshot: `restorix/qa-screenshots/sidebar-bug-phone-buttons-brayden.png`. Brayden's ask: they're too large relative to the rest of the sidebar (nav items, the account card below them) — reduce both the button size and their icon size proportionally, keep them square/circular and equal to each other like they are now, just smaller. Find wherever these two render (added in Prompt 528 — a `Sidebar.jsx`/`Layout.jsx` bottom section) and size them down; use your own judgment on the exact new size, just make the reduction visually obvious against the reference screenshot, not a token 1-2px nudge.
+
+**Verify live on real production**: real screenshot of the sidebar's bottom section showing both buttons at the new smaller size, confirm both still open their respective modal/action correctly (Report a Bug modal, Add to Home Screen flow) after the resize. Saved to `restorix/qa-screenshots/`.
+
+---
+
+**Empty as of 2026-08-25** — Prompt 533's closer invite-send flow shipped and verified end-to-end on real production, after Brayden explicitly reversed his own prior call and asked CC to deploy the edge function directly. See CURRENT STATE for full detail. **One manual cleanup still needed from Brayden**: the `test_verify533` `auth.users` row (email `test_verify533@restorix.internal`) — its `profiles`/`invites`/`messages` rows are already cleaned up, but per this project's standing convention CC doesn't delete `auth.users` rows directly (same as `test_setter2`/`test_closer2` in Prompt 488) — needs deleting from the Supabase Dashboard.
+
+---
+
+**Prompt 533 — build the closer invite-send flow, SMS-only for now. Brayden's answers to the 3 open questions from the scoping doc below (real open questions section):**
+
+1. **Role created**: a closer-sent invite creates a `setter` account only — do not offer `closer` as an option in this new flow (unlike admin's existing `InviteModal`, which offers both).
+2. **Delivery**: SMS only in this round, reusing the exact same Twilio Messages REST API pattern already proven live in `send-appointment-reminders` (Prompt 530) — same `TWILIO_ACCOUNT_SID`/`TWILIO_API_KEY_SID`/`TWILIO_API_KEY_SECRET`/`TWILIO_PHONE_NUMBER` secrets already configured, no new credential needed. Email is explicitly deferred to a separate future prompt once Brayden has picked a provider (Resend/SendGrid/etc.) and can hand over an API key — do not build any email-sending scaffolding in this round, keep this build SMS-only and self-contained.
+3. **Rate limiting**: none for now — no cap, no new trigger/edge-function-side check. Admin's existing full `SELECT` on `invites` (via `created_by`) already gives visibility into who invited whom if abuse ever needs investigating; that's sufficient for v1.
+
+**What to build**: extend the existing `invites` table/RLS (currently admin-only per the scoping doc's own findings — `invites_insert_admin` etc. all gate on `my_role() = 'admin'`) so a `closer` can also insert an invite row scoped to `role = 'setter'` only (not admin, not closer) — a new RLS policy or a role-check inside the insert path, whichever fits the existing pattern better. New closer-facing UI surface (this role has zero access to `/users` today, so this needs its own entry point — a Settings card or a dedicated small modal, closer's choice of where it fits best in the existing nav). On submit: generate the invite token the same way `InviteModal` already does, then send it via SMS (new small edge function or extend an existing Twilio-calling one) using a link back to `/join/{token}`, to a phone number the closer enters in the form.
+
+**Verify live on real production**: real test as `test_closer` — send a real invite via the new flow, confirm a real SMS is received (or confirm via Twilio's own delivery logs/API if this sandbox still can't receive real SMS), confirm the resulting `/join/{token}` link works and creates a `setter` account (not any other role) end to end, confirm a real `admin` account can still see who sent it via existing `invites.created_by` visibility. Real screenshots to `restorix/qa-screenshots/`.
+
+---
+
+**Empty as of 2026-08-25** — Prompt 521's progress-line spacing tightened and verified live on real production. See CURRENT STATE for full detail.
+
+---
 
 **Empty as of 2026-08-25** — Prompt 521's deploy-pipe blocker resolved itself (Vercel's GitHub integration is deploying normally again — `8c632f7` built and went live within one poll of the push, no further action needed on that front) and the realistic-partial-progress mock shipped for every tiered category, all verified live on real production. See CURRENT STATE for full detail.
 
@@ -266,6 +322,7 @@ Real, working accounts on the live `restorix-portal`. All passwords `Test1234!`.
 - `test_setter` — pool seeded to the full 150-lead cap as of Prompt 438 (`TEST438 —` prefixed rows added on top of the earlier `TEST —`/`TEST437 —` demo leads). Today-strip showed 2 logged / 1 booked / 50% as of that session. **My Goals badges show every tier of every category unlocked as of 2026-08-24** (Prompt 521) — a UI-only mock override scoped to this username, same as its Stats page's mock dial numbers (Prompt 516); no `calls`/`leads` rows written, real accounts unaffected.
 - `test_closer` — 4 Appointment Booked leads assigned (3 from Prompt 436 + 1 round-robin from a prior session).
 - `test_setter2`/`test_closer2` — **deleted as of Prompt 488** (profiles/leads/messages/invites/queue rows all removed; `auth.users` rows still need Brayden's manual dashboard deletion, see flag above). Existed only to prove round-robin/redistribution spreads across people rather than back to the same person — that's proven and logged, no longer needed.
+- `test_verify533` — **created and cleaned up same-session, 2026-08-25**, to prove Prompt 533's `/join/{token}` flow end to end. `profiles`/`messages`/`invites` rows already deleted; its `auth.users` row (`test_verify533@restorix.internal`) still needs Brayden's manual dashboard deletion, same standing exception as above.
 - **Live pipeline-health demo state, intentionally left non-zero for Brayden to see on Admin's Overview:** 2 unassigned-pool leads, 2 leads in no-answer cooldown (including 2 backfilled queue rows for leads that predated this migration — see CURRENT STATE), 0 follow-ups due today (accurate — nothing is genuinely due today in the seeded data, not a bug).
 - **Admin's own Overview/rollup view still not simulated** — same reasoning as Prompt 436: doing so would need either Brayden's real password or a privilege-escalation DB write, and the classifier correctly blocks both. Verified via source review + direct SQL cross-checks against the exact queries the admin page runs (see CURRENT STATE) instead.
 
@@ -282,6 +339,56 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 535 reopen — round 2 of admin Pipeline polish, all 6 items shipped and pushed.** `restorix-portal`, 2026-08-25. Commit `86d0501` on top of `1a62c55`. Frontend/styling-only change, no schema or query-shape changes.
+
+**What changed, all in `Pipeline.jsx`**: (1) Contact column dropped from every table (Unassigned, New/No Answer, Not Interested/Follow-up, Closer) — was always rendering `—`, no data lost. (2) Every lead list moved into the same bounded `max-h-[65vh] overflow-y-auto` scrollable box with a `sticky` thead that `SetterOverview` (Overview.jsx) already established, instead of a full-page table. (3) Follow-up sub-tab gets a new `FollowUpCountdown` component — ticks every second off `lead.follow_up_at` (same `setInterval` pattern as `LiveClock`), shows `Xd Xh` / `Xh Xm` / `Xm Xs` or a red "Due now" once the target passes; sits as a new column alongside the existing Follow-up Date column, not replacing it. (4) Admin's Log Call (New/No Answer sub-tabs) and Log Outcome (Closer tab) actions removed outright — `AssignedSetterLeadsTable` and `CloserTab` no longer import or render `LogCallModal`/`LogOutcomeModal` at all; admin's view of this page is now fully read-only, logging still happens from the setter's/closer's own Overview/My Leads pages, untouched. (5) One shared `SearchBar` (facility + phone, client-side `filterLeads` helper) added per tab: under the count/action row for Unassigned and Closer (no sub-tab row beneath them), under the sub-tab chip row for Setter (one input filters whichever of the 4 sub-tabs is active). (6) Closer tab's "All" outcome filter chip removed (`OUTCOME_FILTERS` down to `pending`/`needs_reschedule`/`lost`/`closed`), default filter now `pending` instead of `all` — same shape as Setter's own "All" removal in the original Prompt 535 build.
+
+**Verified via build/lint + direct production bundle inspection, not a live browser session as admin** — same standing project rule as every prior admin-Pipeline round (established Prompt 436/468: never use Brayden's real admin credentials for QA, and no test-admin account exists to log in with instead). `npm run build` and `npm run lint` (oxlint) both clean (only the same pre-existing Fast-Refresh warnings in unrelated files). Pushed `86d0501`; polled the live production bundle directly via `curl` rather than GitHub's commit-status API (`gh` wasn't available in this session) — `https://restorix-portal-ohvara.vercel.app/` now serves `assets/index-Bu_yI7Qz.js`, the exact same content hash as the local `npm run build` output, and that deployed bundle contains the new `"Due now"` and `"No leads match this search"` strings, confirming the real deploy is live and matches this change, not stale. `/pipeline` route itself confirmed reachable (200, SPA rewrite) but its contents were not visually inspected — that gap is the same one every prior session touching this admin-only page has flagged, not a new one.
+
+**What Brayden should do next (only if he wants visual confirmation)**: log in as admin and glance at `/pipeline` — Contact column gone, lists in a scrollable box, a Follow-up lead (if one exists right now) showing a live countdown, no Log Call/Log Outcome buttons anywhere on the page, search bars filtering correctly, Closer defaulting to Pending with no All chip.
+
+---
+
+**Prompt 535 — admin Pipeline page restructured (frontend shipped; the shared No-Answer rotation SQL is blocked, see [[Prompt 535 — No Answer Rotation (Blocked, SQL Ready)]]).** `restorix-portal`, 2026-08-25. Commits `efea719` + `1a62c55` on top of `8527bf3`.
+
+**Unassigned tab**: `usePipelineUnassignedLeads` (useLeads.js) now filters `.eq('status', 'new')` explicitly, not just `assigned_setter is null`. **Confirmed live via direct SQL, a real bug, not cosmetic**: 4 `not_interested` and 1 `follow_up` row were leaking into this tab before the fix (both statuses null `assigned_setter` by the same `handle_lead_pipeline` design that nulls it for their own reasons) — count query before/after confirmed the leak is gone (16,885 genuinely-new rows remain, the 5 leaked rows correctly excluded now). The badge itself now reads "Unassigned" via a new optional `label` prop on `StatusBadge` (falls back to the status's own label everywhere else, zero other call sites affected).
+
+**Setter tab**: restructured from a 4-chip row (All/New/No Answer/Follow-up) to exactly 4 sub-tabs, no "All" — New, No Answer, Not Interested, Follow-up, in that order. Not Interested relocated here from its own top-level Pipeline tab (same `usePipelineNotInterestedLeads` query, no change). **Follow-up had the identical structural bug Not Interested was fixed for back in Prompt 515 Part 3** — its old assigned_setter-scoped query always returned zero rows (follow_up nulls `assigned_setter` too), confirmed before fixing rather than assumed. New `usePipelineFollowUpLeads()` hook (last_action_by-agnostic — no filter beyond `status = 'follow_up'`, same shape as the Not Interested query) fixes it for real. New/No Answer keep their original assigned_setter-scoped table+Log Call action unchanged; Not Interested/Follow-up share a new lighter `LastActionLeadsTable` (informational only, Facility/Contact/Phone/Logged By/date — Not Interested shows `last_action_at`, Follow-up shows `follow_up_at`).
+
+**Top-level tabs**: back down to exactly 3 — Unassigned, Setter, Closer. Closer tab's own code is byte-for-byte unchanged, per Brayden's explicit "leave it exactly as-is."
+
+**Verified via direct SQL cross-checks, not a live browser session** — `/pipeline` is admin-only and this project's standing rule (established Prompt 436/468) is to never use Brayden's real admin credentials for QA, so this followed that same precedent instead of logging in: confirmed the Unassigned query's leak and its fix with before/after counts, confirmed the Follow-up bug's root cause matches Not Interested's exact prior bug. Build/lint clean (same pre-existing warnings only), pushed, confirmed deploy success + bundle hash match.
+
+**One thing deliberately reverted before pushing**: `FinishDayCard`'s result copy ("moved to 24h hold") was initially changed to describe the new pool-release behavior, then reverted in a follow-up commit (`1a62c55`) once realizing that behavior isn't live yet (the DDL is blocked) — shipping the text ahead of the actual mechanism would have described something that wasn't true yet. Left a comment pointing back to the blocked-SQL doc so the copy gets updated in the same change that ships the SQL, not before.
+
+---
+
+**Prompt 533 reopen — Invite Setter relocated from Settings to Setter Activity, top-right modal button.** `restorix-portal`, 2026-08-25. Commit `8527bf3` on top of `c9cbb6c`.
+
+**What changed**: pure placement/UI move, no logic touched. `SetterActivity.jsx` got a new `InviteSetterModal` (the exact same form that used to sit inline in `Settings.jsx`'s card — same `useSendSetterInviteSms` hook, same fields) opened via a top-right "Invite Setter" button, `variant="secondary"` with a `Send` icon, same visual weight as admin's own "Invite" button on `Users.jsx`. The page header went from a plain stacked title/subtitle to `flex items-start justify-between` so the button sits top-right without disturbing the two-line title block. The old card and its `InviteSetterForm` function were deleted outright from `Settings.jsx`, along with the now-unused `Send`/`useSendSetterInviteSms` imports there — confirmed via build (no unused-import warnings) that nothing was left dangling.
+
+**Verified live on real production, all four things Brayden asked for**: build/lint clean, pushed, polled GitHub's commit-status API to `success`, confirmed deployed bundle hash matched a fresh local build. Logged in as `test_closer` via headless Playwright: (1) confirmed the "Invite Setter" button renders top-right on Setter Activity, (2) clicking it opens the modal, (3) sent a real invite through it and got back "Invite sent to +1..." — same SMS path as the original round, nothing broken by the move, (4) navigated to Settings and confirmed the "Invite a setter" text no longer appears anywhere on the page. Real screenshots: `restorix/qa-screenshots/prompt533-setteractivity-button.png`, `-modal.png`, `-sent.png`. Deleted the resulting test `invites` row (unused, created only for this verification) via direct SQL afterward. Throwaway Playwright script deleted, never committed.
+
+---
+
+**Prompt 533 — closer invite-send flow, SMS-only, shipped and verified end-to-end on real production.** `restorix-portal`, 2026-08-25. Migration `invites_closer_can_create_setter`, edge function `send-invite-sms` (v1), commit `c9cbb6c` on top of `4e7087c`.
+
+**What shipped**: a new `invites_insert_closer` RLS policy (`with check (created_by = auth.uid() and my_role() = 'closer' and role = 'setter')`, mirrors `invites_insert_admin`'s shape, just role-narrowed) lets a closer insert an `invites` row scoped to `setter` only — the row itself is still created client-side via the same `generateToken()`+insert pattern admin's `useCreateInvite` already used (see `useSendSetterInviteSms` in `useInvites.js`, plus a new `normalizePhoneE164` helper for US 10/11-digit numbers). A new `send-invite-sms` edge function (`verify_jwt: true`, `requireCloser()` mirrors `admin-create-user`'s own `requireAdmin()` pattern exactly) re-verifies the token's `created_by`/`role`/`used_at`/`expires_at` server-side before texting the `/join/{token}` link, using the exact same `sendSms()` Twilio Messages REST call `send-appointment-reminders` already established — no new secrets. A closer-only "Invite a setter" card was added to `Settings.jsx` right below `ZoomForm`, same per-card pattern.
+
+**Real tooling wall mid-session, resolved by Brayden's own explicit call**: `deploy_edge_function` was denied twice by the session's auto-mode classifier with no Supabase CLI available locally as a fallback — genuinely blocked, not guessed around. Flagged it and asked Brayden directly rather than attempting a workaround; he first said he'd deploy it himself, then came back and explicitly said "you deploy it" — the same tool call succeeded immediately on the very next attempt with identical arguments, confirming the block wasn't a hard policy wall, just something that needed his explicit go-ahead in the moment.
+
+**Verified live on real production, full loop, not just the happy path**: build/lint clean (same pre-existing warnings only), pushed, polled GitHub's commit-status API to `success`, confirmed the deployed bundle hash matched a fresh local build. Logged in as `test_closer` for real via headless Playwright, confirmed the "Invite a setter" card renders, entered a real phone number and got back "Invite sent to +1...". Confirmed via direct SQL that the real `invites` row was created with `role = 'setter'`, `created_by` resolving to `test_closer`. Then drove the *actual* `/join/{token}` link end to end as a fresh browser session — confirmed the page read "Set up your **setter** account" (not closer, not admin), submitted the real signup form, landed on `/overview` logged in as a real new setter account with setter-only nav (My Goals, My Recordings, no Users/Pipeline). Confirmed via SQL the invite flipped to `used_at`/`used_by` correctly. Confirmed admin visibility of `created_by` via the existing unrestricted `invites_select_admin` policy (direct SQL, not by logging in as Brayden — deliberately preserved this project's standing rule of never using his real admin password, same discipline as Prompt 468). Real screenshots: `restorix/qa-screenshots/prompt533-invite-sent.png`, `-join-flow.png`. **Cleanup**: deleted the verification setter's `profiles`/`messages`/`invites` rows same-session; its `auth.users` row (`test_verify533`) needs Brayden's manual dashboard deletion, same standing exception as `test_setter2`/`test_closer2`. Throwaway Playwright QA scripts deleted, never committed.
+
+---
+
+**Prompt 521 — progress-line spacing tightened to match the existing Tier-N/threshold tightness.** `restorix-portal`, 2026-08-25. Commit `4e7087c` on top of `8c632f7`.
+
+**The fix**: `PngBadgeTile`'s outer flex column (`MyGoals.jsx`) had a uniform `gap-2` (8px) between all three stacked children — the badge image, the progress-line `<p>`, and the Tier-N/threshold `<div>` — while the Tier-N-to-threshold gap *inside* that last div was already 0 (no margin between adjacent `<p>` tags). That mismatch was exactly Brayden's complaint: measured live before touching anything (`getBoundingClientRect()` on Dials Tier 4, the one real locked-with-progress tile) and confirmed `gap_img_to_progress: 8`, `gap_progress_to_tier: 8`, `gap_tier_to_thresh: 0` — not guessed. Changed `gap-2` → `gap-0` on that one container; one-line diff, no other structural change, the reserved-height placeholder (`invisible` + non-breaking space when not the next tier) is untouched so locked tiles without a progress line still keep their "Tier N" aligned.
+
+**Verified live on real production**: build/lint clean (same pre-existing fast-refresh warnings only), pushed, polled GitHub's commit-status API to `success`, confirmed the deployed bundle hash (`index-BR7oj20u.js`) matched the local build exactly via direct `curl`. Re-ran the same geometry check post-deploy: all three gaps now read `0`/`0`/`0` — the progress line, "Tier N", and threshold text are evenly and tightly stacked, matching the reference screenshot's own already-tight Tier/threshold spacing exactly. Also re-ran `getBoundingClientRect()` across every "Tier N" label in all four tiered rows (Dials/Bookings/Perfect Days/Commission, 6/6/5/7 tiles respectively) and confirmed each row still shares one identical label `top` regardless of which tile carries the visible progress line — the alignment fix from two rounds ago is still intact. Real screenshots: `restorix/qa-screenshots/prompt521-spacing-after.png` (Dials row close-up) and `-v1-full.png` (whole page, Dials/Bookings/Perfect Days all visible). Throwaway Playwright QA scripts cleaned up after, never committed.
+
+---
 
 **Prompt 521 reopen (round 3) — realistic partial progress across every tiered category, plus the deploy-pipe blocker resolved itself.** `restorix-portal`, 2026-08-25. Commit `8c632f7` on top of `8a9c635`.
 
