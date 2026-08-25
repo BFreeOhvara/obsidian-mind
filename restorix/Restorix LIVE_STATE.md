@@ -14,6 +14,10 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
+**Empty as of 2026-08-24** — Prompt 521's three polish items shipped: earned-count format (`X/N earned`) on all 4 tiered PNG categories matching Special's own; `test_setter` now shows every one of the 26 badges unlocked (UI-only mock, same pattern as its Stats mock data); top-level "26/26" count's color+letter-spacing exactly matched to its label (caught and fixed an em-vs-px tracking mismatch along the way). Real screenshots at `restorix/qa-screenshots/prompt521-polish-testsetter-unlocked-full.png` and `-total-count.png`. See CURRENT STATE for full detail.
+
+---
+
 **Empty as of 2026-08-24** — Prompt 521's Commission-wrap fix reversed per Brayden's call: all 5 categories shrunk uniformly (140px→115px) instead, computed from Commission's own 7-tile natural width against the row's real available width, not guessed. Commission's row is `flex-nowrap` again, fits Tier 1-7 on one line with a real ~52px margin. No source art touched. Real screenshots at `restorix/qa-screenshots/prompt521-shrink-commission.png` and `-v1-full.png`. See CURRENT STATE for full detail. Perfect Days' source-art padding question from the prior round is still open, unrelated to this fix.
 
 ---
@@ -253,7 +257,7 @@ Flagged incidentally during Prompt 488, fixed in Prompt 489 — see CURRENT STAT
 
 Real, working accounts on the live `restorix-portal`. All passwords `Test1234!`. Usernames use underscores, not the periods the original prompts suggested — the username validation regex (`[a-z0-9_-]+`, from Prompt 428) doesn't allow periods.
 
-- `test_setter` — pool seeded to the full 150-lead cap as of Prompt 438 (`TEST438 —` prefixed rows added on top of the earlier `TEST —`/`TEST437 —` demo leads). Today-strip showed 2 logged / 1 booked / 50% as of that session.
+- `test_setter` — pool seeded to the full 150-lead cap as of Prompt 438 (`TEST438 —` prefixed rows added on top of the earlier `TEST —`/`TEST437 —` demo leads). Today-strip showed 2 logged / 1 booked / 50% as of that session. **My Goals badges show every tier of every category unlocked as of 2026-08-24** (Prompt 521) — a UI-only mock override scoped to this username, same as its Stats page's mock dial numbers (Prompt 516); no `calls`/`leads` rows written, real accounts unaffected.
 - `test_closer` — 4 Appointment Booked leads assigned (3 from Prompt 436 + 1 round-robin from a prior session).
 - `test_setter2`/`test_closer2` — **deleted as of Prompt 488** (profiles/leads/messages/invites/queue rows all removed; `auth.users` rows still need Brayden's manual dashboard deletion, see flag above). Existed only to prove round-robin/redistribution spreads across people rather than back to the same person — that's proven and logged, no longer needed.
 - **Live pipeline-health demo state, intentionally left non-zero for Brayden to see on Admin's Overview:** 2 unassigned-pool leads, 2 leads in no-answer cooldown (including 2 backfilled queue rows for leads that predated this migration — see CURRENT STATE), 0 follow-ups due today (accurate — nothing is genuinely due today in the seeded data, not a bug).
@@ -272,6 +276,18 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 521 (three polish items) — earned-count stat lines, `test_setter` full-badge-unlock mock, and the top-level count's color/tracking matched to its label.** `restorix-portal`, 2026-08-24. Commits `3406d3c` and `b8422e9` (a precision follow-up) on top of `e1ec147`.
+
+**1. Earned-count format**: Dials/Bookings/Perfect Days/Commission's right-side header stat switched from "X all-time · Y to next" to Special's own "X/N earned" format — `PngBadgeSection` now uses `tieredProgress(value, thresholds).earned.length` / `thresholds.length` directly, so N is always each category's real tier count (6/6/5/7) with zero hardcoding, live-computed exactly like the badge art itself.
+
+**2. `test_setter` full unlock**: added `isMockAccount = profile?.username === 'test_setter'` to `MyGoals.jsx` — same scoping convention (username, never role) and same "UI-only, zero database writes" discipline Prompt 516 established for this account's Stats page mock dial numbers. When true, `badgeProgress`/`myCommission` short-circuit to each category's own max tier value (`Math.max(...DIAL_TIERS)` etc.) and both Special flags `true`, rather than computing from real `calls`/`commissionLeads` data. Real accounts (including `test_closer`) are completely unaffected — the override only ever fires for this one username.
+
+**3. Total-count styling**: the "26/26" next to "BADGES — ALL-TIME..." now uses `text-accent-deep` (matching the label's own `.eyebrow` color exactly, confirmed via computed-style — both render `rgb(183, 200, 247)`) and `tracking-[1.68px]`. **Worth remembering**: initially reused the label's own `tracking-[0.14em]` value verbatim, which looked like the obvious "same treatment" — but `em`-based tracking scales with font-size, and the count keeps a larger `text-sm` than the label's `0.75rem`, so the same em value rendered at 1.96px instead of the label's actual 1.68px. Caught via a computed-style comparison, not assumed correct from the class name matching — switched to the literal pixel value the label itself renders at, confirmed exact via a second live check after the fix.
+
+**Verified live on real production**: build/lint clean both rounds, pushed, polled GitHub's commit-status API to `success` each time, then session-token-injection + headless-Playwright at the 1920px viewport. Read every category's actual stat-line text back from the DOM (`"6/6 earned"`, `"6/6 earned"`, `"5/5 earned"`, `"7/7 earned"`, `"2/2 earned"`) rather than trusting the code. Counted all 26 badge `<img>` elements on `test_setter`'s page and confirmed zero carry the `grayscale` locked class. Read both the label's and the count's actual `getComputedStyle().color`/`.letterSpacing` and confirmed byte-identical values, not just "should match" from the source. Real screenshots: `restorix/qa-screenshots/prompt521-polish-testsetter-unlocked-full.png` (the first time every badge across all 5 categories has been seen in its unlocked color+glow state at once), `-total-count.png` (the styled header row).
+
+---
 
 **Prompt 521 (Commission wrap reversed — uniform 140px→115px shrink instead) — Brayden's call: shrink every category uniformly rather than let Commission's row break onto a second line.** `restorix-portal`, 2026-08-24. Commit `e1ec147` on top of `6c0662f`.
 
