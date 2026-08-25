@@ -14,6 +14,10 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
+**Empty as of 2026-08-24** — Prompt 521 extended to Special, the final category — every badge category is now on real illustrated PNG art, no category left on the SVG shield template. Special is non-tiered (2 independent named achievements) so it got its own `SpecialBadgeTile`/`SpecialBadgeRow` pair rather than being forced into the tier+threshold abstraction, purple glow. `TierBadge.jsx` and `BadgeTile` deleted outright as fully dead code. Confirmed zero leftover SVG shield elements anywhere on the live page. Real screenshots at `restorix/qa-screenshots/prompt521-special-v1.png` (row) and `-v1-full.png` (the complete final state, all 5 categories). See CURRENT STATE for the full build + verification detail. **This closes the Prompt 521 badge-art saga.**
+
+---
+
 **Empty as of 2026-08-24** — Prompt 521 Dials recolored green → red (green got reassigned to Commission the prior round). Asset swap + one glow color constant, no structural change. Verified the served bytes directly (pixel-sampled the actual production PNG, not just a screenshot) to rule out a stale-cache false-positive. Real screenshots at `restorix/qa-screenshots/prompt521-dials-red-v1.png` (row) and `-unlocked-preview.png` (glow). See CURRENT STATE for the full detail.
 
 ---
@@ -260,6 +264,18 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 521 (extended to Special, the final category) — every badge category is now on real illustrated PNG art; no category left on the SVG shield template.** `restorix-portal`, 2026-08-24. Commit `384daa2` on top of `eb9edbf`.
+
+**Source art**: 2 new files at `restorix/logo-assets/badge-icons/badge-special-backtoback.png` / `-hattrick.png` — MD5-verified byte-identical to the hashes specified, real RGBA alpha confirmed, same 835px canvas height as every other category. Purple (`#7C3AED`), distinct from Dials' red and Commission's green as intended. Both at their own single, permanently-maxed ornamentation (crown w/ purple gems, arcing stars, wings, wreath) since Special has no lower-tier state to show — Back-to-Back uses a two-figures glyph, Hat Trick a magician's hat + wand.
+
+**Code**: Special is structurally different from the other four categories — 2 independent named achievements (earned/not-earned), not a threshold ladder — so it did NOT get folded into `PngBadgeTile`/`PngBadgeSection`'s tier+threshold signature. Instead built a small dedicated `SpecialBadgeTile`/`SpecialBadgeRow` pair (`src/pages/MyGoals.jsx`) reusing the exact same visual language (140px height, shrink-wrap tile width, `flex-nowrap`, grayscale/opacity-35 locked vs. drop-shadow-glow unlocked) keyed by each achievement's own `slug` rather than a tier number. **This round finally made `TierBadgeRow`'s sibling `BadgeTile` and the underlying `TierBadge.jsx` SVG-shield component fully dead** — deleted `TierBadge.jsx` outright (not just unused-but-left) along with `BadgeTile`, `CATEGORY_COLORS` (had only `special` left), and the now-unused `Zap` icon import. Bundle size actually shrank as a result (per `npm run build`'s own reported gzip size). Resize pipeline identical to every prior round: Pillow, `LANCZOS`, fixed 262px height, aspect preserved.
+
+**Verified live on real production**: build/lint clean (one fewer lint warning too, from `TierBadge.jsx`'s own removed fast-refresh warning), pushed, polled GitHub's commit-status API to `success`, then the same session-token-injection + headless-Playwright pipeline as every round before it. `getBoundingClientRect()` confirmed exactly 2 tiles sharing one row/top at 140px, correct `alt` text on each. **Extra check specific to this being the last round**: queried the entire live page for any leftover SVG shield-path elements — zero found, confirming the old template is genuinely gone from the rendered output, not just unreferenced in source. Unlocked purple glow confirmed via the same non-persisted-DOM-swap + computed-`filter` technique as every other category (no test account has earned either Special achievement) — rendered `drop-shadow(rgba(124, 58, 237, 0.6) 0px 0px 10px)` exactly as coded. Real screenshots saved: `restorix/qa-screenshots/prompt521-special-v1.png` (row), `-v1-full.png` (the complete final state — all 5 categories, every one on real illustrated art, in one screenshot), `-unlocked-preview.png`.
+
+**This closes the whole Prompt 521 badge-art saga** — Dials → Bookings → Perfect Days → Commission → Special, plus the earlier sizing/layout/recolor rounds along the way. See [[Restorix Memories]] for the full round-by-round history if useful context for a future badge-related prompt.
+
+---
 
 **Prompt 521 (Dials recolored green → red) — asset swap + one glow color constant, no structural change.** `restorix-portal`, 2026-08-24. Commit `eb9edbf` on top of `743ca49`.
 
