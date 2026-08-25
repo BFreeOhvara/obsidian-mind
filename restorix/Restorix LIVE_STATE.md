@@ -14,6 +14,10 @@ tags:
 
 > CC reads this section FIRST. Execute top to bottom, log each completion to [[Restorix Memories]], delete each item once done.
 
+**Empty as of 2026-08-25** — Prompt 521's "progress to next tier" line shipped and verified live on real production. See CURRENT STATE for full detail.
+
+---
+
 **Empty as of 2026-08-24** — Prompt 521's three polish items shipped: earned-count format (`X/N earned`) on all 4 tiered PNG categories matching Special's own; `test_setter` now shows every one of the 26 badges unlocked (UI-only mock, same pattern as its Stats mock data); top-level "26/26" count's color+letter-spacing exactly matched to its label (caught and fixed an em-vs-px tracking mismatch along the way). Real screenshots at `restorix/qa-screenshots/prompt521-polish-testsetter-unlocked-full.png` and `-total-count.png`. See CURRENT STATE for full detail.
 
 ---
@@ -276,6 +280,18 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 521 (next-tier progress line) — a "current/threshold" line under the badge image, shown only on the single next locked tier a setter hasn't reached yet.** `restorix-portal`, 2026-08-25. Commit `11584d0` on top of `b8422e9`.
+
+**Where it lives**: `PngBadgeTile` and `PngBadgeSection` in `src/pages/MyGoals.jsx`. `tieredProgress(value, thresholds)` (already in `useBadges.js`, already used for the earned-count stat) already computes `next` — the first threshold not yet met — so this needed zero new logic, just a new `isNextTier` prop (`t === next`) threaded from the section's `.map()` down to each tile, and one conditional `<p>` between the badge `<img>` and the tier-label `<div>`. When every tier in a category is earned, `next` is `undefined`, so no tile in that row ever matches — correctly produces zero progress lines anywhere, confirmed live against `test_setter` (all 26/26 earned, no stray text on the page).
+
+**Color**: `text-accent` — read directly from `Layout.jsx`'s real active-nav-item class (`isActive ? 'bg-surface font-semibold text-accent' : ...`) rather than guessed; resolves to `rgb(72, 112, 216)` (`#4870d8`, dark theme) via the `--accent-rgb` CSS variable in `index.css`.
+
+**Fraction formatting**: reuses each category's own `meta.format` (already defined for the header/tile-label formatters) for both sides — plain `toLocaleString()` for Dials/Bookings/Perfect Days, `$`-prefixed for Commission — so a Commission progress line would correctly read e.g. `$1,500/$2,500` rather than needing a separate formatter.
+
+**Verified live on real production, not just locally**: `npm run build`/`npm run lint` clean (same pre-existing fast-refresh warnings only), pushed, confirmed the new `isNextTier` string present in the deployed bundle (`index-C4UHkTs0.js`) before testing further. Logged into `https://portal.restorix.co/goals` for real as `test_setter` via the established session-token-injection technique — confirmed the real (already-shipped) code renders zero progress lines anywhere, exactly as expected since this account is deliberately maxed on every category (Prompt 521's earlier polish round). Since no real account has a natural mid-tier gap, did the same non-persisted DOM-only preview this saga has used for every "no live account can show this state" case before (Bookings' unlocked-glow check, Special's unlocked-purple check, etc.) — injected the exact real markup (`<p class="font-sans text-xs font-semibold text-accent">1,500/2,500</p>`) into a live Dials Tier 4 tile and confirmed via `getComputedStyle` it renders the real accent blue (`rgb(72, 112, 216)`), `text-xs`/`font-semibold`, and sits exactly between the image (`bottom: 556`) and the label (`top: 564`) — both locally and independently re-confirmed against production after deploy. **Got a real screenshot this time** (not blocked by the Browser pane's "not displayed" wall that hit most of this saga) — ran the project's already-installed headless-Playwright pipeline directly via `node`/`npx playwright`, same session-token-injection login, same DOM-only preview technique, screenshotted both the single tile and the whole card on live production: `restorix/qa-screenshots/prompt521-nexttierprogress-v1.png` (tile — blue "1,500/2,500" clearly visible between the red Tier 4 shield and its label) and `-v1-full.png` (whole card, all 5 categories, in context). DOM injection cleaned up immediately after (non-persisted, but removed anyway to leave the live page untouched for the next viewer).
+
+---
 
 **Prompt 521 (three polish items) — earned-count stat lines, `test_setter` full-badge-unlock mock, and the top-level count's color/tracking matched to its label.** `restorix-portal`, 2026-08-24. Commits `3406d3c` and `b8422e9` (a precision follow-up) on top of `e1ec147`.
 
