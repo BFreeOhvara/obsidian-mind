@@ -12,6 +12,10 @@ tags:
 
 ## Next Up for CC
 
+**Empty as of 2026-08-25** — Prompt 536 reopen (top-section spacing tightened, Bookings axis moved to the left) shipped and pushed. See CURRENT STATE for full detail. **One open gap**: no real screenshot was taken — this session's Browser pane couldn't composite frames (screenshot tool timed out with "pane is not displayed" every attempt), so verification used precise DOM measurements (`getBoundingClientRect`) on a throwaway unauthenticated test route instead. Numbers confirm the fix is correct, but if Brayden wants an actual visual, he should grab one himself from `/stats` and drop it in `restorix/qa-screenshots/` for the record.
+
+---
+
 **Empty as of 2026-08-26** — Prompt 536's Stats page Daily/Monthly/All Time redesign shipped and pushed. See CURRENT STATE for full detail and the standing admin/setter-login QA caveat.
 
 ---
@@ -370,6 +374,18 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 536 reopen — Stats page top-section spacing tightened to match Weekly Activity's rhythm; Weekly Activity chart's Bookings axis moved from the right side to the left.** `restorix-portal`, 2026-08-25. Commit `43d2756` on top of `9b21662`.
+
+**Spacing fix, both in `Stats.jsx`'s top block**: the navigator wrapper's margin (`mt-3` → `mt-2`) and the stat-cards grid's margin (`mt-6` → `mt-3`) — the cards gap was the bigger offender, effectively double Weekly Activity's own title-row-to-content gap. Measured both sections live (via a throwaway test route, see below) before and after: Weekly Activity's own navigator-to-chart-box gap is a fixed 12px (`mt-3`); the top section's navigator-to-cards gap now lands at that same 12px, and the header-to-navigator gap now lands at 8px (tight against the two-line title block, which Weekly Activity's single-line `h2` never had to account for).
+
+**Axis fix, in `WeeklyBarChart`**: Bookings' tick text moved from the right side (`x = W - padXRight + tickLen + 4`, anchor start) to the left, anchored at `x = padXLeft - tickLen - 20` (anchor end) — 16px further left than Dials' own tick text (`x = padXLeft - tickLen - 4`), so the two columns sit side by side rather than literally overlapping. Both axes use exactly 6 intervals over the same pixel height, so their tick *rows* land at identical y-coordinates — confirmed live (both "0"s at y=176, both top ticks at y=24, etc.) — meaning color is genuinely the only thing telling the two scales apart now, exactly as Brayden asked for. Both series' tick-mark dashes (the little line connecting each number to the axis) now share one neutral `stroke-line` color instead of being colored per-series (`stroke-accent`/`stroke-success` removed from the dash elements, kept only on the number `<text>` fill). The bottom legend's "(left)"/"(right)" qualifiers removed from both labels since they no longer say anything true — a color swatch already exists in the legend for that job.
+
+**Verified via a throwaway unauthenticated test route, not a real screenshot** — same class of workaround Prompt 536's own `DateRangeCalendar` testing used (temporarily exported `WeeklyBarChart` from `Stats.jsx`, added a `/__qa-stats-test` route rendering the real top-block markup + real `WeeklyBarChart` component against mock data, no Supabase calls), but this session's Browser pane could not composite frames for an actual screenshot — every `computer` screenshot/zoom call timed out with "the Browser pane is not displayed." Fell back to `getBoundingClientRect()`/`querySelectorAll` measurements on the live rendered DOM instead, which is arguably more precise than a screenshot: confirmed the exact pixel gaps above, confirmed Bookings' "0"–"6" now render at `x=20` next to Dials' "0"–"150" at `x=36`, confirmed both axes' tick dashes render `rgba(238,244,241,0.14)` (the shared neutral `stroke-line` color, not blue/green), confirmed the legend no longer contains "(right)" text. Deleted the test route, the `WeeklyBarChart` export, and the throwaway page file completely before committing — confirmed via `git status`/`git diff` that `App.jsx` has zero trace of it. `npm run build`/`npm run lint` clean (same pre-existing warnings only). Pushed `43d2756`; polled the live production URL via `curl` — bundle hash (`index-D-mb5Dah.js`) matched the local build exactly, and the deployed bundle contains the new `"Bookings — 0–"` label with no `"(right)"` string anywhere.
+
+**What Brayden should do next (only if he wants a real screenshot for the record)**: open `/stats`, glance at the top block's tighter spacing against Weekly Activity below it, and confirm the Weekly Activity chart's green 0-6 numbers now sit on the left next to the blue 0-150 numbers with a neutral (not colored) tick dash. Save it to `restorix/qa-screenshots/` if he wants one on file — this session couldn't produce one itself (Browser pane compositing was unavailable all session, not project-specific).
+
+---
 
 **Prompt 536 — Stats page redesigned: FROM/TO range replaced with a Daily/Monthly/All Time period toggle, shipped and pushed.** `restorix-portal`, 2026-08-26. Commit `9b21662` on top of `656cb1b`. New files: `components/ui/PillToggle.jsx`, `components/ui/MonthPaginator.jsx`, `components/ui/DateRangeCalendar.jsx`. Changed: `pages/Stats.jsx`, `lib/dates.js` (added `monthOf`/`shiftMonth`/`firstOfMonth`/`lastOfMonth`).
 
