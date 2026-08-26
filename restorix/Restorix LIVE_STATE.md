@@ -12,6 +12,10 @@ tags:
 
 ## Next Up for CC
 
+**Empty as of 2026-08-25** — Prompt 535 reopen round 3 (Pipeline's top-level Unassigned/Setter/Closer tabs restyled to match Training's segmented-tab look) shipped and pushed. See CURRENT STATE for full detail and the standing admin-QA caveat.
+
+---
+
 **Empty as of 2026-08-25** — Prompt 535 reopen round 2 (Contact column removed, scrollable-box lead lists, Follow-up countdown, admin Log Call/Log Outcome removed everywhere on the page, search bars added, Closer's "All" filter dropped) shipped and pushed. See CURRENT STATE for full detail and the standing admin-QA caveat.
 
 ---
@@ -339,6 +343,16 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 535 reopen round 3 — Pipeline's top-level tabs restyled to match Training's segmented-tab look, shipped and pushed.** `restorix-portal`, 2026-08-25. Commit `8020fac` on top of `86d0501`. Frontend/styling-only, no logic or data changes.
+
+**What changed**: pulled Training.jsx's own inline top-level tab classes (`rounded-lg border px-3 py-2 font-sans text-sm transition-colors`, active = `border-accent bg-accent text-white`, inactive = `border-line bg-base text-fg-secondary hover:border-fg-primary/40`) out into a new shared `components/ui/SegmentedTabs.jsx` component (`tabs`/`active`/`onChange` props), then pointed both Training.jsx's own tab row AND Pipeline.jsx's top-level Unassigned/Setter/Closer tab row at it — a real reuse, not a copy-paste of the class string, per Brayden's explicit "reuse the existing component" ask. Pipeline's New/No Answer/Not Interested/Follow-up sub-tab row (`SUB_TABS`, inside `SetterTab`) and Closer's outcome-filter chip row are both untouched — still the full-pill `STATUS_TINT`/`SOLID`/`OUTCOME_TINT`/`SOLID` treatment, exactly as Brayden asked to leave alone.
+
+**Verified via build/lint + direct production bundle inspection, not a live browser session as admin** — same standing rule as every prior admin-Pipeline round (no test-admin account exists, Brayden's real credentials never used for QA). `npm run build`/`npm run lint` clean (same pre-existing warnings only). Structurally confirmed the swap before pushing: grepped the local build for the new class string (present) and confirmed the old pill string (`rounded-full px-4 py-2`) no longer appears anywhere tied to Pipeline's top-level tabs — its only two remaining source occurrences are unrelated pre-existing buttons in `CloserLeadModal.jsx`/`Overview.jsx` that were never part of this change. After pushing `8020fac`, polled the live production URL directly via `curl` (no `gh` CLI available this session) — bundle hash matched the local build exactly on the second poll (~15s), and the deployed bundle contains the new `SegmentedTabs` class string. `/pipeline` and `/training` weren't visually opened.
+
+**What Brayden should do next (only if he wants visual confirmation)**: log in and glance at `/pipeline` next to `/training` — Unassigned/Setter/Closer should now read as the same rectangular/slightly-rounded tab style Training's Script/Videos/AI Voice Roleplay row uses, while the pill-shaped sub-tab row underneath (and Closer's outcome filters) look exactly as they did before this change.
+
+---
 
 **Prompt 535 reopen — round 2 of admin Pipeline polish, all 6 items shipped and pushed.** `restorix-portal`, 2026-08-25. Commit `86d0501` on top of `1a62c55`. Frontend/styling-only change, no schema or query-shape changes.
 
