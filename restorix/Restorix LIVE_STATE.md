@@ -12,6 +12,10 @@ tags:
 
 ## Next Up for CC
 
+**Empty as of 2026-08-26** — Prompt 536's Stats page Daily/Monthly/All Time redesign shipped and pushed. See CURRENT STATE for full detail and the standing admin/setter-login QA caveat.
+
+---
+
 **Empty as of 2026-08-26** — Prompt 525's inline recording player replaced with a "Play Recording" button + centered modal, shipped and pushed. See CURRENT STATE for full detail and the standing admin/setter-login QA caveat.
 
 ---
@@ -366,6 +370,18 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 536 — Stats page redesigned: FROM/TO range replaced with a Daily/Monthly/All Time period toggle, shipped and pushed.** `restorix-portal`, 2026-08-26. Commit `9b21662` on top of `656cb1b`. New files: `components/ui/PillToggle.jsx`, `components/ui/MonthPaginator.jsx`, `components/ui/DateRangeCalendar.jsx`. Changed: `pages/Stats.jsx`, `lib/dates.js` (added `monthOf`/`shiftMonth`/`firstOfMonth`/`lastOfMonth`).
+
+**What shipped**: the old two native FROM/TO date inputs are gone. New top row: title/subtitle stays left, a `PillToggle` (Daily/Monthly/All Time, same visual pattern as My Goals' own Daily/Weekly/Monthly toggle) sits on the right of the same row. Directly under it, a period-specific navigator — Daily reuses the existing `DayPaginator` component verbatim (same one Activity/My Calls already use), Monthly gets a new `MonthPaginator` (identical chrome, month-stepping, "Next" disabled at the current month), All Time reveals a new `DateRangeCalendar`. The three stat cards moved up into the space the FROM/TO row used to occupy and now filter by whichever period is active — Daily/Monthly always resolve to a real range; All Time only computes real stats once a range has actually been picked (per Brayden's own clarification that "all time just turns into custom date," not silently meaning unbounded-all-data) — until then the cards are replaced with a "Pick a start and end date above" prompt. The admin Setters/Closers rollup table below was quietly wired to the same period-derived range too (it shared the old FROM/TO state and would otherwise have been left broken).
+
+**DateRangeCalendar's interaction**: click any date first, click a second to complete the range (sorted into start/end regardless of click order — order genuinely doesn't matter), double-click one date for a single-day range. Uses the native click event's `e.detail` (2 on a real double-click's second click) to distinguish single vs. double click instead of a setTimeout debounce — every single click stays instantly responsive rather than waiting out an artificial delay to rule out a second click.
+
+**Verified interactively in a real browser, not by reading code alone** — this component has real click-sequencing logic (order-independent range completion, double-click override) that's genuinely easy to get subtly wrong, so build/lint clean wasn't enough confidence on its own. Added a throwaway, unauthenticated `/__qa-calendar-test` route + page rendering the new components standalone (no login needed since it never touches Supabase), drove it via the browser tools: confirmed forward-order range selection (click day 10 then 20 → `{start: "...-10", end: "...-20"}`), confirmed reverse-order sorts correctly (click 24 then 6 → still `{start: "...-06", end: "...-24"}`), confirmed double-click produces a clean single-day range and resets state so the next selection starts fresh, confirmed the calendar's own month navigation and weekday-column alignment are correct (verified July 2026's real first-weekday via `Date.UTC` against the rendered grid's actual leading blank-cell count), and confirmed the highlighting classes are exactly right (solid accent+white on start/end, light accent tint on in-between days, no styling outside the range). Deleted the test route and page completely before committing — confirmed via `git status`/`git diff` on `App.jsx` that zero trace of it shipped, and confirmed the final build's bundle hash matched exactly whether or not the test route had ever existed. Standard `npm run build`/`npm run lint` also clean (same pre-existing warnings only). Pushed `9b21662`; polled the live production URL via `curl` — bundle hash matched the local build, contains the new `"All Time"` and `"Pick a start and end date above"` strings, and does NOT contain `"__qa-calendar-test"` (confirmed the throwaway route never reached production).
+
+**What Brayden should do next (only if he wants visual confirmation)**: open Stats, confirm the Daily/Monthly/All Time toggle renders top-right matching My Goals' toggle style, click through all three tabs, confirm switching days/months actually changes the three card values, pick a custom range on All Time (including double-clicking a single day) and confirm the cards update, and confirm Weekly Activity is untouched.
+
+---
 
 **Prompt 525 — My Recordings' inline audio player replaced with a "Play Recording" button + centered modal, shipped and pushed.** `restorix-portal`, 2026-08-26. Commit `656cb1b` on top of `0ec418a`. Pure UI change, no data/logic touched — built on top of the now-fully-working recording pipeline.
 
