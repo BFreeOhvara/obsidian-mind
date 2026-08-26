@@ -1,5 +1,5 @@
 ---
-date: 2026-08-25
+date: 2026-08-26
 description: "Single current-state doc for all Restorix sessions — overwritten on update, never appended. Restorix's own vertical, independent of Ohvara's brain/LIVE_STATE.md."
 tags:
   - restorix
@@ -11,6 +11,112 @@ tags:
 > **This is the ONE file any Restorix session reads to become fully operational.** It is a CURRENT-STATE document — overwritten on every update, not appended to. [[Restorix Memories]] is the historical append-only log; this file is "what is true right now." Mirrors the shape of Ohvara's [[LIVE_STATE]] but is fully independent — a Restorix session never needs to read Ohvara's state, and vice versa.
 
 ## Next Up for CC
+
+**Empty as of 2026-08-26** — Prompt 538 (Stats page Custom Date button height fix + toggle segment showing the picked custom range) shipped and pushed. See CURRENT STATE / Memories for full detail.
+
+---
+
+**Prompt 539 — Populate the setter Restorix Portal's cold-call script page with Brayden's real script (replacing whatever placeholder/empty state is there now).** This is Restorix's own outbound B2B script — setters/closers cold-calling treatment-center decision-makers to book a demo for the AI infrastructure product itself, not anything patient-facing, so the North Star's "crisis-sensitive, don't sound like shopping for a clinic" tone note (that's for the marketing site's patient/family-facing copy) doesn't apply here.
+
+Originally scaffolded in Prompt 433 as `Script.jsx` / a `SCRIPT_SECTIONS` array under a "Script" sidebar nav item (Resources group, visible to all three roles, Brayden edits the array directly in source — no generation/CMS/LMS, that constraint stands). **Check the current code before assuming that's still true**: this same session's live sidebar screenshots (2026-08-26, `/stats`) show only "Training" under Resources, no visible "Script" item — if it was renamed, merged into Training, or cut since Prompt 433, use whatever the current real home for setter script content is, and log what you actually found in Memories rather than guessing blind or silently reintroducing a removed nav item.
+
+**Script content below — paste verbatim, do not paraphrase, reword, or "clean up" the copy.** Structure into 7 numbered sections exactly as titled, each keeping its italic-style guidance sub-line and full dialogue text:
+
+---
+
+## 1. The Opener
+*Pattern interrupt — sound confused/different, not "salesy"*
+
+Yeah hey — it's Roos, Roos from Restorix... does that ring a bell? This is [Company Name], right?
+
+Oh okay perfect, yeah — I don't want to waste your time, I was wondering if you could help me out real quick?
+
+I tried calling you guys last week but unfortunately I couldn't get in touch...
+
+## 2. Problem Awareness
+*Seed the problem, find the decision maker, stay unsure/neutral — do NOT assume*
+
+Honestly — well I'm not completely sure if you're the right person I should be talking to, but I was just curious — who would be responsible for any possible hidden gaps in the call flow system? That could be causing you guys to miss out on clientele to competitors without even knowing it...
+
+Who should I be talking to about that?
+
+## 3. Engagement
+*Open curiosity, describe their reality without accusing*
+
+Well — honestly I'm not even sure this applies to you guys yet, that's why I'm calling.
+
+But most [Niche] companies we talk to have high call volume coming in, and of course some slips through the cracks and goes to your competitors.
+
+How many calls would you say you're missing per week?
+
+## 4. Consequence Questions
+*Human conversation, build the pain, tie every number back to a real dollar figure*
+
+What do you make on an average deal?
+
+[Break down the numbers with them out loud — let them do the math, don't just tell them]
+
+Okay so if you're missing around [X] calls a week, at [$Y] average job value... that's roughly [$Z] a month just walking out the door. Does that sound about right, or am I off?
+
+Hmm, okay — and when that happens, what are you currently doing about the missed calls? Do you have any follow-up system in place to try and win those back?
+
+(If they have a system)
+Got it, that makes sense — [acknowledge briefly, move on, don't compete with what they have yet]
+
+(If no system)
+Interesting — so when you're missing [X] calls a week, they're just calling the next [niche], and there's nothing catching that or re-engaging them to try and get that business back?
+
+And that's just the calls you know about — how many do you think never even hit voicemail? Just rang out completely?
+
+Yeah, that tracks with what we're seeing across [niche] right now, most owners don't realize it's costing them that much until they actually see it laid out. Does that surprise you, or does it kind of match what you already suspected?
+
+## 5. The Bridge
+*Transition into the solution — low pressure, no pitch language*
+
+So honestly, the reason I'm calling — it's pretty simple. We built something specifically for [niche] that closes that exact gap, so you catch those calls automatically, without hiring anyone new or changing how your day-to-day works.
+
+I don't want to try and explain the whole thing over the phone, it's honestly a lot easier to just show you.
+
+## 6. The Ask — Booking the Demo
+*Assumptive close, offer two concrete times, don't ask "are you interested"*
+
+Would it make sense to jump on a quick 15-minute call where I show you exactly how this would work for [Company Name] specifically — using your actual numbers?
+
+I've got some time [Day] at [Time], or [Day] at [Time] — which works better for you?
+
+If they hesitate on timing:
+No worries — even 10 minutes works, I just want to show you what it'd actually look like with your call volume, not some generic pitch.
+
+## 7. Soft Objection Handling
+*Keep these short — don't argue, just re-anchor to curiosity*
+
+"We're not really looking for anything right now"
+Totally fair — most people we talk to weren't looking either, until they saw what it was actually costing them. That's really all this call is, just showing you the number. If it's not worth it after that, no hard feelings.
+
+"Just send me some info"
+I can do that, but honestly the numbers only mean something when they're your numbers — that's why I'd rather just hop on 10 minutes and run it live instead of sending you a generic PDF. Does [Day] or [Day] work better?
+
+"How much does it cost?"
+Good question — honestly it depends on your call volume, which is exactly why I want to get on that quick call, so I can give you a real number instead of guessing. [Day] or [Day] work for you?
+
+---
+
+**Placeholders:** keep every bracketed placeholder (`[Niche]`, `[Company Name]`, `[X]`, `[$Y]`, `[$Z]`, `[Day]`, `[Time]`) exactly as literal bracketed text in the rendered page — setters fill these in verbally while reading off the script, there's no variable-substitution mechanism, consistent with Prompt 433's explicit no-generation-system constraint. Don't invent a fill-in-the-blank UI for this.
+
+**Verify live on real production**: real screenshot (or DOM/text confirmation if the standing Browser-pane compositing gap noted in recent Prompt 536 rounds is still live) showing the full script rendered on the live page — all 7 sections present in order, guidance sub-lines and placeholders intact, nothing truncated, reformatted, or reworded from the source text above.
+
+---
+
+**Prompt 538 — Stats page: lock the Custom Date button's height to match Daily/Monthly, and show the picked custom range in the Daily/Monthly/All Time toggle itself.** Two related but distinct bugs Brayden caught by direct comparison of the Daily/Monthly/All Time states on `/stats`:
+
+1. **Custom Date button height regression.** Next to the KPI row (right-aligned, above Booking Rate), Daily and Monthly both show a date-range pill at one consistent height ("‹ August 26 · Today ›" / "‹ August 2026 · This Month ›" — same height, only the text/pill length differs). Switching to All Time swaps that pill for a "Custom Date" button, but that button renders visibly *shorter* than the Daily/Monthly pill, and its label sits off-center vertically inside the shrunken box. Fix: lock the Custom Date button's height to the exact same value as the Daily/Monthly pill — it's fine (expected, even) for it to be narrower in width since it's shorter text with no ‹ › arrows, but height must not move. Confirm the label recenters correctly once height is fixed rather than assuming it self-resolves.
+2. **Toggle should surface the picked custom range.** When Brayden opens the Custom Date popover and actually picks a range (e.g. Aug 5 – Aug 10), the Daily | Monthly | All Time segmented control should swap that segment's label from the literal "All Time" to the picked range itself (e.g. "Aug 5 – Aug 10"), reusing the same range-label format the Custom Date button/pill already renders elsewhere — so the toggle itself reflects what's actually active, not a generic "All Time". When All Time is active with no custom range picked (or after the range is cleared via the existing X control), that segment reverts to reading "All Time" exactly as it does today. Label swap only — the underlying data/behavior of that segment (unbounded totals vs. range-filtered totals) is already correct from Prompt 536's rounds and doesn't change here.
+
+Reference screenshots (`restorix/qa-screenshots/`): `prompt-538-stats-date-pill-daily-reference.png` and `prompt-538-stats-date-pill-monthly-reference.png` (Daily/Monthly — correct, matching pill height), `prompt-538-stats-custom-date-button-bug-reference.png` (All Time — the shorter, off-center Custom Date button bug).
+
+**Verify live on real production**: real screenshot (or, if the standing Browser-pane compositing gap is still live, `getBoundingClientRect()` comparison as used in recent 536 rounds) confirming the Custom Date button's height is pixel-identical to the Daily/Monthly pill's height. Plus a real screenshot or DOM-confirmed interaction showing the toggle's third segment displaying an actual picked range (e.g. "Aug 5 – Aug 10") after selecting one via Custom Date, and reverting to "All Time" after clearing it.
+
+---
 
 **Empty as of 2026-08-26** — Prompt 537 (phone formatting app-wide + sidebar icon button shrink, which also closed out the Prompt 528 reopen folded into it) shipped and pushed. See CURRENT STATE / Memories for full detail and the standing Browser-pane screenshot caveat.
 
