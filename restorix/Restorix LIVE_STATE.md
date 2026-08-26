@@ -12,6 +12,10 @@ tags:
 
 ## Next Up for CC
 
+**Empty as of 2026-08-26** — Prompt 540 (derived No Show status, 7-day auto-Lost escalation via lazy write-on-read, real Reschedule action, Needs Rescheduling retired) shipped and pushed. See CURRENT STATE / Memories for full detail, including a flagged item: 2 TEST leads were pushed through the real booking flow during verification and landed on some closer other than test_closer via round-robin — harmless TEST-prefixed fixture data, but flagged since this session had no admin/Supabase access to identify which closer or clean them up.
+
+---
+
 **Empty as of 2026-08-26** — Prompt 538 (Stats page Custom Date button height fix + toggle segment showing the picked custom range) shipped and pushed. See CURRENT STATE / Memories for full detail.
 
 ---
