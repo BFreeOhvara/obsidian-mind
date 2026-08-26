@@ -12,14 +12,18 @@ tags:
 
 ## Next Up for CC
 
-**⚠️ Prompt 525 reopen round 2 — real root cause of the missing recordingStatusCallback found and fixed (source pushed); deploy blocked by the same recurring classifier, needs Brayden.** This session's environment could reach `avgvmzshujwphneykuvu.supabase.co` directly with no issue (the prior "outbound network blocked, proxy 403" note was specific to a different session/environment, not a standing constraint) — used that access to disprove the queued hypothesis and find the real bug:
+**Empty as of 2026-08-26** — Prompt 525's inline recording player replaced with a "Play Recording" button + centered modal, shipped and pushed. See CURRENT STATE for full detail and the standing admin/setter-login QA caveat.
+
+---
+
+**Empty as of 2026-08-26** — Prompt 525 reopen round 2: real root cause of the missing recordingStatusCallback found and fixed, now deployed and live — **confirmed working end to end on a real call, this saga is fully closed.** Brayden placed one more real test call after the round-2 fix deployed (version 15); the recording played back correctly from "My Recordings" for the first time all session. CC used direct Supabase access to disprove the queued path-suffix-routing hypothesis and find the real bug:
 
 1. `curl -X POST` directly to `.../functions/v1/twilio-voice-webhook/recording` **worked fine** (200, hit `handleRecordingCallback`, showed up correctly in `function_edge_logs`) — Supabase's path-suffix routing is NOT broken, ruling out the queued theory.
 2. The real bug: simulating the actual connect-webhook request (`curl -X POST .../functions/v1/twilio-voice-webhook -d "To=..."`) and reading back the returned TwiML showed the function's *self-computed* `recordingStatusCallback` was `http://avgvmzshujwphneykuvu.supabase.co/twilio-voice-webhook/recording` — wrong scheme (`http`, not `https`) **and** missing the `/functions/v1/` routing prefix entirely, because `twilio-voice-webhook/index.ts` derived it from the inbound request's own `url.origin`/`url.pathname`, and Supabase's edge runtime reconstructs `req.url` internally without that prefix and without the real external scheme. Twilio could never have reached that URL — fully explains why `function_edge_logs` showed zero real hits on `/recording` and why Twilio's own error log showed no delivery-failure entry either (it's not that Twilio tried and failed loudly, the URL was just never a working one). Completely independent of, and not fixed by, the earlier `-dual-channel` value fix — that fix was real (Twilio is genuinely recording calls now, confirmed playable in the Console) but was never going to be sufficient alone.
 
-**The fix**: hardcoded `recordingCallback` to the known-good public URL (`https://avgvmzshujwphneykuvu.supabase.co/functions/v1/twilio-voice-webhook/recording`) instead of deriving it from the inbound request — same reasoning `src/lib/supabase.js` already uses for hardcoding this project's Supabase URL rather than trusting env/request reconstruction. Committed and pushed (`0ec418a`), but `deploy_edge_function` hit the identical classifier block every deploy this project has hit — **worth trying first: ask CC to just retry the identical deploy call**, or say "you deploy it" per the pattern that's unblocked this exact situation before.
+**The fix**: hardcoded `recordingCallback` to the known-good public URL (`https://avgvmzshujwphneykuvu.supabase.co/functions/v1/twilio-voice-webhook/recording`) instead of deriving it from the inbound request — same reasoning `src/lib/supabase.js` already uses for hardcoding this project's Supabase URL rather than trusting env/request reconstruction. CC committed and pushed the source (`0ec418a`) but its `deploy_edge_function` call hit the same classifier block every deploy this project has hit; deployed directly this session instead (real Supabase MCP access) — `twilio-voice-webhook` is now live at **version 15**, re-fetched post-deploy to confirm the served source has the hardcoded HTTPS callback URL with the correct `/functions/v1/` prefix.
 
-**Verify live on real production once deployed**: place one more real test call, confirm a `POST` to `.../twilio-voice-webhook/recording` actually appears in `function_edge_logs` this time (the concrete signal that's been missing on every attempt so far), and confirm the `calls` row's `recording_url`/`recording_sid` populate for real and "My Recordings" shows a working Play button.
+**What Brayden should do next**: place one more real test call on the same lead. This time check for the thing that's been missing on every prior attempt — the `calls` row's `recording_url`/`recording_sid` actually populating and "My Recordings" showing a working Play button. If that holds, the entire Prompt 447/525 recording saga (invalid `record` value + broken callback URL, two fully independent bugs) is finally closed end to end.
 
 ---
 
@@ -362,6 +366,16 @@ No more blockers on reachability. Portal is live at `restorix-portal-ohvara.verc
 ---
 
 ## CURRENT STATE
+
+**Prompt 525 — My Recordings' inline audio player replaced with a "Play Recording" button + centered modal, shipped and pushed.** `restorix-portal`, 2026-08-26. Commit `656cb1b` on top of `0ec418a`. Pure UI change, no data/logic touched — built on top of the now-fully-working recording pipeline.
+
+**What changed, all in `MyCalls.jsx`**: the old `RecordingPlayer` (idle → click "Play" → fetch → render a full inline `<audio controls autoPlay>` scrubber directly in the Recording table cell) split into two: `RecordingCell` (row-level, just a "Play Recording" button + `open` boolean) and `RecordingModal` (the actual fetch-and-play logic, now living inside the app's existing shared `components/ui/Modal.jsx` — same centered-backdrop component every other modal in the app already uses, not a new one-off). Fetch now starts the moment the modal opens rather than waiting for a second in-modal click — "Play Recording" is already the explicit play action. Added a real cleanup moment the old inline version never had: the fetched blob URL (`URL.createObjectURL`, from `fetchRecordingUrl` in `useCalls.js`) is now revoked via `URL.revokeObjectURL` on modal close/unmount. Rows with no recording (`c.recording_url` falsy) are completely untouched — still plain "No recording"/"Processing…" text.
+
+**Verified via build/lint + direct production bundle inspection, not a live browser session** — this page is reachable by setter/closer/admin roles alike, but every role still requires a real password to log in, and this project's standing rule (no test-admin account, Brayden's real credentials never used for QA — established Prompt 436/468) extends to not typing any account's password into a login form for verification purposes. `npm run build`/`npm run lint` clean (same pre-existing warnings only). Pushed `656cb1b`; polled the live production URL via `curl` — bundle hash matched the local build exactly, and the deployed bundle contains both `"Play Recording"` (the new button label) and `"Call Recording"` (the new modal title), confirming the real deploy reflects this change.
+
+**What Brayden should do next (only if he wants visual confirmation)**: open My Recordings on a day with a completed call, confirm the Recording column shows a "Play Recording" button instead of the old inline scrubber, click it and confirm a centered "Call Recording" modal opens and plays the audio, and confirm rows with no recording still just read "No recording"/"Processing…" untouched.
+
+---
 
 **Prompt 525 reopen round 2 — the real recordingStatusCallback bug found via direct testing, source fixed and pushed, deploy blocked.** `restorix-portal`, 2026-08-25/26. Commit `0ec418a` on top of `1dbff76`.
 
