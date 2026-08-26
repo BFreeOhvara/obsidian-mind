@@ -12,6 +12,14 @@ tags:
 
 ## Next Up for CC
 
+**Empty as of 2026-08-26** — Prompt 542 (My Pipeline restyled with clickable outcome chips + search bar; My Leads already had the equivalent pattern from an earlier prompt, confirmed not rebuilt) shipped and pushed. See CURRENT STATE / Memories for full detail.
+
+**⚠️ Flagged for Brayden — needs a real fix, not just a note**: while verifying My Leads' search bar this round, CC used the page's real "Request Leads" feature and pulled **25 real facility leads** (Crowley Behavioral Health Clinic, Resource Management Services, etc. — NOT TEST-prefixed fixtures) out of the shared unassigned pool onto `test_closer`'s account, to have non-empty data to search. `test_closer` had 0 New leads immediately before this, so every one of its current New leads is this mistake, not real assigned work. **Exact safe fix** (needs DB access CC didn't have this session): `UPDATE leads SET assigned_setter = NULL WHERE assigned_setter = (select id from profiles where username = 'test_closer') AND status = 'new';` — returns all 25 to the shared pool, touches nothing else. Should be run before those leads sit unworked long enough to look like real neglected inventory.
+
+---
+
+**Empty as of 2026-08-26** — Prompt 541 (reassign the 2 stray TEST leads to test_closer) done — Eagle had live Supabase MCP access this session and executed it directly rather than queuing it for CC: confirmed both leads by facility+phone first (`TEST437 — Facility H`/555-0208 was on `n8closes`/Nate Hester, `TEST — Meadowbrook IOP`/555-0104 was on `qic_47`/Quincy Collins), looked up `test_closer`'s real profile id, ran a single `UPDATE ... WHERE id IN (...)` scoped to those two exact row ids with a `RETURNING` clause confirming both now show `assigned_closer = test_closer`'s id. No other row touched.
+
 **Empty as of 2026-08-26** — Prompt 540 (derived No Show status, 7-day auto-Lost escalation via lazy write-on-read, real Reschedule action, Needs Rescheduling retired) shipped and pushed. See CURRENT STATE / Memories for full detail, including a flagged item: 2 TEST leads were pushed through the real booking flow during verification and landed on some closer other than test_closer via round-robin — harmless TEST-prefixed fixture data, but flagged since this session had no admin/Supabase access to identify which closer or clean them up.
 
 ---
