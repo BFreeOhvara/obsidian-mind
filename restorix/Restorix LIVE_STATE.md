@@ -12,6 +12,18 @@ tags:
 
 ## Next Up for CC
 
+**Empty as of 2026-08-26** — Prompt 537 (phone formatting app-wide + sidebar icon button shrink, which also closed out the Prompt 528 reopen folded into it) shipped and pushed. See CURRENT STATE / Memories for full detail and the standing Browser-pane screenshot caveat.
+
+---
+
+**Empty as of 2026-08-26** — Prompt 536 reopen round 4 (Custom Date pill defaults to "Custom Date" with a fixed steady width, X resets to that default, helper copy added above the calendar, live hover preview of the range fill while picking the second date, Weekly Activity axis gaps tightened with Bookings pinned in place) shipped and pushed. See CURRENT STATE for full detail. **Same standing gap, 4th round running**: Browser pane screenshot/`computer` zoom still times out with "pane is not displayed, so the page is not compositing frames" — worth Brayden checking a session/environment display setting rather than CC retrying the identical call again. Verified instead via real click-through interaction against a live logged-in `test_setter` session (opened the popover, clicked day 10, dispatched a real hover event on day 19 and confirmed via DOM inspection that days 10/19 read `selected` and 11–18 read `inRange` — the live preview firing correctly BEFORE the second click — then actually clicked 19 and confirmed the pill label updated to "Aug 10 – Aug 19", clicked X and confirmed it reverted to "Custom Date" with real all-time totals still showing) plus direct SVG coordinate inspection for the axis retightening (blue anchor 34→44, dash 40–44→47–51, green held at 60 exactly as asked). Post-deploy, fetched the live production bundle directly and confirmed the exact same hash as the local build (`index-CIvcSJVt.js`) plus both new strings (`"Select a start or end date..."`, `"Clear custom date range"`) present in it.
+
+---
+
+**Empty as of 2026-08-26** — Prompt 536 reopen round 3 (stat cards no longer vanish in All Time/Custom Date, All Time defaults to real unbounded totals, Custom Date pill defaults to "All Time" and animates width smoothly, X reset control added, Weekly Activity axis swapped to blue → dash → green) shipped and pushed. See CURRENT STATE for full detail. **Same standing gap, not resolved**: this session's Browser pane again could not composite frames (`computer` screenshot timed out with "pane is not displayed" on every attempt, same as the prior two rounds) — environment-level, not fixable from inside the session. Verification used real click-through interaction via `computer`'s click actions against a live logged-in `test_setter` session on the dev server (opened the Custom Date popover, picked a real Aug 1–15 range, confirmed the label updated and the X appeared, clicked X and confirmed it reverted to "All Time" with real all-time totals re-appearing), plus direct DOM/SVG inspection (`querySelectorAll` on the chart's `<text>`/`<line>` elements) confirming the axis text x-coordinates read blue(34, end-anchored) → dash(40–44) → green(60, end-anchored) → axis(64), left to right as asked. Post-deploy, fetched the live production bundle directly and confirmed both the exact same hash as the local build (`index-a_FdZCPJ.js`) and the literal `"Reset to All Time"` string present in it — proof this is the code actually served, not just a successful push. **If the Browser pane keeps failing across rounds like this, worth Brayden checking for a session/environment setting that enables display** rather than CC retrying the same screenshot call every round.
+
+---
+
 **Empty as of 2026-08-25** — Prompt 536 reopen round 2 (axis-overlap bug fixed, toggle relocated above the stat cards, All Time converted to a "Custom Date" popover trigger) shipped and pushed. See CURRENT STATE for full detail. **Same open gap as last round, not resolved**: this session's Browser pane still could not composite frames (`computer` screenshot/zoom timed out identically to last time) — this is a session/environment-level limitation, not something fixable from inside the session. Fell back to live DOM interaction + `getBoundingClientRect()` measurement instead (clicked through the real popover open/close/selection flow via `computer`'s click actions, which work fine without compositing — only the screenshot itself fails), which is more rigorous than last round's static-measurement-only approach but is still not the real screenshot Brayden explicitly asked for. **If this keeps happening, worth Brayden checking whether there's a session/environment setting that enables Browser pane display** rather than CC retrying the same tool call round after round.
 
 ---
@@ -79,9 +91,7 @@ tags:
 
 ---
 
-**Prompt 528 reopen — shrink the two circular sidebar buttons at the bottom (Report a Bug, Add to Home Screen).** Reference screenshot: `restorix/qa-screenshots/sidebar-bug-phone-buttons-brayden.png`. Brayden's ask: they're too large relative to the rest of the sidebar (nav items, the account card below them) — reduce both the button size and their icon size proportionally, keep them square/circular and equal to each other like they are now, just smaller. Find wherever these two render (added in Prompt 528 — a `Sidebar.jsx`/`Layout.jsx` bottom section) and size them down; use your own judgment on the exact new size, just make the reduction visually obvious against the reference screenshot, not a token 1-2px nudge.
-
-**Verify live on real production**: real screenshot of the sidebar's bottom section showing both buttons at the new smaller size, confirm both still open their respective modal/action correctly (Report a Bug modal, Add to Home Screen flow) after the resize. Saved to `restorix/qa-screenshots/`.
+**Empty as of 2026-08-26** — Prompt 528 reopen (sidebar button shrink) was folded into Prompt 537, which shipped and pushed this round. Fully closed, nothing left to action here.
 
 ---
 
