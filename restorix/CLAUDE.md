@@ -2,15 +2,19 @@
 
 External brain for **Restorix** — AI infrastructure for behavioral health treatment centers. This file loads on top of the global `~/.claude/CLAUDE.md` when Claude Code is working on Restorix specifically. Completely independent of Ohvara (the vault's other vertical, rooted at `brain/` + the vault-root `CLAUDE.md`) — same operator (Brayden), same Atlas vault, otherwise unconnected. Do not read Ohvara's `brain/LIVE_STATE.md`, `North Star.md`, or `Memories.md` for Restorix work; they don't apply.
 
+## Manager Chat Identity & Logging
+
+Inherits the vault root `CLAUDE.md`'s "Manager Chat Identity & Logging" section in full: this instance is Eagle or Falcon depending on account, Atlas is the shared vault both plug into, and **important decisions/context get written to [[Restorix Memories]] (and queue items to [[Restorix LIVE_STATE]]) continuously, as they happen — not batched for a "wrap up" moment, and not only when Brayden asks.** If Brayden switches instances or starts a fresh chat mid-conversation, everything material discussed so far should already be sitting in these two files.
+
 ## Session Start
 
 1. Read [[Restorix LIVE_STATE]] "Next Up for CC" FIRST — the live task queue; execute top to bottom, delete each item when done, log to [[Restorix Memories]]
 2. Read [[Restorix North Star]] and [[Restorix Memories]] before every session — never repeat a logged mistake
 3. State what's relevant before writing code
 
-## Session End
+## Session End (backstop only — most logging should already have happened during the session per the rule above)
 
-1. Append a session log entry to [[Restorix Memories]]: date, topics, decisions, current state, blockers
+1. Append a final session summary entry to [[Restorix Memories]]: date, topics, decisions, current state, blockers
 2. Never end without logging — partial logs beat no logs
 
 ## Shared Rules (inherited from the vault root, apply here too)

@@ -48,6 +48,20 @@ The actual AI infrastructure Restorix installs per client — same model Ohvara 
 
 ~~After-hours crisis-language routing as a standalone sub-agent~~ — folded into Intake & Triage as a mandatory core feature (see above), no longer its own line item.
 
+## Delivery Model — Client Portal & Provisioning
+
+> Decided 2026-08-27 (live conversation with Brayden). Until now, `restorix-portal` was purely the internal sales CRM — setters/closers/admin selling the Stack. This is the missing other half: what a client actually gets once they buy.
+
+**The flow:** the Closer Survey (adaptive tree, see [[Restorix Closer Survey]]) qualifies a prospect into a recommended Stack — one front-runner + however many sub-agents fit. On the call, the closer can adjust that recommendation live (drop a sub-agent, swap the front-runner) before the prospect agrees. The moment the closer **confirms** the final, specific package, the system should auto-provision that client's own login and dashboard — no manual setup step, no separate "start onboarding" action.
+
+**Where it lives:** a **new `client` role inside the existing `restorix-portal` app** — a 4th value alongside `setter`/`closer`/`admin`, not a separate application. Chosen over a standalone app because it reuses the auth/invite/RLS patterns already built rather than duplicating them.
+
+**What "confirm" actually needs to capture (a real, current gap):** today, closing a lead just sets `closer_outcome = 'closed'` plus freeform `closer_notes` and two fee numbers (`deal_setup_fee`/`deal_first_month_fee`) — there's no structured record of *which* front-runner and *which* sub-agents were actually agreed to. That structured selection is the thing provisioning actually needs to build the right dashboard shell, so it has to be captured at confirm time, not reconstructed later from notes.
+
+**MVP scope — a shared component catalog, not per-client custom builds.** Every agent Restorix can sell (every front-runner, every sub-agent) gets built exactly once, as a generic reusable module in a shared catalog — never rebuilt or forked per client. "Provisioning" a client means composing/activating the specific subset of already-built catalog modules that match what they actually bought — two clients with completely different Stacks get two different-looking dashboards, assembled from the same underlying catalog, not two separate implementations. "Incremental" refers to the catalog growing one agent type at a time (build the first front-runner for real, everything else stays an inactive placeholder entry until its turn) — not each client's dashboard being separately built out over time. The client's own side of it: they log in and connect whatever their active modules need (e.g. their phone number, for a voice agent) — "plug in what they need and it starts working."
+
+**Voice-agent engine: not yet decided.** Retell AI is bookmarked in Brayden's browser but he confirmed it isn't a settled choice — treat the actual conversational-AI backend as its own open research question, separate from the dashboard/provisioning work, so the client-portal architecture doesn't get built assuming a specific vendor prematurely.
+
 ## Reference Site
 
 **regenix.io** — starting point only, not the final look. Brayden originally wanted the marketing site's structure AND visual caliber to match closely (**corrected 2026-08-14, Prompt 427:** it's a light sage/mint theme, `#e5ecea` bg, near-black text, teal accent `#07775f`/`#2fd6b4`/`#055c49`, Space Grotesk + Manrope + JetBrains Mono, soft radial glow blobs, pill buttons — not the dark/neon theme originally assumed). **Updated 2026-08-16, Prompt 430:** Brayden then had it deliberately differentiated so it doesn't read as a copy — accent shifted to cornflower blue (`#3a63d6`/`#7c9eff`/`#24469e`), animation timing/easing reworked, and every section's layout/composition rebuilt (not just restyled) while keeping the same content. Regenix is now a structural/quality reference only, not a visual match target.
