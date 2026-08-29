@@ -17,6 +17,16 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-08-29 — Prompt 555 executed (CC): My Leads niche toggle dropped + Request Leads button moved
+
+**[CC | 2026-08-29 — Prompt 555 — SHIPPED. `restorix-portal` `main` @ `9e4b90c`. Frontend only, no backend change.]**
+
+- **`MyLeads.jsx`:** niche is now `useBrand()`'s `niche` (one brand per portal since Prompt 549), not a hand-picked `SegmentedTabs`. Removed: `useState` niche state, the `NICHES` `{value,label}` tab array, the `SegmentedTabs` import, the `nicheTabs` prop. Kept a small `NICHE_LABEL` map + `nicheLabel()` for the Request Leads modal/form display copy (still says "Behavioral Health" / "Bail Bonds", just no longer user-selectable). `niche={niche}` still passed to `SetterOverview` → lead lists stay scoped to the portal's brand.
+- **`SetterOverview` (`Overview.jsx`):** new optional `actionsRow` prop, rendered `{actionsRow && <div className="mt-4 flex justify-end">{actionsRow}</div>}` immediately above `<TodayStrip>`. `nicheTabs` prop kept on the signature (unused now, harmless shared plumbing per spec) — its render guard is just always falsy.
+- **Request Leads button** moved out of `headerRight` (top-right by the title) into `actionsRow` (right above the stat tiles). `MyLeads` passes `headerRight={false}` — `false` is not nullish so the `headerRight ?? <DateClockRow/>` fallback doesn't fire; My Leads gets no clock (it never had one).
+- Setter's own `/overview` (`<SetterOverview profile={profile}/>`, no props) unaffected — `actionsRow`/`headerRight` undefined there, renders exactly as before.
+- **Verified:** `npm run build` + `oxlint` clean, no stale references (`SegmentedTabs`/`NICHES`/`setNiche`/`nicheTabs` all gone from `MyLeads`). **🟡 Not visually verified** — `/my-leads` is `RoleRoute roles={['closer']}`, login classifier-blocked this session (same recurring gap). Needs a logged-in closer walk on both portals: confirm no tab row, button sits above the stat strip, modal niche always matches the portal.
+
 ### 2026-08-29 — Prompt 553 executed (CC): clock removed from My Pipeline header
 
 **[CC | 2026-08-29 — Prompt 553 — SHIPPED. `restorix-portal` `main` @ `2151465`.]**
