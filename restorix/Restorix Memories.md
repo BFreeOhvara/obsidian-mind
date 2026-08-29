@@ -17,9 +17,9 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
-### 2026-08-29 — Prompt 550 executed (CC): suretix-marketing built + committed locally, BLOCKED on GitHub repo creation
+### 2026-08-29 — Prompt 550 executed (CC): suretix-marketing built + pushed → Eagle does Vercel
 
-**[CC | 2026-08-29 — Prompt 550: Suretix marketing site — BUILT, committed at `605b86b`, cannot push (repo doesn't exist yet, CC can't create it)]**
+**[CC | 2026-08-29 — Prompt 550: Suretix marketing site — BUILT + PUSHED, `BFreeOhvara/suretix-marketing` `main` @ `605b86b`]** Brayden created the empty repo (CC couldn't — no `gh` CLI, credential access classifier-blocked), then said "push it" — pushed clean. **Next: Eagle creates the Vercel project + `suretix.co` DNS.**
 
 - **Built at `C:\Users\freem\suretix-marketing`** — full clone of `restorix-marketing`'s structure (Vite/React/Tailwind/framer-motion, no new deps), all 9 section components + 4 `ui/` helpers, re-skinned per the LIVE_STATE Prompt 550 spec. `npm install`, `npm run build`, `npm run lint` (oxlint) all clean. Local git repo initialised, `main` branch, one commit `605b86b`, remote `origin` set to `https://github.com/BFreeOhvara/suretix-marketing.git`.
 - **All section copy is verbatim from the spec** — verified live in a dev-server preview via `get_page_text`: Hero / WhoItsFor / Leak / Process / Outcomes / System / FinalCTA / Nav / Footer all match. Amber accent confirmed rendering (`--accent #b45309`, stat text computed `rgb(180,83,9)`), wordmark "Suretix" (no logo), no horizontal overflow at 375px or desktop, no console errors, Leak h2 renders dark (the Prompt 485 white-text bug is NOT present here).

@@ -12,7 +12,15 @@ tags:
 
 ## Next Up for CC
 
-**🔴 BLOCKED (build done) — Prompt 550: Suretix marketing site.** CC built the whole site at `C:\Users\freem\suretix-marketing` — cloned from `restorix-marketing`, re-skinned per the spec below, all copy verbatim, amber accent, `Stethoscope`→`Scale`, `npm run build`/`lint` clean, previewed live. Local commit `605b86b` on `main`, `origin` remote set. **CANNOT PUSH: the GitHub repo `BFreeOhvara/suretix-marketing` doesn't exist and CC can't create it** — no `gh` CLI, and credential access is classifier-blocked. **NEXT: someone creates the empty repo `BFreeOhvara/suretix-marketing` (no README/license/gitignore), then run `git -C C:\Users\freem\suretix-marketing push -u origin main`.** Then Eagle does Vercel + `suretix.co` DNS. Full build detail + flagged deviations (ChatWidget not mounted, favicon assets skipped, `hello@suretix.co` placeholder booking link, ParticleField rgba swapped to amber) → [[Restorix Memories]] 2026-08-29.
+**🟢 CC DONE → Eagle's turn — Prompt 550: Suretix marketing site.** CC built the whole site, `BFreeOhvara/suretix-marketing` created (by Brayden) and **pushed** — `main` @ `605b86b`, clean. Cloned from `restorix-marketing`, re-skinned per the spec below: all copy verbatim, amber accent, `Stethoscope`→`Scale`, `npm run build`/`lint` clean, previewed live at 375px + desktop.
+
+**NEXT (Eagle):** create the Vercel project (`create_git_project`, linked to `BFreeOhvara/suretix-marketing`, `ohvara` team), wire `suretix.co` / `www.suretix.co` — note GoDaddy already has an `A @ WebsiteBuilder Site` record + `CNAME www` that need replacing.
+
+**Flagged for Brayden/Eagle (detail → [[Restorix Memories]] 2026-08-29):**
+- **ChatWidget copied but NOT mounted** — its `marketing-chat` backend has a behavioral-health system prompt. Enabling chat needs a niche param on `marketing-chat` or a dedicated Suretix edge function — a scoping decision, its own prompt.
+- **No favicon/PWA assets** — didn't ship Restorix-branded icons; `<link rel="icon">` tags removed from `index.html`. Suretix needs its own.
+- **Booking link** = `mailto:hello@suretix.co` placeholder (`TODO` in `ui/Button.jsx`) — confirm the real destination / that the mailbox exists.
+- Minor: `ParticleField.jsx` + Hero/System hardcoded accent rgba swapped blue→amber (canvas can't read CSS vars); Leak phrase-stats ("Nights & weekends") rendered smaller than numeric stats to avoid mobile overflow.
 
 <details><summary>Original Prompt 550 spec (as built)</summary>
 
