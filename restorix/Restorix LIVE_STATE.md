@@ -12,16 +12,11 @@ tags:
 
 ## Next Up for CC
 
-**🟡 OPEN -- Prompt 556: brand-aware browser tab favicon.** Confirmed possible and small -- `useBrand.jsx` already runtime-swaps `document.title` and the `theme-color` meta tag based on `brand.niche` (`BrandProvider`'s `useEffect`, `useBrand.jsx` ~line 114-124) via direct DOM mutation, since `<title>`/`<meta>` can't react to React state on their own. The favicon `<link>` tags need the exact same treatment -- they're just as static in `index.html` today, always pointing at the Restorix teal set regardless of brand.
-
-**Assets are ready -- Eagle already generated and dropped them in the vault**, `restorix/logo-assets/`: `favicon-16-suretix.png`, `favicon-32-suretix.png`, `favicon-48-suretix.png`, `favicon-512-suretix.png`, `apple-touch-icon-suretix.png` -- all resized directly from the already-shipped, already-approved `public/suretix-logo-icon.png` (the exact portal-color icon live today), so colors/crop are guaranteed to match what's already on screen, not re-derived. CC: copy these into `restorix-portal/public/` alongside the existing `favicon-16.png` etc. (keep both sets -- don't overwrite the Restorix ones).
-
-**Wire-up:**
-- `index.html` currently has 4 static `<link rel="icon">` tags (16/32/48/512) plus one `<link rel="apple-touch-icon">`, all pointing at the Restorix filenames -- give each a stable way to be targeted at runtime (an `id` per tag, e.g. `id="favicon-16"` etc., is simplest and matches the existing `document.querySelector('meta[name="theme-color"]')` pattern already used one block below).
-- Extend the same `useEffect` in `useBrand.jsx` (the one already setting `data-brand`, `document.title`, and the theme-color meta) to also set each icon `<link>`'s `href` to the Suretix filename when `brand.niche === 'bail_bonds'`, and back to the Restorix filename otherwise -- same `if/else` shape as the existing theme-color line right below it, just one `<link>` at a time (loop or five explicit lines, CC's call).
-- This must also correctly re-flip on `?brand=` override changes and on the real hostname switch (portal.restorix.co vs portal.suretix.co) -- already covered for free since it's the same effect/dependency array (`[brand.niche, brand.wordmark]`) that already handles both cases for title/theme-color.
-
-**Verification**: load the portal, confirm the browser tab shows the teal Restorix icon on `portal.restorix.co` / `?brand=behavioral_health`, and switches to the gold Suretix "S" on `portal.suretix.co` / `?brand=bail_bonds` -- both on initial load AND after navigating between pages without a full reload (SPA nav), since that's exactly the scenario Brayden described (switching pages while already on the Suretix portal).
+**✅ DONE -- Prompt 556: brand-aware browser tab favicon.** Shipped by CC 2026-08-29 -- `restorix-portal` `main` @ `a1b3d47`.
+- Suretix favicon set (`favicon-16/32/48/512-suretix.png` + `apple-touch-icon-suretix.png`) copied from the vault into `public/` alongside the Restorix set (both kept).
+- `index.html`: the 5 icon `<link>` tags got `id`s (`favicon-16`/`-32`/`-48`/`-512`/`apple-touch-icon`); default hrefs still the Restorix teal set.
+- `useBrand.jsx`: the existing `data-brand`/`title`/`theme-color` `useEffect` now also loops the 5 tags, setting each `href` to the `-suretix` filename when `brand.niche === 'bail_bonds'`, back to the base filename otherwise. Same `[brand.niche, brand.wordmark]` dep array, so it re-flips on `?brand=` override + hostname switch for free.
+- **Verified live (localhost):** `?brand=bail_bonds` → all 5 tags point at `/favicon-*-suretix.png`, title "Suretix Portal", theme-color `#b45309`; `?brand=none` → back to Restorix set. SPA nav to `/overview` (query string dropped) keeps the Suretix set (sessionStorage override persists). All 8 asset URLs serve `200`. Console clean. Build + oxlint clean.
 
 ---
 

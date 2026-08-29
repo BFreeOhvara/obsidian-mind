@@ -17,6 +17,16 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-08-29 — Prompt 556 executed (CC): brand-aware browser tab favicon
+
+**[CC | 2026-08-29 — Prompt 556 — SHIPPED. `restorix-portal` `main` @ `a1b3d47`. Frontend only.]**
+
+- Same pattern as Prompt 549's `document.title` / `theme-color` runtime swap: `<link rel="icon">` tags can't react to React state, so `BrandProvider`'s `useEffect` mutates the DOM directly.
+- `index.html` — the 4 `<link rel="icon">` + 1 `<link rel="apple-touch-icon">` tags got `id`s (`favicon-16/32/48/512`, `apple-touch-icon`). Defaults unchanged (Restorix teal set).
+- `useBrand.jsx` — extended the existing `[brand.niche, brand.wordmark]` effect with a loop over `[id, baseHref]` pairs setting each `href` to `base.replace('.png', '-suretix.png')` on `bail_bonds`, base otherwise. Re-flips on `?brand=` override + `portal.restorix.co`↔`portal.suretix.co` for free (same effect).
+- Assets: Eagle pre-generated `favicon-{16,32,48,512}-suretix.png` + `apple-touch-icon-suretix.png` in `restorix/logo-assets/` (resized from the live `suretix-logo-icon.png`); CC copied them into `public/` beside the Restorix set — both sets kept.
+- **Verified live (localhost, no auth needed — favicon swaps on the login page):** `?brand=bail_bonds` → all 5 tags `/favicon-*-suretix.png` + title/theme-color flip; `?brand=none` → Restorix set restored; SPA nav (`pushState` to `/overview`, query string gone) keeps the Suretix set via the persisted sessionStorage override. 8/8 asset URLs `200`, console clean, build + oxlint clean.
+
 ### 2026-08-29 — Prompt 555 executed (CC): My Leads niche toggle dropped + Request Leads button moved
 
 **[CC | 2026-08-29 — Prompt 555 — SHIPPED. `restorix-portal` `main` @ `9e4b90c`. Frontend only, no backend change.]**
