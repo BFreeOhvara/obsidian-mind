@@ -17,6 +17,33 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-08-29 — Prompt 554 executed (CC): 24h No-Answer hold + My Pipeline Setter/Closer split
+
+**[CC | 2026-08-29 — Prompt 554 — FRONTEND SHIPPED `restorix-portal` `main` @ `b33822a`. DB MIGRATION WRITTEN + COMMITTED, NOT APPLIED — Eagle applies + verifies.]**
+
+**Recon findings (queried the live DB via Supabase MCP, project `avgvmzshujwphneykuvu`, before writing anything):**
+- `handle_lead_pipeline` (BEFORE UPDATE trigger) on `no_answer`: sets `no_answer_at = now()`, keeps `assigned_setter`. Unchanged — this is the piece the new model relies on.
+- **Piece 1 was already done.** `_do_closer_day_end` + `process_all_closer_day_ends` (cron `cron.job` jobid 13, `*/15 * * * *`) + `run_closer_day_end` all already exist — shipped Prompt 547 (`20260828222610_prompt547_setter_full_refresh_and_closer_dayend_v3`). Closer day-end is release-only (no refill) — correct, since closers pull on-demand via `request_closer_leads`. The spec was written from a stale understanding. **Did NOT loosen `run_setter_day_end`'s setter-only check** as the spec literally asked — the setter path's refill is hardcoded `niche = 'behavioral_health'` + 150 cap, which would be actively wrong for a bail_bonds closer. `run_closer_day_end` is the right path and already exists.
+- `redistribute_no_answers` runs on cron jobid 2, `*/5 * * * *`. `no_answer_queue` currently has **0 rows**; 9 `no_answer` leads, all still assigned, none past 24h — so applying the migration triggers no mass release. Only 1 active setter, 5 active closers.
+- Only 2 functions reference `no_answer_queue` (`_do_setter_day_end`, `redistribute_no_answers`); no views. One frontend query hits it: `usePipelineHealth` (admin "No-Answer Cooldown" tile) — updated to count held `no_answer` leads instead.
+
+**DB migration** (`restorix-portal/supabase/migrations/20260829_prompt554_no_answer_24h_hold.sql` — this repo has no `db push` history table, migrations are applied directly via MCP; the file is the reviewed source of record):
+- `_do_setter_day_end`: removed the "rolled" CTE (null `assigned_setter` + insert `no_answer_queue`). Day-end now only does the `new`-release + BH-refill half. `no_answer_rolled` kept in `RETURNS TABLE` (PostgREST cache / `useFinishDay` default), always 0.
+- `redistribute_no_answers`: body replaced — `update leads set assigned_setter=null, status='new', no_answer_at=null where status='no_answer' and no_answer_at is not null and now()-no_answer_at >= interval '24 hours'`. No more random-other-setter reassignment. Name + cron kept. (Checked: `status` `no_answer`→`new` fires no `handle_lead_pipeline` branch, and the trigger doesn't touch `no_answer_at`, so the explicit `no_answer_at=null` sticks.)
+- `COMMENT ON TABLE no_answer_queue` — deprecated marker; table + rows kept (zero-data-loss).
+
+**⚠️ `apply_migration` was blocked by the CC auto-mode classifier** (production DDL). This matches the established project pattern anyway — Eagle applies DB changes via MCP from CC's committed source (Prompt 549 precedent). Not a workaround-worthy blocker; it's the handoff.
+
+**Frontend** (`b33822a`):
+- `CloserPipeline` (`Overview.jsx`) → thin wrapper: `<h1>` + date span + `SegmentedTabs` (`MY_PIPELINE_TABS` = Closer/Setter, no Unassigned). Closer tab body extracted verbatim to new `CloserBookedPipeline({ profile })` (minus the old header row). Setter tab = `<SetterOverview profile={profile} niche={brand.niche} embedded />`.
+- `SetterOverview` gained `embedded` prop — renders a compact "N leads in your pool" line instead of the full h1 + `headerRight` block, so it nests cleanly. Everything below (TodayStrip, search, status sub-tabs, table) unchanged. `FinishDayCard` already gated on `!niche` so it stays hidden here.
+- `usePipelineHealth`: "No-Answer Cooldown" count switched from `no_answer_queue` (soon always empty) to `leads` where `status='no_answer' and no_answer_at is not null`.
+- Build + oxlint clean (14 warnings, all pre-existing).
+
+**🟡 Frontend not visually verified** — `/my-pipeline` is closer-only, login classifier-blocked (recurring gap). Login page renders, Overview module loads, no console errors. Needs a logged-in closer walk.
+
+**⚠️ Eagle's post-apply verification (from the spec, with a real setter test account):** (a) day-end still releases + refills `new`; (b) a `no_answer` lead stays assigned + visible in the setter pool AND admin Setter→No Answer for ~24h; (c) after 24h (or a manual `select redistribute_no_answers();`) the row shows `assigned_setter IS NULL, status='new', no_answer_at IS NULL`.
+
 ### 2026-08-29 — Prompt 556 executed (CC): brand-aware browser tab favicon
 
 **[CC | 2026-08-29 — Prompt 556 — SHIPPED. `restorix-portal` `main` @ `a1b3d47`. Frontend only.]**

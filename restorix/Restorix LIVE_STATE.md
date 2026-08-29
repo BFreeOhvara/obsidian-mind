@@ -29,7 +29,15 @@ tags:
 
 ---
 
-**🟡 OPEN -- Prompt 554: real 24h No-Answer hold (replaces day-end rolling + auto-reassign), extended to closers, plus a new Setter/Closer tab split on My Pipeline.** This is a real behavior change to already-shipped setter logic, confirmed explicitly with Brayden (not a guess) -- read this whole thing before touching anything, and treat the DB changes as the risky part since real setters depend on the current mechanism today.
+**🟠 CC DONE — DB MIGRATION AWAITING EAGLE — Prompt 554: real 24h No-Answer hold + My Pipeline Setter/Closer split.** Frontend shipped `restorix-portal` `main` @ `b33822a`. **The DB migration is written + committed but NOT applied** — `restorix-portal/supabase/migrations/20260829_prompt554_no_answer_24h_hold.sql`. Eagle: apply it via the Supabase MCP against `avgvmzshujwphneykuvu` (same flow as Prompt 549), then run the real-setter-account verification below. Full detail: [[Restorix Memories]] 2026-08-29 "Prompt 554 executed (CC)".
+
+- **DB (in the migration file, 3 statements):** (1) `_do_setter_day_end` — drop the no_answer-rolling half; day-end now only releases+refills `new` leads (`no_answer_rolled` stays in the return signature, always 0). (2) `redistribute_no_answers` — replace body: release `no_answer` leads straight to Unassigned (`assigned_setter=null, status='new', no_answer_at=null`) once `now()-no_answer_at >= 24h`, instead of reassigning queued leads to a random other setter. Same name + cron (jobid 2, every 5 min). (3) `COMMENT ON TABLE no_answer_queue` — deprecated marker; table kept (0 rows, no data loss), no longer read/written.
+- **Piece 1 (closer day-end) was ALREADY DONE** — `_do_closer_day_end` / `process_all_closer_day_ends` (cron jobid 13) shipped in Prompt 547 (migration `20260828222610`). The spec's "extend `run_setter_day_end` to closers" is deliberately NOT done: the setter path's refill is `niche='behavioral_health'`-only + 150-cap, wrong for closers; `run_closer_day_end` (release-only) already covers them correctly.
+- **Frontend (shipped `b33822a`):** `CloserPipeline` → thin wrapper: page `<h1>` + date + a `SegmentedTabs` Closer/Setter split. **Closer tab** = the existing booked-outcome table, extracted verbatim to `CloserBookedPipeline` (minus its own header row). **Setter tab** = `<SetterOverview profile={closer} niche={brand.niche} embedded />` — the closer's own self-dialed My-Leads pipeline. New `embedded` prop on `SetterOverview` drops its page-header row (keeps a compact "N leads in your pool" line). `usePipelineHealth`'s "No-Answer Cooldown" tile now counts held `no_answer` leads instead of the (soon-always-empty) `no_answer_queue`. Build + oxlint clean.
+- **🟡 Frontend not visually verified** — `/my-pipeline` is closer-only, login classifier-blocked this session. Structurally confirmed (build clean, module loads, login renders, no console errors). Needs a logged-in closer walk: Closer tab unchanged, Setter tab shows the self-dial funnel (empty for a closer who never self-dials).
+- **⚠️ Eagle's verification checklist (from the spec — do NOT skip):** with a real setter test account, after applying the migration: (a) day-end still releases + refills `new` leads; (b) a `no_answer` lead stays assigned + visible in the setter's pool AND admin Setter→No Answer for ~24h; (c) after 24h `redistribute_no_answers()` (or a manual `select redistribute_no_answers();`) moves it to Unassigned — check `assigned_setter IS NULL, status='new', no_answer_at IS NULL` on the actual row before/after.
+
+<details><summary>Original Prompt 554 spec (as built)</summary>
 
 **Current behavior (verified directly against the live DB, not assumed):**
 - `handle_lead_pipeline()` trigger sets `no_answer_at := now()` the instant a lead's status becomes `'no_answer'`, but does NOT null `assigned_setter` at that point (unlike follow_up/not_interested/appointment_booked, which null it immediately).
@@ -60,6 +68,8 @@ tags:
 - **Setter** tab = the same view My Leads already renders (`SetterOverview`'s New/No-Answer/Follow-up/Not-Interested breakdown), reused here rather than rebuilt, scoped to the logged-in closer's own id -- so a closer can see their own self-dialed lead-nurture pipeline without leaving My Pipeline. Reuse the existing `SetterOverview`/hooks rather than duplicating logic; if that means embedding `SetterOverview` directly as this tab's content, that's fine -- check whether it renders cleanly nested inside `CloserPipeline`'s existing layout before assuming.
 
 **Verification**: this changes real, currently-relied-upon setter behavior, not just adding something new for closers -- don't ship without confirming with a real setter test account that day-end release/refill still works, and that a no_answer lead genuinely stays visible for the intended 24h and then genuinely lands in Unassigned (not just "probably does," actually check `assigned_setter`/`status` on a test lead before/after).
+
+</details>
 
 ---
 
