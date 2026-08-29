@@ -12,9 +12,29 @@ tags:
 
 ## Next Up for CC
 
-**🟢 CC DONE → Eagle's turn — Prompt 550: Suretix marketing site.** CC built the whole site, `BFreeOhvara/suretix-marketing` created (by Brayden) and **pushed** — `main` @ `605b86b`, clean. Cloned from `restorix-marketing`, re-skinned per the spec below: all copy verbatim, amber accent, `Stethoscope`→`Scale`, `npm run build`/`lint` clean, previewed live at 375px + desktop.
+**🟡 OPEN -- Prompt 552: Suretix logo rollout, brand-aware Swap icon, brand-aware ParticleField.** Three related pieces, all touching `restorix-portal` (Prompt 551 -- the closer survey -- is still separately queued and unstarted; do that one too but it's independent of this one).
 
-**NEXT (Eagle):** create the Vercel project (`create_git_project`, linked to `BFreeOhvara/suretix-marketing`, `ohvara` team), wire `suretix.co` / `www.suretix.co` — note GoDaddy already has an `A @ WebsiteBuilder Site` record + `CNAME www` that need replacing.
+**1. Final Suretix logo files (both confirmed by Brayden, icon-only, no wordmark):**
+- `restorix/logo-assets/suretix-icon-marketing-final.png` -- burnt orange, `#C2610C` base / `#FBBF24` highlight. Goes on the **marketing site** (`suretix-marketing` repo): replace the plain-text "Suretix" wordmark in `Nav.jsx` and `Footer.jsx` with this image, and generate a real favicon/apple-touch-icon set from it (Prompt 550 shipped with those tags removed entirely since no logo existed yet -- now one does). Also becomes the Vercel project avatar for `suretix-marketing` (Settings -> General -> Avatar, same flow Eagle just did by hand for `restorix-portal`/`restorix-marketing` -- CC can do this one via `vercel` CLI or Brayden/Eagle can do it manually, whichever is easier).
+- `restorix/logo-assets/suretix-icon-portal-final.png` -- golden-mustard, `#CA8A04` base / `#FDE047` highlight. Goes on the **portal**: set as `niche_brands.bail_bonds.logo_url` (Eagle will do the DB write once the image is hosted somewhere reachable -- easiest is committing it into `restorix-portal`'s own `public/` as a static asset and using that path, matching however `behavioral_health`'s logo_url is currently set, if it's set at all -- check first rather than assuming). Replaces the plain-text wordmark placeholder whatever the portal currently uses for Suretix (Prompt 549 shipped with `?brand=` preview but no real logo asset).
+
+Note these two are deliberately different colors from each other -- same relationship as Restorix's own teal-portal/royal-blue-marketing split (Prompt 490-ish). Not a bug, don't unify them.
+
+**2. Swap button: replace the generic icon with the *other* brand's own portal icon.** Currently `SwapButton` in `Layout.jsx` renders `<SidebarIconButton icon={ArrowLeftRight} .../>` -- a generic lucide swap arrow, same regardless of which niche you're on. Brayden wants it to show the *destination* brand's icon instead: on the Restorix portal, show Suretix's icon (`suretix-icon-portal-final.png`, since that's what you're swapping *to*); on the Suretix portal, show Restorix's own portal icon (`restorix-icon-transparent.png`, teal -- already in `restorix/logo-assets`, already the file used for the `restorix-portal` Vercel avatar Eagle just set). `SidebarIconButton` currently expects `icon: Icon` as a Lucide-style component rendered as `<Icon size={20}/>` -- either give it an `iconSrc`/image-node override, or wrap each PNG as a tiny component matching that same `size` prop contract, whichever is the smaller diff. Keep the existing `otherName` logic/label behavior (worth double-checking while in there: it currently reads `brand.niche === 'bail_bonds' ? 'Restorix Sustain' : 'Suretix'` -- "Restorix Sustain" looks like a stray/wrong name, flag it back to Brayden rather than silently fixing or leaving it, since Eagle doesn't know if that's intentional).
+
+**3. ParticleField background: currently hardcoded to Restorix blue regardless of active brand.** `src/components/ui/ParticleField.jsx` (mounted behind every page via `Layout.jsx`, and on `Login.jsx`) hardcodes `rgba(58, 99, 214, ...)` (mirrors Restorix `--accent`) for the connecting lines and `rgba(124, 158, 255, 0.6)` (mirrors Restorix `--accent-bright`) for the dots -- canvas can't read CSS custom properties, same limitation already documented inline in that file. This was never made brand-aware in Prompt 549 (that prompt covered the CSS token system, not this canvas). Brayden wants it to switch when viewing the Suretix portal. Read `useBrand()` inside `ParticleField` and pick the rgba pair by `brand.niche`:
+- `behavioral_health` (unchanged): lines `rgba(58, 99, 214, ...)`, dots `rgba(124, 158, 255, 0.6)`
+- `bail_bonds` (new): lines `rgba(180, 83, 9, ...)` (mirrors Suretix `--accent` #B45309), dots `rgba(245, 158, 11, 0.6)` (mirrors Suretix `--accent-bright` #F59E0B)
+
+Deliberately reusing the *existing CSS token values* here, not the two new logo colors above -- the particle field is a broad thematic background element tied to the site's overall accent language (same relationship the marketing site's own ParticleField swap already established in Prompt 550), while the two logo colors are specifically for the icon mark. Don't introduce a third color family. Verify via the existing `?brand=bail_bonds` override on both a portal page and `/login`.
+
+---
+
+
+
+**✅ DONE — Prompt 550: Suretix marketing site.** CC built the whole site, `BFreeOhvara/suretix-marketing` created (by Brayden) and **pushed** — `main` @ `605b86b`, clean. Cloned from `restorix-marketing`, re-skinned per the spec below: all copy verbatim, amber accent, `Stethoscope`→`Scale`, `npm run build`/`lint` clean, previewed live at 375px + desktop.
+
+Live at `suretix.co`, verified by Brayden and independently by Eagle (DNS resolves to Vercel's IP, production build READY, page renders correctly). Vercel project `suretix-marketing` created, domains wired: `suretix.co` is the canonical production domain, `www.suretix.co` 308-redirects to it -- matches `restorix-marketing`'s exact pattern (Brayden caught the initial mismatch, Eagle fixed it via Claude Chrome browser automation on Brayden's Chrome). GoDaddy `A @` and `CNAME www` records replaced by Brayden per Eagle's exact values.
 
 **Flagged for Brayden/Eagle (detail → [[Restorix Memories]] 2026-08-29):**
 - **ChatWidget copied but NOT mounted** — its `marketing-chat` backend has a behavioral-health system prompt. Enabling chat needs a niche param on `marketing-chat` or a dedicated Suretix edge function — a scoping decision, its own prompt.
@@ -97,7 +117,16 @@ Full content specified below, sourced from a section-by-section rewrite of the r
 
 ---
 
-**🟡 OPEN — Prompt 551: Suretix closer survey (`/survey` route in `restorix-portal`, made niche-aware).** Builds on Prompt 549's `useBrand()`/niche infrastructure — no new route, no new page, the existing `/survey` page becomes niche-aware the same way `Layout.jsx`/`MyPipeline` already are.
+**🟢 CC DONE (1 verification gap) — Prompt 551: Suretix closer survey.** Shipped `6e54b48` on `restorix-portal` `main`.
+- **`src/lib/surveySuretix.js`** — mirrors `survey.js`'s exact export surface, content verbatim from [[Suretix Closer Survey]]. Front-runner `intake_dispatch`/`missed_call_recovery`; sub-agents `collateral_verification`/`follow_up`/`jail_sync`/`court_compliance`/`referral_reporting`. Section 6 (court-date/check-in compliance) is a genuine rebuild.
+- **`Survey.jsx` refactored to data-driven** — the question wording lived hardcoded in `Survey.jsx`, not in `survey.js`, so "only the content module swaps" required moving every niche-specific string into each module's new `COPY` export. Branching / state-machine JSX is now one shared implementation reading `COPY`. `survey.js` behavior for behavioral_health is unchanged (strings transcribed verbatim).
+- **Scoping decision (flagged):** only the standalone `/survey` page is niche-aware (`Survey` wrapper reads `useBrand().niche`). `SurveyBody` still defaults to `behavioral_health`, so **`CloserLeadModal`'s in-modal survey is unchanged** — making it niche-aware would emit Suretix agent keys into the Client-Portal provisioning flow + `agentCatalog.js`, which are behavioral-health-only (Prompt 546 territory, its own prompt). No regression; noted for a follow-up if Brayden wants the modal niche-aware too.
+- **Verified:** `npm run build` + `oxlint` clean (only pre-existing fast-refresh warnings). Node parity/branch/copy-key check — both modules same export surface + state shape, every `COPY.*` path `Survey.jsx` reads present in both, every front-runner + all 5 sub-agent keys resolve in `RESULTS_CONTENT`, full hot/cold branch runs correct. **GAP: live `?brand=bail_bonds` render walk not done** — `/survey` needs closer/admin auth and every login path is classifier-blocked this session (same recurring gap). Needs a real logged-in pass: `?brand=bail_bonds` → full Suretix tree end to end; `?brand=none` → BH unchanged.
+- **Out of scope (untouched):** pricing-formula automation.
+
+<details><summary>Original Prompt 551 spec</summary>
+
+Builds on Prompt 549's `useBrand()`/niche infrastructure — no new route, no new page, the existing `/survey` page becomes niche-aware the same way `Layout.jsx`/`MyPipeline` already are.
 
 **Content source**: [[Suretix Closer Survey]] vault note — mirrors [[Restorix Closer Survey]]'s exact structure (the doc Prompt 469's original survey was built from), rebuilt for surety/bail bond agencies rather than reskinned. Confirmed with Brayden directly, including one deliberately non-mirrored piece: the sub-agent that was "Appointment Reminder & No-Show Prevention" in Restorix's version is "Court-date & check-in compliance" here — bond forfeiture is a materially different (bigger) risk than a no-show, not just a reworded label, so its qualifying questions and results copy are genuinely different, not translated 1:1.
 
@@ -108,6 +137,7 @@ Full content specified below, sourced from a section-by-section rewrite of the r
 
 **Explicitly out of scope**: any pricing-formula automation — both vault docs flag this as a real open decision, not something to invent here.
 
+</details>
 
 ---
 
