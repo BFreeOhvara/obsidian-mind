@@ -17,6 +17,32 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-08-29 — Prompt 559 executed (CC): My Leads spacing + No-Answer countdown + Follow-up midnight cutoff
+
+**[CC | 2026-08-29 — Prompt 559 — SHIPPED. `restorix-portal` `main` @ `05c5f3c`. Frontend only, no migration.]**
+
+- **Part A (spacing):** `TodayStrip` gained `className` prop (default `'mt-4'`). `SetterOverview` passes `actionsRow ? 'mt-2' : 'mt-4'` and sets the `actionsRow` wrapper to `mt-3` (was `mt-4`). Net: on My Leads the button row + stat tiles pull up under the header; `/overview` and the embedded My Pipeline Setter tab (no `actionsRow`) are byte-identical. This is a **judgment nudge, not pixel-confirmed** — Brayden was expected to fine-tune from a screenshot.
+- **Part B (countdown):** `noAnswerTimeLeft(no_answer_at)` helper — `new Date(no_answer_at) + 24h - Date.now()` → `"Xh left"` / `"Xm left"` / `"Releasing…"`. New conditional table column "Releases in", gated `statusFilter === 'no_answer'`, mirroring the existing Callback column's pattern exactly. No ticking interval — recomputed each render, `useMyPool`'s 15s `refetchInterval` drives re-renders. Same `SetterOverview` renders in My Leads and My Pipeline → Setter, so both get it.
+- **Part C (Follow-up cutoff):** added explicit prop `todayFollowUpOnly` (default false) — **only `MyLeads.jsx` passes it.** Deliberately NOT tied to `embedded` as the spec suggested: `SetterOverview` non-embedded has TWO call sites (My Leads *and* the setter's own `/overview`), and Part A explicitly says don't touch `/overview`. An explicit opt-in prop keeps `/overview` and My Pipeline → Setter both unchanged (all Follow-up leads visible), only My Leads scoped.
+  - Filtering lives in `SetterOverview`'s `leadsByTab` useMemo, NOT the shared `useMyFollowUps` hook — so the hook's react-query cache stays shared between the two call sites (My Leads + My Pipeline → Setter both mount `SetterOverview` for the same `profile.id`; a hook-level param would need distinct query keys or they'd collide).
+  - Scoped by `zonedDateStr(new Date(l.last_action_at).getTime(), tz) === zonedDateStr(Date.now(), tz)` — mark date (`last_action_at`, when it was set to follow_up by `handle_lead_pipeline`), NOT `follow_up_at` (the scheduled callback date). Applied to both `followUps.due` and `followUps.future` buckets, on top of the existing due/future split.
+- Build + oxlint clean (14 warnings, all pre-existing). **🟡 Not visually verified** — My Leads / My Pipeline are closer-only, login classifier-blocked. Login renders, Overview module loads, no console errors. Needs the closer walk from the spec (esp. backdating `last_action_at` to confirm the Follow-up cutoff, same technique Eagle used for the 554 hold).
+
+### Prompt 554 DB migration applied + verified (Eagle) -- and a real side effect caught mid-test
+
+CC shipped Prompt 554 as a frontend commit (`b33822a`) plus a written-but-unapplied migration file, flagged for Eagle to apply and verify per the original spec (never ship a change to real setter logic without confirming it against live data). Reviewed the migration line by line against the spec before applying -- matched exactly, including a detail CC caught that wasn't in the original ask: `process_all_closer_day_ends` already existed from Prompt 547, so the "extend day-end to closers" piece of the spec turned out to already be built, correctly not touched.
+
+Checked live DB state before applying (0 `no_answer_queue` rows, 9 `no_answer` leads, none past 24h) to confirm applying wouldn't trigger a surprise mass-release, then applied via `apply_migration`.
+
+Verified end-to-end with a real synthetic lead against the Test Setter account (not just reading the SQL and assuming): inserted a throwaway lead, marked it `no_answer`, force-ran `_do_setter_day_end` on Test Setter, confirmed the lead came through completely untouched (`no_answer_rolled: 0`, still assigned) -- the core fix. Backdated `no_answer_at` 25 hours, ran `redistribute_no_answers()`, confirmed the lead dropped to `status='new', assigned_setter=null, no_answer_at=null` -- genuinely Unassigned, not reassigned to a different setter. Deleted the test lead after.
+
+**Caught mid-test**: forcing `_do_setter_day_end` on Test Setter to bypass its once-per-day guard also triggered the unrelated "new lead release + refill" half of day-end for real -- 149 leads released and 149 refilled from the shared behavioral_health pool. Real inventory, real reshuffle, not a no-op. Traced it and concluded it wasn't damage: Test Setter's `last_day_end_date` was already stale (last run 8/16), meaning the normal 15-minute `process_all_setter_day_ends` cron was already going to run this exact release+refill today regardless of the test -- forcing it just ran a few minutes early rather than causing anything extra. Documented rather than silently ignored, since "my test call had a real side effect but I decided it was already going to happen anyway" is exactly the kind of reasoning that should be visible, not assumed safe after the fact.
+
+**Also found and queued as Prompt 557** (not fixed inline, since code changes go through CC): `FinishDayCard`'s result banner still says "N no-answers moved to 24h hold" -- text left over from before this migration, now guaranteed to always read 0 since day-end no longer touches no_answer leads at all. CC's frontend diff didn't touch this copy because it wasn't part of the file it edited for 554; only surfaced by reading the whole component during verification, not just the diff.
+
+Also independently reviewed and confirmed clean against spec: Prompt 553 (clock removal), Prompt 555 (My Leads niche toggle removal + button reposition), Prompt 556 (brand-aware favicon swap) -- all matched their LIVE_STATE specs closely, `npm run build` clean. Browser link to Brayden's Chrome was down at verification time, so none of the four were click-tested visually -- code review + a live DB test stood in for 554's risky half; the other three are small, low-risk UI diffs.
+
+
 ### 2026-08-29 — Prompt 554 executed (CC): 24h No-Answer hold + My Pipeline Setter/Closer split
 
 **[CC | 2026-08-29 — Prompt 554 — FRONTEND SHIPPED `restorix-portal` `main` @ `b33822a`. DB MIGRATION WRITTEN + COMMITTED, NOT APPLIED — Eagle applies + verifies.]**
