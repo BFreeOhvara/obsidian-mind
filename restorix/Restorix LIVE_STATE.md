@@ -34,7 +34,18 @@ Concretely: this is a pure query/filter change, no backend migration, no day-end
 
 ---
 
-**🟡 OPEN -- Prompt 558: My Pipeline layout cleanup -- drop the date, move the count subtitle above the Setter/Closer tabs, trim the Setter tab's stats + status pills.** Confirmed against real screenshots of the shipped Prompt 554 tabs (`Overview.jsx`, `CloserPipeline` ~line 400 and `CloserBookedPipeline` ~line 434). Four related layout changes, no backend involved:
+**✅ DONE -- Prompt 558: My Pipeline layout cleanup.** Shipped by CC 2026-08-29 -- `restorix-portal` `main` @ `ad7b031`. Frontend only. Full detail: [[Restorix Memories]] 2026-08-29 "Prompt 558 executed (CC)".
+- **1. Date gone** -- `CloserPipeline`'s header is now just `<h1>{title}</h1>` (dropped the `toLocaleDateString` span + the `tz` local it needed). Both sub-tabs share this header.
+- **2. Count subtitle moved to the wrapper**, under the `<h1>`, above the `SegmentedTabs` -- text follows the active tab (`"N booked lead(s)"` on Closer / `"N lead(s) in your pool"` on Setter). Wrapper computes both via `useMyBooked` + `useMyPool` (niche-filtered same as the children; react-query dedupes the keys). `CloserBookedPipeline` dropped its own `<p>…booked leads</p>`; `SetterOverview`'s `embedded` branch now renders **no header at all** (`{!embedded && <div>…</div>}`).
+- **3. Stat tiles gone from the embedded Setter tab** -- `{!embedded && <TodayStrip …/>}`. `/overview` + My Leads keep them.
+- **4. Status pills restricted in the embedded Setter tab** to `no_answer` / `follow_up` / `not_interested` (`EMBEDDED_STATUS_KEYS`); default `statusFilter` is `'no_answer'` when `embedded` (was hardcoded `'new'`), and the `follow_up_due→` fallback effect respects that too. `/overview` + My Leads keep all six.
+- **⚠️ FLAG for Brayden (spec assumption, not confirmed):** dropped **Follow-Up Due** from the embedded pills too -- spec said "only no answer, follow-up, and not interested" and Follow-Up Due wasn't named; it's a live slice of the Follow-up bucket anyway. Revert to a 4th pill if that's wrong.
+- Minor: tightened the embedded search-row top margin (`mt-1` vs `mt-6`) since it now sits right under the wrapper's tab switcher with nothing between.
+- Build + oxlint clean. **🟡 Not visually verified** -- My Pipeline is closer-only, login classifier-blocked. Login renders, module loads, no console errors. Needs the closer click-through in the spec's Verification.
+
+<details><summary>Original Prompt 558 spec</summary>
+
+Four related layout changes, no backend involved:
 
 **1. Remove the date from My Pipeline's header entirely.** `CloserPipeline`'s header row (~line 407-413) renders `{title}` plus a `<span>` with `toLocaleDateString(...)` (Prompt 553 left the date after dropping the clock). Brayden now wants the date gone too -- just `<h1>{title}</h1>` alone, no header-right content at all. Applies to both the Closer and Setter sub-tabs, since they share this one wrapper header.
 
@@ -51,6 +62,8 @@ Since the count itself is currently computed inside each child component (`useMy
 **4. Restrict the Setter tab's status filter pills to just No Answer, Follow-up, and Not Interested.** Same embedded Setter-tab context only. `STATUS_TABS` (line 92) has six entries (New, Follow-Up Due, No Answer, Follow-up, Not Interested, Appointment Booked); `visibleTabs` (line 213) currently shows all of them except Follow-Up Due when its count is 0. For this embedded view specifically, Brayden wants ONLY No Answer / Follow-up / Not Interested selectable -- New and Appointment Booked pills gone here (a closer works their New leads from My Leads, not this tracking view; Appointment Booked leads already show up in the Closer tab once booked). **Assumption, not confirmed**: Follow-Up Due wasn't named explicitly -- reading "only no answer, follow-up, and not interested" literally, drop it too here (it's a live view of the Follow-up bucket anyway, not a separate underlying status), but flag this back to Brayden if that's not what he meant. Since `New` won't be a visible tab in this scoped view, the default `statusFilter` (currently hardcoded `'new'`, line 177) needs to default to one of the three visible tabs here instead (e.g. `'no_answer'`) or the view will open with no tab visually selected. Again scoped to this one embedded call site -- `/overview` and My Leads keep all their current tabs untouched.
 
 **Verification**: click through both My Pipeline sub-tabs as a closer -- confirm no date anywhere on the page, confirm the booked/pool count sits under the title above the tab switcher on both sub-tabs, confirm the Setter tab has no stat tiles and only 3 status pills (no New, no Appointment Booked), confirm `/overview` (setter's own page) and My Leads are both completely unchanged.
+
+</details>
 
 ---
 

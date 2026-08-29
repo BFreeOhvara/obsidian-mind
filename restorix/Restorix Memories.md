@@ -17,6 +17,21 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-08-29 — Prompt 558 executed (CC): My Pipeline layout cleanup
+
+**[CC | 2026-08-29 — Prompt 558 — SHIPPED. `restorix-portal` `main` @ `ad7b031`. Frontend only.]**
+
+Restructured the same `CloserPipeline` / `CloserBookedPipeline` / `SetterOverview(embedded)` area that Prompts 554 + 559 built — layout only, no behavior/query change.
+
+- **Date dropped** — `CloserPipeline`'s header is `<h1>{title}</h1>` alone now; removed the `toLocaleDateString` span (Prompt 553's leftover) and the `tz` local it needed.
+- **Count subtitle hoisted to the wrapper** — sits under `<h1>`, above the `SegmentedTabs`; wording follows `view` (`"N booked lead(s)"` / `"N lead(s) in your pool"`). Wrapper derives both counts by calling `useMyBooked(profile.id)` + `useMyPool(profile.id)` itself and niche-filtering `l.niche === brand.niche` — react-query dedupes the keys against the children's identical calls, so no extra fetch. `CloserBookedPipeline` dropped its own `<p>…booked leads</p>`; `SetterOverview`'s `embedded` branch went from rendering a bare `<p>` to rendering nothing (`{!embedded && <header/>}`) — clean since `embedded` has exactly one caller and it now always owns the subtitle.
+- **`TodayStrip` gated** — `{!embedded && <TodayStrip/>}`. Only the My Pipeline Setter tab loses the stat tiles; `/overview` + My Leads keep them.
+- **Status pills restricted when embedded** — `EMBEDDED_STATUS_KEYS = ['no_answer','follow_up','not_interested']`; `visibleTabs` branches on `embedded`. Default `statusFilter` becomes `embedded ? 'no_answer' : 'new'` (was hardcoded `'new'` — would've opened on a hidden tab), and the `follow_up_due` zero-fallback effect matches.
+- **⚠️ FLAG (spec assumption):** also dropped **Follow-Up Due** from the embedded pills — spec said "only no answer, follow-up, and not interested" and didn't name it. It's a live slice of the Follow-up bucket. Told Brayden to say if he wants it back as a 4th pill.
+- Minor spacing: embedded search-row top margin `mt-6 → mt-1` (nothing renders above it now except the wrapper's tab switcher).
+- **Overlap with 554/559 handled:** 559's `noAnswerTimeLeft` countdown column keys on `statusFilter === 'no_answer'` — still the default + a visible pill when embedded, so it still shows. 559's `todayFollowUpOnly` is My-Leads-only (explicit prop), untouched here.
+- Build + oxlint clean (14 warnings, pre-existing). **🟡 Not visually verified** — closer-only page, login classifier-blocked; login renders, module loads, no console errors.
+
 ### 2026-08-29 — Prompt 559 executed (CC): My Leads spacing + No-Answer countdown + Follow-up midnight cutoff
 
 **[CC | 2026-08-29 — Prompt 559 — SHIPPED. `restorix-portal` `main` @ `05c5f3c`. Frontend only, no migration.]**
