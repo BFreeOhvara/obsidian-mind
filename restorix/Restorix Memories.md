@@ -17,6 +17,14 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-08-29 — Prompt 557 executed (CC): stale Finish Day copy
+
+**[CC | 2026-08-29 — Prompt 557 — SHIPPED. `restorix-portal` `main` @ `1c38c35`. Cosmetic.]**
+
+`FinishDayCard`'s result line dropped the `{no_answer_rolled} no-answer(s) moved to 24h hold ·` clause — always 0 since Prompt 554 (day-end no longer touches no_answer leads), and it described a mechanism Finish Day no longer performs. Now just `{refilled} new lead(s) pulled in for tomorrow.` Also replaced the stale Prompt 535 comment above the component (which called the old `no_answer_queue` + `redistribute_no_answers` two-stage handoff "CURRENT live behavior") with a one-line 557 note. `_do_setter_day_end` still returns `no_answer_rolled` in its `RETURNS TABLE` — the field's just unused by the UI now. Build + oxlint clean.
+
+**Prompts 552–559 all shipped by CC this session (2026-08-29). Queue empty.** Open items are all on Eagle/Brayden: visual pass on the closer-only pages (every session's login is classifier-blocked, so 553/555/558/559 are structurally-verified only), the `niche_brands.bail_bonds.logo_url` DB write, the `suretix-marketing` Vercel avatar, and two small confirm-or-revert calls (`SwapButton` "Restorix Sustain" label; `Follow-Up Due` pill in the embedded My Pipeline Setter tab).
+
 ### 2026-08-29 — Prompt 558 executed (CC): My Pipeline layout cleanup
 
 **[CC | 2026-08-29 — Prompt 558 — SHIPPED. `restorix-portal` `main` @ `ad7b031`. Frontend only.]**

@@ -67,7 +67,13 @@ Since the count itself is currently computed inside each child component (`useMy
 
 ---
 
-**🟡 OPEN -- Prompt 557: stale "Finish Day" result copy from before Prompt 554 (small, found during Eagle's verification).** `Overview.jsx`'s `FinishDayCard` (~line 134) still renders `{result.no_answer_rolled} no-answer{...} moved to 24h hold · {result.refilled} new lead{...} pulled in for tomorrow.` after a setter clicks "Finish Day". Since Prompt 554's migration, `_do_setter_day_end` always returns `no_answer_rolled: 0` (day-end no longer touches no_answer leads at all -- they're already on their own 24h hold from the moment they're marked, not "moved" there by Finish Day) -- so this line will now always read "0 no-answers moved to 24h hold," which is both always-zero and describes a mechanism Finish Day doesn't perform anymore. Drop the no-answer clause entirely and just report the refill: "{result.refilled} new lead{...} pulled in for tomorrow." There's also a stale comment block right above `FinishDayCard` (~line 104, dated Prompt 535) describing this same copy as reflecting "CURRENT live behavior" -- delete it, it's describing a state that's now two migrations out of date. Not touched by 554's frontend diff, so it slipped through -- purely cosmetic, no rush.
+**✅ DONE -- Prompt 557: dropped stale no-answer clause from Finish Day result copy.** Shipped by CC 2026-08-29 -- `restorix-portal` `main` @ `1c38c35`. `FinishDayCard`'s result line is now just `{result.refilled} new lead(s) pulled in for tomorrow.` (the `no_answer_rolled … moved to 24h hold` clause is gone -- always 0 since Prompt 554). Also deleted the stale Prompt 535 comment block above it that described the old `no_answer_queue` + `redistribute_no_answers` two-stage handoff as "CURRENT live behavior", replaced with a one-line Prompt 557 note. Build + oxlint clean.
+
+**🎉 Queue empty.** All of Prompts 552–559 shipped by CC. Outstanding on Eagle/Brayden (from those prompts):
+- Verify the closer-only UI (My Leads / My Pipeline) visually once the Chrome link is back — 553/555/558/559 all shipped structurally-verified only (login classifier-blocked every session).
+- `niche_brands.bail_bonds.logo_url` DB write → `/suretix-logo-icon.png` (Prompt 552).
+- `suretix-marketing` Vercel project avatar (Prompt 552).
+- Decide: `SwapButton`'s `'Restorix Sustain'` label (Prompt 552) + `Follow-Up Due` pill in the embedded My Pipeline Setter tab (Prompt 558, CC's assumption).
 
 ---
 
