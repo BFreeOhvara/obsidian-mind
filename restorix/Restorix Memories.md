@@ -17,6 +17,30 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-08-29 — Prompt 553 executed (CC): clock removed from My Pipeline header
+
+**[CC | 2026-08-29 — Prompt 553 — SHIPPED. `restorix-portal` `main` @ `2151465`.]**
+
+- `CloserPipeline` (`Overview.jsx`, the component `/my-pipeline` mounts via `MyPipeline.jsx`) rendered `<DateClockRow timezone={tz} />` in its header — a date label + a per-second ticking `<LiveClock>`. Brayden wanted the clock gone from this page only.
+- Fix: replaced `<DateClockRow>` at that one call site with an inline `<span className="font-mono text-sm text-fg-faint [font-variant-numeric:tabular-nums]">` holding the same `toLocaleDateString('en-US', { timeZone: tz, weekday:'long', month:'short', day:'numeric' })` call `DateClockRow` uses. No `showClock` prop added to the shared component (two other pages still want the clock) — smaller, more local diff.
+- Untouched: `DateClockRow` + `LiveClock` definitions and the `LiveClock` import (still used by `SetterOverview` ~line 237 and `CloserOverview` ~lines 608/772). `tz` was already defined in `CloserPipeline`.
+- `npm run build` + `oxlint` clean. Not visually verified — `/my-pipeline` needs a logged-in closer, login classifier-blocked this session (same recurring gap); trivial diff, structurally confirmed.
+
+### No-Answer handling overhaul (Prompt 554) — discrepancy between assumed and actual behavior
+
+Brayden asked for a midnight hard-refresh on the closer's My Leads page (mirroring setter day-end), a new Setter/Closer tab split on My Pipeline, and a 24-hour hold/timer for No-Answer leads before they return to Unassigned. Before writing the build prompt, queried the live Supabase functions directly (`_do_setter_day_end`, `run_setter_day_end`, `redistribute_no_answers`, `handle_lead_pipeline`) rather than assuming either Brayden's description or my own first read of the code was correct.
+
+Actual current behavior turned out to differ from what either of us expected: No-Answer leads are unassigned at the setter's next day-end (not on a rolling 24h-from-when-marked timer), sit in a `no_answer_queue` table, and once `available_at` (now()+24h from day-end, not from when marked) passes, `redistribute_no_answers()` silently reassigns them to a **different random active setter** — they never actually land in Unassigned. Brayden's mental model (and my initial one) was that they eventually surface to Unassigned; they don't, they get bounced to another setter with a new no-answer clock, invisible to the closer/setter who lost them.
+
+Surfaced this exact discrepancy in plain language with the real SQL quoted, then got two explicit confirmations via AskUserQuestion rather than guessing:
+1. Change the No-Answer hold to a real 24-hours-from-when-marked timer, for setters too (not just closers) — confirmed "Yes, change it for everyone."
+2. Replace the silent reassign-to-another-setter with a genuine drop to the general Unassigned pool when the hold expires — confirmed "Yes, drop to Unassigned."
+
+Also clarified scope on the new Setter tab: it is NOT setter-booked leads that get routed to a closer (those still flow into the existing Pending tab, untouched) — it's specifically leads the closer personally dialed themselves via the existing My Leads self-request flow. A closer who never personally dials (has setters dial for him) will just see an empty Setter tab.
+
+Lesson: for any change to already-shipped, business-critical logic, read the live implementation before writing the spec — the described behavior, the assumed behavior, and the actual behavior can all three be different, and the gap is exactly where a "correct-looking" build goes wrong in production.
+
+
 ### 2026-08-29 — Prompt 552 executed (CC): Suretix logo rollout + brand-aware Swap icon + ParticleField
 
 **[CC | 2026-08-29 — Prompt 552 — SHIPPED. `restorix-portal` `main` @ `ac9d5c8`, `suretix-marketing` `main` @ `827ff99`. Both pushed, clean.]**
