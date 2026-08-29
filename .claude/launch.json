@@ -18,6 +18,12 @@
       "runtimeExecutable": "cmd",
       "runtimeArgs": ["/c", "cd /d C:\\Users\\freem\\restorix-setter-portal && npm run dev -- --port 5175"],
       "port": 5175
+    },
+    {
+      "name": "suretix-marketing",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "cd /d C:\\Users\\freem\\suretix-marketing && npm run dev -- --port 5176"],
+      "port": 5176
     }
   ]
 }

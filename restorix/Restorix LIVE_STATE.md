@@ -12,11 +12,110 @@ tags:
 
 ## Next Up for CC
 
-**Empty as of 2026-08-29** — **Prompt 549 frontend is COMPLETE and pushed; two manual hand-offs to Eagle/Brayden before it's live end to end (below).** Commit `ca6cd0e` on `restorix-setter-portal` `main`. Full detail: this block + [[Restorix Memories]] 2026-08-29.
+**🔴 BLOCKED (build done) — Prompt 550: Suretix marketing site.** CC built the whole site at `C:\Users\freem\suretix-marketing` — cloned from `restorix-marketing`, re-skinned per the spec below, all copy verbatim, amber accent, `Stethoscope`→`Scale`, `npm run build`/`lint` clean, previewed live. Local commit `605b86b` on `main`, `origin` remote set. **CANNOT PUSH: the GitHub repo `BFreeOhvara/suretix-marketing` doesn't exist and CC can't create it** — no `gh` CLI, and credential access is classifier-blocked. **NEXT: someone creates the empty repo `BFreeOhvara/suretix-marketing` (no README/license/gitignore), then run `git -C C:\Users\freem\suretix-marketing push -u origin main`.** Then Eagle does Vercel + `suretix.co` DNS. Full build detail + flagged deviations (ChatWidget not mounted, favicon assets skipped, `hello@suretix.co` placeholder booking link, ParticleField rgba swapped to amber) → [[Restorix Memories]] 2026-08-29.
 
-### ⚠️ HAND-OFFS TO EAGLE/BRAYDEN (Prompt 549 not fully live until these are done)
-1. **Deploy the edge function `mint-handoff-link`** — source is in the repo at `supabase/functions/mint-handoff-link/index.ts` (committed `ca6cd0e`). CC's `deploy_edge_function` was classifier-blocked (same as every prior prompt — 533/546/etc). Deploy WITH `verify_jwt: true`. No new secrets needed (`SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` already configured). Until deployed, the closer Swap button fails gracefully ("Swap failed — Failed to fetch") and does nothing else.
-2. **Add redirect URLs in the Supabase dashboard** — Authentication → URL Configuration → Redirect URLs must include BOTH `https://portal.restorix.co/auth/callback` and `https://portal.suretix.co/auth/callback`. Without these, `generateLink`'s `redirectTo` is silently ignored and the hand-off lands on the Site URL instead. (This is also written into the function file's header comment.)
+<details><summary>Original Prompt 550 spec (as built)</summary>
+
+Full content specified below, sourced from a section-by-section rewrite of the real, current `restorix-marketing` copy (not invented from a generic template) — confirmed with Brayden directly before this was queued.
+
+**Repo & deploy**: new GitHub repo `suretix-marketing` under `BFreeOhvara`, cloned from `restorix-marketing`'s current structure as a starting point (`Hero.jsx`, `WhoItsFor.jsx`, `Leak.jsx`, `Process.jsx`, `Outcomes.jsx`, `System.jsx`, `FinalCTA.jsx`, `Nav.jsx`, `Footer.jsx`, `ChatWidget.jsx`, `App.jsx`, `main.jsx`, plus `ui/Reveal.jsx`/`ui/Button.jsx`/`ui/ParticleField.jsx`/`ui/SectionHeading.jsx` copied over unchanged) — same Vite/React/Tailwind/framer-motion stack, no new dependencies needed. Push to `main`. **Once pushed, Eagle will create the Vercel project directly (`create_git_project`, linked to the new repo, `ohvara` team) and wire up `suretix.co`/`www.suretix.co`** — CC doesn't need to touch Vercel/domains for this prompt.
+
+**Color**: reuse the exact Suretix amber ramp already live in `restorix-portal`'s `index.css` under `[data-brand="suretix"]` (Prompt 549) — light `--accent #B45309` / `--accent-bright #F59E0B` / `--accent-deep #78350F`; dark `--accent #C2610C` (CC's own WCAG-retuned value from 549, not the original seed) / `--accent-bright #FBBF24` / `--accent-deep #FDE68A`. Same token names, same usage pattern (`bg-accent`, `text-accent-deep`, etc.) as the existing `restorix-marketing` codebase already uses — just re-seeded with these values instead of the blue ones.
+
+**Logo**: no Suretix logo exists yet (same status as the portal) — plain-text "Suretix" wordmark in `Nav.jsx`/`Footer.jsx` in place of the `<img src="/logo-icon.png">` + "Restorix" pairing, same placeholder approach Prompt 549 used. Swap when Brayden supplies real assets — not this prompt.
+
+**Content — full section-by-section copy, use verbatim as the source of truth:**
+
+---
+**Hero** (`Hero.jsx`)
+- Eyebrow: "AI infrastructure for surety bond agencies"
+- H1 (two lines, same treatment as the original's `<br/>` split): "More bonds posted." / "No call missed, day or night."
+- Subhead: "Suretix installs AI systems that answer, qualify, and dispatch every inquiry — so your agency writes more of the bonds it's already earning, without adding night-shift staff."
+- Buttons: "Book a Strategy Call" (primary), "See how the system works" (secondary) — unchanged
+- Ticker: `['24/7 CALL CAPTURE', 'JAIL & CHARGE LOOKUP', 'AUTOMATIC DISPATCH']`
+- Live-card timeline (`TIMELINE` const): `{ icon: PhoneIncoming, label: 'Call received', time: '0:00' }`, `{ icon: MessageSquareText, label: 'Text-back sent', time: '0:04' }`, `{ icon: CalendarCheck, label: 'Agent dispatched', time: '2:17' }`
+- Live-card pill text: "No call left waiting"
+
+**WhoItsFor** (`WhoItsFor.jsx`)
+- Eyebrow: "Who It's For" · Title: "Built for serious surety bond agencies." · Body: "Suretix is purpose-built for agencies where the release journey is urgent, high-stakes, and easy to lose to whoever answers first."
+- `SEGMENTS` (5, same `n`/`title`/`body` shape):
+  1. "County & municipal bail agencies" — "Time-critical release calls qualified and dispatched before a family calls the next bondsman — with charge, bond amount, and jurisdiction confirmed on first contact."
+  2. "Felony & high-bond cases" — "Complex, high-value bonds handled with the right collateral and co-signer questions in the right order, every time — no detail lost between shifts."
+  3. "Immigration bond agencies" — "ICE detention calls are a different urgency and a different script. Screened and routed correctly from the first ring, any hour a family reaches out."
+  4. "Multi-jurisdiction & multi-county agencies" — "Consistent intake no matter which county jail is calling — the same accurate first response whether it's your home county or three hours away."
+  5. "Federal bond agents" — "Higher-stakes federal cases get the qualification depth they require — always-on capture that turns a 2am call into a dispatched agent."
+- Bottom line: "Adjacent specialty? If your clients call before they're released, Suretix fits." · Button: "Check your fit"
+
+**Leak** (`Leak.jsx`)
+- Eyebrow: "The Leak" · Title: "Most agencies lose the bonds they've already won." · Body: "You spend real money and reputation to be the name someone finds at 2am. Then the funnel leaks between \"they called\" and \"you wrote the bond.\" It's rarely a marketing problem — it's an infrastructure problem."
+- Footnote (**honest, do not invent bail-specific stats — the industry doesn't publish intake benchmarks the way healthcare does**): "The 5-minute response stat is general lead-response-time research (Velocify/InsideSales.com, Harvard Business Review), not bail-specific — treat the others as directional, not cited."
+- `STAGES` (4, same `n`/`title`/`body`/`stat`/`caption` shape):
+  1. "The Missed Call" — body: "Bail inquiries hit voicemail at 2am, over weekends, mid-transport. Most callers don't wait — they call the next bondsman in the search results." — stat: "Nights & weekends" — caption: "when most arrests — and most calls — happen"
+  2. "The Slow Follow-Up" — body: "By the time someone calls back, the family may have already found another agency — or a decision's been made without you. Manual callback queues can't keep pace with how fast this decision gets made." — stat: "9–21×" — caption: "more likely to convert when contacted within 5 minutes"
+  3. "The Cold Lead" — body: "Without someone qualifying the charge, bond amount, and collateral fast, a real inquiry goes cold within hours — the person's released another way, or the family moves on to whoever answered first." — stat: "Hours, not days" — caption: "before the person is released another way or moved to arraignment"
+  4. "The Buried Front Desk" — body: "Confirming jurisdiction, running the charge, and manually calling jails back eat hours that should go to the clients you're already bonding out." — stat: "18.5%" — caption: "click-to-call conversion, vs. 2.8% for form fills"
+
+**Process** (`Process.jsx`) — eyebrow "How It Works" · title "A four-step install, not a software handoff." (unchanged)
+- `STEPS` (4, same shape):
+  1. "Consult" — lead: "We map how inquiries actually reach you." — body: "Before a single line of automation, we audit your real intake funnel — channels, call volume, response times, and exactly where inquiries drop. No templates, no assumptions." — tags: `['FUNNEL AUDIT', 'CALL REVIEW', 'DROP-OFF MAPPING']`
+  2. "Architect" — lead: "We design the system around your agency." — body: "A clear blueprint: which agents, which scripts, which handoffs, and what writes back to your case management system and calendar. You see and approve the entire flow before anything ships." — tags: `['AGENT DESIGN', 'SCRIPT LOGIC', 'INTEGRATION PLAN']`
+  3. "Install" — lead: "We build, integrate, and go live with you." — body: "We configure the agents on your jurisdictions, bond types, and compliance requirements, connect them to your stack, and launch — with you watching every conversation from day one." — tags: `['BUILD', 'INTEGRATE', 'SUPERVISED LAUNCH']`
+  4. "Optimize" — lead: "We tune relentlessly for bonds written." — body: "Weekly review of real conversations and conversion data. We refine qualification, timing, and tone until the numbers move — then keep them moving as you grow." — tags: `['CONVERSATION QA', 'CONVERSION TUNING', 'REPORTING']`
+
+**Outcomes** (`Outcomes.jsx`) — eyebrow "Outcomes" · title "The numbers an agency owner actually cares about." · badge: "Suretix is early — real client data, not averages"
+- `METRICS`: "Average first-response time" / "Target: under 60 seconds, day or night" · "Inquiry-to-bond-written lift" / "Measured within the first 90 days live" · "Missed calls re-engaged" / "Automatic text-back & callback" · "Hours reclaimed each week" / "Dispatch admin removed"
+
+**System** (`System.jsx`) — eyebrow "The Suretix System" · title "Not a chatbot. A connected response layer." (deliberately not "release layer" — Suretix doesn't control the actual legal release process, don't overstate it) · body: "Five capabilities, architected as one system around your agency. Each part hands off to the next — capture to qualify, recover to dispatch, dispatch to follow-up — so no inquiry falls through the gaps between tools." · badge: "Suretix**CORE**" (split-color exactly like `Restorix<span className="text-accent">CORE</span>` today)
+- `CAPABILITIES` (5, same shape — **note the icon swap on #3**: `Stethoscope` is medical-specific and wrong here, use lucide-react's `Scale` instead, a justice/legal-scale icon):
+  1. `PhoneIncoming` — "Lead capture & qualification" — "Every inquiry — call, text, or web — answered and scored in seconds, then routed by urgency so cases that need a bondsman first reach one first."
+  2. `MessageSquareText` — "Missed-call recovery" — "An unanswered call instantly triggers a text-back and callback sequence, so the inquiry your marketing paid for never reaches a competitor."
+  3. `Scale` (swapped from `Stethoscope`) — "Charge & bond-amount triage" — "A voice agent that asks the right questions — charge, bond amount, jurisdiction, collateral — on brand, around the clock, and routes each caller to the right next step."
+  4. `ClipboardCheck` — "Structured intake & dispatch" — "Intake collected conversationally and written straight to your case system — no double entry, no details lost between shifts."
+  5. `HeartHandshake` — "Follow-up & nurture" — "Persistent, appropriate follow-up that keeps an undecided family supported until they're ready to move — never pushy, always human when it matters."
+
+**FinalCTA** (`FinalCTA.jsx`) — ticker unchanged `['30-MINUTE STRATEGY CALL', 'WE MAP YOUR FUNNEL LIVE', 'NO OBLIGATION']` · eyebrow "Book a Strategy Call" · h2: "Stop paying to attract bonds you never write." · body: "In 30 minutes we'll map your current intake funnel, show you exactly where it leaks, and outline the Suretix system that closes it. If it's not a fit, we'll tell you." · button: "Book a Strategy Call"
+
+**Nav** (`Nav.jsx`) — links unchanged (`#leak` "The Leak", `#system` "The System", `#process` "Process", `#who` "Who It's For") — generic enough to carry over as-is. Wordmark "Suretix" per the no-logo-yet note above.
+
+**Footer** (`Footer.jsx`) — "© {YEAR} Suretix. AI infrastructure for surety bond agencies."
+
+---
+
+**ChatWidget.jsx**: check what it currently does (likely talks to the `marketing-chat` edge function) before touching it — if it's hardcoded to Restorix-specific system prompt/context, that needs its own Suretix-aware version or a niche parameter; don't ship a chat widget that talks about behavioral health on a bail-bonds site. Flag back if this needs its own scoping conversation rather than guessing the fix.
+
+**Verification**: `npm run build` + lint clean, visually confirm every section renders with real copy (no lorem/placeholder left in), confirm the amber accent renders correctly in both light/dark, confirm mobile layout (375px) doesn't break given the copy is different lengths than the original in places.
+
+</details>
+
+---
+
+**🟡 OPEN — Prompt 551: Suretix closer survey (`/survey` route in `restorix-portal`, made niche-aware).** Builds on Prompt 549's `useBrand()`/niche infrastructure — no new route, no new page, the existing `/survey` page becomes niche-aware the same way `Layout.jsx`/`MyPipeline` already are.
+
+**Content source**: [[Suretix Closer Survey]] vault note — mirrors [[Restorix Closer Survey]]'s exact structure (the doc Prompt 469's original survey was built from), rebuilt for surety/bail bond agencies rather than reskinned. Confirmed with Brayden directly, including one deliberately non-mirrored piece: the sub-agent that was "Appointment Reminder & No-Show Prevention" in Restorix's version is "Court-date & check-in compliance" here — bond forfeiture is a materially different (bigger) risk than a no-show, not just a reworded label, so its qualifying questions and results copy are genuinely different, not translated 1:1.
+
+**What to build**:
+1. New `src/lib/surveySuretix.js`, mirroring `src/lib/survey.js`'s exact shape (`FRONT_RUNNERS`, `RESULTS_CONTENT`, `initialSurveyState()`, and whatever the branching/scoring logic functions are — read the existing file's full structure before starting, don't guess the shape from the constants alone) — content pulled verbatim from the vault note above, not summarized. Front-runner keys: `intake_dispatch` (was `intake_triage`), `missed_call_recovery` (unchanged). Sub-agent keys: `collateral_verification` (was `insurance`), `follow_up` (unchanged), `jail_sync` (was `bed_sync`), `court_compliance` (was `reminders`), `referral_reporting` (unchanged).
+2. `Survey.jsx` picks which content module to use based on `useBrand()`'s resolved niche (`behavioral_health` → existing `survey.js`, `bail_bonds` → new `surveySuretix.js`) — same pattern as the portal's other niche-branching, not a second route or a duplicated page component. The question tree/branching UI logic itself is niche-agnostic (same state machine shape either way per point 1) — only the content module swaps.
+3. Verify via the same `?brand=bail_bonds` preview override Prompt 549 already built — confirm the full Suretix tree renders correctly end to end (all 7 sections + Q0, every branch, results screen for both front-runners and all 5 sub-agents) and that `?brand=` absent / behavioral_health still renders the original Restorix survey completely unchanged.
+
+**Explicitly out of scope**: any pricing-formula automation — both vault docs flag this as a real open decision, not something to invent here.
+
+
+---
+
+**Empty as of 2026-08-29** — **Prompt 549 is 2 of 3 infra hand-offs done. Only the GoDaddy DNS record is still outstanding, on Brayden.** Full detail: this block + [[Restorix Memories]] 2026-08-29.
+
+### ✅ Deployed by Eagle (2026-08-29) — `mint-handoff-link` is live
+Applied directly via Supabase MCP from CC's exact committed source (`ca6cd0e`), `verify_jwt: true` as instructed — confirmed `ACTIVE` via `list_edge_functions`.
+
+### ✅ Domain routing set up via Brayden + a Claude Chrome browser session (2026-08-29)
+1. **Vercel — done.** `portal.suretix.co` added to the existing `restorix-portal` project (same project as `portal.restorix.co`, Production environment) — confirms the shared-deployment architecture is wired correctly, not a second project. Vercel's required DNS record: CNAME `portal` → `40c4e8f53c205962.vercel-dns-017.com.` — independently corroborated by Eagle: this is the exact same target already live for `portal.restorix.co` on the same project.
+2. **Supabase redirect URLs — done.** Both `https://portal.restorix.co/auth/callback` and `https://portal.suretix.co/auth/callback` added under Authentication → URL Configuration → Redirect URLs (list was empty before, nothing overwritten).
+3. **GoDaddy DNS record — DONE, added by Brayden directly in GoDaddy's DNS editor** (Claude Chrome couldn't reach that page, see above — Brayden did it himself via `dcc.godaddy.com/control/portfolio/suretix.co/settings`, Add New Record). **Verified live by Eagle via direct DNS lookup**: `portal.suretix.co` now resolves to `40c4e8f53c205962.vercel-dns-017.com` — the exact same Vercel target as `portal.restorix.co`. DNS side is fully confirmed correct, not just self-reported.
+
+**Vercel project side (also checked live via the Vercel MCP, connected 2026-08-29)**: `restorix-portal`'s `get_project` domain list doesn't show `portal.suretix.co` yet even though DNS resolves correctly — likely just SSL/verification lag on Vercel's side rather than a real problem, but not yet independently confirmed as fully "Valid Configuration." Brayden checking the actual Domains tab in the Vercel dashboard is the next real confirmation, not just DNS.
+
+**Prompt 549 status: all 3 infra hand-offs complete on the DNS/redirect-URL/edge-function side.** Last open item is confirming Vercel shows the domain as fully verified (SSL issued), then a real live cross-domain Swap round-trip test.
 
 ### ✅ Shipped by CC (2026-08-29), frontend, `ca6cd0e`
 - **`useBrand()` + `<BrandProvider>`** (`src/hooks/useBrand.jsx`) — resolves the brand from `window.location.hostname` against `niche_brands.portal_domain`, falls back to `behavioral_health` for localhost / preview URLs / no match. `niche_brands`' RLS is **authenticated-only**, so a hardcoded `BRAND_FALLBACK` map (kept in sync with the two seeded rows) covers the pre-auth Login/Join pages and the DB row is used once authenticated. Provider sits inside `<BrowserRouter>` so it can re-resolve on in-app navigation (`useLocation().search` in deps).
