@@ -17,6 +17,12 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-08-29 — Prompt 560 executed (CC): pills above search on embedded Setter tab
+
+**[CC | 2026-08-29 — Prompt 560 — SHIPPED. `restorix-portal` `main` @ `a39434a`. Frontend only, no migration. Render-order swap.]**
+
+`SetterOverview` (`Overview.jsx`): the search row and status-pill row are now extracted to `searchRow` / `pillsRow` consts before `return`, rendered pills-then-search when `embedded` (My Pipeline → Setter tab) and search-then-pills everywhere else (`/overview`, My Leads — unchanged). Margins swapped with the order so whichever row is first owns the tight top margin: embedded pills `mt-1` (was on search), embedded search `mt-3` (was on pills); non-embedded keeps search `mt-6` / pills `mt-3`. No logic/state/query change — same `visibleTabs`, `statusFilter`, `search` wiring. Build + oxlint clean. Not visually verified (My Pipeline is closer-only, login classifier-blocked).
+
 ### 2026-08-29 — Prompt 561 executed (CC): "My Calls" → "My Recordings" for closers
 
 **[CC | 2026-08-29 — Prompt 561 — SHIPPED. `restorix-portal` `main` @ `186022a`. Frontend only, no migration. Label-only.]**

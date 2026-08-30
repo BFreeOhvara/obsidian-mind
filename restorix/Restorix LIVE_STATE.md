@@ -27,7 +27,10 @@ tags:
 
 ---
 
-**🟡 OPEN -- Prompt 560: swap the order of the search bar and status pills on My Pipeline's embedded Setter tab.** `SetterOverview` (`Overview.jsx`) currently renders the search input (line ~307) before the status filter pills (line ~320) everywhere it's used. Confirmed from a screenshot of the embedded Setter tab specifically (My Pipeline → Setter): Brayden wants the pills (No Answer / Follow-up / Not Interested there) ABOVE the search bar on this one view. Scope to `embedded` only -- swap the two blocks' render order when `embedded` is true, leave the order unchanged on `/overview` and My Leads (search still above pills there, not asked to change). Purely a JSX reorder, no logic change -- watch the `mt-*` spacing on each block since they'll need to swap which one owns the tighter top margin too.
+**✅ DONE -- Prompt 560: pills above search on the embedded My Pipeline → Setter tab.** Shipped by CC 2026-08-29 -- `restorix-portal` `main` @ `a39434a`. Frontend only, render-order swap. Full detail: [[Restorix Memories]] 2026-08-29 "Prompt 560 executed (CC)".
+- `SetterOverview` (`Overview.jsx`): search + pills rows extracted to `searchRow` / `pillsRow` consts; rendered pills-then-search when `embedded`, search-then-pills everywhere else (`/overview`, My Leads unchanged).
+- Margins swapped with the order: embedded pills `mt-1` (was on search), embedded search `mt-3` (was on pills); non-embedded unchanged (`mt-6` / `mt-3`).
+- No logic/state/query change. Build + oxlint clean. Not visually verified (closer-only page, login classifier-blocked).
 
 ---
 
@@ -88,8 +91,8 @@ Since the count itself is currently computed inside each child component (`useMy
 
 **✅ DONE -- Prompt 557: dropped stale no-answer clause from Finish Day result copy.** Shipped by CC 2026-08-29 -- `restorix-portal` `main` @ `1c38c35`. `FinishDayCard`'s result line is now just `{result.refilled} new lead(s) pulled in for tomorrow.` (the `no_answer_rolled … moved to 24h hold` clause is gone -- always 0 since Prompt 554). Also deleted the stale Prompt 535 comment block above it that described the old `no_answer_queue` + `redistribute_no_answers` two-stage handoff as "CURRENT live behavior", replaced with a one-line Prompt 557 note. Build + oxlint clean.
 
-**🎉 Queue empty.** All of Prompts 552–559 shipped by CC. Outstanding on Eagle/Brayden (from those prompts):
-- Verify the closer-only UI (My Leads / My Pipeline) visually once the Chrome link is back — 553/555/558/559 all shipped structurally-verified only (login classifier-blocked every session).
+**🎉 Queue empty.** All of Prompts 552–562 shipped by CC. Outstanding on Eagle/Brayden (from those prompts):
+- Verify the closer-only UI (My Leads / My Pipeline) visually once the Chrome link is back — 553/555/558/559/560/561/562 all shipped structurally-verified only (login classifier-blocked every session). In particular: 562's tighter My Leads header, 560's pill/search reorder on the embedded Setter tab, 561's "My Recordings" label for closers.
 - `niche_brands.bail_bonds.logo_url` DB write → `/suretix-logo-icon.png` (Prompt 552).
 - `suretix-marketing` Vercel project avatar (Prompt 552).
 - Decide: `SwapButton`'s `'Restorix Sustain'` label (Prompt 552) + `Follow-Up Due` pill in the embedded My Pipeline Setter tab (Prompt 558, CC's assumption).
