@@ -20,9 +20,10 @@ tags:
 
 ---
 
-**🟡 OPEN -- Prompt 561: rename "My Calls" to "My Recordings" for closers too (currently setter-only).** Prompt 474 already did this exact rename for setters -- `Layout.jsx` ~line 60 has `{ to: '/my-calls', label: 'My Calls', labelByRole: { setter: 'My Recordings' }, ... roles: ['setter', 'closer'] }` (sidebar), and `MyCalls.jsx` ~line 101-102 has `const heading = profile?.role === 'setter' ? 'My Recordings' : 'My Calls'` (page heading). Brayden now wants closer to read "My Recordings" too -- same route (`/my-calls`), same data, label only, exactly the same scope Prompt 474 already established for setter. Admin is untouched either way (admin doesn't get this sidebar item at all, `roles: ['setter','closer']`; `MyCalls.jsx`'s own `isAdmin` branch for the subtitle text stays as-is).
-
-Simplest: since setter and closer will now show identical text, either drop `labelByRole` entirely and change the base `label` to `'My Recordings'` (sidebar), and change the heading ternary to `profile?.role === 'admin' ? 'My Calls' : 'My Recordings'` (page) -- CC's call on which reads cleaner, just don't touch the route path, the data, or admin's copy.
+**✅ DONE -- Prompt 561: "My Calls" → "My Recordings" for closers too.** Shipped by CC 2026-08-29 -- `restorix-portal` `main` @ `186022a`. Frontend only, label-only. Full detail: [[Restorix Memories]] 2026-08-29 "Prompt 561 executed (CC)".
+- `Layout.jsx` ~line 60: dropped `labelByRole` entirely, base `label: 'My Recordings'` (setter + closer are the only roles with the item, both now identical). Line 374's `labelByRole?.[...]` lookup left as harmless plumbing.
+- `MyCalls.jsx` ~line 102: heading ternary `role === 'setter' ? … : …` → `isAdmin ? 'My Calls' : 'My Recordings'` (reused existing `isAdmin` local).
+- Route, data, admin copy untouched. Build + oxlint clean. Static string swap, near-zero risk; not visually verified (closer login classifier-blocked).
 
 ---
 

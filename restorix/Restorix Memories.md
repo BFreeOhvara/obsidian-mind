@@ -17,6 +17,12 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-08-29 — Prompt 561 executed (CC): "My Calls" → "My Recordings" for closers
+
+**[CC | 2026-08-29 — Prompt 561 — SHIPPED. `restorix-portal` `main` @ `186022a`. Frontend only, no migration. Label-only.]**
+
+Extends Prompt 474's setter-only rename to closers. Setter + closer are the only roles with this nav item (`roles: ['setter','closer']`), so both now read the same — dropped `labelByRole` entirely, set base `label: 'My Recordings'` in `Layout.jsx` (~line 60). Page heading in `MyCalls.jsx` (~line 102): ternary flipped from `role === 'setter' ? 'My Recordings' : 'My Calls'` to `isAdmin ? 'My Calls' : 'My Recordings'` (reused the existing `isAdmin` local). Route (`/my-calls`), data, and admin's copy (heading + subtitle) all untouched. `Layout.jsx` line 374's `item.labelByRole?.[...] || item.label` lookup left in place — now always falls through to `item.label` for every nav item, harmless defensive plumbing (same call as Prompt 555 leaving unused `nicheTabs`). Build + oxlint clean. Not visually verified (closer login classifier-blocked) but this is a static string swap — near-zero risk.
+
 ### 2026-08-29 — Prompt 562 executed (CC): My Leads header spacing, 2nd pass
 
 **[CC | 2026-08-29 — Prompt 562 — SHIPPED. `restorix-portal` `main` @ `27738b8`. Frontend only, no migration.]**
