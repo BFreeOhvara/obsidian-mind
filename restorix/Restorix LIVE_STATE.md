@@ -12,6 +12,24 @@ tags:
 
 ## Next Up for CC
 
+**✅ DONE -- Prompt 562: My Leads header spacing, 2nd pass.** Shipped by CC 2026-08-29 -- `restorix-portal` `main` @ `27738b8`. Frontend only, no migration. Full detail: [[Restorix Memories]] 2026-08-29 "Prompt 562 executed (CC)".
+- `SetterOverview` (`Overview.jsx` ~line 290/294): `actionsRow` wrapper `mt-3 → mt-1`; `TodayStrip` `className` `mt-2 → mt-1` (only when `actionsRow` present). Removes ~12px vs 559's numbers so subtitle → button → tiles pull up tight as one block.
+- Subtitle `<p className="mt-1">` left alone -- already minimal, shared with `/overview` (spec says don't touch it). Didn't do the "merge into one wrapper" restructure the spec floated as a fallback -- margin cut is decisive enough for a judgment-nudge tweak.
+- Scoped to My Leads only via the existing `actionsRow` flag; `/overview` + embedded My Pipeline → Setter tab keep `mt-4`.
+- Build + oxlint clean. **🟡 Not visually verified** -- My Leads is closer-only, login classifier-blocked. If still loose, next step: merge `actionsRow` + `TodayStrip` into one wrapper with a single top margin.
+
+---
+
+**🟡 OPEN -- Prompt 561: rename "My Calls" to "My Recordings" for closers too (currently setter-only).** Prompt 474 already did this exact rename for setters -- `Layout.jsx` ~line 60 has `{ to: '/my-calls', label: 'My Calls', labelByRole: { setter: 'My Recordings' }, ... roles: ['setter', 'closer'] }` (sidebar), and `MyCalls.jsx` ~line 101-102 has `const heading = profile?.role === 'setter' ? 'My Recordings' : 'My Calls'` (page heading). Brayden now wants closer to read "My Recordings" too -- same route (`/my-calls`), same data, label only, exactly the same scope Prompt 474 already established for setter. Admin is untouched either way (admin doesn't get this sidebar item at all, `roles: ['setter','closer']`; `MyCalls.jsx`'s own `isAdmin` branch for the subtitle text stays as-is).
+
+Simplest: since setter and closer will now show identical text, either drop `labelByRole` entirely and change the base `label` to `'My Recordings'` (sidebar), and change the heading ternary to `profile?.role === 'admin' ? 'My Calls' : 'My Recordings'` (page) -- CC's call on which reads cleaner, just don't touch the route path, the data, or admin's copy.
+
+---
+
+**🟡 OPEN -- Prompt 560: swap the order of the search bar and status pills on My Pipeline's embedded Setter tab.** `SetterOverview` (`Overview.jsx`) currently renders the search input (line ~307) before the status filter pills (line ~320) everywhere it's used. Confirmed from a screenshot of the embedded Setter tab specifically (My Pipeline → Setter): Brayden wants the pills (No Answer / Follow-up / Not Interested there) ABOVE the search bar on this one view. Scope to `embedded` only -- swap the two blocks' render order when `embedded` is true, leave the order unchanged on `/overview` and My Leads (search still above pills there, not asked to change). Purely a JSX reorder, no logic change -- watch the `mt-*` spacing on each block since they'll need to swap which one owns the tighter top margin too.
+
+---
+
 **✅ DONE -- Prompt 559: My Leads spacing + No-Answer countdown + Follow-up midnight cutoff.** Shipped by CC 2026-08-29 -- `restorix-portal` `main` @ `05c5f3c`. Frontend only, no migration. Full detail: [[Restorix Memories]] 2026-08-29 "Prompt 559 executed (CC)".
 - **Part A:** `TodayStrip` gained a `className` prop (default `mt-4`). On My Leads (`actionsRow` present) the button row is `mt-3` and `TodayStrip` is `mt-2` — tighter block under the header. `/overview` + the embedded My Pipeline Setter tab keep `mt-4`. **Judgment nudge, not pixel-confirmed** — Brayden fine-tunes from a screenshot.
 - **Part B:** `noAnswerTimeLeft(no_answer_at)` helper → "18h left" / "42m left" / "Releasing…". New conditional "Releases in" column, renders `when statusFilter === 'no_answer'`, mirroring the existing Callback column. Recomputed per render (no interval; `useMyPool` refetches 15s). Shows in both My Leads and My Pipeline → Setter (same component).

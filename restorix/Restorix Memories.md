@@ -17,6 +17,19 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-08-29 — Prompt 562 executed (CC): My Leads header spacing, 2nd pass
+
+**[CC | 2026-08-29 — Prompt 562 — SHIPPED. `restorix-portal` `main` @ `27738b8`. Frontend only, no migration.]**
+
+Second pass at the same complaint Prompt 559 Part A already cut once: the header→tiles span on My Leads still read loose (title → "N leads in your pool" subtitle → large gap → Request Leads button → gap → stat tiles). `SetterOverview` (`Overview.jsx` ~line 290/294): cut both margins again — `actionsRow` wrapper `mt-3 → mt-1`, `TodayStrip` `className` `mt-2 → mt-1` (only when `actionsRow` is present). Subtitle `<p className="mt-1">` left alone — it's already minimal and shared with `/overview`, which the spec says not to touch. Didn't do the "merge into one block" restructure the spec floated as a fallback — mt-1/mt-1 removes 12px vs 559's numbers, decisive enough for a judgment-nudge tweak Brayden fine-tunes from a screenshot. Scoped to My Leads only via the existing `actionsRow` flag — `/overview` and the embedded My Pipeline → Setter tab keep `mt-4` (no `actionsRow` on either). Build + oxlint clean. **🟡 Not visually verified** — My Leads is closer-only, login classifier-blocked (recurring). If still loose, next step is merging `actionsRow` + `TodayStrip` into one wrapper with a single top margin.
+
+### Prompts 557/558/559 independently verified (Eagle)
+
+CC shipped all three in one batch (`1c38c35`, `ad7b031`, `05c5f3c` on `restorix-portal` `main`) and already updated LIVE_STATE itself with accurate DONE entries, including correctly carrying forward the open "Follow-Up Due pill" question from the 558 spec rather than silently resolving it either way. Reviewed all three diffs directly (not just the self-report) against their specs -- all matched closely: 557's copy fix, 558's header/layout restructure (count line lifted to the wrapper, embedded Setter tab stripped to 3 status pills, both via a shared `embedded` flag), and 559's three-part build (tighter My Leads margins, a `noAnswerTimeLeft()` countdown column keyed off `no_answer_at + 24h`, and a `todayFollowUpOnly` prop that scopes My Leads' Follow-up buckets to `last_action_at`'s local date while leaving My Pipeline → Setter and /overview unfiltered). `npm run build` clean after all three.
+
+Two small open questions remain unresolved from this whole arc, both already tracked in LIVE_STATE's "Next Up" section: the `SwapButton`'s "Restorix Sustain" label (Prompt 552), and whether the embedded My Pipeline → Setter tab should also show a Follow-Up Due pill (Prompt 558's assumption dropped it, unconfirmed).
+
+
 ### 2026-08-29 — Prompt 557 executed (CC): stale Finish Day copy
 
 **[CC | 2026-08-29 — Prompt 557 — SHIPPED. `restorix-portal` `main` @ `1c38c35`. Cosmetic.]**
