@@ -17,6 +17,16 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-08-31 — Prompt 563 executed (CC): Request Leads back beside My Leads title
+
+**[CC | 2026-08-31 — Prompt 563 — SHIPPED. `restorix-portal` `main` @ `6def87e`. Frontend only, no migration.]**
+
+Reverses Prompt 555's move of the Request Leads button (out of its own row above the tiles, back into the `headerRight` slot beside the `My Leads` title), while keeping the tight header→tiles gap 559/562 tuned.
+- `MyLeads.jsx`: `headerRight={false}` + `actionsRow={<RequestLeadsButton/>}` → `headerRight={<RequestLeadsButton/>}` + new `compactStats` prop. `RequestLeadsButton`/`RequestLeadsForm` unchanged.
+- `SetterOverview` (`Overview.jsx`): dropped `actionsRow` from the signature and removed its `{actionsRow && <div className="mt-1 flex justify-end">…}` render block entirely (zero remaining call sites — it only ever existed for this button). Added `compactStats = false`; `TodayStrip`'s margin is now `compactStats ? 'mt-1' : 'mt-4'` (was keyed off `actionsRow`, which would have silently broken `/overview` once `actionsRow` stopped existing anywhere).
+- `/overview` (setter's own page, line 992) and the embedded My Pipeline → Setter tab (line 508) pass neither prop → `headerRight` falls to `DateClockRow` / `mt-4` tiles as before. Only `embedded` (no `TodayStrip` at all) and `/overview` unaffected.
+- Build + oxlint clean. **🟡 Not visually verified** — My Leads is closer-only, login classifier-blocked (recurring). Needs the closer check: button beside title, subtitle→tile-1 gap as tight as the old button→tile-4 gap.
+
 ### 2026-08-29 — Prompt 560 executed (CC): pills above search on embedded Setter tab
 
 **[CC | 2026-08-29 — Prompt 560 — SHIPPED. `restorix-portal` `main` @ `a39434a`. Frontend only, no migration. Render-order swap.]**
