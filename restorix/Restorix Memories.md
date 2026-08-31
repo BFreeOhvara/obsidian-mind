@@ -17,6 +17,15 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-08-31 — Prompt 564 executed (CC): bottom-align My Leads subtitle with Request Leads
+
+**[CC | 2026-08-31 — Prompt 564 — SHIPPED. `restorix-portal` `main` @ `4495995`. Frontend only, no migration.]**
+
+Two small follow-ups to Prompt 563's header row, both `Overview.jsx` `SetterOverview`, both keyed off the existing `compactStats` prop so `/overview` is untouched:
+1. Header row `items-start` → `clsx(..., compactStats ? 'items-end' : 'items-start')` — the title/subtitle stack (taller: h1 + `mt-1` subtitle) now bottom-aligns with the shorter Request Leads button, so "N leads in your pool" and the button share a baseline. `/overview` keeps `items-start`.
+2. `TodayStrip` margin `compactStats ? 'mt-1' : 'mt-4'` → `mt-0.5` (from Prompt 563's `mt-1`) — button/tiles gap nudged ~2px tighter. `mt-0.5` already in use elsewhere (`CloserLeadModal.jsx`), TW 3.4.
+- Build + oxlint clean. **🟡 Not visually verified** — closer-only page, login classifier-blocked. Needs the closer check: subtitle bottom edge level with button bottom edge, button slightly closer to tiles than after 563.
+
 ### 2026-08-31 — Prompt 563 executed (CC): Request Leads back beside My Leads title
 
 **[CC | 2026-08-31 — Prompt 563 — SHIPPED. `restorix-portal` `main` @ `6def87e`. Frontend only, no migration.]**

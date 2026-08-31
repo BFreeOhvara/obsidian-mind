@@ -12,6 +12,13 @@ tags:
 
 ## Next Up for CC
 
+**✅ DONE -- Prompt 564: bottom-align My Leads subtitle with Request Leads + nudge tiles gap.** Shipped by CC 2026-08-31 -- `restorix-portal` `main` @ `4495995`. Frontend only, no migration. Full detail: [[Restorix Memories]] 2026-08-31 "Prompt 564 executed (CC)".
+- Header row `items-start` → `compactStats ? 'items-end' : 'items-start'` (via `clsx`) -- subtitle bottom now level with the Request Leads button baseline on My Leads; `/overview` keeps `items-start`.
+- `TodayStrip` margin `compactStats ? 'mt-1' → 'mt-0.5'` -- button/tiles gap ~2px tighter than Prompt 563.
+- Both keyed off the existing `compactStats` prop, so `/overview` unchanged. Build + oxlint clean. **🟡 Not visually verified** -- closer-only page, login classifier-blocked.
+
+---
+
 **✅ DONE -- Prompt 563: Request Leads back beside the My Leads title, tight tiles gap kept.** Shipped by CC 2026-08-31 -- `restorix-portal` `main` @ `6def87e`. Frontend only, no migration. Full detail: [[Restorix Memories]] 2026-08-31 "Prompt 563 executed (CC)".
 - `MyLeads.jsx`: `headerRight={false}` + `actionsRow={<RequestLeadsButton/>}` → `headerRight={<RequestLeadsButton/>}` + new `compactStats` prop.
 - `SetterOverview` (`Overview.jsx`): `actionsRow` removed from the signature and its render block deleted (zero remaining call sites). New `compactStats = false`; `TodayStrip` margin now `compactStats ? 'mt-1' : 'mt-4'` (explicit prop, not the `actionsRow` proxy that would've broken `/overview`).
@@ -99,8 +106,8 @@ Since the count itself is currently computed inside each child component (`useMy
 
 **✅ DONE -- Prompt 557: dropped stale no-answer clause from Finish Day result copy.** Shipped by CC 2026-08-29 -- `restorix-portal` `main` @ `1c38c35`. `FinishDayCard`'s result line is now just `{result.refilled} new lead(s) pulled in for tomorrow.` (the `no_answer_rolled … moved to 24h hold` clause is gone -- always 0 since Prompt 554). Also deleted the stale Prompt 535 comment block above it that described the old `no_answer_queue` + `redistribute_no_answers` two-stage handoff as "CURRENT live behavior", replaced with a one-line Prompt 557 note. Build + oxlint clean.
 
-**🎉 Queue empty.** All of Prompts 552–563 shipped by CC. Outstanding on Eagle/Brayden (from those prompts):
-- Verify the closer-only UI (My Leads / My Pipeline) visually once the Chrome link is back — 553/555/558/559/560/561/562/563 all shipped structurally-verified only (login classifier-blocked every session). In particular: 563's Request Leads back beside the My Leads title + tight tiles gap, 560's pill/search reorder on the embedded Setter tab, 561's "My Recordings" label for closers.
+**🎉 Queue empty.** All of Prompts 552–564 shipped by CC. Outstanding on Eagle/Brayden (from those prompts):
+- Verify the closer-only UI (My Leads / My Pipeline) visually once the Chrome link is back — 553/555/558/559/560/561/562/563/564 all shipped structurally-verified only (login classifier-blocked every session). In particular: 563/564's My Leads header (Request Leads beside the title, subtitle bottom-aligned to it, tight tiles gap), 560's pill/search reorder on the embedded Setter tab, 561's "My Recordings" label for closers.
 - `niche_brands.bail_bonds.logo_url` DB write → `/suretix-logo-icon.png` (Prompt 552).
 - `suretix-marketing` Vercel project avatar (Prompt 552).
 - Decide: `SwapButton`'s `'Restorix Sustain'` label (Prompt 552) + `Follow-Up Due` pill in the embedded My Pipeline Setter tab (Prompt 558, CC's assumption).
