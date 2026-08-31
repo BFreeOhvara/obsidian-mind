@@ -12,6 +12,47 @@ tags:
 
 ## Next Up for CC
 
+**🎉 Queue empty.** Prompt 565 shipped by CC 2026-08-31. Prompts 552–565 all done.
+
+---
+
+**✅ DONE -- Prompt 565: per-agent sidebar tabs + pages for the Client Portal.** Shipped by CC 2026-08-31 -- `restorix-portal` `main` @ `f9751c1`. Frontend only, no migration. **Visually verified live as `test_client`** (login NOT classifier-blocked this session). Full detail: [[Restorix Memories]] 2026-08-31 "Prompt 565 executed (CC)".
+- `agentCatalog.js`: new `navLabel` on all 7 entries (Intake & Triage / Missed-Call Recovery / Insurance Verification / Follow-Up / Bed Availability / Appointment Reminders / Referral Reporting) -- `label` untouched.
+- New `src/pages/MyAgent.jsx` + route `/my-agents/:agentKey` (`RoleRoute roles={['client']}`). Guard: agent not in caller's own deal → redirect `/overview`. Full-page render of the catalog entry (label + Live/Coming-soon badge + whatItIs + whatItDoes + needsConnect). Still all `placeholder` → "Coming soon".
+- `Layout.jsx`: `useMyDeal({ enabled: isClient })` (new `enabled` opt on the hook), one `NavItemLink` per purchased agent in the TODAY group after Overview (front_runner then sub_agents), icon `Bot`.
+- `Overview.jsx` `ClientAgentCard`: wrapped in `<Link>` to its own page (optional spec addition). Overview otherwise unchanged.
+- Verified: sidebar shows Overview + this deal's 4 agents; each opens its page; `/my-agents/bed_sync` (not bought) → `/overview`. Console/build/oxlint clean.
+
+<details><summary>Original Prompt 565 spec</summary>
+
+**🟡 OPEN -- Prompt 565: give each client-purchased agent its own sidebar tab, instead of stacking every agent as a card on one Overview page.** Confirmed with Brayden, using screenshots of the client dashboard (`portal.restorix.co/overview` as `test_client`). Real IA change to the Client Portal -- Brayden's own framing: "first step" of building this part of the app out further, more to come after this.
+
+**Current state (`Overview.jsx` `ClientOverview`, ~line 847-881; catalog at `src/lib/agentCatalog.js`):** a client's dashboard is one page (`/overview`) that renders `deals.front_runner` as a hero card plus `deals.sub_agents` as more cards underneath, each pulling `label`/copy from the shared `AGENT_CATALOG` (7 possible entries total: `intake_triage`, `missed_call_recovery`, `insurance`, `follow_up`, `bed_sync`, `reminders`, `referral_reporting` -- a given client's deal only has some subset). Every entry is `status: 'placeholder'` today (renders "Coming soon", honestly, never hidden) -- this prompt is purely about navigation/IA, not about making any agent actually live.
+
+**What Brayden wants:** each agent the client purchased gets its own sidebar tab/page (like every other role already has -- he pointed at the existing TODAY section header + Overview item as the pattern to follow), instead of everything stacked on one page. Confirmed explicitly: **keep Overview as its own tab** (the summary/landing page, unchanged) and **add the per-agent tabs alongside it**, not replacing it.
+
+**Naming**: Brayden explicitly handed tab-naming judgment to Eagle (referencing the earlier "Communication" section-label call) rather than confirm each one -- these are the navLabels to ship, short and client-facing, distinct from the catalog's fuller internal `label` (which stays as-is, still used for survey content / card headings elsewhere):
+- `intake_triage` → **"Intake & Triage"**
+- `missed_call_recovery` → **"Missed-Call Recovery"** (already short, unchanged)
+- `insurance` → **"Insurance Verification"** (Brayden explicitly didn't want "Insurance / payer verification")
+- `follow_up` → **"Follow-Up"**
+- `bed_sync` → **"Bed Availability"**
+- `reminders` → **"Appointment Reminders"**
+- `referral_reporting` → **"Referral Reporting"**
+
+Add these as a new `navLabel` field on each `AGENT_CATALOG` entry (`agentCatalog.js`) -- keep the existing `label` field untouched (still used by `RESULTS_CONTENT`/survey and wherever the fuller phrase reads better), `navLabel` is net-new, sidebar-only.
+
+**Build:**
+1. A new route per agent, e.g. `/my-agents/:agentKey` (`App.jsx`), rendering a new full-page version of what `ClientAgentCard` renders today -- same catalog lookup (`catalogEntry(agentKey)`), same "Live"/"Coming soon" badge and copy, just as its own page instead of one card among several. Guard it: if `agentKey` isn't actually in this client's own `deal.front_runner` or `deal.sub_agents` (someone typing a URL for an agent they didn't buy), don't render another client's/catalog's content -- redirect to `/overview` or show a clean "not part of your plan" state, RLS-consistent with how `useMyDeal` already scopes to the caller's own deal.
+2. Sidebar (`Layout.jsx`): the static `NAV_GROUPS`/`roles`-array pattern (~line 22-104) doesn't support per-user dynamic items -- this needs a client-only dynamic branch. In the TODAY group specifically, when `profile?.role === 'client'`, call `useMyDeal()` and render one additional `NavItemLink` per purchased agent (front_runner first, then sub_agents, matching Overview's own card order) right after the existing static Overview item -- `to: `/my-agents/${key}`, label: catalogEntry(key).navLabel`. Icon choice is CC's call (reuse one consistent icon for all agent tabs is fine, doesn't need to be bespoke per agent).
+3. Existing Overview page (`ClientOverview`) stays exactly as-is, cards and all -- not required to link out to the new per-agent pages, though CC may make each card a link to its own new page if that's a small, obviously-correct addition; not mandatory for this prompt.
+
+**Verification**: log in as `test_client` (password `Test1234!`, set by Eagle), confirm the sidebar now shows Overview plus one tab per this deal's actual purchased agents (Inbound Intake & Triage, Insurance, Follow-up, Appointment Reminders, based on what's live on the account today), each opening its own page with that agent's own copy/status, Overview unchanged. Confirm a client can't reach an agent page for something not in their own deal.
+
+</details>
+
+---
+
 **✅ DONE -- Prompt 564: bottom-align My Leads subtitle with Request Leads + nudge tiles gap.** Shipped by CC 2026-08-31 -- `restorix-portal` `main` @ `4495995`. Frontend only, no migration. Full detail: [[Restorix Memories]] 2026-08-31 "Prompt 564 executed (CC)".
 - Header row `items-start` → `compactStats ? 'items-end' : 'items-start'` (via `clsx`) -- subtitle bottom now level with the Request Leads button baseline on My Leads; `/overview` keeps `items-start`.
 - `TodayStrip` margin `compactStats ? 'mt-1' → 'mt-0.5'` -- button/tiles gap ~2px tighter than Prompt 563.

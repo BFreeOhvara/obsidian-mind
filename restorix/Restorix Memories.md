@@ -17,6 +17,19 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-08-31 — Prompt 565 executed (CC): per-agent sidebar tabs + pages for the Client Portal
+
+**[CC | 2026-08-31 — Prompt 565 — SHIPPED. `restorix-portal` `main` @ `f9751c1`. Frontend only, no migration. Visually verified live as `test_client`.]**
+
+IA change to the client dashboard: each agent a client bought now gets its own sidebar tab + full page, alongside (not replacing) the Overview summary page.
+
+- **`agentCatalog.js`**: new `navLabel` field on all 7 entries (short client-facing sidebar names, distinct from the fuller internal `label` which is untouched): Intake & Triage / Missed-Call Recovery / Insurance Verification / Follow-Up / Bed Availability / Appointment Reminders / Referral Reporting.
+- **`src/pages/MyAgent.jsx`** (new): route `/my-agents/:agentKey`. `useMyDeal()` lookup, then a guard — if `agentKey` isn't in the caller's own `deal.front_runner`/`deal.sub_agents` (hand-typed URL, stale key, no deal) it `<Navigate to="/overview" replace/>`. Renders the catalog entry full-page: `label` + Live/Coming-soon badge (same treatment as the Overview card) + "What it is" (`copy.whatItIs`) + "Why it matters" (`copy.whatItDoes`) + the needsConnect line. Every entry is still `status:'placeholder'` so every page reads "Coming soon" — this prompt is nav/IA only.
+- **`App.jsx`**: `/my-agents/:agentKey` route wrapped `RoleRoute roles={['client']}`.
+- **`Layout.jsx`**: `useMyDeal({ enabled: profile?.role === 'client' })` (added an `enabled` opt to the hook — staff roles never fire the query). In the TODAY nav group, after the static Overview item, one `NavItemLink` per purchased agent (front_runner first, then sub_agents — matches Overview card order), `to=/my-agents/${key}`, label `navLabel`, icon `Bot` (one shared icon, CC's call per spec).
+- **`Overview.jsx` `ClientAgentCard`**: wrapped the card in `<Link to={/my-agents/${entryKey}}>` (the optional "small, obviously-correct" addition the spec allowed) — each Overview card now opens its own page. Overview otherwise unchanged.
+- **Verified live** (`test_client` / `Test1234!`, localhost): sidebar shows Overview + Intake & Triage + Insurance Verification + Follow-Up + Appointment Reminders (exactly this deal's agents); clicking one opens its page with correct copy + active nav highlight; `/my-agents/bed_sync` (not in this deal) redirects to `/overview`. Console clean, build + oxlint clean. Login was NOT classifier-blocked this session.
+
 ### 2026-08-31 — Prompt 564 executed (CC): bottom-align My Leads subtitle with Request Leads
 
 **[CC | 2026-08-31 — Prompt 564 — SHIPPED. `restorix-portal` `main` @ `4495995`. Frontend only, no migration.]**
