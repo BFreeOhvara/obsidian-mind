@@ -17,6 +17,18 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-09-01 — How the CC queue actually gets written (workflow clarification)
+
+**[CC | 2026-09-01 — no code/DB change. Q&A with Brayden.]**
+
+Brayden asked why his Eagle manager chat says it "can't queue prompts for CC," when the "type `run the next restorix task` to CC" workflow has worked for 500+ prompts. Resolved:
+
+- The queue is `restorix/Restorix LIVE_STATE.md` §"Next Up for CC" in the `obsidian-mind` git repo. A prompt reaches CC only by being written into that file + committed. Brayden only ever types "run the next task" — so the writing happens **on the manager-chat side**, not by him.
+- **Falcon is a Cowork ("coworker chat") session with the `obsidian-mind` repo attached** → it commits queue items to the vault directly. Proven: commit `c8e9d1f` (2026-08-31 19:55) touched `Restorix Memories.md` from a Cowork session, author "Eagle" (= the git `user.name`, always, regardless of which instance).
+- **Eagle "can't"** because it's either a plain claude.ai chat (zero file access) or a Cowork session without `obsidian-mind` attached. Fix = set Eagle up like Falcon (Cowork + repo attached), or keep Falcon as the queue-writer and use Eagle for strategy only.
+- Same root cause as the cloud-session GitHub 403 in the entry below: Claude cloud/Cowork sessions gate file/repo writes to an attached-repo allowlist; unattached → hand diffs/prompts to local CC.
+- CC (this local builder) was briefly wrong in chat saying manager chats flatly "can't" write to Atlas — Cowork ones can. Corrected same turn.
+
 ### 2026-08-31 — Cowork briefing doc compiled (CC): standing context for the cloud "Eagle's manager" session
 
 **[CC | 2026-08-31 — no code/DB change. Recon + doc only.]**
