@@ -4,13 +4,14 @@ External brain for **Restorix** — AI infrastructure for behavioral health trea
 
 ## Manager Chat Identity & Logging
 
-Inherits the vault root `CLAUDE.md`'s "Manager Chat Identity & Logging" section in full: this instance is Eagle or Falcon depending on account, Atlas is the shared vault both plug into, and **important decisions/context get written to [[Restorix Memories]] (and queue items to [[Restorix LIVE_STATE]]) continuously, as they happen — not batched for a "wrap up" moment, and not only when Brayden asks.** If Brayden switches instances or starts a fresh chat mid-conversation, everything material discussed so far should already be sitting in these two files.
+Inherits the vault root `CLAUDE.md`'s "Manager Chat Identity & Logging" section in full: this instance is Eagle or Falcon depending on account, Atlas is the shared vault both plug into, and **important decisions/context get written to [[Restorix Memories]] (and queue items to [[Restorix CC Queue]]) continuously, as they happen — not batched for a "wrap up" moment, and not only when Brayden asks.** If Brayden switches instances or starts a fresh chat mid-conversation, everything material discussed so far should already be sitting in these two files.
 
 ## Session Start
 
-1. Read [[Restorix LIVE_STATE]] "Next Up for CC" FIRST — the live task queue; execute top to bottom, delete each item when done, log to [[Restorix Memories]]
-2. Read [[Restorix North Star]] and [[Restorix Memories]] before every session — never repeat a logged mistake
-3. State what's relevant before writing code
+1. Read [[Restorix CC Queue]] FIRST — the live task queue; execute top to bottom, delete each item the moment it ships, full record to [[Restorix Memories]]
+2. Read [[Restorix LIVE_STATE]] for current state (what's true right now, recently-shipped archive)
+3. Read [[Restorix North Star]] and [[Restorix Memories]] before every session — never repeat a logged mistake
+4. State what's relevant before writing code
 
 ## Session End (backstop only — most logging should already have happened during the session per the rule above)
 

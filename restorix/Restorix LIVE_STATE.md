@@ -10,9 +10,13 @@ tags:
 
 > **This is the ONE file any Restorix session reads to become fully operational.** It is a CURRENT-STATE document — overwritten on every update, not appended to. [[Restorix Memories]] is the historical append-only log; this file is "what is true right now." Mirrors the shape of Ohvara's [[LIVE_STATE]] but is fully independent — a Restorix session never needs to read Ohvara's state, and vice versa.
 
-## Next Up for CC
+## CC Queue
 
-**🎉 Queue empty.** Prompt 565 shipped by CC 2026-08-31. Prompts 552–565 all done.
+**The live task queue moved to its own file → [[Restorix CC Queue]]** (2026-09-01). Read that first at session start, execute top to bottom, delete each item on ship, full record to [[Restorix Memories]]. Manager/Cowork chats append prompts there, not here. This section is now just the recently-shipped archive.
+
+### Recently shipped (archive)
+
+**🎉 Queue empty as of Prompt 565** (shipped by CC 2026-08-31). Prompts 552–565 all done. Current open item lives in [[Restorix CC Queue]].
 
 ---
 
