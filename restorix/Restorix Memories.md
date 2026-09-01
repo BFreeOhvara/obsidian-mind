@@ -29,7 +29,9 @@ Added a **"Reaching Atlas safely"** sub-section to the shared *Manager Chat Iden
 3. Prompt numbers: one source of truth = highest referenced in the real `LIVE_STATE` + `Memories` files on disk, +1. No privately reserving numbers.
 4. Ownership split: manager/Cowork chats write queue items; CC writes shipped-logs + current-state. Don't both edit the same file in the same window.
 
-**Proposed, not yet done** (awaiting Brayden's go): split the CC queue into its own small file `restorix/Restorix CC Queue.md` (Eagle owns it, CC empties it on ship) so ownership is automatic and it's cheap to read/verify. Also flagged: `Restorix LIVE_STATE.md` is 563KB despite being a "current-state, overwritten" doc — months of appends, needs a trim (separate job).
+**Done** (`95ee702`): split the CC queue into its own file [[Restorix CC Queue]] — manager/Cowork chats append prompts there, CC deletes each on ship. Pointers updated in vault-root `CLAUDE.md` (line 11, 21) + `restorix/CLAUDE.md` (Session Start step 1, Manager Chat section). `LIVE_STATE`'s old `## Next Up for CC` → `## CC Queue` with a pointer + the recently-shipped archive kept below it. First queue item: Prompt 566 = *verify* 558 is live (a check, not a build).
+
+Still flagged, separate job (not greenlit): `Restorix LIVE_STATE.md` is 563KB despite being a "current-state, overwritten" doc — months of appends, needs a trim.
 
 ### 2026-09-01 — "New" My Pipeline layout asks = already-shipped Prompt 558 (verify before re-queuing)
 
