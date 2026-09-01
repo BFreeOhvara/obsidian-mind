@@ -17,6 +17,19 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-09-01 — Prompt 566 (CC): Prompt 558's My Pipeline layout confirmed LIVE — no build needed
+
+**[CC | 2026-09-01 — Prompt 566 — CLOSED, no code change. Verified live as `test_closer` (`Test1234!` — Brayden supplied; closer login is NOT classifier-blocked anymore).]**
+
+Brayden had a screenshot of `/my-pipeline` that looked like the pre-558 layout. Logged in as the closer and checked both sub-tabs on the dev server (HEAD `1256611`):
+- **Closer tab:** header is `My Pipeline` + `8 booked leads` subtitle sitting *above* the Closer/Setter switcher, **no date anywhere**. ✅ 558 points 1 + 2.
+- **Setter tab:** subtitle `0 leads in your pool` above the switcher, **no stat tiles**, status pills are exactly **No Answer / Follow-up / Not Interested** (no New, no Appointment Booked, no Follow-Up Due). ✅ 558 points 3 + 4.
+- Console clean.
+
+**Verdict: Prompt 558 is fully live and correct. Brayden's screenshot was stale** (cached tab / old deploy on his end). Nothing to build. Queue item deleted.
+
+**Unblocks a backlog:** this is the first time closer-only pages have been verified live — the classifier block that hit every session 553→564 is gone (both `test_client` and `test_closer` log in fine now). Prompts 553/555/559/560/561/562/563/564 all shipped "structurally verified only" and could now get a real visual pass if Brayden wants one. Flagged to him, not auto-done (not in queue).
+
 ### 2026-09-01 — Prompt 567 executed (CC): group client sidebar agent tabs into categories
 
 **[CC | 2026-09-01 — Prompt 567 — SHIPPED. `restorix-portal` `main` @ `1256611`. Frontend only, no migration. Visually verified live as `test_client`.]**

@@ -16,7 +16,9 @@ tags:
 
 ### Recently shipped (archive)
 
-**Latest shipped: Prompt 567** (CC 2026-09-01, `restorix-portal` `main` @ `1256611`) — client sidebar agent tabs grouped into `navCategory` sections, navLabels tightened, per-agent page heading now uses navLabel. Prompts 552–567 done except 566. Open queue lives in [[Restorix CC Queue]] (currently: Prompt 566 = *verify* 558's My Pipeline layout is live — blocked on a `test_closer` login).
+**Latest shipped: Prompt 567** (CC 2026-09-01, `restorix-portal` `main` @ `1256611`) — client sidebar agent tabs grouped into `navCategory` sections, navLabels tightened, per-agent page heading now uses navLabel. **Prompts 552–567 all done** (566 was a verify-only check, closed 2026-09-01: Prompt 558's My Pipeline layout confirmed live as `test_closer`, Brayden's screenshot was stale). [[Restorix CC Queue]] is empty.
+
+**Closer-login classifier block is gone** (2026-09-01) — `test_client` and `test_closer` both log in fine (`Test1234!`). Prompts 553/555/559–564 shipped structurally-verified-only and are now visually verifiable if wanted.
 
 ---
 
