@@ -17,6 +17,20 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-08-31 — Cowork briefing doc compiled (CC): standing context for the cloud "Eagle's manager" session
+
+**[CC | 2026-08-31 — no code/DB change. Recon + doc only.]**
+
+Brayden asked for a self-contained standing briefing for a Claude Cowork cloud session ("Eagle's manager") that has Supabase MCP read/write on `avgvmzshujwphneykuvu` but 403s on `git push` to `restorix-portal` ("not in this session's authorized repository set"). Doc lives at `scratchpad/restorix-portal-cowork-briefing.md` (printed to terminal for hand-off; not committed to the vault unless Brayden wants it in `restorix/`).
+
+Covers: project/brand overview + `useBrand.jsx` hostname/`?brand=` switching; the Prompt NNN workflow and that **Atlas = the `obsidian-mind` vault repo**, queue = `Restorix LIVE_STATE.md` §"Next Up for CC", log = `Restorix Memories.md`; repo/deploy facts (repo `BFreeOhvara/restorix-portal`, branch `main`, Vercel project `restorix-portal`/team `ohvara` auto-deploy on push, edge functions + migrations manual via MCP); access boundaries; env state; codebase conventions.
+
+Things surfaced while compiling, worth keeping:
+- **`deals` row for Test Client was modified today** — `updated_at` `2026-09-01 00:18Z`. `sub_agents` is now `["insurance","follow_up","bed_sync","reminders","referral_reporting"]`; at Prompt 565 verification it was just `insurance/follow_up/reminders`. Someone (likely the Cowork session testing) expanded it. Baseline for the Prompt 565 Memories entry no longer matches live.
+- **`niche_brands.bail_bonds.logo_url` is now `/suretix-logo-icon.png`** — the pending item from Prompt 552 (LIVE_STATE line ~223) is actually done; that line is stale.
+- Edge functions deployed but **not in repo source**: `get-recording` (v6). Repo `supabase/functions/` is not a complete mirror; `supabase/migrations/` has 1 file vs 60 applied.
+- The GitHub 403 is a Claude cloud-sandbox repo-allowlist guardrail, not a GitHub perms issue — fixable only by attaching the repo to that session's environment; otherwise cloud session hands diffs to local CC (mirrors Eagle's role).
+
 ### 2026-08-31 — Prompt 565 executed (CC): per-agent sidebar tabs + pages for the Client Portal
 
 **[CC | 2026-08-31 — Prompt 565 — SHIPPED. `restorix-portal` `main` @ `f9751c1`. Frontend only, no migration. Visually verified live as `test_client`.]**
