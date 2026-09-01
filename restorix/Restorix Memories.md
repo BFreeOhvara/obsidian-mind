@@ -17,6 +17,20 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-09-01 — Manager-chat / Atlas-access rules added to CLAUDE.md (stale-clone incident)
+
+**[CC | 2026-09-01 — vault-root `CLAUDE.md` @ `4452d7d`. Doc change only.]**
+
+Root cause of the Prompt 558 confusion: Eagle (Cowork) reasoned + "queued" against a `git clone` of the vault in a cloud sandbox, not the live local folder `C:\Users\freem\obsidian-mind` that was attached to the session the whole time. Clone = frozen snapshot → stale "what's shipped" picture; its writes never reached the real files (sandbox `git push` 403s on the repo allowlist). A prior Eagle chat's "Prompt 558 queued" never landed in the real `Restorix LIVE_STATE.md`.
+
+Added a **"Reaching Atlas safely"** sub-section to the shared *Manager Chat Identity & Logging* block in vault-root `CLAUDE.md`:
+1. Reach Atlas via the connected local folder, never a clone. Confirm attached at session start; if not attached, stop and tell Brayden (don't fall back to a clone).
+2. Verify every Atlas write landed — re-read the file from disk and confirm the text before reporting done.
+3. Prompt numbers: one source of truth = highest referenced in the real `LIVE_STATE` + `Memories` files on disk, +1. No privately reserving numbers.
+4. Ownership split: manager/Cowork chats write queue items; CC writes shipped-logs + current-state. Don't both edit the same file in the same window.
+
+**Proposed, not yet done** (awaiting Brayden's go): split the CC queue into its own small file `restorix/Restorix CC Queue.md` (Eagle owns it, CC empties it on ship) so ownership is automatic and it's cheap to read/verify. Also flagged: `Restorix LIVE_STATE.md` is 563KB despite being a "current-state, overwritten" doc — months of appends, needs a trim (separate job).
+
 ### 2026-09-01 — "New" My Pipeline layout asks = already-shipped Prompt 558 (verify before re-queuing)
 
 **[CC | 2026-09-01 — no code change. Investigation only, triggered by Eagle Cowork proposing a new prompt.]**
