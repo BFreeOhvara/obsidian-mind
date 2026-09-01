@@ -17,6 +17,18 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-09-01 — "New" My Pipeline layout asks = already-shipped Prompt 558 (verify before re-queuing)
+
+**[CC | 2026-09-01 — no code change. Investigation only, triggered by Eagle Cowork proposing a new prompt.]**
+
+Eagle (Cowork) — reading a stale cloud clone — proposed a "new" My Pipeline prompt from a Brayden screenshot: move the lead count, drop the four stat tiles, trim the Setter status pills, remove the date. **All four are Prompt 558** ("My Pipeline layout cleanup", shipped 2026-08-29, `restorix-portal` `main` @ `ad7b031`). Verified in the real local repo at HEAD `f9751c1`: `CloserPipeline` in `src/pages/Overview.jsx` (what `/my-pipeline` renders via `MyPipeline.jsx`) has all four — date gone (line ~494), subtitle moved to wrapper (line ~497), `{!embedded && <TodayStrip/>}` (line ~333), `EMBEDDED_STATUS_KEYS = ['no_answer','follow_up','not_interested']` (line ~245). It's on `main`, auto-deployed.
+
+- **558 was shipped "structurally verified only"** — closer login was classifier-blocked every session it was worked, so it has never been eyeballed live.
+- So if Brayden's screenshot shows the OLD layout, the problem is 558 not reaching prod (deploy/cache/render bug) — NOT missing feature work. If it shows the new layout, the screenshot is just stale.
+- **Action before any "566" for this**: pull `/my-pipeline` up live as a closer and confirm which. `test_client` login worked fine this session (classifier block may be lifted) — closer likely works too; need `test_closer` creds.
+- Numbering: next genuinely-free number is 566 (552–565 all shipped/logged). Don't reserve 567 for Eagle's unshipped sandbox "sidebar-grouping" work — it's not in the real vault. Whatever hits `Restorix LIVE_STATE.md` §"Next Up for CC" first takes 566.
+- **Coordination**: Eagle (Cowork) now has direct write access to the real local vault `C:\Users\freem\obsidian-mind` (not just the GitHub clone). Split to avoid clobbering LIVE_STATE: Eagle writes queue items, CC writes "shipped" logs.
+
 ### 2026-09-01 — How the CC queue actually gets written (workflow clarification)
 
 **[CC | 2026-09-01 — no code/DB change. Q&A with Brayden.]**
