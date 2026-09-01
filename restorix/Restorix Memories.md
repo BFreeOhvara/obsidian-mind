@@ -17,6 +17,19 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-09-01 — Prompt 567 executed (CC): group client sidebar agent tabs into categories
+
+**[CC | 2026-09-01 — Prompt 567 — SHIPPED. `restorix-portal` `main` @ `1256611`. Frontend only, no migration. Visually verified live as `test_client`.]**
+
+Builds on Prompt 565. The per-agent sidebar tabs were one flat list under TODAY; now they're grouped into small `navCategory` sections (the COMMUNICATION/ACCOUNT shape).
+
+- **`agentCatalog.js`**: added `navCategory` + `navIcon` (lucide) to all 7 entries, and tightened `navLabel` wording — `Phone Calls` (Inbound / `PhoneCall`), `Missed Calls` (Inbound / `PhoneMissed`), `Insurance` (Insurance / `ShieldCheck`), `Follow-Ups` (Follow-Ups / `Repeat`), `Bed Availability` (Scheduling / `BedDouble`), `Appointment Reminders` (Calendar / `CalendarClock`), `Referral Reports` (Reporting / `PieChart`). `label` still untouched (survey + Overview cards).
+- **`Layout.jsx`**: new `buildClientAgentGroups(deal)` — buckets the client's purchased agents by `navCategory` (front_runner first), one nav group per category, `roles: ['client']` on each item, unknown keys skipped. New `navGroups` const: for a client it's `[TODAY, ...agent category groups, ACCOUNT]`; for staff it's `NAV_GROUPS` untouched. Nav render maps `navGroups` instead of `NAV_GROUPS`; the Prompt 565 flat-injection branch (`clientAgentLinks` + the `agentLinks` render) is gone.
+- **`MyAgent.jsx`**: page `<h1>` now `entry.navLabel || entry.label` — the per-agent page title matches the sidebar tab that links to it instead of the internal jargon.
+- Applied by hand from Eagle's sandbox diff (`b2c35ed`) — `git apply` choked on a malformed hunk in the pasted diff, so re-implemented directly (I wrote 565, code is small). Renamed the diff's placeholder `Prompt 566` comments → `Prompt 567` per Eagle's note. Build + oxlint clean.
+- **Verified live** (`test_client` / `Test1234!`, localhost): sidebar shows INBOUND / INSURANCE / FOLLOW-UPS / SCHEDULING / CALENDAR / REPORTING groups, each tab routes to its `/my-agents/:key` page, page heading reads the short navLabel ("Phone Calls", "Referral Reports"). Overview cards still show full `label`. Console clean.
+- **Note:** `test_client`'s deal now carries 6 agents (added `bed_sync` + `referral_reporting` since the Prompt 565 session's 4) — someone widened the test deal's `sub_agents` between sessions, presumably to exercise more categories. Not a problem, just state drift worth knowing.
+
 ### 2026-09-01 — Manager-chat / Atlas-access rules added to CLAUDE.md (stale-clone incident)
 
 **[CC | 2026-09-01 — vault-root `CLAUDE.md` @ `4452d7d`. Doc change only.]**

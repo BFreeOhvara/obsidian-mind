@@ -16,7 +16,7 @@ tags:
 
 ### Recently shipped (archive)
 
-**🎉 Queue empty as of Prompt 565** (shipped by CC 2026-08-31). Prompts 552–565 all done. Current open item lives in [[Restorix CC Queue]].
+**Latest shipped: Prompt 567** (CC 2026-09-01, `restorix-portal` `main` @ `1256611`) — client sidebar agent tabs grouped into `navCategory` sections, navLabels tightened, per-agent page heading now uses navLabel. Prompts 552–567 done except 566. Open queue lives in [[Restorix CC Queue]] (currently: Prompt 566 = *verify* 558's My Pipeline layout is live — blocked on a `test_closer` login).
 
 ---
 
