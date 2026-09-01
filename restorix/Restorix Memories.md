@@ -17,6 +17,18 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-09-01 — Prompt 568 executed (CC): live-state layout preview for the Phone Calls agent page
+
+**[CC | 2026-09-01 — Prompt 568 — SHIPPED. `restorix-setter-portal` `main` @ `1543f0a`. Frontend only, no migration. Visually verified live as `test_client`.]**
+
+UI/layout-only pass on `src/pages/MyAgent.jsx` — builds what the Intake & Triage ("Phone Calls") page *would* look like once it's a real live agent, gated so nobody hits it by accident. **`AGENT_CATALOG.intake_triage.status` is still `'placeholder'`** — untouched — so every real client still gets the honest "Coming soon" render. Nothing is wired to real data.
+
+- **Gate:** `useSearchParams` — `?preview=live` + a `PREVIEW[agentKey]` block existing. Built as a `PREVIEW` map keyed by agentKey (only `intake_triage` populated), so 569/570 just add keys — same mechanism, not a new conditional per agent (matches what those prompts ask for).
+- **Preview render** (replaces the `whatItIs`/`whatItDoes`/`needsConnect` block, preview path only): header badge flips to green "Live" (`STATUS_SOLID.appointment_booked`); 4 stat tiles (`grid grid-cols-2 sm:grid-cols-4`, replicated `Tile` markup from `Overview.jsx` — `rounded-card border border-line bg-elevated p-5` / `.eyebrow` / `font-display text-3xl`) = Calls answered today 24 / Avg pickup Instant / Consults booked today 9 / Booking rate 38%; "Recent calls" list of 8 rows (mono phone number + one-line outcome + `STATUS_TINT` pill + relative time), pill colors: `appointment_booked` green = Booked ×3, `new` blue = Routed to staff ×2, `not_interested` red = Escalated ×1 (the after-hours crisis-language row), `no_answer` gray = In progress ×2; condensed value-prop line = `entry.copy.whatItDoes` in `text-xs text-fg-faint`.
+- **No new tokens/colors/fonts/components.** `npm run build` + `oxlint` clean (only pre-existing `only-export-components` warnings elsewhere).
+- **Verified live** (`test_client` / `Test1234!`, localhost dev): `/my-agents/intake_triage?preview=live` renders the full preview; `/my-agents/intake_triage` (no param) still renders "COMING SOON" + What it is / Why it matters / connect line unchanged; `/my-agents/insurance?preview=live` ignores the param and renders the normal placeholder. Console clean.
+- Queue item 568 deleted from [[Restorix CC Queue]] (569 + 570 remain — added by a manager chat mid-session; both extend this same `PREVIEW`-map gate).
+
 ### 2026-09-01 — Prompt 566 (CC): Prompt 558's My Pipeline layout confirmed LIVE — no build needed
 
 **[CC | 2026-09-01 — Prompt 566 — CLOSED, no code change. Verified live as `test_closer` (`Test1234!` — Brayden supplied; closer login is NOT classifier-blocked anymore).]**

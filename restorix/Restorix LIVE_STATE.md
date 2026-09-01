@@ -16,7 +16,7 @@ tags:
 
 ### Recently shipped (archive)
 
-**Latest shipped: Prompt 567** (CC 2026-09-01, `restorix-portal` `main` @ `1256611`) — client sidebar agent tabs grouped into `navCategory` sections, navLabels tightened, per-agent page heading now uses navLabel. **Prompts 552–567 all done** (566 was a verify-only check, closed 2026-09-01: Prompt 558's My Pipeline layout confirmed live as `test_closer`, Brayden's screenshot was stale). [[Restorix CC Queue]] is empty.
+**Latest shipped: Prompt 568** (CC 2026-09-01, `restorix-setter-portal` `main` @ `1543f0a`) — live-state layout preview for the Phone Calls (Intake & Triage) agent page in `MyAgent.jsx`, gated behind `?preview=live` (a `PREVIEW` map keyed by agentKey). `status` still `'placeholder'` — real clients unaffected, honest "Coming soon" unchanged. Verified live as `test_client` at `/my-agents/intake_triage?preview=live`. **Prompts 552–568 all done** (566 was a verify-only check). [[Restorix CC Queue]] holds **Prompt 569** (same preview for Insurance) + **Prompt 570** (same for Follow-Ups) — both extend 568's `PREVIEW`-map gate.
 
 **Closer-login classifier block is gone** (2026-09-01) — `test_client` and `test_closer` both log in fine (`Test1234!`). Prompts 553/555/559–564 shipped structurally-verified-only and are now visually verifiable if wanted.
 
