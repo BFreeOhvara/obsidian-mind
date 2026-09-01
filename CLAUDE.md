@@ -2,7 +2,25 @@
 
 This vault hosts **two independent businesses**: **Ohvara** (below, rooted at `brain/`) and **Restorix** (`restorix/`, AI infrastructure for behavioral health treatment centers). Same operator (Brayden), same vault for shared tooling/conventions, otherwise unconnected — Restorix has its own current-state doc, memory log, and goals file, and never needs Ohvara's.
 
-**Before doing anything else, determine which vertical the session's request is about.** If it's Restorix (or genuinely ambiguous), stop reading here and read `restorix/CLAUDE.md` instead — everything below this point (Session Start/End, Pricing, Infrastructure, Rules) is Ohvara-specific and does not apply to Restorix work. If it's Ohvara, continue below as normal.
+## Manager Chat Identity & Logging (shared — applies to every session, both verticals)
+
+- This vault is named **Atlas** — the shared memory every Claude instance plugs into, regardless of vertical or account.
+- A conversational/manager session (as opposed to CC, the builder that executes queued work against the real codebase) is **Eagle** if on claude.ai account 2 (the newer Pro account), or **Falcon** if on claude.ai account 1 (the original account).
+- Workflow: Brayden works with Eagle or Falcon → the session writes back to Atlas as it goes → the other instance (or CC) picks up seamlessly, with **zero manual "save this chat" step from Brayden.**
+- **Log continuously, not just at session end.** The moment something important is decided, queued, built, fixed, or learned during a manager chat, write it into the relevant vertical's files right then — don't batch it for a "wrap up" moment, and don't wait for Brayden to ask. If he switches instances (Eagle ↔ Falcon) or opens a fresh chat mid-conversation, everything material that's happened so far should already be sitting in Atlas.
+  - Restorix: queue items → [[Restorix LIVE_STATE]], decisions/context/history → [[Restorix Memories]]
+  - Ohvara: queue items → [[LIVE_STATE]], decisions/context/history → [[Memories]]
+- **"Important" enough to log right away** = anything a fresh instance picking this up cold would need to not have to ask Brayden to repeat: a new standing rule, a scoping decision, a bug's confirmed root cause, a queued build spec, a clarified requirement, a piece of state that changed. Routine back-and-forth (clarifying questions, "yes that's right," small talk) doesn't need its own entry.
+- End-of-session logging (in the vertical-specific sections below) is a backstop/final summary on top of this, not a substitute for it — most of what belongs in Atlas should already be there well before a session ends.
+
+### Reaching Atlas safely (manager/Cowork chats — added 2026-09-01 after a stale-clone incident)
+
+- **Reach Atlas through the connected local folder, never a clone.** A Cowork session normally has the live vault folder `C:\Users\freem\obsidian-mind` attached directly — the same path CC uses — so reads and writes hit the real files immediately, no `git` involved. Confirm it's attached at the start of every session. Do **not** `git clone` the vault into a sandbox and work from that copy: a clone is a frozen snapshot that goes stale the moment it's made, and its writes never reach the real files (the `git push` back is deliberately not authorized from sandboxes). If the local folder is not attached to a given session, **stop and tell Brayden** — do not fall back to a clone.
+- **Verify every Atlas write actually landed.** After writing a queue item or a Memories/LIVE_STATE entry, re-read that file from disk and confirm the exact text is present before reporting it done. An unverified write may not have happened, or may have gone to the wrong copy of the file.
+- **Prompt numbers have one source of truth: the real files on disk.** The next number is one past the highest referenced in `Restorix LIVE_STATE.md` + `Restorix Memories.md` (or Ohvara's `LIVE_STATE.md` + `Memories.md`). Never privately reserve a number in a working copy or in a chat — a number is not taken until it is written into the real queue file.
+- **Ownership split, to avoid clobbering shared files:** manager/Cowork chats write **queue items** (to the "Next Up for CC" section / file); CC writes the **"shipped" logs and current-state**. Don't both edit the same file in the same window.
+
+**Before doing anything else, determine which vertical the session's request is about.** If it's Restorix (or genuinely ambiguous), stop reading here and read `restorix/CLAUDE.md` instead — everything below this point (Session Start/End, Pricing, Infrastructure, Rules) is Ohvara-specific and does not apply to Restorix work; the Manager Chat Identity & Logging rule above still applies regardless. If it's Ohvara, continue below as normal.
 
 # Ohvara Vault
 
@@ -10,9 +28,7 @@ External brain for **Ohvara** — SMB automation business turned inbound insuran
 
 ## Identity
 
-- This vault is named **Atlas** — the shared memory all Claude instances plug into
-- This instance is **Eagle** if on claude.ai account 2 (new Pro account), or **Falcon** if on claude.ai account 1 (original account)
-- Workflow: work with Eagle or Falcon → session writes back to Atlas → other instance picks up seamlessly
+See "Manager Chat Identity & Logging" at the top of this file (shared across both verticals) — Atlas/Eagle/Falcon naming and the continuous-logging rule both apply here unchanged.
 
 ## Session Start
 
@@ -27,9 +43,9 @@ External brain for **Ohvara** — SMB automation business turned inbound insuran
 When the conversation reaches 15+ exchanges or 3+ distinct topics, warn Brayden with:
 "We're getting close to context limit — say wrap up when ready and I'll write everything to Atlas and give you your resume prompt for the next chat."
 
-## Session End
+## Session End (backstop — most of this should already be in [[Memories]] per the continuous-logging rule above)
 
-1. Append a session log entry to [[Memories]] on every wrap up: date, topics, decisions, current state, blockers, resume prompt
+1. Append a final session summary entry to [[Memories]] on every wrap up: date, topics, decisions, current state, blockers, resume prompt
 2. Update [[ohvara-dashboard]] brain doc if any dashboard code changed
 3. Never end without logging — partial logs beat no logs
 
