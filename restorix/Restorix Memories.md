@@ -17,6 +17,19 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-09-01 — Prompt 571 executed (CC): live-state layout preview for the Bed Availability agent page
+
+**[CC | 2026-09-01 — Prompt 571 — SHIPPED. `restorix-setter-portal` `main` @ `ec22ddd`. Frontend only, no migration. Visually verified as `test_client`.]**
+
+First agent preview with a *dedicated* render, not the shared `LivePreview`. Bed Availability is continuous state (open beds per program), not per-lead outcomes, so a new `BedAvailabilityPreview` component in `src/pages/MyAgent.jsx`; routed to when `showLivePreview && agentKey === 'bed_sync'`, else falls through to `LivePreview` (intake_triage/insurance/follow_up unchanged). `AGENT_CATALOG.bed_sync.status` still `'placeholder'`. Same test-account identity gate (added `bed_sync` to the `PREVIEW` map).
+
+- **Tiles:** Beds open 12 (+ smaller `/ 18` via a new optional `sub` prop on `PreviewTile` — backward-compatible, other callers don't pass it) / Occupancy 67% / Programs synced 3 / Last synced 2 min ago.
+- **"By program"** — 3 rows (Detox 4/6, Residential 6/9, PHP / day program 2/3), each: name + horizontal bar (`bg-muted` track, `bg-accent` fill, width = open/total) + "X / Y open" in mono. Bar fill matches the 67% occupancy tile (12/18).
+- **"Recent sync activity"** — 6 rows (fewer than the 8-row logs — no per-lead volume to fill it), each a colored dot + line + time. New `SYNC_DOT` map: `released`→`bg-success` green, `held`→`bg-accent-bright` blue, `staff`→`bg-fg-faint` gray. Dots, not outcome pills (not a discrete win/loss).
+- Value-prop line = `entry.copy.whatItDoes` in `text-xs text-fg-faint`. No new colors/fonts — `bg-accent-bright` and `bg-fg-faint` are existing `tailwind.config.js` tokens.
+- `npm run build` + `oxlint` clean. **Verified** (`test_client` / `Test1234!`, localhost): `/my-agents/bed_sync` renders bars + colored dots; Phone Calls (568) / Insurance (569) / Follow-Ups (570) previews still correct; `/my-agents/reminders` still "COMING SOON". Pre-existing console 400 (background Supabase query) unrelated.
+- Queue item 571 deleted. **Prompt 573** remains — redo the *Phone Calls* preview with its own dedicated shape (attention panel + call funnel + day-grouped log), since 568/569/570 all look like the same generic page. Note: 573 will reshape `PREVIEW.intake_triage` and add a `PhoneCallsPreview` — the `PreviewTile` `sub` prop and `SYNC_DOT`/bar patterns from 571 are reusable there (funnel = the same bar rotated to steps).
+
 ### 2026-09-01 — Prompt 570 executed (CC): live-state layout preview for the Follow-Ups agent page
 
 **[CC | 2026-09-01 — Prompt 570 — SHIPPED. `restorix-setter-portal` `main` @ `981bdef`. Frontend only, no migration. Visually verified as `test_client`.]**
