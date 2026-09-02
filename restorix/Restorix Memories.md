@@ -17,6 +17,18 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-09-01 — Prompt 570 executed (CC): live-state layout preview for the Follow-Ups agent page
+
+**[CC | 2026-09-01 — Prompt 570 — SHIPPED. `restorix-setter-portal` `main` @ `981bdef`. Frontend only, no migration. Visually verified as `test_client`.]**
+
+Added a `follow_up` key to the `PREVIEW` map in `src/pages/MyAgent.jsx` — third agent, same test-account gate Prompt 572 introduced (renders for `test_client` on normal navigation to `/my-agents/follow_up`, no `?preview=live`). `AGENT_CATALOG.follow_up.status` still `'placeholder'`.
+
+- **Tiles:** Active sequences 6 / Messages sent today 14 / Re-engaged this week 3 / Avg days to book 2.4.
+- **"Recent activity"** — 8 rows, phone number (`monoRef: true`) + channel/result + `STATUS_TINT` pill: `appointment_booked` green "Booked" ×2, `no_answer` gray "In sequence" ×3, `follow_up` **yellow** "Nurturing" ×2 (replied-but-not-ready — the app's own follow-up color reused for exactly that meaning), `not_interested` red "Opted out" ×1 (replied STOP).
+- Value-prop line = `entry.copy.whatItDoes` in `text-xs text-fg-faint`. No new tokens/colors/fonts/components — first `PREVIEW` row to use yellow, but it's the existing `STATUS_TINT.follow_up`, not new.
+- `npm run build` + `oxlint` clean. **Verified** (`test_client` / `Test1234!`, localhost): `/my-agents/follow_up` full preview with yellow "Nurturing" pills; Phone Calls (568) + Insurance (569) previews still correct; `/my-agents/bed_sync` still "COMING SOON".
+- Queue item 570 deleted. **Prompt 571** (Bed Availability) remains — deliberately a different shape (occupancy bars + per-program breakdown + sync-activity dots, not an outcome-pill log).
+
 ### 2026-09-01 — Prompt 572 executed (CC): preview gate is now test-account identity, not a URL param
 
 **[CC | 2026-09-01 — Prompt 572 — SHIPPED. `restorix-setter-portal` `main` @ `a61fdde`. Frontend only, no migration. Visually verified live as `test_client`.]**
