@@ -25,13 +25,13 @@ tags:
 
 **Same shape as 568 (Phone Calls) and 569 (Insurance), applied to Follow-Ups:** a UI/layout pass only, on one page, for one agent. `AGENT_CATALOG.follow_up.status` stays `'placeholder'` — do **not** flip it to `'live'`, same reason both predecessors gave: `MyAgent.jsx` is shared across every agent, `status` is what Overview's card and the badge actually key off, no real automation exists behind Follow-Ups yet. This only builds what the page *would* look like.
 
-**Gate:** extend the same `?preview=live` query-param gate from 568/569 in `src/pages/MyAgent.jsx`, now also matching `agentKey === 'follow_up'` — a third branch alongside `intake_triage` and `insurance`, same mechanism, not a new one. Every other `agentKey`, and Follow-Ups' own page without the query param, renders exactly as it does today. Test client's `sub_agents` already includes `follow_up`, so `portal.restorix.co/my-agents/follow_up?preview=live` as `test_client` is how Brayden reviews it.
+**Gate:** extend the test-account identity gate from 572 in `src/pages/MyAgent.jsx`, now also matching `agentKey === 'follow_up'` — a third branch alongside `intake_triage` and `insurance`, same mechanism, not a new one. Every other `agentKey` renders exactly as it does today, and any account other than `test_client` sees the unchanged placeholder on Follow-Ups too. Test client's `sub_agents` already includes `follow_up`, so `portal.restorix.co/my-agents/follow_up` — no query param needed — as `test_client` is how Brayden reviews it.
 
-**What renders when `?preview=live` is present, for Follow-Ups only:**
+**What renders for the test client account, on Follow-Ups only:**
 
-Keep the existing header row as-is. Under `?preview=live`, the badge reads "Live" — same `STATUS_SOLID.appointment_booked` solid-green treatment 568/569 used.
+Keep the existing header row as-is. For the test client account, the badge reads "Live" — same `STATUS_SOLID.appointment_booked` solid-green treatment 568/569 used.
 
-Below the header, replace the `whatItIs`/`whatItDoes`/`needsConnect` block (preview-flag path only) with:
+Below the header, replace the `whatItIs`/`whatItDoes`/`needsConnect` block (test-account path only) with:
 
 1. **A stat-tile row, 4 tiles** — same `Tile` pattern/grid as 568/569 (`rounded-card border border-line bg-elevated p-5`, `.eyebrow` label, `font-display text-3xl font-medium` value, `grid grid-cols-2 sm:grid-cols-4 gap-4`). Hardcoded sample values:
    - "Active sequences" → 6
@@ -50,6 +50,41 @@ Below the header, replace the `whatItIs`/`whatItDoes`/`needsConnect` block (prev
 
 **Visual system:** identical constraint to 568/569 — reuse `rounded-card`, `bg-elevated`, `border-line`, `.eyebrow`, `font-display`/`font-sans`, `STATUS_SOLID`/`STATUS_TINT` exactly as already defined. No new colors, no new fonts, no new component patterns — this page should feel like the same system as the two before it.
 
-**Do:** build in `src/pages/MyAgent.jsx` behind the extended preview gate, hardcoded sample data only, `npm run build && npm run lint`, visually verify at `/my-agents/follow_up?preview=live` as `test_client`, confirm Phone Calls' (568) and Insurance's (569) previews still render correctly and every other agent page — including Follow-Ups' own page without the query param — is pixel-identical to before this prompt. Commit as `Prompt 570: build live-state layout preview for the Follow-Ups agent page`, push, log in [[Restorix Memories]], clear from the queue.
+**Do:** build in `src/pages/MyAgent.jsx` behind the test-account gate from 572, hardcoded sample data only, `npm run build && npm run lint`, visually verify at `/my-agents/follow_up` (no query param) as `test_client`, confirm Phone Calls' (568) and Insurance's (569) previews still render correctly and every other agent page — including Follow-Ups' own page for any non-test account — is pixel-identical to before this prompt. Commit as `Prompt 570: build live-state layout preview for the Follow-Ups agent page`, push, log in [[Restorix Memories]], clear from the queue.
 
 **Not in scope:** the Overview page's own redesign (still queued for after every individual agent page is done), any other agent's page, and anything that actually makes Follow-Ups functional.
+
+
+---
+
+## Prompt 571 — build out the "Bed Availability" agent page as if it were live — layout only, no real system yet
+
+**Same scope discipline as 568/569/570, applied to Bed Availability — but a different shape, deliberately.** `AGENT_CATALOG.bed_sync.status` stays `'placeholder'` — do **not** flip it to `'live'`, same reason as every prompt in this series: `MyAgent.jsx` is shared across every agent, `status` is what Overview's card and the badge actually key off, no real automation exists behind Bed Availability yet. This only builds what the page *would* look like.
+
+**Gate:** extend the same test-account identity gate from 572 in `src/pages/MyAgent.jsx`, now also matching `agentKey === 'bed_sync'` — a fourth branch, same mechanism. Every other `agentKey` renders exactly as it does today, and any account other than `test_client` sees the unchanged placeholder on Bed Availability too. Test client's `sub_agents` already includes `bed_sync`, so `portal.restorix.co/my-agents/bed_sync` — no query param needed — as `test_client` is how Brayden reviews it.
+
+**Why this one shouldn't just copy 568-570's call/message-log shape:** Bed Availability isn't a conversation with a discrete per-lead outcome (booked / routed / opted-out) — it's a continuously-synced *state* (how many beds are open right now, per program). Forcing it into the same "outcome pill per row" log would misrepresent what this agent actually does. Build it around availability instead, matching the shape already sketched on the Overview mockup Brayden and Eagle reviewed 2026-09-01 (occupancy bars, not outcome pills), just with more room to break it out by program.
+
+**What renders for the test client account, on Bed Availability only:**
+
+Keep the existing header row as-is. For the test client account, the badge reads "Live" — same `STATUS_SOLID.appointment_booked` solid-green treatment as the rest of this series.
+
+Below the header, replace the `whatItIs`/`whatItDoes`/`needsConnect` block (test-account path only) with:
+
+1. **A stat-tile row, 4 tiles** — same `Tile` pattern/grid as the rest of this series (`rounded-card border border-line bg-elevated p-5`, `.eyebrow` label, `font-display text-3xl font-medium` value, `grid grid-cols-2 sm:grid-cols-4 gap-4`). Hardcoded sample values:
+   - "Beds open" → 12 <span style="opacity:.6">/ 18</span> (smaller "/ 18" the way the Overview mockup rendered it — CC's own call on exact markup)
+   - "Occupancy" → 67%
+   - "Programs synced" → 3
+   - "Last synced" → 2 min ago
+
+2. **A "By program" section** — `.eyebrow` label, then one row per program (3 rows: Detox, Residential, PHP/day program — CC's call on exact names, keep them plausible for a behavioral-health facility). Each row: program name on the left, a small horizontal occupancy bar (`bg-muted` track, `bg-accent` fill, matching the bar already built for this card on the Overview mockup) filled to that program's own ratio, "X / Y open" at the end. Sample split across the 12/18 total, e.g. Detox 4/6, Residential 6/9, PHP 2/3.
+
+3. **A "Recent sync activity" section** below that — `.eyebrow` label, ~6 sample rows (fewer than the other pages' 8 — this agent doesn't generate per-lead conversation volume, padding it to 8 would be filler). Each row: a small colored dot (not an outcome pill — this isn't a discrete win/loss) + one-line description + relative timestamp, same dot pattern already used on the Overview mockup's hero card: green dot for a bed released/opened, blue (`accent-bright`) dot for a bed held/reserved, gray (`text-faint`) dot for a manual staff update. Sample content, e.g. "Detox wing — 2 beds released" / "Residential — 1 bed held for incoming transfer" / "PHP — capacity updated by staff."
+
+4. **A condensed value-prop line** below that — reuse `entry.copy.whatItDoes` (unchanged on the catalog: "A delay here is a common reason an inquiry gets lost... Instant, accurate availability keeps the booking moving..."), rendered smaller/fainter than its current placeholder treatment, same as the rest of this series.
+
+**Visual system:** identical constraint to the rest of this series — reuse `rounded-card`, `bg-elevated`, `border-line`, `.eyebrow`, `font-display`/`font-sans` tokens exactly as already defined. The occupancy-bar treatment is the one already used on the Overview mockup for this same card, not a new pattern. No new colors, no new fonts.
+
+**Do:** build in `src/pages/MyAgent.jsx` behind the test-account gate from 572, hardcoded sample data only, `npm run build && npm run lint`, visually verify at `/my-agents/bed_sync` (no query param) as `test_client`, confirm Phone Calls (568), Insurance (569) and Follow-Ups (570) previews still render correctly and every other agent page — including Bed Availability's own page for any non-test account — is pixel-identical to before this prompt. Commit as `Prompt 571: build live-state layout preview for the Bed Availability agent page`, push, log in [[Restorix Memories]], clear from the queue.
+
+**Not in scope:** the Overview page's own redesign (still queued for after every individual agent page is done), any other agent's page, and anything that actually makes Bed Availability functional.

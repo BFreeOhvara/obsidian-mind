@@ -17,6 +17,18 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-09-01 — Prompt 572 executed (CC): preview gate is now test-account identity, not a URL param
+
+**[CC | 2026-09-01 — Prompt 572 — SHIPPED. `restorix-setter-portal` `main` @ `a61fdde`. Frontend only, no migration. Visually verified live as `test_client`.]**
+
+The 568/569 preview was gated behind `?preview=live` — a URL trick Brayden had to remember to type. Replaced the gate in `src/pages/MyAgent.jsx`:
+- Dropped `useSearchParams`; added `useAuth`. New module const `TEST_CLIENT_EMAIL = 'test_client@restorix.internal'`.
+- `const isTestClient = session?.user?.email === TEST_CLIENT_EMAIL` — `session` from `useAuth()`. The email is the authenticated Supabase session identity (username `test_client` → `<username>@restorix.internal` per `useAuth.jsx` `signIn`), server-issued, not URL-based, not client-editable. No schema change — no new flag needed, the email already uniquely identifies the seeded account.
+- `showLivePreview = isTestClient && !!PREVIEW[agentKey]` (was `searchParams.get('preview') === 'live' && ...`).
+- `AGENT_CATALOG.*.status` still all `'placeholder'` — untouched.
+- `npm run build` + `oxlint` clean. **Verified live** (`test_client` / `Test1234!`, localhost): `/my-agents/intake_triage` and `/my-agents/insurance` with **no query param** both render the full preview; `/my-agents/reminders` (no PREVIEW block) still "COMING SOON"; the old `?preview=live` URL still lands fine (param is just ignored now). Non-test-account placeholder unchanged — verified by logic (`isTestClient` false → placeholder branch), no second client account exists to log in with. Pre-existing console 400 (background Supabase query) still present, unrelated.
+- Queue item 572 deleted from [[Restorix CC Queue]]. **Prompts 570 (Follow-Ups) + 571 (Bed Availability)** remain — both now say "extend the test-account identity gate from 572", i.e. add a `follow_up` / `bed_sync` key to the `PREVIEW` map (571's Bed Availability is a deliberately different shape: occupancy bars + by-program breakdown + sync-activity dots, not an outcome-pill log).
+
 ### 2026-09-01 — Prompt 569 executed (CC): live-state layout preview for the Insurance agent page
 
 **[CC | 2026-09-01 — Prompt 569 — SHIPPED. `restorix-setter-portal` `main` @ `608fd5a`. Frontend only, no migration. Visually verified live as `test_client`.]**

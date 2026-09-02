@@ -16,9 +16,9 @@ tags:
 
 ### Recently shipped (archive)
 
-**Latest shipped: Prompt 569** (CC 2026-09-01, `restorix-setter-portal` `main` @ `608fd5a`) — live-state layout preview for the Insurance agent page in `MyAgent.jsx`, extends 568's `?preview=live` `PREVIEW`-map gate (added an `insurance` key, no new conditional). `status` still `'placeholder'`. Verified live as `test_client` at `/my-agents/insurance?preview=live`. **Prompts 552–569 all done** (566 was a verify-only check). [[Restorix CC Queue]] holds **Prompt 570** (same preview for Follow-Ups) — extends the same gate with a `follow_up` key.
+**Latest shipped: Prompt 572** (CC 2026-09-01, `restorix-setter-portal` `main` @ `a61fdde`) — the 568/569 agent-page live preview is no longer gated on `?preview=live`; it's now gated on **test-account identity** (`session.user.email === 'test_client@restorix.internal'`, via `useAuth`). So `test_client` sees the Phone Calls + Insurance previews on plain navigation (`/my-agents/intake_triage`, `/my-agents/insurance` — no param); every other account sees the unchanged placeholder. `AGENT_CATALOG.*.status` still all `'placeholder'`. **Prompts 552–572 all done** (566 verify-only). [[Restorix CC Queue]] holds **Prompt 570** (Follow-Ups preview) + **Prompt 571** (Bed Availability preview — deliberately a different shape: occupancy bars, not an outcome log) — both extend 572's `PREVIEW`-map + identity gate.
 
-**Prompt 568** (CC 2026-09-01, @ `1543f0a`) — same, for the Phone Calls (Intake & Triage) page; introduced the `?preview=live` `PREVIEW`-map gate.
+**Prompt 568/569** (CC 2026-09-01, @ `1543f0a` / `608fd5a`) — built the Phone Calls + Insurance live-preview layouts in `MyAgent.jsx` (`PREVIEW` map keyed by agentKey: 4 stat tiles + an ~8-row outcome log + a condensed value-prop line, all hardcoded sample data, reusing `STATUS_TINT` pill colors). Originally `?preview=live`-gated; 572 swapped that for the identity gate.
 
 **Closer-login classifier block is gone** (2026-09-01) — `test_client` and `test_closer` both log in fine (`Test1234!`). Prompts 553/555/559–564 shipped structurally-verified-only and are now visually verifiable if wanted.
 
