@@ -17,6 +17,20 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-09-01 — Prompt 573 executed (CC): Phone Calls preview redone with its own dedicated layout
+
+**[CC | 2026-09-01 — Prompt 573 — SHIPPED. `restorix-setter-portal` `main` @ `600bab9`. Frontend only, no migration. Visually verified as `test_client`.]**
+
+568/569/570 all render through the shared `LivePreview` (4 tiles + flat log), so the three agent pages looked identical. Gave `intake_triage` its own `PhoneCallsPreview` component in `src/pages/MyAgent.jsx`, routed to when `showLivePreview && agentKey === 'intake_triage'` (before the `bed_sync` branch). insurance + follow_up still use `LivePreview` unchanged — Brayden will queue their own redesigns separately.
+
+- **`PREVIEW.intake_triage` reshaped** from `tiles`/`rows` → `avgPickup` + `funnel` (3 stages) + `calls` (same 8 rows, same outcomes/timestamps, now tagged `day: 'Today'|'Yesterday'` and two tagged `attention: 'urgent'|'callback'` with an `attentionReason`).
+- **"Needs your attention"** — only renders if any call has `attention`. Card = flex row with a 1-unit colored left bar (`bg-danger` red for the crisis escalation, `bg-yellow-600` amber for the awaiting-callback), phone + reason + time. No empty state — section just doesn't render otherwise.
+- **"Today at a glance"** — a funnel (Answered 24 → Consult offered 14 → Booked 9), each a `bg-muted` track + `bg-accent` fill at `value/24` width with the count inside and conversion-off-previous (58%, 64%) to the right. "Avg pickup: Instant" as a small standalone stat in the section header row (not a funnel stage). 9/24 still ≈ the 38% booking rate the old tile claimed.
+- **"Recent calls"** — new shared `CallRow` component (identical treatment to `LivePreview`'s rows), grouped under "Today" (6 rows) / "Yesterday" (2 rows: the 5h/6h ones) `.eyebrow` sub-headers. Attention calls still appear here too (full record).
+- No new tokens/colors/fonts. `bg-yellow-600` = the same shade `STATUS_SOLID.follow_up` already uses.
+- `npm run build` + `oxlint` clean. **Verified** (`test_client` / `Test1234!`, localhost): `/my-agents/intake_triage` renders attention panel + funnel + day groups; Insurance (569), Follow-Ups (570), Bed Availability (571) previews all pixel-identical; `/my-agents/referral_reporting` still "COMING SOON". Pre-existing console 400 (background Supabase query) unrelated.
+- Queue item 573 deleted — **[[Restorix CC Queue]] is now empty.**
+
 ### 2026-09-01 — Prompt 571 executed (CC): live-state layout preview for the Bed Availability agent page
 
 **[CC | 2026-09-01 — Prompt 571 — SHIPPED. `restorix-setter-portal` `main` @ `ec22ddd`. Frontend only, no migration. Visually verified as `test_client`.]**

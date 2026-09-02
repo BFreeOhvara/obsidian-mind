@@ -16,9 +16,13 @@ tags:
 
 ### Recently shipped (archive)
 
-**Latest shipped: Prompt 571** (CC 2026-09-01, `restorix-setter-portal` `main` @ `ec22ddd`) — **Bed Availability** agent-page live preview, the first with a *dedicated* render (`BedAvailabilityPreview` in `MyAgent.jsx`, routed to when `agentKey === 'bed_sync'`) instead of the shared `LivePreview`: 4 tiles (Beds open 12 /18, Occupancy 67%, Programs synced 3, Last synced 2 min ago) + a "By program" section with `bg-muted`/`bg-accent` occupancy bars (Detox 4/6, Residential 6/9, PHP 2/3) + a 6-row "Recent sync activity" feed with colored dots (`SYNC_DOT`: green released / blue held / gray staff). Added an optional `sub` prop to `PreviewTile` (backward-compatible). `AGENT_CATALOG.*.status` still all `'placeholder'`. Verified as `test_client` at `/my-agents/bed_sync`. **Prompts 552–572 all done** (566 verify-only). [[Restorix CC Queue]] holds **Prompt 573** — redo the Phone Calls preview with its own dedicated shape (attention panel + call funnel + day-grouped log), since 568/569/570 all render through the same generic `LivePreview`.
+**Latest shipped: Prompt 573** (CC 2026-09-01, `restorix-setter-portal` `main` @ `600bab9`) — **Phone Calls** preview redone with its own dedicated `PhoneCallsPreview` render (routed to when `agentKey === 'intake_triage'`): a "Needs your attention" callout (colored left bar — red crisis escalation / amber awaiting-callback, only renders if there's something), a booked-consult funnel (Answered 24 → Consult offered 14 → Booked 9, `bg-muted`/`bg-accent` bars + conversion %), and the call log grouped under "Today"/"Yesterday". `PREVIEW.intake_triage` reshaped (`avgPickup`/`funnel`/`calls` — same 8 calls). insurance + follow_up still on the shared `LivePreview`. **[[Restorix CC Queue]] is now empty.**
+
+**Prompt 571** (CC 2026-09-01, @ `ec22ddd`) — **Bed Availability** preview, first dedicated render (`BedAvailabilityPreview`): 4 tiles + "By program" occupancy bars (Detox 4/6, Residential 6/9, PHP 2/3) + 6-row "Recent sync activity" feed with colored dots (`SYNC_DOT`). Added optional `sub` prop to `PreviewTile`.
 
 **Prompt 570** (CC 2026-09-01, @ `981bdef`) — **Follow-Ups** preview: a `follow_up` key in the `PREVIEW` map (4 tiles + 8-row "Recent activity" log), yellow `STATUS_TINT.follow_up` "Nurturing" pill.
+
+`AGENT_CATALOG.*.status` still all `'placeholder'` — all previews are test-account-only (`test_client@restorix.internal` identity gate from 572). **Prompts 552–573 all done** (566 verify-only).
 
 **Prompt 572** (CC 2026-09-01, @ `a61fdde`) — the agent-page live preview is no longer gated on `?preview=live`; it's gated on **test-account identity** (`session.user.email === 'test_client@restorix.internal'`, via `useAuth`). So `test_client` sees the previews on plain navigation; every other account sees the unchanged placeholder.
 
