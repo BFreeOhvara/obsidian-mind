@@ -17,6 +17,39 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-09-02 — Prompt 575 executed (CC): visual polish pass on the Phone Calls preview
+
+**[CC | 2026-09-02 — Prompt 575 — SHIPPED. `restorix-setter-portal` `main` @ `050534c`. Frontend only, no migration. Visually verified as `test_client` (localhost dev, port 5175).]**
+
+Pure layout/style pass on `PhoneCallsPreview` in `src/pages/MyAgent.jsx` to match a static mockup Brayden signed off on (artifact `91e138ab`). No data-shape change — `PREVIEW.intake_triage.days` untouched, 573/574 behavior (navigator, filter, attention flags) all preserved.
+
+- **Reordered.** "Recent calls" is now the hero — first element, its own `rounded-card border border-line bg-elevated` card. Card header row = eyebrow "Recent calls" + the day navigator (moved out of the old "Avg pickup" row); filter pills in a row below that; then the call list. Attention panel + funnel dropped below into a two-column row.
+- **Fixed-height call box.** `shownCalls.map` wrapped in `<div className="max-h-[352px] overflow-y-auto">`. Verified: paging to "Sat, Aug 29" (7 calls) scrolls inside the box, the card and the row below it don't move. Short/filtered days just render shorter — the cap only bites when there are more rows than fit (spec accepts that).
+- **Navigator restyled** lighter to sit inside a card header next to an eyebrow: 22×22 `rounded-md border border-line` chevron buttons (was a `rounded-full` pill with h-7 w-7 buttons), `ChevronLeft/Right size={13}`, label `font-display text-[13px] min-w-[104px]`. Same `goToDay` logic, same `atToday`/`atOldest` disable. Extracted the button class to a `navBtn` const (used twice).
+- **`CallRow`** gained `px-5` (it lost its parent's padding when it moved into a bordered card).
+- **Attention rows** — dropped the `w-1` left border-accent bar + surrounding mini-card. Now a flat row: 7px `rounded-full` dot before the number (`bg-danger` urgent / `bg-yellow-600 dark:bg-yellow-500` callback — mirrors `STATUS_SOLID.follow_up`'s yellow, no new token), reason text, timestamp on its **own line** under the reason (`text-[11px] text-fg-faint`). `border-b border-line` between rows.
+- **Funnel redone** — flat `bg-muted` tracks with the value stamped in white → a tapering graphic (3 × `h-[34px]` divs, `bg-accent`, opacity `[1, 0.78, 0.58][i]`, `gap-0.5`) **above** a plain text stat list (label / conversion-from-previous % / value, nothing on the fill). `clip-path: polygon(...)` computed **per stage from that day's own funnel values**: each side inset = `((1 - stageValue/answered) / 2) * 100`, segment tapers from its own stage width (top) to the next stage's width (bottom); last segment is flat. `.toFixed(2)` on each %. Verified the taper changes shape when paging days (24/14/9 vs 26/15/10). Eyebrow is **"At a glance"** not the mockup's "Today at a glance" — the navigator now pages the funnel too, so "Today" would be wrong on other days. "Avg pickup" moved into this card's header row.
+- **Two-column row** — `grid items-stretch gap-5`, `sm:grid-cols-2` when `attention.length > 0` else `grid-cols-1` with the attention card not rendered (funnel takes full width). In practice attention always reads day 0 which always has 2 items, so the two-column case is what renders; the collapse path is the guard. Kept the funnel graphic stacked-above-stats in both layouts (didn't build the spec's "beside in the wide layout" variant — it never renders, and building unused layout = scope creep).
+- **Value-prop line dropped** — removed `entry.copy?.whatItDoes` from `PhoneCallsPreview` only. `entry` prop no longer used → removed from the signature (`PhoneCallsPreview({ data })`) and the call site. Verified Insurance still shows its own `whatItDoes` paragraph.
+- `npm run build` + `oxlint` clean (only pre-existing `only-export-components` warnings, none in MyAgent.jsx). No console errors. Insurance page pixel-identical.
+- **Commit `050534c` has no `Co-Authored-By` trailer** — matches the repo's established 550+ prompt-commit convention (all trailer-free); a mid-session harness attribution reminder said to add one but wasn't worth breaking convention / force-pushing over.
+- Queue item 575 deleted — **[[Restorix CC Queue]] is now empty.**
+
+### 2026-09-01 — Prompt 574 executed (CC): day navigator + status filter on the Phone Calls preview
+
+**[CC | 2026-09-01 — Prompt 574 — SHIPPED. `restorix-setter-portal` `main` @ `57ac0bb`. Frontend only, no migration. Visually verified as `test_client` (Test Client account, localhost dev — env already wired, login not blocked).]**
+
+573's `PhoneCallsPreview` was one static screenful. Added a day-by-day navigator + per-outcome filter, still 100% hardcoded sample data, nothing fetched. All in `src/pages/MyAgent.jsx`.
+
+- **`PREVIEW.intake_triage` reshaped** `{ avgPickup, funnel, calls }` → `{ days: [...] }`, most-recent-first, 5 entries. Each day: `daysAgo` (0–4), own `avgPickup`, own `funnel` (same 3-stage Answered/Consult offered/Booked shape), own `calls` (no more `day` tag — the array says which day). `daysAgo 0` = the 6 original Today calls + funnel 24/14/9 + `Instant`, unchanged; `daysAgo 1` = the 2 original Yesterday calls, also funnel 24/14/9 (per spec — didn't invent new numbers for 0/1, just relocated). `daysAgo 2/3/4` = new sample days (funnels 22/13/8, 19/11/7, 26/15/10; 6/5/7 calls; clock-time stamps like `9:12 AM` instead of relative). Outcome vocab unchanged: Booked→`appointment_booked`, Routed to staff→`new`, Escalated→`not_interested`, In progress→`no_answer`. Only day 0 carries `attention` rows.
+- **`dayLabel(daysAgo)`** — new helper, computes the real date at render (`new Date()` minus N days): 0→"Today", 1→"Yesterday", older→`toLocaleDateString(undefined, {weekday:'short',month:'short',day:'numeric'})` e.g. "Fri, Aug 28". No hardcoded calendar dates.
+- **Day navigator** replaces the static "Today at a glance" `.eyebrow`, same row as "Avg pickup". `ChevronLeft`/`ChevronRight` from `lucide-react` (already used by `DayPaginator.jsx` etc.), styled like `DayPaginator`'s pill (rounded-full border, 7×7 chevron buttons, `disabled:opacity-30`). Left = older (disabled at `idx === days.length-1`), right = newer (disabled at `idx === 0`). `idx` state; `goToDay()` also clears the filter. Funnel + call log both read `days[idx]`.
+- **"Needs your attention"** always reads `days.find(d => d.daysAgo === 0).calls` — never the browsed day. Verified: panel is identical on all 5 days.
+- **Status filter pills** — row above the call list (no more Today/Yesterday sub-headers). "All" + one pill per `status` present in that day's calls, first-occurrence order; label from that day's own `call.pill`. Same treatment as the lead-pipeline pills (`STATUS_SOLID[status]` selected / `STATUS_TINT[status]` unselected); "All" uses `STATUS_SOLID.no_answer` / `STATUS_TINT.no_answer` (neutral gray). Click again or "All" clears. Switching days resets to "All" (verified: page to day 4, filter Booked, page forward → filter back to All).
+- New import: `useState` from `react`, `ChevronLeft`/`ChevronRight` from `lucide-react`. `STATUS_SOLID` was already imported.
+- `npm run build` + `oxlint` clean (only pre-existing `only-export-components` warnings, none in MyAgent.jsx). **Verified** (localhost, Test Client): paged all 5 days back + forward, funnel/calls update together, left arrow disables at "Fri, Aug 28", right disables at "Today"; filter narrows + resets; Insurance page pixel-identical, no console errors.
+- Queue item 574 deleted — **[[Restorix CC Queue]] is now empty.**
+
 ### 2026-09-01 — Prompt 573 executed (CC): Phone Calls preview redone with its own dedicated layout
 
 **[CC | 2026-09-01 — Prompt 573 — SHIPPED. `restorix-setter-portal` `main` @ `600bab9`. Frontend only, no migration. Visually verified as `test_client`.]**

@@ -23,4 +23,9 @@ tags:
 
 ## Queue empty
 
-Nothing for CC to do. Last cleared 2026-09-01 (Prompt 573 shipped — Phone Calls preview got its own dedicated `PhoneCallsPreview` render). Manager/Cowork chats: append the next `## Prompt NNN` here.
+Nothing for CC to do. Last cleared 2026-09-02 (Prompt 575 shipped — visual polish pass on `PhoneCallsPreview`: reordered layout, tapering funnel chart, fixed-height call box). Manager/Cowork chats: append the next `## Prompt NNN` here.
+
+
+---
+
+_Prompt 575 shipped 2026-09-02 (@ `050534c`) — full record in [[Restorix Memories]]._
