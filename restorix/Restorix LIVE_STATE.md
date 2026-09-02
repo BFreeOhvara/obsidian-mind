@@ -16,7 +16,9 @@ tags:
 
 ### Recently shipped (archive)
 
-**Latest shipped: Prompt 568** (CC 2026-09-01, `restorix-setter-portal` `main` @ `1543f0a`) — live-state layout preview for the Phone Calls (Intake & Triage) agent page in `MyAgent.jsx`, gated behind `?preview=live` (a `PREVIEW` map keyed by agentKey). `status` still `'placeholder'` — real clients unaffected, honest "Coming soon" unchanged. Verified live as `test_client` at `/my-agents/intake_triage?preview=live`. **Prompts 552–568 all done** (566 was a verify-only check). [[Restorix CC Queue]] holds **Prompt 569** (same preview for Insurance) + **Prompt 570** (same for Follow-Ups) — both extend 568's `PREVIEW`-map gate.
+**Latest shipped: Prompt 569** (CC 2026-09-01, `restorix-setter-portal` `main` @ `608fd5a`) — live-state layout preview for the Insurance agent page in `MyAgent.jsx`, extends 568's `?preview=live` `PREVIEW`-map gate (added an `insurance` key, no new conditional). `status` still `'placeholder'`. Verified live as `test_client` at `/my-agents/insurance?preview=live`. **Prompts 552–569 all done** (566 was a verify-only check). [[Restorix CC Queue]] holds **Prompt 570** (same preview for Follow-Ups) — extends the same gate with a `follow_up` key.
+
+**Prompt 568** (CC 2026-09-01, @ `1543f0a`) — same, for the Phone Calls (Intake & Triage) page; introduced the `?preview=live` `PREVIEW`-map gate.
 
 **Closer-login classifier block is gone** (2026-09-01) — `test_client` and `test_closer` both log in fine (`Test1234!`). Prompts 553/555/559–564 shipped structurally-verified-only and are now visually verifiable if wanted.
 

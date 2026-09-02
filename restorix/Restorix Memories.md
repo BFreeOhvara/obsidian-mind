@@ -17,6 +17,19 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-09-01 — Prompt 569 executed (CC): live-state layout preview for the Insurance agent page
+
+**[CC | 2026-09-01 — Prompt 569 — SHIPPED. `restorix-setter-portal` `main` @ `608fd5a`. Frontend only, no migration. Visually verified live as `test_client`.]**
+
+Extends Prompt 568's `PREVIEW`-map gate in `src/pages/MyAgent.jsx` — added an `insurance` key, no new conditional. `AGENT_CATALOG.insurance.status` still `'placeholder'` (untouched). `?preview=live` on any agent without a `PREVIEW` entry still renders the normal placeholder.
+
+- **Tiles:** Verifications today 17 / Avg turnaround 45 sec / Confirmed in-network 71% / Flagged for staff 3.
+- **"Recent verifications"** — 8 rows, payer name + one-line result + `STATUS_TINT` pill: `appointment_booked` green "In-network" ×3 (Aetna, BCBS, UnitedHealthcare), `new` blue "Out-of-network" ×2 (Cigna, Optum/UMR), `not_interested` red "Coverage expired" ×1 (Humana — the flagged case), `no_answer` gray "Self-pay"/"No coverage" ×2 (Self-pay, Kaiser).
+- **Row-ref styling:** added a `monoRef` flag to the PREVIEW block — `true` for `intake_triage` (phone numbers, mono), omitted for `insurance` so payer names render `font-sans font-medium`. 570 (Follow-Ups, phone numbers) will set `monoRef: true` again.
+- Condensed value-prop line = `entry.copy.whatItDoes` in `text-xs text-fg-faint`. No new tokens/colors/fonts.
+- `npm run build` + `oxlint` clean. **Verified live** (`test_client` / `Test1234!`, localhost): `/my-agents/insurance?preview=live` renders full preview; `/my-agents/insurance` (no param) still "COMING SOON" unchanged; Phone Calls preview (568) still renders correctly. One pre-existing console 400 (a background Supabase query, same as prior sessions — not from the hardcoded preview, which fetches nothing).
+- Queue item 569 deleted from [[Restorix CC Queue]]. **Prompt 570** (same preview for Follow-Ups) remains — will add a `follow_up` key with `monoRef: true` and a `follow_up`-yellow pill for the "replied, not ready yet" outcome.
+
 ### 2026-09-01 — Prompt 568 executed (CC): live-state layout preview for the Phone Calls agent page
 
 **[CC | 2026-09-01 — Prompt 568 — SHIPPED. `restorix-setter-portal` `main` @ `1543f0a`. Frontend only, no migration. Visually verified live as `test_client`.]**
