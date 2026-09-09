@@ -20,6 +20,7 @@ tags:
 
 ---
 
+_Prompt 582 shipped 2026-09-09 (@ `6cf9351`) — full record in [[Restorix Memories]]._
 _Prompt 581 shipped 2026-09-09 (@ `5500e4f`) — supersedes 579/580; full record in [[Restorix Memories]]._
 _Prompt 579 shipped 2026-09-09 (@ `729a470`) — full record in [[Restorix Memories]]._
 _Prompt 578 shipped 2026-09-09 (@ `27dba03`) — full record in [[Restorix Memories]]._

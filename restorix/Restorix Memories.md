@@ -17,6 +17,18 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-09-09 — Prompt 582 executed (CC): sample Close Rate chart data for `test_closer` (+ fixed a latent 581 bar-height bug)
+
+**[CC | 2026-09-09 — Prompt 582 — SHIPPED. `restorix-setter-portal` `main` @ `6cf9351`, pushed. Frontend only, no DB write. Verified live as `test_closer`.]**
+
+`test_closer` has no real booked/resolved leads, so Prompt 581's "Close Rate — Last 8 Weeks" chart rendered 8 empty dashed no-data bars — no way to see a populated chart. Added UI-only sample data for **that chart only** (tile row stays real 0 / "—", same as `test_setter`'s own tile row).
+
+- **`mockCloseWeeks(currentMonday)`** in `Stats.jsx` (next to `mockDays`): 8 Monday-anchored weeks, each seeded off its own Monday string via the existing **`seededRandom`** (xmur3+mulberry32) so numbers are stable across re-renders. Each week: `resolved` 3–10, `rate` recomputed as `closed/resolved` from a ~35–80% target — every week `resolved > 0` on purpose (this path exists to show a populated chart). Shape matches `closerCloseRateByWeek`'s real output exactly (`{ monday, closed, lost, resolved, rate }`).
+- Gate: **`isMockCloser = profile?.username === 'test_closer'`** — username-scoped exactly like `isMockAccount`/`test_setter`, never role-scoped, so it can never hit a real closer. `closeWeeks` useMemo now: `!isCloser → []`; `isMockCloser → mockCloseWeeks(...)`; else the real `closerCloseRateByWeek`.
+- **Latent Prompt 581 bug fixed** (surfaced by finally seeing a populated chart): `CloseRateWeeksChart`'s bar track was `flex w-full flex-1 items-end` inside a `flex items-end` row — an `items-end` row does **not** stretch its children, so the `flex-1` track collapsed to **0 height** and a populated bar's `height: N%` resolved to **0px**. Never caught in 581 because `test_closer`'s chart was 100% no-data stubs, which carry a fixed `h-2` and don't depend on the track height. Fix: explicit **`h-[150px]`** on the track div. Confirmed live via `getBoundingClientRect` — bars now 50–113px tall, proportional to rate.
+- Live check as `test_closer`: tile row still real (`0 / 0 / — / —` on Daily); chart shows 8 populated bars, first neutral (no prior week), then a real green/red mix by week-over-week trend (e.g. Jul 27 33% < Jul 20 56% → red; Aug 3 50% > 33% → green), heights proportional. `npm run build` + `npm run lint` clean (15 warnings, all pre-existing).
+- Queue item 582 deleted — **[[Restorix CC Queue]] is now empty.**
+
 ### 2026-09-09 — Prompt 581 executed (CC): closer Stats rebuilt — Taken/Sold/Close Rate/No Show Rate + an 8-week Close Rate trend (reworks 579)
 
 **[CC | 2026-09-09 — Prompt 581 — SHIPPED. `restorix-setter-portal` `main` @ `5500e4f`, pushed. Frontend only, no migration. Verified live as `test_closer`.]**
