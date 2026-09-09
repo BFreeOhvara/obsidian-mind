@@ -17,6 +17,28 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-09-09 — Prompt 581 executed (CC): closer Stats rebuilt — Taken/Sold/Close Rate/No Show Rate + an 8-week Close Rate trend (reworks 579)
+
+**[CC | 2026-09-09 — Prompt 581 — SHIPPED. `restorix-setter-portal` `main` @ `5500e4f`, pushed. Frontend only, no migration. Verified live as `test_closer`.]**
+
+**Supersedes Prompt 580** (was queued, never shipped — the spec said to skip/delete it; it wasn't actually in the queue file, nothing to remove). Reworks Prompt 579's closer Stats page. Brayden, looking at 579 live: *"you could just find that out from the pipeline... I don't really think that these stat pages are necessary [as built]."* Real problem 579 missed — every number it showed (Assigned/Closed/Lost/No Show as raw counts) already exists as a live filter-chip count on My Pipeline; the page redisplayed a working queue instead of being a place to check your own **rate**.
+
+- **`useStats.js` `statsForCloser`**: dropped the all-time-only `winRate`. Added:
+  - **`closeRate` = closed / (closed + lost)** — resolved deals only, **no-shows OUT of the denominator**. Decided explicitly in conversation: `Sold ÷ (Sold + Lost)`, *not* `Sold ÷ Taken` — isolates the closer's selling skill from show-rate (a scheduling/reminder problem, tracked separately). `"NN%"` / `"—"` at zero denominator.
+  - **`noShowRate` = noShow / assigned**, same formatting.
+  - Both **period-scoped like every tile** — a **deliberate reversal** of 579/CloserOverview's "Win Rate is all-time only, one period's sample is too small." **Brayden made this call explicitly** (wants one consistent window across all four numbers). Flagged in-code (`statsForCloser` comment) so nobody "fixes" it back to all-time without checking with him. `CloserOverview`'s own "Win Rate (All Time)" tile is a *separate inline* computation in `Overview.jsx` — **not touched** (verified live: still reads 14% independently).
+  - Raw `assigned`/`closed`/`lost`/`noShow` kept on the return object (needed for the rates + the admin table).
+  - New helper **`closerCloseRateByWeek(leads, closerId, tz, weekCount=8)`** — Close Rate per Monday-anchored week (reuses `mondayOf`/`shiftDay`/`zonedDayRange`), leads-based off `closer_outcome`/`closer_outcome_at`, `rate: null` for a week with zero resolved deals (a no-data week is **not** a 0% week).
+- **`Stats.jsx`**:
+  - Closer tiles → **Strategy Calls Taken / Strategy Calls Sold / Close Rate / No Show Rate** (grid back to `sm:grid-cols-2 lg:grid-cols-4`).
+  - **Outcome Mix block deleted** (was 579's).
+  - Weekly Activity + 21-business-day heatmap **re-gated to `!isCloser`** — 579 had un-gated them for closers; put back. Setters/admin sections **byte-for-byte unchanged**.
+  - New closer-only **"Close Rate — Last 8 Weeks"** bar chart (`CloseRateWeeksChart`): fixed recent window, no pagination (like the old heatmap). Bar height = that week's Close Rate; colour vs. the previous week — **green up / red down / muted flat** (`bg-success`/`bg-danger`/`bg-fg-faint`, no new hex). Oldest bar or a week whose prior week has no data → muted. A zero-resolved week → a hollow dashed stub, not a full-height red bar.
+  - Admin **Closers rollup** → Name / Taken / Sold / Close Rate / No Show Rate (colSpan 6→5), same 4 metrics a closer sees.
+- **Data limitation, same as 579**: `test_closer`'s resolved deals have null `closer_outcome_at` (forward-only, Prompt 548), so the 8-week chart renders all-no-data-stubs for that account — the colour/trend path (green/red bars) couldn't be exercised against real data this session, only read. The all-time tiles still work because `closed`/`lost` fall back to counting null-stamped rows on an unbounded view (kept from 579).
+- Live checks as `test_closer`: Daily = 0 / 0 / — / — (nothing today). All Time = **Taken 3 / Sold 1 / Close Rate 33% / No Show Rate 33%** — Close Rate 1/(1+2)=33%, No Show Rate 1/3=33%, both consistent. Monthly (Sep 2026) = Taken 1 / Sold 0 / **Close Rate "—"** (0 resolved, correctly not "0%") / No Show Rate 100%. Chart renders 8 correct week labels + legend. `npm run build` + `npm run lint` clean (15 warnings, all pre-existing Fast-Refresh).
+- Queue item 581 deleted — **[[Restorix CC Queue]] is now empty.**
+
 ### 2026-09-09 — Prompt 579 executed (CC): closer Stats page — multi-tile parity with the setter Stats page
 
 **[CC | 2026-09-09 — Prompt 579 — SHIPPED. `restorix-setter-portal` `main` @ `729a470`, pushed. Frontend only, no migration (added two columns to an existing `select`, no DDL). Verified live as `test_closer` in the local preview.]**
