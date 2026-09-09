@@ -17,6 +17,27 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-09-09 — Prompt 579 executed (CC): closer Stats page — multi-tile parity with the setter Stats page
+
+**[CC | 2026-09-09 — Prompt 579 — SHIPPED. `restorix-setter-portal` `main` @ `729a470`, pushed. Frontend only, no migration (added two columns to an existing `select`, no DDL). Verified live as `test_closer` in the local preview.]**
+
+Brayden, looking at the closer Stats page live (one card, "Strategy Calls Assigned — 0"): "I want this stat page to actually mean something, like it does on the setter portal." The closer branch of `Stats.jsx` rendered exactly one `Tile` and `!isCloser`-gated the entire Weekly Activity / heatmap block. Brought it to the same depth as the setter page, **reusing `CloserOverview`'s exact computations** (Overview.jsx) rather than a second way.
+
+- **`useStats.js` `statsForCloser`**: `{ assigned }` → `{ assigned, pending, noShow, lost, closed, winRate }`.
+  - `assigned` / `pending` / `noShow` — scoped by `strategy_call_at` in the period. `noShow` goes through `displayOutcome` (never a raw `closer_outcome === 'no_show'` — that value is derived, never stored: `lib/closerOutcome.js`).
+  - `closed` / `lost` — scoped by `closer_outcome_at` (matches `CloserOverview`'s own `closedThisWeek`). **`closer_outcome_at` is forward-only (Prompt 548) — older rows carry a null stamp.** First pass had `inRange(null, …)` → `false`, so on All Time the Closed/Lost tiles read 0 while an all-time Win Rate below showed 33% (real, from raw `closer_outcome` counts) — caught live as an obvious contradiction. Fix: on an **unbounded** (All Time, empty start/end) view, count null-stamped closed/lost rows too; bounded periods stay stamp-scoped like Overview.
+  - `winRate` — deliberately **all-time regardless of the selected period** (`CloserOverview`'s own reasoning: "a single week's sample is too small to mean anything"). `closed / (closed + lost)`, resolved deals only, `'—'` when zero resolved.
+  - `useAllLeadsForStats` `select` gained `closer_outcome, closer_outcome_at` (the two fields those counts need).
+- **`Stats.jsx`**:
+  - Closer tile row: 5 tiles — Strategy Calls Assigned / Closed / Lost / No Show / Win Rate (All Time). Grid `sm:grid-cols-3 lg:grid-cols-5` for closers, unchanged 3-col for setters.
+  - New closer-only **Outcome Mix** row — one non-clickable pill per `CLOSER_OUTCOME_TILES` with its period count, reusing `OUTCOME_LABELS`/`OUTCOME_TINT` verbatim (same look as `CloserBookedPipeline`'s filter chips; My Pipeline owns the filtering interaction — Stats is a report).
+  - Weekly Activity + 21-business-day heatmap: `!isCloser` gate dropped entirely (`{(<div>…</div>)}` → plain `<div>`). `calls` already captures closer activity — the column is named `setter_id` for historical reasons but holds whoever logged the call (`LogCallModal` is shared), so `useMyAllCalls(profile.id)` already returned the closer's own history; the gate was hiding real data. Admin still also gets the team rollup below.
+  - Admin **Closers rollup table**: Name + "Strategy Calls Assigned" → Name / Assigned / Closed / Lost / No Show / Win Rate (colSpan 2 → 6), from the extended `statsForCloser` per rep — same `rangeFor(repTz)` pattern `rollup.setters` already uses. **Structurally verified only** — no test-admin account exists (standing rule, Prompt 436/468).
+- **`CLOSER_OUTCOME_TILES`** moved from a private const in `Overview.jsx` to an export in `components/ui/OutcomeBadge.jsx` (the outcome-vocabulary home) so Stats + Overview share one definition. Overview imports it from there now.
+- **FLAG honored**: no revenue/deal-value field exists anywhere in the schema (Commissions.jsx's "no defined comp structure" gap) — no dollar tile added, a stats page can count outcomes but not money until that business decision is made.
+- Live check as `test_closer`: Daily view all 0s (nothing logged today); All Time → Assigned 3 / Closed 1 / Lost 2 / No Show 1 / Win Rate 33% (**1/(1+2) — consistent with the tiles after the null-stamp fix**); Outcome Mix matched the tiles exactly; Weekly Activity + heatmap rendered fine with the account's sparse call history (zero-value bars/cells, no crash). `npm run build` + `npm run lint` clean (15 Fast-Refresh warnings — one new, the `CLOSER_OUTCOME_TILES` export on OutcomeBadge.jsx, a file that already carries 3 of the same).
+- Queue item 579 deleted — **[[Restorix CC Queue]] is now empty.**
+
 ### 2026-09-09 — Prompt 578 executed (CC): Client Portal CRM reframe — nav + Overview + Pipeline + Appointments + Reports
 
 **[CC | 2026-09-09 — Prompt 578 — SHIPPED. `restorix-setter-portal` `main` @ `27dba03`, pushed. Frontend only, no migration, no DB touched. Verified live as `test_client` in the local dev preview — all 5 client pages rendered and interacted with.]**
