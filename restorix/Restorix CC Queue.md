@@ -18,15 +18,8 @@ tags:
 > - **Numbering:** next prompt number = one past the highest referenced in [[Restorix LIVE_STATE]] + [[Restorix Memories]]. Don't reserve numbers anywhere but here.
 > - One `## Prompt NNN — <title>` heading per item. Put the full spec inline (or in a `<details>` block). Order = execution order.
 
-
 ---
 
-## Queue empty
-
-Nothing for CC to do. Last cleared 2026-09-05 (Prompt 577 shipped — `la-ldi-bail-scraper`, the Louisiana bail-bonds lead source, deployed + 695 real leads ingested + cron-scheduled). Manager/Cowork chats: append the next `## Prompt NNN` here.
-
-
----
-
+_Prompt 578 shipped 2026-09-09 (@ `27dba03`) — full record in [[Restorix Memories]]._
 _Prompt 577 shipped 2026-09-05 (@ `f6e0561`) — full record in [[Restorix Memories]]._
 _Prompt 576 shipped 2026-09-04 (@ `3d9eef9`) — full record in [[Restorix Memories]]._
