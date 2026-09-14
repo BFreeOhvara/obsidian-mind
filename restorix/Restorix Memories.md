@@ -17,6 +17,21 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-09-14 — Prompt 595 executed (CC): My Pipeline box quantized to whole rows + vertically centered empty state
+
+**[CC | 2026-09-14 — Prompt 595 — SHIPPED. `restorix-setter-portal` `main` @ `1f17bb7`, pushed. Frontend only, no migration. Verified live at a 1366×768 viewport as `test_closer` (10 real `lost` leads, 5 real `follow_up` leads) and `test_setter` (149 real `new` leads).]**
+
+Brayden looked at My Pipeline's Closer tab (Lost, 10 leads) and noticed the box's bottom edge cut through the last visible row instead of ending on that row's own bottom border — [[Restorix Memories#2026-09-14 — Prompt 594|Prompt 594]]'s `h-[65vh]` box has no relationship to its `h-[72px]` rows, so at most viewport heights the box simply doesn't land on a multiple of 72px. Two more asks bundled in: keep the "no page scroll" property (591's original goal) after resizing, and vertically center the empty-state message in the box (it was sitting near the top).
+
+**Fix:**
+- Both tables' box height switched from `h-[65vh]` to a fixed pixel height = the shared 43px `<thead>` height + a whole number of 72px rows. Row count is context-dependent, picked by measuring real geometry live rather than guessing: `CloserBookedPipeline` (only ever renders inside My Pipeline) and `SetterOverview`'s embedded My Pipeline→Setter tab both have less content above the table (`boxTop` ≈290px) and fit **5** rows (`h-[403px]`) before the page itself would need to scroll at 1366×768. `SetterOverview` non-embedded (`/overview`, `/my-leads`) carries `TodayStrip`'s 4 stat tiles above the table (`boxTop` ≈400px) and only fits **4** rows (`h-[331px]`) — using the embedded page's roomier 5-row height there would have broken the no-page-scroll property Brayden explicitly restated.
+- Empty/loading `<td>` gained an explicit height (360px embedded / 288px non-embedded — the box height minus the header, i.e. exactly the space the rows would have occupied) plus `align-middle`. A bare `<td>` only takes the height of its own padding; giving it real height and using the table cell's native `vertical-align` centers the message correctly without needing flex-on-td tricks (which can make browsers generate an anonymous table-cell wrapper and break `colSpan`/sizing).
+- Verified live: Closer→Lost (10 leads) box bottom sits within 0.5px of the 5th row's real bottom border (sub-pixel only, from the 72px row's own fractional rendering); Setter→Follow-up (5 real leads) fills exactly 5 rows; `test_setter`'s `/overview` (149 real leads) box bottom lands within 0.5px of the 4th row's bottom. `document.documentElement.scrollHeight === clientHeight === 768` (no page scroll) confirmed on both the tightest embedded case (10 Lost rows) and the tightest non-embedded case (149 New rows). Empty tabs on both Closer/Setter sides of My Pipeline and on `/overview` show the centered message. Build + lint clean.
+
+**Pattern worth repeating (extends [[Restorix Memories#2026-09-14 — Prompt 594|594]]'s):** when a fixed-height scroll box needs to end exactly on content boundaries, don't reach for a viewport-relative height (`vh`) — measure the container's real position (`getBoundingClientRect().top`) and the viewport height live for every context the shared component renders in, then pick a literal pixel height (header height + N × row height) per context. Tailwind's JIT scanner needs the complete arbitrary-value class string to appear literally in source — a template-interpolated `h-[${n}px]` will not generate CSS, so context-dependent heights have to be written as explicit ternary branches with full literal strings, not computed.
+
+---
+
 ### 2026-09-14 — Prompt 594 executed (CC): My Pipeline row-height parity + empty-status-tab box/header preserved
 
 **[CC | 2026-09-14 — Prompt 594 — SHIPPED. `restorix-setter-portal` `main` @ `aaabbb3`, pushed. Frontend only, no migration. Verified live locally (dev server) as `test_closer` (real data: 5 `follow_up` leads, 2 `Pending` booked leads) and `test_setter`/My Leads (empty states).]**
