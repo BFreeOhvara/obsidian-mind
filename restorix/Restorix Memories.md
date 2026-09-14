@@ -17,6 +17,26 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-09-14 — Prompt 596 executed (CC): My Pipeline row count raised to 8, My Leads/Overview to 7
+
+**[CC | 2026-09-14 — Prompt 596 — SHIPPED. `restorix-setter-portal` `main` @ `0fcfd5d`, pushed. Frontend only, no migration. Verified live as `test_closer` (My Pipeline Closer→Lost, 10 leads; Setter→Follow-up, 5 leads; Setter→No Answer, 0 leads) and `test_setter` (`/overview`, 149 New leads; No Answer, 0 leads; Appointment Booked, 3 leads).]**
+
+[[Restorix Memories#2026-09-14 — Prompt 595|Prompt 595]] picked its row counts (5 for My Pipeline, 4 for My Leads/`/overview`) by testing at a fixed 1366×768 viewport. Brayden was looking at the result live on his own (larger) screen and saw a lot of unused space below the box before the page would actually need to scroll, so he asked for more rows: My Pipeline (both tabs) 5→8, My Leads/`/overview` 4→7 (kept one row smaller than My Pipeline since that page carries stat tiles + Request Leads button above the table, less headroom).
+
+**Fix (pure arithmetic on 595's established formula, 43px header + N×72px rows):**
+- `CloserBookedPipeline`'s box (`src/pages/Overview.jsx` ~line 684): `h-[403px]` → `h-[619px]` (8 rows). Empty-state `<td>`: `h-[360px]` → `h-[576px]`.
+- `SetterOverview`'s `embedded` branch (My Pipeline→Setter tab, ~line 452): `h-[403px]` → `h-[619px]` (8 rows). Empty-state `<td>`: `h-[360px]` → `h-[576px]`.
+- `SetterOverview`'s `!embedded` branch (`/overview`, `/my-leads`, same shared component): `h-[331px]` → `h-[547px]` (7 rows). Empty-state `<td>`: `h-[288px]` → `h-[504px]`.
+
+**Verification caveat worth flagging:** at 1366×768 (595's test viewport), an 8-row My Pipeline box now genuinely needs the page to scroll — `boxTop` ≈290px + 619px box = 909px bottom, past the 768px viewport. This isn't a bug in the fix; it's the direct consequence of Brayden's own ask (bigger rows, tested against his real screen, not the 1366×768 baseline). Re-verified against a 1920×1080 viewport instead: all four contexts (My Pipeline Closer 8 rows / Setter 8 rows, My Leads/`/overview` 7 rows) land within 0.5px of their box's bottom border with `document.documentElement.scrollHeight === window.innerHeight` (no page scroll) at that size. If Brayden's actual monitor is smaller than 1920×1080, the page may scroll on My Pipeline — flag this if he reports it.
+- Empty-state tabs re-checked at the new heights: My Pipeline Setter→No Answer (`test_closer`, 0 leads) and `/overview`→No Answer (`test_setter`, 0 leads) both show "Nothing here right now." vertically centered in the taller box.
+
+Build (`npm run build`) + lint (`npm run lint`) clean — only pre-existing `only-export-components` warnings.
+
+**Pattern worth repeating:** when a prompt gives exact target pixel math derived from a specific test viewport, implement the math as given, but re-verify the "no page scroll" claim at a size actually representative of where the requester is looking (their own screen) rather than assuming the original baseline viewport still holds — a taller box can silently reintroduce page scroll at the old baseline even though the requester's real screen has room to spare.
+
+---
+
 ### 2026-09-14 — Prompt 595 executed (CC): My Pipeline box quantized to whole rows + vertically centered empty state
 
 **[CC | 2026-09-14 — Prompt 595 — SHIPPED. `restorix-setter-portal` `main` @ `1f17bb7`, pushed. Frontend only, no migration. Verified live at a 1366×768 viewport as `test_closer` (10 real `lost` leads, 5 real `follow_up` leads) and `test_setter` (149 real `new` leads).]**
