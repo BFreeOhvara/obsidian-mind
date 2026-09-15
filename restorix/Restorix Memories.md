@@ -17,6 +17,20 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-09-15 — Prompt 597 executed (CC): My Pipeline top-gap trim shipped, but the page scroll it was meant to fix is NOT eliminated
+
+**[CC | 2026-09-15 — Prompt 597 — SHIPPED (partial). `restorix-setter-portal` `main` @ `db0659d`, pushed. Frontend only, no migration. Verified live as `test_closer` at 1366×768 (My Pipeline Closer→Lost, 11 leads; Setter→Follow-up, 4 leads); spot-checked Commissions to confirm the shared `<main>` padding was untouched elsewhere.]**
+
+**Fix:** `CloserPipeline`'s root `<div>` (`src/pages/Overview.jsx` ~line 598) got `-mt-4`, canceling 16px of Layout's shared `<main className="px-6 py-8">` top padding for this route only. Header-to-toggle gap measured (via `getBoundingClientRect()`) at 48px before, 32px after — within Brayden's requested ~24-40px "one to two lines" range, and still a visibly distinct gap, not flush.
+
+**⚠️ Flagging, not guessing (per the prompt's own instruction not to compensate by shrinking the box):** the page-level scrollbar 596's 8-row box introduced is still present. Measured overflow: `document.documentElement.scrollHeight` (941px) vs `clientHeight` (768px) = 173px overflow *before* this fix; after the 16px trim, 925px vs 768px = 157px still overflowing. Brayden's diagnosis (title-space left over from Prompt 589 moving the title into the header) doesn't hold up numerically — that title/subtitle block was already removed from the DOM at 589, not left as empty space; the actual gap available to trim was only the 48px between header and toggle, nowhere close to the 173px the 8-row box needs. Reducing that gap further than 32px (toward 0, i.e. flush) would only claw back at most another ~16-24px — still far short. **This needs a decision from Brayden**: either accept the page scroll as a tradeoff for 8 visible rows, or revisit the row count/box height from 595/596.
+
+**Pattern worth repeating:** when a prompt's fix theory is stated as fact ("the space is still sitting unused"), measure it before implementing — `getBoundingClientRect()` on the actual elements took seconds and immediately showed the theory's math didn't close the gap, avoiding a false "shipped, scroll fixed" report.
+
+Build (`npm run build`) + lint (`npm run lint`) clean — only pre-existing `only-export-components` warnings.
+
+---
+
 ### 2026-09-14 — Prompt 596 executed (CC): My Pipeline row count raised to 8, My Leads/Overview to 7
 
 **[CC | 2026-09-14 — Prompt 596 — SHIPPED. `restorix-setter-portal` `main` @ `0fcfd5d`, pushed. Frontend only, no migration. Verified live as `test_closer` (My Pipeline Closer→Lost, 10 leads; Setter→Follow-up, 5 leads; Setter→No Answer, 0 leads) and `test_setter` (`/overview`, 149 New leads; No Answer, 0 leads; Appointment Booked, 3 leads).]**
