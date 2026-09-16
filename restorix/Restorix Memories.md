@@ -17,6 +17,26 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-09-16 — Prompt 599 executed (CC): Training restyled to grouped tabs, Closer Survey folded in as a Script sub-tab
+
+**[CC | 2026-09-16 — Prompt 599 — SHIPPED. `restorix-setter-portal` `main` @ `1cbfa95`, pushed. Frontend only, no migration. Verified live as both `test_closer` and `test_setter`.]**
+
+**What shipped:** Three changes to `src/pages/Training.jsx` from one queue item:
+1. Dropped the "AI Voice Roleplay" top-level tab entirely (was a coming-soon stub) — `TABS` is now just `[script, videos]`.
+2. Top-level Script/Videos toggle restyled to `SegmentedTabs variant="grouped"` (the same conjoined-pill look as My Pipeline's Closer/Setter toggle) instead of two separately-bordered buttons.
+3. The standalone "Closer Survey" tool (`SurveyBody` from `src/pages/Survey.jsx`) is now the **Closer** half of a new nested Closer/Setter grouped sub-toggle inside the Script tab (Closer first, active by default); the existing 7-section cold-call script (unchanged, `ScriptTab`) is the **Setter** half.
+
+**Removed as a consequence:** the standalone `/survey` route (`App.jsx`), its sidebar nav item (`Layout.jsx` — `{ to: '/survey', label: 'Closer Survey', ... }`), and `Survey.jsx`'s now-dead default export (`Survey()`). Kept the `SurveyBody` named export completely unchanged — `CloserLeadModal` still imports and calls it the same way it always did, untouched by this prompt. Also removed the now-unused `ListChecks` icon import from `Layout.jsx`.
+
+**Access-change flag (per the prompt's own explicit callout, not a silent decision):** `/survey` was previously `closer`+`admin`-only; Training is `setter`+`closer`. Folding the survey tool into Training's Closer sub-tab means setters can now open and run the live survey wizard, which they couldn't reach before (it wasn't secrecy-gated, just not surfaced to them). Defaulted to leaving it open per the prompt's own stated default — **flagging for Brayden in case he wants the Closer sub-tab hidden from setters**, but no code gates it that way today.
+
+**Verification:** `npm run build` + `npm run lint` clean (only pre-existing `only-export-components`/`exhaustive-deps` warnings, same set as every prior prompt). Live-checked both roles on localhost:
+- `test_closer`: Training → one grouped Script/Videos pill, no Roleplay tab anywhere; Script tab defaults to Closer sub-tab active, survey wizard renders and is interactive (Step 1 of 7 through summary); Setter sub-tab shows the unchanged 7-section script; Videos unchanged; sidebar has no "Closer Survey"; `/survey` is unreachable (renders blank — there was no app-wide 404/wildcard route before this change either, so that's pre-existing behavior, not a regression).
+- `test_setter`: same grouped tabs/sub-tabs render identically, including being able to open the Closer sub-tab; nothing else on the setter sidebar changed.
+- Did **not** live-click through `CloserLeadModal`'s own embedded Survey tab (no booked leads existed on the test account to open the modal with) — verified by code inspection instead that its `SurveyBody` import and call shape are byte-for-byte unchanged, so it should be unaffected. Worth a real click-through next time a booked lead exists on `test_closer`.
+
+**Repo location note (for future sessions):** the Training/`/survey` files live in `restorix-setter-portal` (`C:\Users\freem\restorix-setter-portal`), not `ohvara-client-portal` — the two are separate local clones and easy to mix up by name alone.
+
 ### 2026-09-16 — Prompt 598 executed (CC): My Leads' Request Leads button became a floating bubble; page scroll still NOT eliminated
 
 **[CC | 2026-09-16 — Prompt 598 — SHIPPED (partial). `restorix-setter-portal` `main` @ `ffb4fc4`, pushed. Frontend only, no migration. Verified live as `test_closer` (My Leads bubble/tooltip/modal, My Pipeline both Closer/Setter tabs untouched) and `test_setter` (`/overview` header row pixel-unchanged).]**
