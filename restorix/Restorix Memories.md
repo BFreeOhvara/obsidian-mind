@@ -17,6 +17,22 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-09-16 — Prompt 598 executed (CC): My Leads' Request Leads button became a floating bubble; page scroll still NOT eliminated
+
+**[CC | 2026-09-16 — Prompt 598 — SHIPPED (partial). `restorix-setter-portal` `main` @ `ffb4fc4`, pushed. Frontend only, no migration. Verified live as `test_closer` (My Leads bubble/tooltip/modal, My Pipeline both Closer/Setter tabs untouched) and `test_setter` (`/overview` header row pixel-unchanged).]**
+
+**Fix:** New `showHeaderRow` prop on `SetterOverview` (`src/pages/Overview.jsx`, default `true`) skips the entire `!embedded` header-right row (`<div className="flex justify-end">…</div>`) when `false` — not just swaps its content. `MyLeads.jsx` passes `showHeaderRow={false}` instead of `headerRight={<RequestLeadsButton/>}`, and the button is gone from `SetterOverview` entirely. New `RequestLeadsBubble` (`MyLeads.jsx` only, not lifted into any shared component) is a fixed bottom-right circular button (`bg-accent`, same brand blue as the old button) with a small dismissible tooltip callout ("This is where you request leads.") that shows on load and dismisses on × click or on opening the modal. Clicking the bubble opens the exact same `RequestLeadsForm`/`Modal`, unchanged.
+
+**⚠️ Flagging, not guessing (same rule 597 was shipped under):** removing the header row alone didn't close My Leads' page-level scroll. Measured `document.documentElement.scrollHeight` vs `clientHeight` at 1024×768: 961px vs 768px (193px overflow) before any trim. Applied 597's exact technique — a page-scoped `-mt-4` on My Leads' own root wrapper (canceling 16px of Layout's shared `<main>` padding for this route only, same as `CloserPipeline` did) — which brought it to 945px vs 768px (177px overflow), a 16px recovery, structurally identical to 597's own result (16px of 173px recovered there). Per the prompt's explicit instruction, stopped here rather than compensating by shrinking the table box or other spacing — **this is a decision for Brayden**, same open question 597 already raised for My Pipeline's version of this problem.
+
+**Judgment calls flagged for Brayden:** tooltip copy ("This is where you request leads.") and dismiss behavior (no persistence across sessions/visits — resets to visible every page load) were both left as CC's call per the spec; icon reused the existing `Plus` icon rather than picking a new one.
+
+**Pattern confirmed again:** [[Restorix Memories#2026-09-15 — Prompt 597|597's]] "page-scoped negative margin only recovers Layout's own padding, not the deeper overflow" finding generalizes — this is now the second page (My Pipeline, now My Leads) where removing a header element and/or trimming `<main>`'s padding recovers a small, fixed amount (~16px) but doesn't touch whatever is actually driving the larger overflow (likely the fixed-row-count table boxes from 595/596). Future "kill the page scroll" prompts on these pages should probably start by questioning the table box height itself, not the header spacing above it.
+
+Build (`npm run build`) + lint (`npm run lint`) clean — only pre-existing `only-export-components` warnings.
+
+---
+
 ### 2026-09-15 — Prompt 597 executed (CC): My Pipeline top-gap trim shipped, but the page scroll it was meant to fix is NOT eliminated
 
 **[CC | 2026-09-15 — Prompt 597 — SHIPPED (partial). `restorix-setter-portal` `main` @ `db0659d`, pushed. Frontend only, no migration. Verified live as `test_closer` at 1366×768 (My Pipeline Closer→Lost, 11 leads; Setter→Follow-up, 4 leads); spot-checked Commissions to confirm the shared `<main>` padding was untouched elsewhere.]**
