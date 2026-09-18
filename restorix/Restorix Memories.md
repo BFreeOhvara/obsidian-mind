@@ -17,6 +17,31 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-09-18 — Prompt 611 executed (CC): client "request payment method change" flow shipped, new `billing_requests` table applied manually by Brayden after CC's migration attempt was classifier-blocked
+
+**[CC | 2026-09-18 — Prompt 611 — SHIPPED. `restorix-portal` (checked out locally as `restorix-setter-portal`) `main` @ `7528864`, pushed.]**
+
+**What shipped:** new `billing_requests` table, same shape/RLS as `bug_reports` (own-row insert/select for the client, full read/update for admin) — `client_profile_id`, optional `note`, `status` open/resolved, `created_at`/`resolved_at`. `src/hooks/useBillingRequests.js` — `useSubmitBillingRequest`/`useBillingRequests`/`useResolveBillingRequest`, same three-function shape as `useBugReports.js`; the admin list additionally resolves each request's facility name via a second `deals`/`leads` query merged in JS (no direct FK from `billing_requests` to `deals`, so this couldn't be a single embedded select like `useMyDeal`'s). Client-facing: a new "Billing" card on `ClientOverview` (`src/pages/Overview.jsx`, both the real and preview/test-client render branches) with a "Request payment method change" button opening `src/components/BillingRequestModal.jsx` (optional note field, same structure as the existing `BugReportModal.jsx`) — submits, shows "Request sent — we'll be in touch." No card fields, no Stripe, nothing resembling real payment processing anywhere in this prompt, as explicitly scoped. Admin-facing: new `src/pages/BillingRequests.jsx` (open/resolve list, mirrors `BugReports.jsx` exactly) wired into the ADMIN sidebar group and `/billing-requests` route, admin-only via `RoleRoute`.
+
+**Migration blocked, handed to Brayden exactly as the prompt anticipated:** `apply_migration` was denied by the Claude Code auto-mode classifier (`[Modify Shared Resources]`), same category as prior DDL blocks (Prompt 608 etc.) — flagged rather than worked around. The SQL is saved at `supabase/migrations/20260918_prompt611_billing_requests.sql` in the repo (also committed) and is a one-paste job:
+```sql
+create table billing_requests (
+  id uuid primary key default gen_random_uuid(),
+  client_profile_id uuid not null references profiles(id),
+  note text,
+  status text not null default 'open' check (status in ('open', 'resolved')),
+  created_at timestamptz not null default now(),
+  resolved_at timestamptz
+);
+alter table billing_requests enable row level security;
+create policy billing_requests_insert_own on billing_requests for insert with check (client_profile_id = auth.uid());
+create policy billing_requests_select_own_or_admin on billing_requests for select using (client_profile_id = auth.uid() or my_role() = 'admin'::user_role);
+create policy billing_requests_update_admin on billing_requests for update using (my_role() = 'admin'::user_role) with check (my_role() = 'admin'::user_role);
+```
+**Until this SQL is run, the feature is not live** — the button will error on submit and the admin page will error on load. This is the actual next action, not just a nice-to-have.
+
+**Verification — code-level only, no click-through, same policy stance as Prompts 609/610:** `npm run build`/`npm run lint` (oxlint) both clean, zero new warnings beyond the pre-existing set. Read `bug_reports`' live RLS policies and `profiles`/`deals` schemas directly via Supabase MCP (read-only `execute_sql`, not blocked) before writing the mirrored migration, rather than guessing at the shape. This session's tool-safety rules prohibit entering a password under any framing, so no `test_closer`/admin/client login happened — nothing here has been eyeballed live by a human yet, and can't be until the table exists anyway.
+
 ### 2026-09-18 — Prompt 610 executed (CC): agent catalog gets real (placeholder) pricing, Log Outcome + Client Portal tabs now share one front-runner/sub-agent selection that computes a suggested deal price — code-verified only, browser login not attempted this session (same policy call as 609)
 
 **[CC | 2026-09-18 — Prompt 610 — SHIPPED. `restorix-setter-portal` `main` @ `88925ed`, pushed. Frontend only, no migration.]**
