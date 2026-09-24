@@ -62,52 +62,16 @@ a{color:inherit}
 .nav .btn{margin-left:8px}
 @media (max-width:1020px){.nav-links{display:none}.nav .btn{margin-left:auto}}
 
-/* HERO CONCEPTS — Prompt 640: message-only brief, copy written fresh per concept */
-.ctag{background:repeating-linear-gradient(135deg,var(--bg-cool) 0 10px,var(--bg) 10px 20px);border-block:1px solid var(--line-strong)}
-.ctag .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 16px;padding-block:10px;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.14em;color:var(--ink-soft)}
-.ctag b{font-weight:500;color:var(--ink);background:var(--bg);padding:5px 9px;border:1px solid var(--line-strong)}
-
-/* 1 — The next center: two centers, one call, side by side */
-.hx-race{background:var(--bg);padding-block:clamp(44px,6vw,88px) clamp(52px,7vw,96px)}
-.r-h{font-family:var(--f-display);font-weight:600;font-size:clamp(34px,5vw,72px);line-height:1;letter-spacing:-.04em;max-width:24ch;text-wrap:balance}
-.r-h span{display:block;color:var(--accent-deep);font-weight:500}
-.lanes{margin-top:clamp(32px,4.5vw,56px);display:grid;gap:10px}
-.lane{display:grid;grid-template-columns:minmax(150px,.9fr) repeat(4,minmax(0,1fr));gap:10px;align-items:stretch}
-.lane-name{display:flex;flex-direction:column;justify-content:center;font-family:var(--f-display);font-weight:600;font-size:18px;line-height:1.2;letter-spacing:-.01em;padding-right:8px}
-.lane-name small{display:block;margin-top:4px;font-family:var(--f-mono);font-weight:400;font-size:10.5px;letter-spacing:.12em;color:var(--muted)}
-.lane ol{display:contents}
-.lane li{position:relative;padding:14px 16px 16px;border-radius:3px;font-size:15px;line-height:1.35;transition:opacity .45s,background-color .45s,color .45s}
-.lane li b{display:block;font-family:var(--f-mono);font-weight:500;font-size:12px;letter-spacing:.06em;margin-bottom:6px}
-.lane-them li{background:transparent;border:1px dashed var(--line-strong);color:var(--muted)}
-.lane-them li b{color:var(--muted)}
-.lane-them li.lost{color:var(--ink);border-style:solid;border-color:var(--ink)}
-.lane-them li.lost span{text-decoration:line-through;text-decoration-thickness:1.5px}
-.lane-you li{background:var(--surface);border:1px solid var(--line);color:var(--ink)}
-.lane-you li b{color:var(--accent-deep)}
-.lane-you li.won{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
-.lane-you li.won b{color:rgba(255,255,255,.8)}
-.lane-you .lane-name{color:var(--accent-deep)}
-.lanes.play li{opacity:.18}
-.lanes.play li.on{opacity:1}
-.r-note{margin-top:12px;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;color:var(--muted)}
-.r-foot{display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px 40px;align-items:center;margin-top:clamp(32px,4vw,48px)}
-.r-foot p{color:var(--ink-soft);max-width:44em;font-size:16px}
-@media (max-width:860px){
-  .lane{grid-template-columns:1fr 1fr}
-  .lane-name{grid-column:1 / -1;padding:10px 0 2px}
-  .r-foot{grid-template-columns:1fr}
-}
-
-/* 2 — 2:14 a.m.: the after-hours inquiry, told as the conversation */
+/* HERO — 2:14 a.m.: the after-hours inquiry, told as the conversation, over a faint constellation */
 .hx-night{position:relative;background:var(--ink);color:var(--on-ink);overflow:hidden;padding-block:clamp(48px,7vw,104px)}
+.hero-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
 .hx-night::before{content:"";position:absolute;right:-12%;top:-30%;width:70%;aspect-ratio:1;border-radius:50%;background:radial-gradient(closest-side,rgba(58,99,214,.32),rgba(58,99,214,0));pointer-events:none}
-.n-grid{position:relative;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.85fr);gap:clamp(40px,6vw,96px);align-items:center}
+.n-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.85fr);gap:clamp(40px,6vw,96px);align-items:center}
 .n-time{font-family:var(--f-mono);font-size:clamp(15px,1.3vw,18px);letter-spacing:.08em;color:var(--accent-on-ink)}
 .n-copy h1{margin-top:18px;font-family:var(--f-display);font-weight:500;font-size:clamp(38px,5.4vw,78px);line-height:1;letter-spacing:-.04em;text-wrap:balance}
 .n-copy h1 span{display:block;margin-top:.3em;color:var(--on-ink-muted);font-weight:400;font-size:.52em;line-height:1.15;letter-spacing:-.02em}
-.n-body{margin-top:clamp(22px,2.5vw,32px);color:rgba(242,245,244,.8);max-width:31em;font-size:17px}
-.n-cta{display:flex;flex-wrap:wrap;align-items:center;gap:14px 22px;margin-top:30px}
-.n-note{font-size:14px;color:var(--on-ink-muted);max-width:24em}
+.n-line{margin-top:clamp(20px,2.4vw,30px);color:rgba(242,245,244,.8);font-size:18px}
+.n-cta{margin-top:30px}
 .thread{display:flex;flex-direction:column;gap:12px;font-size:15px;line-height:1.45;max-width:430px;justify-self:end;width:100%}
 .th-sys{align-self:center;font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;color:var(--on-ink-muted);padding-block:4px}
 .th-sys.ok{color:var(--accent-on-ink)}
@@ -123,18 +87,6 @@ a{color:inherit}
   .n-grid{grid-template-columns:1fr}
   .thread{justify-self:stretch;max-width:none}
 }
-
-/* 3 — Already paid for: the economics, said in one breath */
-.hx-paid{background:var(--bg-cool);padding-block:clamp(48px,7vw,112px)}
-.p-for{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;color:var(--muted);max-width:60em}
-.p-body{margin-top:clamp(20px,3vw,36px);font-family:var(--f-display);font-weight:500;font-size:clamp(27px,3.5vw,50px);line-height:1.17;letter-spacing:-.028em;color:var(--ink-soft);max-width:26em}
-.p-body h1{display:inline;font:inherit;color:var(--ink);font-weight:700}
-.p-body em{font-style:normal;color:var(--accent-deep);background:linear-gradient(transparent 62%,var(--accent-tint) 62%)}
-.p-cta{display:inline-flex;align-items:center;gap:.4em;vertical-align:.12em;margin-left:.2em;padding:.28em .6em .32em;border-radius:4px;background:var(--accent);color:#fff;font-family:var(--f-body);font-weight:700;font-size:.44em;letter-spacing:0;text-decoration:none;white-space:nowrap;transition:background-color .2s}
-.p-cta:hover{background:var(--accent-deep)}
-.p-parts{display:flex;flex-wrap:wrap;gap:10px 28px;margin-top:clamp(32px,4vw,52px);padding-top:18px;border-top:1px solid var(--line-strong);font-family:var(--f-mono);font-size:11.5px;letter-spacing:.1em;color:var(--ink-soft)}
-.p-parts strong{font-weight:500;color:var(--ink)}
-@media (max-width:560px){.p-cta{font-size:.6em}}
 
 /* LEAK — a stepped funnel that drips at every ledge */
 .leak{padding-block:clamp(72px,10vw,136px);border-top:1px solid var(--line)}
@@ -300,47 +252,15 @@ a{color:inherit}
 </header>
 
 <main>
-<div class="ctag"><div class="wrap"><b>HERO CONCEPT 1</b><span>THE NEXT CENTER · 1 / 3</span></div></div>
-<section class="hx hx-race" id="top">
-  <div class="wrap">
-    <h1 class="r-h">A family looking for treatment won't wait on hold. <span>They'll call the next center.</span></h1>
-    <div class="lanes" aria-label="The same after-hours call, at two centers">
-      <div class="lane lane-them">
-        <p class="lane-name">Another center<small>STAFFED DESK, CLOSED</small></p>
-        <ol>
-          <li><b>0:00</b><span>Call comes in after hours</span></li>
-          <li><b>0:30</b><span>Voicemail</span></li>
-          <li><b>NEXT DAY</b><span>Sits on the callback list</span></li>
-          <li class="lost"><b>—</b><span>Family calls the next center</span></li>
-        </ol>
-      </div>
-      <div class="lane lane-you">
-        <p class="lane-name">Your center<small>WITH RESTORIX</small></p>
-        <ol>
-          <li><b>0:00</b><span>Call comes in after hours</span></li>
-          <li><b>0:04</b><span>Text-back sent</span></li>
-          <li><b>THEN</b><span>Level of care &amp; insurance screened</span></li>
-          <li class="won"><b>2:17</b><span>Consult booked</span></li>
-        </ol>
-      </div>
-    </div>
-    <p class="r-note">ILLUSTRATIVE EXAMPLE · TIMES FROM A SINGLE INQUIRY</p>
-    <div class="r-foot">
-      <a class="btn btn-primary btn-lg" href="#call">Book a strategy call</a>
-      <p>Restorix builds the AI intake layer for detox, residential, IOP/PHP, dual-diagnosis, eating disorder and psychiatric programs, so every inquiry is answered, qualified and booked before the family moves on. No new front-desk hires.</p>
-    </div>
-  </div>
-</section>
-<div class="ctag"><div class="wrap"><b>HERO CONCEPT 2</b><span>2:14 A.M. · 2 / 3</span></div></div>
-<section class="hx hx-night" id="hero-night">
+<section class="hx hx-night" id="top">
+  <canvas class="hero-canvas" id="hero-canvas" aria-hidden="true"></canvas>
   <div class="wrap n-grid">
     <div class="n-copy">
       <p class="n-time">2:14 a.m.</p>
       <h1>Someone just decided to get help. <span>Your front desk went home hours ago.</span></h1>
-      <p class="n-body">Restorix answers every admissions inquiry, whether it's a phone call, a web chat or a form, within seconds. It asks the right level-of-care and insurance questions, then puts the consult on your calendar. Day or night, with the team you already have.</p>
+      <p class="n-line">Restorix answers every inquiry in seconds, day or night.</p>
       <div class="n-cta">
         <a class="btn btn-primary btn-lg" href="#call">Book a strategy call</a>
-        <span class="n-note">30 minutes. We'll look at what happens to your after-hours inquiries today.</span>
       </div>
     </div>
     <div class="thread" aria-label="Example after-hours inquiry, handled by Restorix">
@@ -353,15 +273,6 @@ a{color:inherit}
     </div>
   </div>
 </section>
-<div class="ctag"><div class="wrap"><b>HERO CONCEPT 3</b><span>ALREADY PAID FOR · 3 / 3</span></div></div>
-<section class="hx hx-paid" id="hero-paid">
-  <div class="wrap">
-    <p class="p-for">For detox, residential, IOP/PHP, dual-diagnosis, eating disorder and psychiatric programs</p>
-    <div class="p-body"><h1>You already paid to make the phone ring.</h1> Whether that call becomes an admission gets decided in the next few minutes, by a voicemail, a callback list, or the center that picked up first. Restorix answers every inquiry <em>in seconds</em>, qualifies it and books the consult, day or night, with the team you already have. <a class="p-cta" href="#call">Book a strategy call <span aria-hidden="true">→</span></a></div>
-    <p class="p-parts"><strong>NOT A CHATBOT.</strong><span>CAPTURE</span><span>LEVEL-OF-CARE &amp; INSURANCE TRIAGE</span><span>BOOKING</span><span>FOLLOW-UP</span></p>
-  </div>
-</section>
-<div class="ctag"><div class="wrap"><b>APPROVED PAGE CONTINUES</b><span>LEAK → CLOSING, UNCHANGED</span></div></div>
 <section class="leak" id="leak">
   <div class="wrap">
     <div class="split">
@@ -545,8 +456,8 @@ a{color:inherit}
 (function(){
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* Hero concepts: 1 steps both centers through the same call; 2 replays the 2:14 a.m. thread */
-  var lanes = document.querySelector('.lanes'), thread = document.querySelector('.thread');
+  /* Hero: replays the 2:14 a.m. thread while it's in view */
+  var thread = document.querySelector('.thread');
   function sequence(host, groups, stepMs, holdMs){
     if (reduce || !host) return;
     var inView = false, started = false;
@@ -561,12 +472,69 @@ a{color:inherit}
       if (inView && !started) { started = true; setTimeout(run, 1200); }
     }).observe(host);
   }
-  if (lanes) {
-    var them = lanes.querySelectorAll('.lane-them li'), you = lanes.querySelectorAll('.lane-you li'), cols = [];
-    for (var i = 0; i < them.length; i++) cols.push([them[i], you[i]]);
-    sequence(lanes, cols, 1100, 3200);
-  }
   if (thread) sequence(thread, Array.prototype.map.call(thread.children, function(el){ return [el]; }), 1000, 4200);
+
+  /* Hero: a faint constellation behind the thread, same language as the System chart, ambient only */
+  (function(){
+    var host = document.getElementById('top'), cv = document.getElementById('hero-canvas');
+    if (!host || !cv || !cv.getContext) return;
+    var ctx = cv.getContext('2d'), W = 0, H = 0, R = 40, inView = true;
+    var SPOTS = [[.06,.18],[.24,.9],[.46,.08],[.6,.52],[.8,.14],[.95,.62],[.74,.92],[.36,.46]];
+    var LINKS = [[0,2],[2,4],[4,5],[5,6],[6,3],[3,7],[7,1],[3,4],[2,3]];
+    var seed = 29, rnd = function(){ seed = seed * 16807 % 2147483647; return (seed - 1) / 2147483646; };
+    var groups = SPOTS.map(function(){
+      var pts = [];
+      for (var k = 0; k < 13; k++) pts.push({ a: rnd() * 6.283, r: .2 + Math.sqrt(rnd()) * .8, ph: rnd() * 6.283, sp: .00025 + rnd() * .0004, amp: .1 + rnd() * .12 });
+      return pts;
+    });
+    function size(){
+      var dpr = Math.min(2, window.devicePixelRatio || 1);
+      W = host.clientWidth; H = host.clientHeight;
+      cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      R = Math.max(34, Math.min(W, H) * .11);
+    }
+    /* quieter on the left, where the headline sits */
+    function fade(x){ return .35 + .65 * Math.min(1, Math.max(0, x / W)); }
+    function ctrl(a, b){ var dx = b.x - a.x, dy = b.y - a.y; return { x: (a.x + b.x) / 2 - dy * .14, y: (a.y + b.y) / 2 + dx * .14 }; }
+    function q(a, c, b, t){ var u = 1 - t; return { x: u*u*a.x + 2*u*t*c.x + t*t*b.x, y: u*u*a.y + 2*u*t*c.y + t*t*b.y }; }
+    function draw(t){
+      ctx.clearRect(0, 0, W, H);
+      var C = SPOTS.map(function(s){ return { x: s[0] * W, y: s[1] * H }; });
+      LINKS.forEach(function(l, k){
+        var a = C[l[0]], b = C[l[1]], c = ctrl(a, b), f = fade((a.x + b.x) / 2);
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.quadraticCurveTo(c.x, c.y, b.x, b.y);
+        ctx.setLineDash([2, 7]); ctx.strokeStyle = 'rgba(148,171,241,' + (.16 * f) + ')'; ctx.lineWidth = 1; ctx.stroke(); ctx.setLineDash([]);
+        var p = (t * .00007 + k * .17) % 1, pt = q(a, c, b, p);
+        ctx.beginPath(); ctx.arc(pt.x, pt.y, 1.8, 0, 6.283); ctx.fillStyle = 'rgba(148,171,241,' + (.5 * fade(pt.x)) + ')'; ctx.fill();
+      });
+      groups.forEach(function(pts, i){
+        var c = C[i], f = fade(c.x);
+        var P = pts.map(function(p){
+          var rr = R * p.r * (1 + Math.sin(t * p.sp + p.ph) * p.amp), aa = p.a + Math.sin(t * p.sp * .7 + p.ph) * .3;
+          return { x: c.x + Math.cos(aa) * rr, y: c.y + Math.sin(aa) * rr };
+        });
+        ctx.lineWidth = 1;
+        for (var x = 0; x < P.length; x++) for (var y = x + 1; y < P.length; y++) {
+          var d = Math.hypot(P[x].x - P[y].x, P[x].y - P[y].y), lim = R * .75;
+          if (d < lim) { ctx.strokeStyle = 'rgba(148,171,241,' + (.2 * (1 - d / lim) * f) + ')'; ctx.beginPath(); ctx.moveTo(P[x].x, P[x].y); ctx.lineTo(P[y].x, P[y].y); ctx.stroke(); }
+        }
+        P.forEach(function(p, k){ ctx.beginPath(); ctx.arc(p.x, p.y, k % 4 === 0 ? 1.9 : 1.3, 0, 6.283); ctx.fillStyle = 'rgba(148,171,241,' + (.42 * f) + ')'; ctx.fill(); });
+        ctx.beginPath(); ctx.arc(c.x, c.y, 2.6, 0, 6.283); ctx.fillStyle = 'rgba(148,171,241,' + (.6 * f) + ')'; ctx.fill();
+      });
+    }
+    size();
+    var redraw = function(){ size(); draw(reduce ? 0 : performance.now()); };
+    if ('ResizeObserver' in window) new ResizeObserver(redraw).observe(host);
+    window.addEventListener('resize', redraw);
+    if (reduce) { draw(0); return; }
+    if ('IntersectionObserver' in window) new IntersectionObserver(function(es){ inView = es[0].isIntersecting; }).observe(host);
+    (function loop(t){
+      if (host.clientWidth !== W || host.clientHeight !== H) size();
+      if (inView && !document.hidden) draw(t);
+      requestAnimationFrame(loop);
+    })(performance.now());
+  })();
 
   /* Outcomes: stopwatch ticks, 0–5 min, one tick per 10 s */
   var g = document.getElementById('dial-ticks'), ns = 'http://www.w3.org/2000/svg';
