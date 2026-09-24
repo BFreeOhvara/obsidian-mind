@@ -62,35 +62,43 @@ a{color:inherit}
 .nav .btn{margin-left:8px}
 @media (max-width:1020px){.nav-links{display:none}.nav .btn{margin-left:auto}}
 
-/* HERO */
-.hero{padding-block:clamp(56px,9vw,120px) clamp(64px,8vw,112px)}
+/* HERO — the example inquiry's clock, set as the middle line of the headline */
+.hero{padding-block:clamp(40px,5vw,68px) clamp(64px,8vw,104px);overflow:hidden}
+.hero-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:14px 40px}
 .hero-eyebrow{font-size:13px;letter-spacing:.04em;color:var(--accent-deep)}
-.hero-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,.75fr);gap:clamp(40px,5vw,80px);align-items:end}
-.hero-h1{font-family:var(--f-display);font-size:clamp(44px,6.1vw,86px);line-height:.97;letter-spacing:-.04em;margin-top:24px}
-.hero-h1 span{display:block}
-.h1-a{font-weight:600}
-.h1-b{font-weight:400;color:var(--muted);margin-top:.1em}
-.hero-sub{margin-top:clamp(28px,3vw,40px);font-size:clamp(17px,1.5vw,20px);line-height:1.55;color:var(--ink-soft);max-width:31em}
-.cta-row{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:center;margin-top:32px}
-.pills{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:36px;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.1em;color:var(--ink-soft)}
+.pills{display:flex;flex-wrap:wrap;gap:10px 22px;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.1em;color:var(--ink-soft)}
 .pills li{display:inline-flex;align-items:center;gap:8px}
 .pills li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
-
-.ticket{justify-self:end;width:100%;max-width:400px;background:var(--ink);color:var(--on-ink);border-radius:6px;overflow:hidden;box-shadow:0 30px 60px -30px rgba(20,22,26,.55)}
-.ticket-head{display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid var(--ink-line);font-family:var(--f-mono);font-size:11.5px;letter-spacing:.14em}
-.live-dot{width:8px;height:8px;border-radius:50%;background:var(--accent-on-ink);box-shadow:0 0 0 0 rgba(148,171,241,.6);animation:pulse 2s infinite}
-.ticket-clock{margin-left:auto;font-size:13px;letter-spacing:.04em;color:var(--on-ink-muted);font-variant-numeric:tabular-nums}
-.ticket-rows li{display:grid;grid-template-columns:52px 1fr 20px;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--ink-line);color:var(--on-ink-muted);transition:color .3s}
-.ticket-rows .t{font-family:var(--f-mono);font-size:13px;font-variant-numeric:tabular-nums}
-.ticket-rows .ev{font-family:var(--f-display);font-size:18px;font-weight:500;letter-spacing:-.01em}
-.ticket-rows .ck{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--ink-line);display:grid;place-items:center;transition:background-color .3s,border-color .3s}
-.ticket-rows .ck svg{width:11px;height:11px;opacity:0;transition:opacity .3s}
-.ticket-rows li.done{color:var(--on-ink)}
-.ticket-rows li.done .ck{background:var(--accent);border-color:var(--accent)}
-.ticket-rows li.done .ck svg{opacity:1}
-.ticket-foot{padding:14px 20px;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.14em;color:var(--accent-on-ink)}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(148,171,241,.55)}70%{box-shadow:0 0 0 9px rgba(148,171,241,0)}100%{box-shadow:0 0 0 0 rgba(148,171,241,0)}}
-@media (max-width:900px){.hero-grid{grid-template-columns:1fr}.ticket{justify-self:start}}
+.hero-stack{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:clamp(28px,5vw,72px);margin-top:clamp(28px,4vw,52px)}
+.hero-h1{display:contents}
+.h1-a,.h1-b{grid-column:1 / -1;display:block;font-family:var(--f-display);font-size:clamp(40px,6.4vw,86px);line-height:1;letter-spacing:-.04em;text-wrap:balance}
+.h1-a{grid-row:1;font-weight:600}
+.h1-b{grid-row:3;font-weight:400;color:var(--muted);max-width:17ch}
+.clock{grid-row:2;grid-column:1;display:flex;font-family:var(--f-display);font-weight:500;font-size:clamp(112px,18vw,228px);line-height:1;letter-spacing:-.04em;color:var(--accent);font-variant-numeric:tabular-nums;margin-block:.05em .03em;user-select:none}
+.clock .col{display:block;height:1em;overflow:hidden}
+.clock .reel{display:block;transform:translateY(calc(var(--d) * -1em));transition:transform .95s cubic-bezier(.2,.75,.15,1)}
+.clock .reel span{display:block;height:1em}
+.clock .colon{color:var(--accent-deep);animation:blink 2s steps(1) infinite;padding-inline:.02em}
+@keyframes blink{50%{opacity:.3}}
+.events{grid-row:2;grid-column:2;align-self:center;max-width:340px}
+.ev-list li{position:relative;display:grid;grid-template-columns:48px 1fr;gap:12px;align-items:baseline;padding:7px 0 7px 22px;color:var(--muted);font-size:16px;transition:color .4s}
+.ev-list li::before{content:"";position:absolute;left:0;top:50%;width:9px;height:9px;margin-top:-4.5px;border-radius:50%;border:1.5px solid var(--line-strong);transition:background-color .4s,border-color .4s}
+.ev-list .t{font-family:var(--f-mono);font-size:13px;font-variant-numeric:tabular-nums}
+.ev-list li.past{color:var(--ink-soft)}
+.ev-list li.past::before{background:var(--accent-deep);border-color:var(--accent-deep)}
+.ev-list li.now{color:var(--ink);font-weight:700}
+.ev-list li.now::before{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 5px var(--accent-tint)}
+.ev-foot{margin-top:14px;padding-left:22px;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.14em;color:var(--accent-deep)}
+.hero-foot{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px 56px;align-items:end;margin-top:clamp(32px,3.5vw,44px)}
+.hero-sub{font-size:clamp(17px,1.5vw,20px);line-height:1.55;color:var(--ink-soft);max-width:31em}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:center}
+@media (max-width:760px){
+  .hero-stack{grid-template-columns:1fr}
+  .h1-b{grid-row:3}
+  .clock{grid-row:2;font-size:31vw}
+  .events{grid-row:4;grid-column:1;margin-top:28px;max-width:none}
+  .hero-foot{grid-template-columns:1fr}
+}
 
 /* LEAK — a stepped funnel that drips at every ledge */
 .leak{padding-block:clamp(72px,10vw,136px);border-top:1px solid var(--line)}
@@ -233,7 +241,8 @@ a{color:inherit}
 
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
-  .live-dot{animation:none}
+  .clock .colon{animation:none}
+  .clock .reel{transition:none}
   .drip{animation:none;opacity:.5;transform:translateY(14px)}
   .ledge .l2,.ledge .r2{display:none}
 }
@@ -259,30 +268,32 @@ a{color:inherit}
 <main>
 <section class="hero" id="top">
   <div class="wrap">
-    <div class="hero-grid">
-      <div>
-        <p class="eyebrow hero-eyebrow">AI infrastructure for behavioral health treatment centers</p>
-        <h1 class="hero-h1"><span class="h1-a">More admissions booked.</span> <span class="h1-b">None of the manual intake work.</span></h1>
-        <p class="hero-sub">Restorix installs AI systems that capture, qualify, and follow up with every inquiry — so your center books more of the admissions it's already earning, without adding front-desk staff.</p>
-        <div class="cta-row">
-          <a class="btn btn-primary" href="#call">Book a Strategy Call</a>
-          <a class="link-arrow" href="#system">See how the system works <span aria-hidden="true">↓</span></a>
-        </div>
-        <ul class="pills">
-          <li>24/7 INQUIRY CAPTURE</li>
-          <li>LEVEL-OF-CARE TRIAGE</li>
-          <li>AUTOMATIC BOOKING</li>
-        </ul>
-      </div>
-      <aside class="ticket" aria-label="Live intake example">
-        <div class="ticket-head"><span class="live-dot" aria-hidden="true"></span><span>LIVE INTAKE</span><span class="ticket-clock" id="clock" aria-hidden="true">2:17</span></div>
-        <ol class="ticket-rows">
-          <li class="done" data-t="0"><span class="t">0:00</span><span class="ev">Inquiry received</span><span class="ck" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.2 5 8.6l4.6-5" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></li>
-          <li class="done" data-t="4"><span class="t">0:04</span><span class="ev">Text-back sent</span><span class="ck" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.2 5 8.6l4.6-5" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></li>
-          <li class="done" data-t="137"><span class="t">2:17</span><span class="ev">Consult booked</span><span class="ck" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.2 5 8.6l4.6-5" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></li>
+    <div class="hero-top">
+      <p class="eyebrow hero-eyebrow">AI infrastructure for behavioral health treatment centers</p>
+      <ul class="pills">
+        <li>24/7 INQUIRY CAPTURE</li>
+        <li>LEVEL-OF-CARE TRIAGE</li>
+        <li>AUTOMATIC BOOKING</li>
+      </ul>
+    </div>
+    <div class="hero-stack">
+      <h1 class="hero-h1"><span class="h1-a">More admissions booked.</span> <span class="h1-b">None of the manual intake work.</span></h1>
+      <div class="clock" aria-hidden="true"><span class="col" style="--d:2"><span class="reel"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span></span></span><span class="colon">:</span><span class="col" style="--d:1"><span class="reel"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></span></span><span class="col" style="--d:7"><span class="reel"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span></span></span></div>
+      <div class="events">
+        <ol class="ev-list" aria-label="An example inquiry">
+          <li class="past"><span class="t">0:00</span><span>Inquiry received</span></li>
+          <li class="past"><span class="t">0:04</span><span>Text-back sent</span></li>
+          <li class="now"><span class="t">2:17</span><span>Consult booked</span></li>
         </ol>
-        <div class="ticket-foot">NO INQUIRY LEFT WAITING</div>
-      </aside>
+        <p class="ev-foot">NO INQUIRY LEFT WAITING</p>
+      </div>
+    </div>
+    <div class="hero-foot">
+      <p class="hero-sub">Restorix installs AI systems that capture, qualify, and follow up with every inquiry — so your center books more of the admissions it's already earning, without adding front-desk staff.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#call">Book a Strategy Call</a>
+        <a class="link-arrow" href="#system">See how the system works <span aria-hidden="true">↓</span></a>
+      </div>
     </div>
   </div>
 </section>
@@ -470,23 +481,22 @@ a{color:inherit}
 (function(){
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* Hero: intake ticket replays 0:00 → 2:17 */
-  var clock = document.getElementById('clock');
-  var rows = Array.prototype.slice.call(document.querySelectorAll('.ticket-rows li'));
-  if (!reduce && clock) {
-    var RUN = 5200, HOLD = 2800, t0 = performance.now(), last = -1;
-    var fmt = function(s){ s = Math.floor(s); return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); };
-    (function tick(now){
-      var e = (now - t0) % (RUN + HOLD);
-      var sec = Math.min(137, 137 * Math.pow(Math.min(1, e / RUN), 1.7));
-      var whole = Math.floor(sec);
-      if (whole !== last) {
-        last = whole;
-        clock.textContent = fmt(whole);
-        rows.forEach(function(r){ r.classList.toggle('done', whole >= +r.dataset.t); });
-      }
-      requestAnimationFrame(tick);
-    })(t0);
+  /* Hero: the headline's clock runs the example inquiry 0:00 → 0:04 → 2:17 */
+  var clockEl = document.querySelector('.clock');
+  var cols = clockEl.querySelectorAll('.col');
+  var evs = Array.prototype.slice.call(document.querySelectorAll('.ev-list li'));
+  var STATES = [[0,0,0],[0,0,4],[2,1,7]], HOLD = [1500, 2400, 3800], si = 2, heroIn = true;
+  function showState(i){
+    STATES[i].forEach(function(d, k){ cols[k].style.setProperty('--d', d); });
+    evs.forEach(function(li, k){ li.classList.toggle('now', k === i); li.classList.toggle('past', k < i); });
+  }
+  if (!reduce) {
+    if ('IntersectionObserver' in window) new IntersectionObserver(function(es){ heroIn = es[0].isIntersecting; }).observe(document.getElementById('top'));
+    var step = function(){
+      if (heroIn && !document.hidden) { si = (si + 1) % STATES.length; showState(si); }
+      setTimeout(step, HOLD[si]);
+    };
+    setTimeout(step, 2600);
   }
 
   /* Outcomes: stopwatch ticks, 0–5 min, one tick per 10 s */
