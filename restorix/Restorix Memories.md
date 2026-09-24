@@ -1445,3 +1445,68 @@ Two more Suretix build prompts (550, 551) written into [[Restorix LIVE_STATE]]'s
   - (e) Run one real test strategy call: book → join → record → end, wait for Zoom to process it, then confirm the row appears in the Closer tab and plays. This is the only real end-to-end proof.
   - Also: the background copy is subject to the edge-function wall-clock limit. A very large file on a slow link could time out, so watch the first real run's logs for `[zoom-recording-webhook]`.
   **Lesson**: a user-managed Zoom OAuth app's webhooks cover every meeting the user hosts, not only the ones your app created. Always check an event against your own records before copying anything. [[Restorix CC Queue]] item deleted; **Prompt 648 (in-portal button to turn on a closer's own Zoom cloud recording) is next in the queue.**
+- **[CC | 2026-09-24 — Prompt 648 BUILT + DEPLOYED, not verified against a real Zoom account (blocked on Brayden's Marketplace scope change): in-portal button to turn on a closer's own Zoom cloud recording]** `restorix-setter-portal` (GitHub/Vercel `restorix-portal`) commit `0cc4ba3`, pushed `origin/main`.
+  **The spec's scopes were wrong (checked before building):** the spec named `cloud_recording:read:recording_settings` / `cloud_recording:update:recording_settings`. Zoom's granular-scopes doc maps those to "Get/Update meeting recording settings", which are `GET/PATCH /meetings/{meetingId}/recordings/settings`. Those endpoints control the sharing/viewing settings of **one finished recording**. They are not the account's on/off switch. The per-user switch is `recording.cloud_recording`, read and written with `GET/PATCH /users/me/settings`. Zoom's Users API doc lists its granular scopes as **`user:read:settings`** and **`user:update:settings`**. Both are non-admin and work with the `me` alias, so the spec's goal of no admin access still holds. Built against those.
+  **What shipped:**
+  1. **New `zoom-recording-setting` edge function** (v1, `verify_jwt: true`, deployed via MCP; `get_edge_function` matched local byte-for-byte).
+     - It takes `{action: 'get' | 'enable'}` and identifies the caller from their own JWT only.
+     - Token refresh follows `get-zoom-personal-room`'s pattern, and the rotated refresh token is stored.
+     - It returns `{state}` as a 200, so the client can render each state:
+       - `not_connected`, `on`, `off`.
+       - `needs_reconnect`: Zoom returns error 4711 "does not contain scopes" or error 124, or rejects the refresh token with 400/401.
+       - `unsupported`: after enabling, a re-read still shows off and `GET /users/me` has `type === 1` (free Basic).
+       - `blocked`: still off on a paid account, which usually means the Zoom account's admin locked it.
+     - `enable` **never trusts the PATCH alone**. Zoom can return 204 without changing the value when the plan or a lock won't allow it. So the function re-reads and only reports `on` if Zoom shows it on.
+     - If the setting is already on, `enable` skips the PATCH.
+  2. **Hooks** (`useZoom.js`):
+     - `useZoomRecordingSetting(closerId, connectedAt)` is keyed on `connected_at`, so a reconnect (new token row, new scopes) triggers a fresh read.
+     - `useEnableZoomCloudRecording()` is the turn-on mutation.
+  3. **UI** (`Settings.jsx`): a `CloudRecordingRow` sits inside `ZoomForm`'s connected block, below Disconnect, after a hairline divider. It is titled "Cloud recording" with an On / Off / Reconnect needed pill. States:
+     - **On**: green check and "Your strategy calls are recorded automatically."
+     - **Off**: a "Turn on cloud recording" button that shows "Turning on…" and is disabled while the call runs.
+     - **Reconnect needed**: "Your Zoom was connected before the portal could manage recording. Reconnect once…" and a **Reconnect Zoom** button. The button calls `ZoomForm`'s existing `connect()`, i.e. 617's popup flow, unchanged. The callback upserts the row, which changes `connected_at` and triggers a re-read.
+     - **Failures** (red):
+       - "Your Zoom plan doesn't support cloud recording — contact Brayden."
+       - "Zoom didn't turn cloud recording on — it may be locked off by your Zoom account's admin. Contact Brayden."
+     - **Read error**: "Couldn't check this setting in Zoom." with Try again.
+     - **Turn-on only (judgment call):** there is no Off control, because switching it off here would silently stop 647's recordings. Flag for Brayden if he wants one.
+  **What didn't change:**
+  - In `Settings.jsx`, the only removed line is the useZoom import, which was replaced by a wider one.
+  - `zoom-oauth-start`, `zoom-oauth-callback`, 617's connect/disconnect/popup logic, and 618/634/635's meeting creation and join have zero diff.
+  - No migration.
+  **Verified:**
+  - `npm run build` clean. `oxlint` still shows 23 warnings, all pre-existing.
+  - **Node harness on the real function source** (Deno and supabase mocked, fetch stubbed), **15/15**:
+    - Bad JWT → 401; unknown action → 400.
+    - `not_connected`.
+    - `get` returns off/on from the real field.
+    - 4711 → `needs_reconnect`.
+    - `enable` PATCHes `{recording:{cloud_recording:true}}` with the Bearer token, then re-reads.
+    - Already on → no PATCH.
+    - 204 but still off on Basic → `unsupported` (no fake success).
+    - PATCH 400 on Basic → `unsupported`, with Zoom's message.
+    - Still off on Licensed → `blocked`.
+    - 4711 on the PATCH only → `needs_reconnect`.
+    - Expiring token is refreshed and the rotated refresh token stored.
+    - Dead refresh token → `needs_reconnect`.
+    - Zoom 503 → 502, not a made-up state.
+  - **UI harness** rendered the real `Settings` → Integrations as a closer in every state. It was `harness-648.*` plus a vite config mocking `useAuth` and fetch; all deleted before commit, and its temporary vault `.claude/launch.json` entry reverted with `git checkout`.
+    - Off → click → "Turning on…" (disabled) → On.
+    - The `unsupported` and `blocked` messages.
+    - When `enable` returns `needs_reconnect`, the row switches to the reconnect state.
+    - Read error → Try again refetches.
+    - Not connected → no row.
+    - Reconnect Zoom called `zoom-oauth-start` and opened the `zoom-connect` 520×720 popup. The button then read "Waiting for Zoom…" (disabled).
+    - At 390px the row stays inside the card with no overflow.
+    - Screenshots timed out again (window in the background), so this was verified by DOM text and measurement.
+  - The live endpoint with no auth returns 401 (the gateway's `verify_jwt`).
+  - **Verified live** (Prompt 620 rule): `dpl_HoNXHiDR7TEi1tsT1nnJYBLqbP4F` `READY`, `aliasError: null`, aliased to `portal.restorix.co`/`portal.suretix.co`. The served `/assets/index-DsWTCZa3.js` is byte-identical to the local build. It contains `zoom-recording-setting`, "Turn on cloud recording", "Reconnect Zoom" and "doesn't support cloud recording".
+  **NOT verified — blocked on Brayden** (CC has no Marketplace access and can't log in as `test_closer`):
+  - (a) In Zoom Marketplace → the Restorix OAuth app → Scopes, add **`user:read:settings`** and **`user:update:settings`**. Until then even a fresh Connect gets a token without them, so the row shows "Reconnect needed" and reconnecting won't fix it.
+  - (b) Log in as `test_closer` and open Settings → Integrations. `test_closer` is the only row in `closer_zoom_tokens` (connected 2026-09-20), which is exactly the "already-connected closer" case.
+    - Confirm the row says **Reconnect needed**.
+    - Press Reconnect Zoom, then **Turn on cloud recording**.
+    - Confirm the row reads On, and that it shows On in Zoom's own web settings too.
+  - (c) If that Zoom account is on free Basic, (b) should show the "plan doesn't support" message instead. That is the real test of the failure state. No Basic test account was available to CC.
+  - (d) 647's blockers still stand: webhook secret, `recording.completed` subscription, paid plan, upload limit.
+  **Lesson**: Zoom's granular scope names describe an endpoint, not a feature. `cloud_recording:*:recording_settings` sounds like the on/off switch but only covers one recording's sharing settings. Before asking anyone to add a scope in Marketplace, look up the exact endpoint in Zoom's scope table. [[Restorix CC Queue]] item deleted; **queue is now empty.**
