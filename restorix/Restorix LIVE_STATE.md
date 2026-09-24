@@ -16,7 +16,9 @@ tags:
 
 ### Recently shipped (archive)
 
-**Latest shipped: Prompt 639** (CC 2026-09-23, preview only) — four hero concepts stacked for comparison in the same artifact (https://claude.ai/artifact/H1BbeGhrjAy2C5BQQWYEvk, Version 5), replacing the 638 clock hero: A Blackout poster (black, loud), B Blue slab (proof is the hero), C Type specimen (pure type, light), D Intake wall (deep blue, log texture). The rest of the page is byte-identical. **Awaiting Brayden's pick.** Full record in [[Restorix Memories]].
+**Latest shipped: Prompt 640** (CC 2026-09-23, preview only) — hero copy freed. Three message-led concepts with newly written copy replace 639's four in the same artifact (https://claude.ai/artifact/H1BbeGhrjAy2C5BQQWYEvk, Version 6): 1 The next center (race between two centers), 2 2:14 a.m. (an after-hours text-back conversation), 3 Already paid for (ROI paragraph with an inline booking button). The rest of the page is byte-identical. **Awaiting Brayden's reaction.** Full record in [[Restorix Memories]].
+
+**Previously — Prompt 639** (CC 2026-09-23, preview only) — four hero concepts stacked for comparison in the same artifact (https://claude.ai/artifact/H1BbeGhrjAy2C5BQQWYEvk, Version 5), replacing the 638 clock hero: A Blackout poster (black, loud), B Blue slab (proof is the hero), C Type specimen (pure type, light), D Intake wall (deep blue, log texture). The rest of the page is byte-identical. **Awaiting Brayden's pick.** Full record in [[Restorix Memories]].
 
 **Previously — Prompt 638** (CC 2026-09-23, preview only) — homepage hero rebuilt on Opus 5.5 inside the approved v3 file and published to the same artifact (https://claude.ai/artifact/H1BbeGhrjAy2C5BQQWYEvk, Version 4, which replaced the manager-chat hero edits at Brayden's call). The rolling timestamp 0:00 → 0:04 → 2:17 is set as the headline's giant middle line, with a synced step list beside it. Every non-hero part of the file is byte-identical to 637. **Awaiting Brayden's reaction; mobile unseen.** Full record in [[Restorix Memories]].
 
