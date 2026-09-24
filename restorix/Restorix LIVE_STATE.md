@@ -16,6 +16,8 @@ tags:
 
 ### Recently shipped (archive)
 
+**Latest shipped: Prompt 644** (CC 2026-09-23, `restorix-portal` `main` @ `a605cc7`, live `dpl_43xUXgTW5ziCk3DwCZPsuLzJZ7MV`) — closer `/meeting-room` built out from one card into a full page. It keeps 636's status card + Calls table unchanged and adds: Room check (Zoom/in-portal/auto-open), 4 stat tiles, Call Prep for the current or next call (setter notes, reminder texts sent, survey status), Recent Calls with outcomes, and a Soon card (recordings, device check). No schema changes. **Awaiting Brayden's look on real data.** Full record in [[Restorix Memories]].
+
 **Prompt 643 — PUSHED, pending Vercel verification** (CC 2026-09-23): the new homepage (v3 design, 2:14 a.m. hero) is on `restorix-marketing` `main` @ `aa14628` (includes the 642 port `a606d22`). The booking CTAs are styled normally but inert, a plain `<button>` with no destination, until the lead → closer → Zoom pipeline is built. The manager chat checks deployment READY + the restorix.co alias. Full record in [[Restorix Memories]].
 
 **Latest shipped: Prompt 641** (CC 2026-09-23, preview only) — **homepage hero converged**: the '2:14 a.m.' hero (dark, after-hours text-back thread) is now the single hero in the v3 preview (https://claude.ai/artifact/H1BbeGhrjAy2C5BQQWYEvk, Version 7), with a faint constellation canvas behind it and a trimmed left column (timestamp, headline, one line, booking button). The rest of the page is byte-identical. Still preview-only; nothing in `restorix-marketing` changed. Full record in [[Restorix Memories]].
