@@ -16,6 +16,8 @@ tags:
 
 ### Recently shipped (archive)
 
+**⛔ Prompt 642 — BLOCKED, built not pushed** (CC 2026-09-23): the v3 homepage is fully ported into `restorix-marketing` on local branch `prompt-642-new-homepage` @ `a606d22` (build/lint clean, pixel-matched to the preview at 1440px, clean at 375px). **Not pushed: `main` is still `beea4e1`.** Waiting on Brayden for a real booking destination, because the live CTA mailto (hello@restorix.io) is a dead inbox. One-line swap of `BOOKING_HREF` in `ui/Button.jsx`, then push. Full record in [[Restorix Memories]].
+
 **Latest shipped: Prompt 641** (CC 2026-09-23, preview only) — **homepage hero converged**: the '2:14 a.m.' hero (dark, after-hours text-back thread) is now the single hero in the v3 preview (https://claude.ai/artifact/H1BbeGhrjAy2C5BQQWYEvk, Version 7), with a faint constellation canvas behind it and a trimmed left column (timestamp, headline, one line, booking button). The rest of the page is byte-identical. Still preview-only; nothing in `restorix-marketing` changed. Full record in [[Restorix Memories]].
 
 **Previously — Prompt 640** (CC 2026-09-23, preview only) — hero copy freed. Three message-led concepts with newly written copy replace 639's four in the same artifact (https://claude.ai/artifact/H1BbeGhrjAy2C5BQQWYEvk, Version 6): 1 The next center (race between two centers), 2 2:14 a.m. (an after-hours text-back conversation), 3 Already paid for (ROI paragraph with an inline booking button). The rest of the page is byte-identical. **Awaiting Brayden's reaction.** Full record in [[Restorix Memories]].
