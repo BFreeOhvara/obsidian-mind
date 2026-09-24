@@ -1,0 +1,612 @@
+<title>Restorix Homepage v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --bg:#e6ecea;
+  --bg-cool:#e9edf0;
+  --surface:#f4f7f6;
+  --ink:#14161a;
+  --ink-soft:#3b4048;
+  --muted:#6b7280;
+  --line:rgba(20,22,26,.12);
+  --line-strong:rgba(20,22,26,.26);
+  --accent:#3a63d6;
+  --accent-deep:#24469e;
+  --accent-tint:rgba(58,99,214,.10);
+  --accent-on-ink:#94abf1;
+  --on-ink:#f2f5f4;
+  --on-ink-muted:rgba(242,245,244,.56);
+  --ink-line:rgba(242,245,244,.14);
+  --f-display:'Space Grotesk','Helvetica Neue',Arial,sans-serif;
+  --f-body:'Manrope','Segoe UI',system-ui,sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;
+  --gutter:clamp(16px,4vw,48px);
+  --max:1240px;
+  --nav-h:68px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--nav-h) + 16px)}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+h1,h2,h3,p,ul,ol,dl,dd,figure{margin:0}
+ul,ol{padding:0;list-style:none}
+a{color:inherit}
+.wrap{max-width:var(--max);margin-inline:auto;padding-inline:var(--gutter)}
+.eyebrow{font-family:var(--f-mono);font-size:12px;font-weight:500;letter-spacing:.14em;color:var(--accent-deep)}
+.h2{font-family:var(--f-display);font-weight:500;font-size:clamp(34px,4.4vw,60px);line-height:1.02;letter-spacing:-.028em;text-wrap:balance;margin-top:16px}
+.lede{color:var(--ink-soft);max-width:34em;text-wrap:pretty}
+.mono-s{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;color:var(--muted);line-height:1.5}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:10px;font-family:var(--f-body);font-weight:700;font-size:15px;line-height:1;text-decoration:none;padding:15px 22px;border-radius:4px;border:1px solid transparent;cursor:pointer;transition:background-color .2s,color .2s,border-color .2s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-deep)}
+.btn-sm{padding:11px 16px;font-size:14px}
+.btn-lg{padding:19px 28px;font-size:16px}
+.btn-line{border-color:var(--line-strong);color:var(--ink)}
+.btn-line:hover{border-color:var(--ink)}
+.link-arrow{font-weight:700;font-size:15px;text-decoration:none;display:inline-flex;gap:8px;align-items:center;padding-block:15px;border-bottom:1px solid var(--line-strong)}
+.link-arrow:hover{border-color:var(--ink)}
+
+/* nav */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:rgba(230,236,234,.86);backdrop-filter:saturate(1.2) blur(12px);-webkit-backdrop-filter:saturate(1.2) blur(12px);border-bottom:1px solid var(--line)}
+.nav-in{height:var(--nav-h);display:flex;align-items:center;gap:32px}
+.brand{display:inline-flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:600;font-size:21px;letter-spacing:-.02em;text-decoration:none}
+.brand svg{width:22px;height:22px}
+.nav-links{display:flex;gap:26px;margin-left:auto;font-size:14px;font-weight:600;color:var(--ink-soft)}
+.nav-links a{text-decoration:none}
+.nav-links a:hover{color:var(--ink)}
+.nav .btn{margin-left:8px}
+@media (max-width:1020px){.nav-links{display:none}.nav .btn{margin-left:auto}}
+
+/* HERO */
+.hero{padding-block:clamp(56px,9vw,120px) clamp(64px,8vw,112px)}
+.hero-eyebrow{font-size:13px;letter-spacing:.04em;color:var(--accent-deep)}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,.75fr);gap:clamp(40px,5vw,80px);align-items:end}
+.hero-h1{font-family:var(--f-display);font-size:clamp(44px,6.1vw,86px);line-height:.97;letter-spacing:-.04em;margin-top:24px}
+.hero-h1 span{display:block}
+.h1-a{font-weight:600}
+.h1-b{font-weight:400;color:var(--muted);margin-top:.1em}
+.hero-sub{margin-top:clamp(28px,3vw,40px);font-size:clamp(17px,1.5vw,20px);line-height:1.55;color:var(--ink-soft);max-width:31em}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:center;margin-top:32px}
+.pills{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:36px;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.1em;color:var(--ink-soft)}
+.pills li{display:inline-flex;align-items:center;gap:8px}
+.pills li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
+
+.ticket{justify-self:end;width:100%;max-width:400px;background:var(--ink);color:var(--on-ink);border-radius:6px;overflow:hidden;box-shadow:0 30px 60px -30px rgba(20,22,26,.55)}
+.ticket-head{display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid var(--ink-line);font-family:var(--f-mono);font-size:11.5px;letter-spacing:.14em}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--accent-on-ink);box-shadow:0 0 0 0 rgba(148,171,241,.6);animation:pulse 2s infinite}
+.ticket-clock{margin-left:auto;font-size:13px;letter-spacing:.04em;color:var(--on-ink-muted);font-variant-numeric:tabular-nums}
+.ticket-rows li{display:grid;grid-template-columns:52px 1fr 20px;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--ink-line);color:var(--on-ink-muted);transition:color .3s}
+.ticket-rows .t{font-family:var(--f-mono);font-size:13px;font-variant-numeric:tabular-nums}
+.ticket-rows .ev{font-family:var(--f-display);font-size:18px;font-weight:500;letter-spacing:-.01em}
+.ticket-rows .ck{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--ink-line);display:grid;place-items:center;transition:background-color .3s,border-color .3s}
+.ticket-rows .ck svg{width:11px;height:11px;opacity:0;transition:opacity .3s}
+.ticket-rows li.done{color:var(--on-ink)}
+.ticket-rows li.done .ck{background:var(--accent);border-color:var(--accent)}
+.ticket-rows li.done .ck svg{opacity:1}
+.ticket-foot{padding:14px 20px;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.14em;color:var(--accent-on-ink)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(148,171,241,.55)}70%{box-shadow:0 0 0 9px rgba(148,171,241,0)}100%{box-shadow:0 0 0 0 rgba(148,171,241,0)}}
+@media (max-width:900px){.hero-grid{grid-template-columns:1fr}.ticket{justify-self:start}}
+
+/* LEAK — a stepped funnel that drips at every ledge */
+.leak{padding-block:clamp(72px,10vw,136px);border-top:1px solid var(--line)}
+.split{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;row-gap:24px;align-items:end}
+.split > :first-child{grid-column:1 / span 7}
+.split > :last-child{grid-column:9 / span 4}
+.funnel{--w1:100;--w2:86;--w3:72;--w4:58;margin-top:clamp(48px,6vw,80px);display:flex;flex-direction:column;align-items:center}
+.band{position:relative;display:grid;grid-template-columns:minmax(150px,.75fr) minmax(0,2fr);gap:12px 32px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:3px;padding:28px clamp(20px,3vw,36px)}
+.band:nth-of-type(1){width:calc(var(--w1) * 1%)}
+.band:nth-of-type(2){width:calc(var(--w2) * 1%)}
+.band:nth-of-type(3){width:calc(var(--w3) * 1%)}
+.band:nth-of-type(4){width:calc(var(--w4) * 1%)}
+.band h3{font-family:var(--f-display);font-weight:600;font-size:22px;letter-spacing:-.015em;line-height:1.2}
+.band p{color:var(--ink-soft);margin-top:8px;font-size:16px;line-height:1.6}
+.stat .num{display:block;font-family:var(--f-display);font-weight:500;font-size:clamp(40px,4.4vw,58px);line-height:1;letter-spacing:-.035em;color:var(--accent-deep);font-variant-numeric:tabular-nums}
+.stat .mono-s{display:block;margin-top:10px;max-width:22ch}
+.ledge{position:relative;width:100%;height:30px}
+.drip{position:absolute;top:0;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:var(--accent);opacity:0;animation:drip 2.6s cubic-bezier(.45,0,.9,.6) infinite}
+.ledge .l1{left:calc(50% - var(--b) * .5% - (var(--a) - var(--b)) * .25%)}
+.ledge .l2{left:calc(50% - var(--b) * .5% - (var(--a) - var(--b)) * .12%);animation-delay:1.3s}
+.ledge .r1{left:calc(50% + var(--b) * .5% + (var(--a) - var(--b)) * .25%);animation-delay:.6s}
+.ledge .r2{left:calc(50% + var(--b) * .5% + (var(--a) - var(--b)) * .38%);animation-delay:1.9s}
+.lg1{--a:var(--w1);--b:var(--w2)}
+.lg2{--a:var(--w2);--b:var(--w3)}
+.lg3{--a:var(--w3);--b:var(--w4)}
+@keyframes drip{0%{transform:translateY(-2px) scale(.5);opacity:0}12%{opacity:.95}100%{transform:translateY(70px) scale(1);opacity:0}}
+.leak .caption{margin-top:28px;text-align:center}
+@media (max-width:860px){
+  .split > :first-child,.split > :last-child{grid-column:1 / -1}
+  .funnel{--w1:100;--w2:95;--w3:90;--w4:85}
+  .band{grid-template-columns:1fr}
+}
+
+/* SYSTEM — annotated star chart */
+.system{background:var(--bg-cool);padding-block:clamp(72px,10vw,136px)}
+.sys-head{max-width:760px}
+.sys-head .lede{margin-top:20px}
+.sys-stage{position:relative;margin-top:clamp(40px,6vw,72px);display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;row-gap:20px}
+.sys-stage canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.node{position:relative;z-index:1;display:grid;grid-template-columns:var(--orb,104px) minmax(0,1fr);align-items:center;text-align:left;background:none;border:0;padding:0;font:inherit;color:inherit;cursor:pointer}
+.orb{width:var(--orb,104px);height:var(--orb,104px)}
+.node .txt{background:var(--bg-cool);padding:12px 14px 14px;border-radius:3px}
+.node .ttl{display:block;font-family:var(--f-display);font-weight:600;font-size:20px;letter-spacing:-.015em;line-height:1.2;transition:color .25s}
+.node .dsc{display:block;margin-top:8px;font-size:15px;line-height:1.55;color:var(--ink-soft)}
+.node[aria-pressed="true"] .ttl{color:var(--accent-deep)}
+.n0{grid-column:1 / span 4;grid-row:1}
+.n1{grid-column:6 / span 4;grid-row:1;margin-top:120px}
+.n2{grid-column:2 / span 4;grid-row:2;margin-top:24px}
+.n3{grid-column:9 / span 4;grid-row:2;margin-top:-24px}
+.n4{grid-column:5 / span 4;grid-row:3;margin-top:8px}
+@media (max-width:1100px){
+  .n0{grid-column:1 / span 6}
+  .n1{grid-column:7 / span 6;margin-top:80px}
+  .n2{grid-column:1 / span 6;margin-top:0}
+  .n3{grid-column:7 / span 6;margin-top:56px}
+  .n4{grid-column:3 / span 7;margin-top:0}
+}
+@media (max-width:720px){
+  .sys-stage{--orb:76px;grid-template-columns:1fr;row-gap:12px}
+  .n0,.n1,.n2,.n3,.n4{grid-column:1;grid-row:auto;margin-top:0}
+  .n1,.n3{padding-left:28px}
+}
+
+/* HOW — a running verb index beside the chapters */
+.how{padding-block:clamp(72px,10vw,136px)}
+.how-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:clamp(32px,6vw,96px);margin-top:clamp(40px,6vw,72px)}
+.verbs{position:sticky;top:calc(var(--nav-h) + 40px);align-self:start}
+.verbs a{display:flex;align-items:flex-start;gap:14px;text-decoration:none;font-family:var(--f-display);font-weight:600;font-size:clamp(44px,6vw,86px);line-height:1.04;letter-spacing:-.04em;color:transparent;-webkit-text-stroke:1.2px var(--line-strong);transition:color .35s,-webkit-text-stroke-color .35s}
+.verbs a .vi,.verb-inline .vi{font-family:var(--f-mono);font-size:12px;font-weight:500;letter-spacing:.06em;color:var(--muted);-webkit-text-stroke:0;margin-top:.9em;min-width:2.2em}
+.verbs a.on{color:var(--ink);-webkit-text-stroke-color:var(--ink)}
+.verbs a.on .vi{color:var(--accent-deep)}
+.step{padding-block:36px 56px;border-top:1px solid var(--line);min-height:min(46vh,440px)}
+.step:first-child{border-top:0;padding-top:12px}
+.verb-inline{display:none}
+.step h3{font-family:var(--f-display);font-weight:500;font-size:clamp(24px,2.4vw,32px);line-height:1.15;letter-spacing:-.02em;text-wrap:balance}
+.step p{color:var(--ink-soft);margin-top:14px;max-width:34em}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.tags li{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;padding:7px 10px;border:1px solid var(--line-strong);border-radius:2px;color:var(--ink-soft)}
+@media (max-width:860px){
+  .how-grid{grid-template-columns:1fr}
+  .verbs{display:none}
+  .verb-inline{display:flex;gap:10px;align-items:baseline;font-family:var(--f-display);font-weight:600;font-size:44px;letter-spacing:-.04em;line-height:1;margin-bottom:18px}
+  .verb-inline .vi{margin-top:0;color:var(--accent-deep)}
+  .step{min-height:0}
+}
+
+/* WHO — run-in editorial copy */
+.who{background:var(--bg-cool);padding-block:clamp(72px,10vw,136px)}
+.who-head{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;row-gap:20px}
+.who-head > div{grid-column:1 / span 8}
+.who-head .lede{grid-column:1 / span 6;font-size:19px}
+.who-body{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;row-gap:48px;margin-top:clamp(40px,6vw,72px);align-items:end}
+.runin{grid-column:1 / span 8;columns:2;column-gap:44px}
+.runin p{break-inside:avoid;margin-bottom:28px;font-size:16px;line-height:1.65;color:var(--ink-soft)}
+.runin strong{display:block;font-family:var(--f-display);font-weight:600;font-size:22px;line-height:1.18;letter-spacing:-.018em;color:var(--ink);margin-bottom:6px}
+.fit{grid-column:10 / span 3;padding-top:22px;border-top:2px solid var(--accent);margin-bottom:28px}
+.fit p{font-family:var(--f-display);font-size:clamp(22px,2vw,27px);line-height:1.22;letter-spacing:-.02em;font-weight:500}
+.fit p span{color:var(--accent-deep)}
+.fit .btn{margin-top:24px}
+@media (max-width:980px){
+  .who-head > div,.who-head .lede,.runin,.fit{grid-column:1 / -1}
+}
+@media (max-width:640px){.runin{columns:1}}
+
+/* OUTCOMES — a report waiting for its first numbers */
+.out{padding-block:clamp(72px,10vw,136px)}
+.honest{font-family:var(--f-display);font-size:20px;line-height:1.35;letter-spacing:-.01em;color:var(--accent-deep);display:flex;gap:10px}
+.honest .mark{font-family:var(--f-mono);font-size:26px;line-height:1}
+.out-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(24px,4vw,56px);margin-top:clamp(40px,6vw,72px);align-items:stretch}
+.dial-panel{background:var(--surface);border:1px solid var(--line);border-radius:3px;padding:28px;display:flex;flex-direction:column;gap:20px}
+.m-name{display:block;font-family:var(--f-display);font-weight:600;font-size:22px;letter-spacing:-.015em;line-height:1.2}
+.m-sub{display:block;margin-top:8px}
+.dial{width:100%;max-width:340px;align-self:center;height:auto}
+.dial .tk{stroke:var(--line-strong)}
+.dial .tk.mj{stroke:var(--ink)}
+.dial .lbl{font-family:var(--f-mono);font-size:12px;fill:var(--muted)}
+.dial .face{fill:none;stroke:var(--line)}
+.ledger{display:flex;flex-direction:column}
+.ledger .row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px 24px;align-items:center;padding-block:26px;border-bottom:1px solid var(--line)}
+.ledger .row:first-child{border-top:1px solid var(--line)}
+.ledger dd{text-align:right}
+.blank{display:block;font-family:var(--f-display);font-size:52px;line-height:1;color:var(--line-strong);font-weight:400}
+.np{display:inline-block;margin-top:8px;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;color:var(--muted);padding:4px 7px;border:1px dashed var(--line-strong);border-radius:2px}
+@media (max-width:860px){.out-grid{grid-template-columns:1fr}}
+@media (max-width:480px){.ledger .row{grid-template-columns:1fr}.ledger dd{text-align:left}}
+
+/* CLOSING */
+.call{background:var(--ink);color:var(--on-ink);padding-block:clamp(80px,11vw,152px)}
+.call .eyebrow{color:var(--accent-on-ink)}
+.call-h{font-family:var(--f-display);font-weight:500;font-size:clamp(42px,6.8vw,96px);line-height:.98;letter-spacing:-.04em;margin-top:24px;max-width:15ch;text-wrap:balance}
+.call-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:24px;row-gap:36px;margin-top:clamp(40px,5vw,64px);align-items:end}
+.call-body{grid-column:1 / span 5;color:var(--on-ink-muted);font-size:18px}
+.call-cta{grid-column:6 / span 3}
+.call-tags{grid-column:10 / span 3;display:flex;flex-direction:column;gap:12px;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.12em;color:var(--on-ink)}
+.call-tags li{display:flex;gap:10px;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--ink-line)}
+.call-tags li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent-on-ink);flex:none}
+@media (max-width:980px){.call-body,.call-cta,.call-tags{grid-column:1 / -1}}
+.foot{background:var(--ink);color:var(--on-ink-muted);border-top:1px solid var(--ink-line);padding-block:28px}
+.foot .brand{color:var(--on-ink);font-size:18px}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .live-dot{animation:none}
+  .drip{animation:none;opacity:.5;transform:translateY(14px)}
+  .ledge .l2,.ledge .r2{display:none}
+}
+</style>
+
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#top" aria-label="Restorix home">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17 12 6l7 9" fill="none" stroke="#3a63d6" stroke-width="1.6"/><circle cx="5" cy="17" r="2.6" fill="#14161a"/><circle cx="12" cy="6" r="2.6" fill="#3a63d6"/><circle cx="19" cy="15" r="2.6" fill="#24469e"/></svg>
+      Restorix
+    </a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#leak">The Leak</a>
+      <a href="#system">The Restorix System</a>
+      <a href="#how">How It Works</a>
+      <a href="#who">Who It's For</a>
+      <a href="#outcomes">Outcomes</a>
+    </nav>
+    <a class="btn btn-primary btn-sm" href="#call">Book a Strategy Call</a>
+  </div>
+</header>
+
+<main>
+<section class="hero" id="top">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <p class="eyebrow hero-eyebrow">AI infrastructure for behavioral health treatment centers</p>
+        <h1 class="hero-h1"><span class="h1-a">More admissions booked.</span> <span class="h1-b">None of the manual intake work.</span></h1>
+        <p class="hero-sub">Restorix installs AI systems that capture, qualify, and follow up with every inquiry — so your center books more of the admissions it's already earning, without adding front-desk staff.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#call">Book a Strategy Call</a>
+          <a class="link-arrow" href="#system">See how the system works <span aria-hidden="true">↓</span></a>
+        </div>
+        <ul class="pills">
+          <li>24/7 INQUIRY CAPTURE</li>
+          <li>LEVEL-OF-CARE TRIAGE</li>
+          <li>AUTOMATIC BOOKING</li>
+        </ul>
+      </div>
+      <aside class="ticket" aria-label="Live intake example">
+        <div class="ticket-head"><span class="live-dot" aria-hidden="true"></span><span>LIVE INTAKE</span><span class="ticket-clock" id="clock" aria-hidden="true">2:17</span></div>
+        <ol class="ticket-rows">
+          <li class="done" data-t="0"><span class="t">0:00</span><span class="ev">Inquiry received</span><span class="ck" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.2 5 8.6l4.6-5" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></li>
+          <li class="done" data-t="4"><span class="t">0:04</span><span class="ev">Text-back sent</span><span class="ck" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.2 5 8.6l4.6-5" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></li>
+          <li class="done" data-t="137"><span class="t">2:17</span><span class="ev">Consult booked</span><span class="ck" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.2 5 8.6l4.6-5" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></li>
+        </ol>
+        <div class="ticket-foot">NO INQUIRY LEFT WAITING</div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section class="leak" id="leak">
+  <div class="wrap">
+    <div class="split">
+      <div>
+        <p class="eyebrow">THE LEAK</p>
+        <h2 class="h2">Most centers lose the admissions they've already won.</h2>
+      </div>
+      <p class="lede">You spend real money and staff hours to make the phone ring. Then the funnel leaks at every stage between 'interested' and 'admitted.' It's rarely a marketing problem — it's an infrastructure problem.</p>
+    </div>
+
+    <div class="funnel">
+      <article class="band">
+        <div class="stat"><span class="num">60–75%</span><span class="mono-s">OF ADMISSION INQUIRIES ARRIVE BY PHONE</span></div>
+        <div><h3>The Missed Call</h3><p>Admissions inquiries hit voicemail during assessments, after hours, and over weekends. Most callers don't wait — they call the next center.</p></div>
+      </article>
+      <div class="ledge lg1" aria-hidden="true"><i class="drip l1"></i><i class="drip l2"></i><i class="drip r1"></i><i class="drip r2"></i></div>
+      <article class="band">
+        <div class="stat"><span class="num">9–21×</span><span class="mono-s">MORE LIKELY TO CONVERT WHEN CONTACTED WITHIN 5 MINUTES</span></div>
+        <div><h3>The Slow Follow-Up</h3><p>By the time someone hears back, they may already be in crisis with another facility. Manual callback queues simply can't keep pace with intent.</p></div>
+      </article>
+      <div class="ledge lg2" aria-hidden="true"><i class="drip l1"></i><i class="drip l2"></i><i class="drip r1"></i><i class="drip r2"></i></div>
+      <article class="band">
+        <div class="stat"><span class="num">&lt;20%</span><span class="mono-s">AVERAGE CONVERSION RATE FROM INBOUND CALL TO ADMISSION</span></div>
+        <div><h3>The Cold Lead</h3><p>Without structured, level-of-care-aware follow-up, a real inquiry goes quiet within days. The need was real — the system to recapture it wasn't there.</p></div>
+      </article>
+      <div class="ledge lg3" aria-hidden="true"><i class="drip l1"></i><i class="drip l2"></i><i class="drip r1"></i><i class="drip r2"></i></div>
+      <article class="band">
+        <div class="stat"><span class="num">18.5%</span><span class="mono-s">CLICK-TO-CALL CONVERSION, VS. 2.8% FOR FORM FILLS</span></div>
+        <div><h3>The Buried Front Desk</h3><p>Verifying insurance, screening level of care, and manual re-scheduling eat hours that should go to the people already in your care.</p></div>
+      </article>
+    </div>
+    <p class="mono-s caption">BASED ON PUBLISHED BEHAVIORAL-HEALTH INTAKE BENCHMARKS</p>
+  </div>
+</section>
+
+<section class="system" id="system">
+  <div class="wrap">
+    <div class="sys-head">
+      <p class="eyebrow">THE RESTORIX SYSTEM</p>
+      <h2 class="h2">Not a chatbot. A connected revenue layer.</h2>
+      <p class="lede">Five capabilities, architected as one system around your center. Each part hands off to the next — capture to qualify, recover to book, book to nurture — so no inquiry falls through the gaps between tools.</p>
+    </div>
+    <div class="sys-stage" id="stage">
+      <canvas id="sys-canvas" role="img" aria-label="Five linked clusters of points, one per capability, with signals passing between them"></canvas>
+      <button class="node n0" type="button" data-i="0" aria-pressed="true"><span class="orb" aria-hidden="true"></span><span class="txt"><span class="ttl">Lead capture &amp; qualification</span><span class="dsc">Every inquiry — web, form, or phone — answered and scored in seconds, then routed by urgency so the calls that need a human first reach one first.</span></span></button>
+      <button class="node n1" type="button" data-i="1" aria-pressed="false"><span class="orb" aria-hidden="true"></span><span class="txt"><span class="ttl">Missed-call recovery</span><span class="dsc">An unanswered call instantly triggers a text-back and callback sequence, so the inquiry your marketing paid for never reaches a competitor.</span></span></button>
+      <button class="node n2" type="button" data-i="2" aria-pressed="false"><span class="orb" aria-hidden="true"></span><span class="txt"><span class="ttl">Level-of-care &amp; insurance triage</span><span class="dsc">A voice agent that asks the right clinical and coverage questions, on brand, around the clock — and routes each caller to the right level of care.</span></span></button>
+      <button class="node n3" type="button" data-i="3" aria-pressed="false"><span class="orb" aria-hidden="true"></span><span class="txt"><span class="ttl">Structured intake &amp; booking</span><span class="dsc">Intake collected conversationally and written straight to your calendar and systems — no double entry, no details lost between shifts.</span></span></button>
+      <button class="node n4" type="button" data-i="4" aria-pressed="false"><span class="orb" aria-hidden="true"></span><span class="txt"><span class="ttl">Follow-up &amp; nurture</span><span class="dsc">Persistent, clinically appropriate sequences that keep undecided families supported until they're ready — never pushy, always human when it matters.</span></span></button>
+    </div>
+  </div>
+</section>
+
+<section class="how" id="how">
+  <div class="wrap">
+    <p class="eyebrow">HOW IT WORKS</p>
+    <h2 class="h2">A four-step install, not a software handoff.</h2>
+    <div class="how-grid">
+      <nav class="verbs" aria-label="Install steps">
+        <a href="#step-consult" class="on"><span class="vi">1/4</span>Consult</a>
+        <a href="#step-architect"><span class="vi">2/4</span>Architect</a>
+        <a href="#step-install"><span class="vi">3/4</span>Install</a>
+        <a href="#step-optimize"><span class="vi">4/4</span>Optimize</a>
+      </nav>
+      <div class="steps">
+        <article class="step" id="step-consult" data-step="0">
+          <p class="verb-inline" aria-hidden="true"><span class="vi">1/4</span>Consult</p>
+          <h3>We map how inquiries actually reach you.</h3>
+          <p>Before a single line of automation, we audit your real intake funnel — channels, call volume, response times, and exactly where inquiries drop. No templates, no assumptions.</p>
+          <ul class="tags"><li>FUNNEL AUDIT</li><li>CALL REVIEW</li><li>DROP-OFF MAPPING</li></ul>
+        </article>
+        <article class="step" id="step-architect" data-step="1">
+          <p class="verb-inline" aria-hidden="true"><span class="vi">2/4</span>Architect</p>
+          <h3>We design the system around your center.</h3>
+          <p>A clear blueprint: which agents, which scripts, which handoffs, and what writes back to your EHR/CRM and calendar. You see and approve the entire flow before anything ships.</p>
+          <ul class="tags"><li>AGENT DESIGN</li><li>SCRIPT LOGIC</li><li>INTEGRATION PLAN</li></ul>
+        </article>
+        <article class="step" id="step-install" data-step="2">
+          <p class="verb-inline" aria-hidden="true"><span class="vi">3/4</span>Install</p>
+          <h3>We build, integrate, and go live with you.</h3>
+          <p>We configure the agents on your levels of care, insurance mix, and compliance needs, connect them to your stack, and launch — with you watching every conversation from day one.</p>
+          <ul class="tags"><li>BUILD</li><li>INTEGRATE</li><li>SUPERVISED LAUNCH</li></ul>
+        </article>
+        <article class="step" id="step-optimize" data-step="3">
+          <p class="verb-inline" aria-hidden="true"><span class="vi">4/4</span>Optimize</p>
+          <h3>We tune relentlessly for booked admissions.</h3>
+          <p>Weekly review of real conversations and conversion data. We refine triage, timing, and tone until the numbers move — then keep them moving as you grow.</p>
+          <ul class="tags"><li>CONVERSATION QA</li><li>CONVERSION TUNING</li><li>REPORTING</li></ul>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="who" id="who">
+  <div class="wrap">
+    <div class="who-head">
+      <div>
+        <p class="eyebrow">WHO IT'S FOR</p>
+        <h2 class="h2">Built for serious behavioral health providers.</h2>
+      </div>
+      <p class="lede">Restorix is purpose-built for centers where the admissions journey is urgent, high-consideration, and easy to lose to a slow reply.</p>
+    </div>
+    <div class="who-body">
+      <div class="runin">
+        <p><strong>Substance use detox &amp; residential rehab</strong> Time-sensitive inquiries qualified and booked before a family calls the next center — with bed availability and insurance handled accurately on first contact.</p>
+        <p><strong>IOP / PHP outpatient programs</strong> Ongoing enrollment deserves fast, consistent first responses. Capture the inquiry, screen the fit, get them scheduled for an assessment.</p>
+        <p><strong>Dual-diagnosis &amp; co-occurring disorder centers</strong> Complex clinical intake handled with the right questions in the right order, every time — no detail lost between shifts or hand-offs.</p>
+        <p><strong>Eating disorder treatment centers</strong> A sensitive first conversation, every time, at any hour a family reaches out — routed to your team the moment more than triage is needed.</p>
+        <p><strong>Psychiatric &amp; specialty mental health</strong> Including ketamine and TMS programs — always-on booking that turns after-hours interest and missed calls into scheduled consults.</p>
+      </div>
+      <aside class="fit">
+        <p><span>Adjacent specialty?</span> If your patients call before they commit, Restorix fits.</p>
+        <a class="btn btn-line" href="#call">Check your fit</a>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section class="out" id="outcomes">
+  <div class="wrap">
+    <div class="split">
+      <div>
+        <p class="eyebrow">OUTCOMES</p>
+        <h2 class="h2">The numbers a center director actually cares about.</h2>
+      </div>
+      <p class="honest"><span class="mark" aria-hidden="true">*</span><span>Restorix is early — real client data, not averages</span></p>
+    </div>
+    <div class="out-grid">
+      <figure class="dial-panel">
+        <figcaption><span class="m-name">Average first-response time</span><span class="mono-s m-sub">TARGET: UNDER 60 SECONDS, DAY OR NIGHT</span></figcaption>
+        <svg class="dial" viewBox="0 0 320 320" aria-hidden="true">
+          <circle class="face" cx="160" cy="160" r="138"/>
+          <g id="dial-ticks"></g>
+          <path d="M160 22 A138 138 0 0 1 291.25 117.36" fill="none" stroke="#3a63d6" stroke-width="7" stroke-linecap="round"/>
+          <text x="160" y="170" text-anchor="middle" style="font-family:'Space Grotesk',sans-serif;font-size:56px" fill="rgba(20,22,26,.26)">—</text>
+          <text x="160" y="206" text-anchor="middle" class="lbl" style="font-size:10px;letter-spacing:.12em">NOT YET POPULATED</text>
+          <text x="160" y="248" text-anchor="middle" class="lbl" style="font-size:10px;letter-spacing:.12em">MIN</text>
+        </svg>
+      </figure>
+      <dl class="ledger">
+        <div class="row">
+          <dt><span class="m-name">Inquiry-to-admission lift</span><span class="mono-s m-sub">MEASURED WITHIN THE FIRST 90 DAYS LIVE</span></dt>
+          <dd><span class="blank" aria-hidden="true">—</span><span class="np">NOT YET POPULATED</span></dd>
+        </div>
+        <div class="row">
+          <dt><span class="m-name">Missed calls re-engaged</span><span class="mono-s m-sub">AUTOMATIC TEXT-BACK &amp; CALLBACK</span></dt>
+          <dd><span class="blank" aria-hidden="true">—</span><span class="np">NOT YET POPULATED</span></dd>
+        </div>
+        <div class="row">
+          <dt><span class="m-name">Hours reclaimed each week</span><span class="mono-s m-sub">FRONT-DESK ADMIN REMOVED</span></dt>
+          <dd><span class="blank" aria-hidden="true">—</span><span class="np">NOT YET POPULATED</span></dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section class="call" id="call">
+  <div class="wrap">
+    <p class="eyebrow">BOOK A STRATEGY CALL</p>
+    <h2 class="call-h">Stop paying to attract admissions you never book.</h2>
+    <div class="call-grid">
+      <p class="call-body">In 30 minutes we'll map your current intake funnel, show you exactly where it leaks, and outline the Restorix system that closes it. If it's not a fit, we'll tell you.</p>
+      <div class="call-cta"><a class="btn btn-primary btn-lg" href="#call">Book a Strategy Call</a></div>
+      <ul class="call-tags"><li>30-MINUTE STRATEGY CALL</li><li>WE MAP YOUR FUNNEL LIVE</li><li>NO OBLIGATION</li></ul>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="foot">
+  <div class="wrap">
+    <a class="brand" href="#top">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17 12 6l7 9" fill="none" stroke="#94abf1" stroke-width="1.6"/><circle cx="5" cy="17" r="2.6" fill="#f2f5f4"/><circle cx="12" cy="6" r="2.6" fill="#94abf1"/><circle cx="19" cy="15" r="2.6" fill="#3a63d6"/></svg>
+      Restorix
+    </a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* Hero: intake ticket replays 0:00 → 2:17 */
+  var clock = document.getElementById('clock');
+  var rows = Array.prototype.slice.call(document.querySelectorAll('.ticket-rows li'));
+  if (!reduce && clock) {
+    var RUN = 5200, HOLD = 2800, t0 = performance.now(), last = -1;
+    var fmt = function(s){ s = Math.floor(s); return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); };
+    (function tick(now){
+      var e = (now - t0) % (RUN + HOLD);
+      var sec = Math.min(137, 137 * Math.pow(Math.min(1, e / RUN), 1.7));
+      var whole = Math.floor(sec);
+      if (whole !== last) {
+        last = whole;
+        clock.textContent = fmt(whole);
+        rows.forEach(function(r){ r.classList.toggle('done', whole >= +r.dataset.t); });
+      }
+      requestAnimationFrame(tick);
+    })(t0);
+  }
+
+  /* Outcomes: stopwatch ticks, 0–5 min, one tick per 10 s */
+  var g = document.getElementById('dial-ticks'), ns = 'http://www.w3.org/2000/svg';
+  for (var s = 0; s < 300; s += 10) {
+    var a = s / 300 * Math.PI * 2 - Math.PI / 2, major = s % 60 === 0;
+    var r1 = 126, r2 = major ? 110 : 119;
+    var ln = document.createElementNS(ns, 'line');
+    ln.setAttribute('x1', 160 + Math.cos(a) * r1); ln.setAttribute('y1', 160 + Math.sin(a) * r1);
+    ln.setAttribute('x2', 160 + Math.cos(a) * r2); ln.setAttribute('y2', 160 + Math.sin(a) * r2);
+    ln.setAttribute('class', major ? 'tk mj' : 'tk'); ln.setAttribute('stroke-width', major ? 2 : 1);
+    g.appendChild(ln);
+    if (major) {
+      var tx = document.createElementNS(ns, 'text');
+      tx.setAttribute('x', 160 + Math.cos(a) * 94); tx.setAttribute('y', 160 + Math.sin(a) * 94 + 4);
+      tx.setAttribute('text-anchor', 'middle'); tx.setAttribute('class', 'lbl');
+      tx.textContent = s / 60;
+      g.appendChild(tx);
+    }
+  }
+
+  /* How it works: running verb index follows the chapter in view */
+  var verbs = Array.prototype.slice.call(document.querySelectorAll('.verbs a'));
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if (e.isIntersecting) {
+          var i = +e.target.dataset.step;
+          verbs.forEach(function(v, k){ v.classList.toggle('on', k === i); });
+        }
+      });
+    }, { rootMargin: '-38% 0px -58% 0px' });
+    document.querySelectorAll('.step').forEach(function(el){ io.observe(el); });
+  }
+
+  /* System: a star chart — one cluster per capability, signals passing along the handoffs */
+  var stage = document.getElementById('stage'), cv = document.getElementById('sys-canvas');
+  var ctx = cv.getContext('2d');
+  var nodes = Array.prototype.slice.call(stage.querySelectorAll('.node'));
+  var orbs = nodes.map(function(n){ return n.querySelector('.orb'); });
+  var EDGES = [[0,2],[0,1],[1,3],[2,3],[3,4]];
+  var active = 0, auto = !reduce, inView = true, W = 0, H = 0, centers = [], R = 40;
+  var seed = 11; var rnd = function(){ seed = seed * 16807 % 2147483647; return (seed - 1) / 2147483646; };
+  var clusters = orbs.map(function(){
+    var pts = [];
+    for (var k = 0; k < 17; k++) pts.push({ a: rnd() * 6.283, r: .25 + Math.sqrt(rnd()) * .75, ph: rnd() * 6.283, sp: .00035 + rnd() * .0005, amp: .08 + rnd() * .1 });
+    return pts;
+  });
+
+  function measure(){
+    var b = stage.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
+    W = b.width; H = b.height;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    centers = orbs.map(function(o){ var r = o.getBoundingClientRect(); return { x: r.left - b.left + r.width / 2, y: r.top - b.top + r.height / 2 }; });
+    R = orbs[0].getBoundingClientRect().width * .42;
+  }
+  function ctrl(a, b){ var dx = b.x - a.x, dy = b.y - a.y; return { x: (a.x + b.x) / 2 - dy * .16, y: (a.y + b.y) / 2 + dx * .16 }; }
+  function q(a, c, b, t){ var u = 1 - t; return { x: u*u*a.x + 2*u*t*c.x + t*t*b.x, y: u*u*a.y + 2*u*t*c.y + t*t*b.y }; }
+
+  function draw(t){
+    ctx.clearRect(0, 0, W, H);
+    EDGES.forEach(function(e, k){
+      var a = centers[e[0]], b = centers[e[1]], c = ctrl(a, b), hot = e[0] === active || e[1] === active;
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.quadraticCurveTo(c.x, c.y, b.x, b.y);
+      ctx.setLineDash(hot ? [] : [2, 6]);
+      ctx.strokeStyle = hot ? 'rgba(58,99,214,.5)' : 'rgba(20,22,26,.18)';
+      ctx.lineWidth = hot ? 1.4 : 1; ctx.stroke(); ctx.setLineDash([]);
+      var n = hot ? 3 : 1;
+      for (var m = 0; m < n; m++) {
+        var p = (t * (hot ? .00018 : .0001) + k * .21 + m / n) % 1, pt = q(a, c, b, p);
+        ctx.beginPath(); ctx.arc(pt.x, pt.y, hot ? 2.6 : 1.8, 0, 6.283);
+        ctx.fillStyle = hot ? '#3a63d6' : 'rgba(20,22,26,.4)'; ctx.fill();
+      }
+    });
+    clusters.forEach(function(pts, i){
+      var c = centers[i], on = i === active;
+      var P = pts.map(function(p){
+        var rr = R * p.r * (1 + Math.sin(t * p.sp + p.ph) * p.amp), aa = p.a + Math.sin(t * p.sp * .7 + p.ph) * .3;
+        return { x: c.x + Math.cos(aa) * rr, y: c.y + Math.sin(aa) * rr };
+      });
+      ctx.lineWidth = 1;
+      for (var x = 0; x < P.length; x++) for (var y = x + 1; y < P.length; y++) {
+        var d = Math.hypot(P[x].x - P[y].x, P[x].y - P[y].y), lim = R * .7;
+        if (d < lim) {
+          var al = 1 - d / lim;
+          ctx.strokeStyle = on ? 'rgba(58,99,214,' + (.55 * al) + ')' : 'rgba(20,22,26,' + (.2 * al) + ')';
+          ctx.beginPath(); ctx.moveTo(P[x].x, P[x].y); ctx.lineTo(P[y].x, P[y].y); ctx.stroke();
+        }
+      }
+      P.forEach(function(p, k){
+        ctx.beginPath(); ctx.arc(p.x, p.y, (k % 5 === 0 ? 2.4 : 1.6) * (on ? 1.25 : 1), 0, 6.283);
+        ctx.fillStyle = on ? '#3a63d6' : 'rgba(20,22,26,.55)'; ctx.fill();
+      });
+      ctx.beginPath(); ctx.arc(c.x, c.y, on ? 5 : 3.5, 0, 6.283);
+      ctx.fillStyle = on ? '#24469e' : '#14161a'; ctx.fill();
+      if (on) { ctx.beginPath(); ctx.arc(c.x, c.y, R * 1.15, 0, 6.283); ctx.strokeStyle = 'rgba(58,99,214,.28)'; ctx.stroke(); }
+    });
+  }
+
+  function setActive(i, byUser){
+    if (byUser) auto = false;
+    active = i;
+    nodes.forEach(function(n, k){ n.setAttribute('aria-pressed', k === i ? 'true' : 'false'); });
+    if (reduce) draw(0);
+  }
+  nodes.forEach(function(n, i){
+    n.addEventListener('click', function(){ setActive(i, true); });
+    n.addEventListener('mouseenter', function(){ setActive(i, true); });
+    n.addEventListener('focus', function(){ setActive(i, true); });
+  });
+
+  measure();
+  if ('ResizeObserver' in window) new ResizeObserver(function(){ measure(); if (reduce) draw(0); }).observe(stage);
+  else window.addEventListener('resize', measure);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ measure(); if (reduce) draw(0); });
+
+  if (reduce) { draw(0); return; }
+  if ('IntersectionObserver' in window) new IntersectionObserver(function(es){ inView = es[0].isIntersecting; }).observe(stage);
+  setInterval(function(){ if (auto && inView && !document.hidden) setActive((active + 1) % nodes.length, false); }, 4200);
+  (function loop(t){ if (inView) draw(t); requestAnimationFrame(loop); })(performance.now());
+})();
+</script>
