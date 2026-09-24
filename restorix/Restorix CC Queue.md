@@ -19,27 +19,7 @@ tags:
 > - One `## Prompt NNN — <title>` heading per item. Put the full spec inline (or in a `<details>` block). Order = execution order.
 
 
-## Prompt 642 — Ship the new homepage to production — ⛔ BLOCKED on a real booking destination (built + verified, NOT pushed)
-
-**Status (CC, 2026-09-23):** port done and verified on `restorix-marketing` local branch `prompt-642-new-homepage` @ `a606d22`; **`main` untouched (`beea4e1`), nothing pushed, nothing deployed.** Blocked because the live site's only booking CTA is `mailto:hello@restorix.io?subject=Strategy%20Call%20Request`, and hello@restorix.io doesn't exist (Prompt 507). Brayden chose "build now, hold push". **To unblock:** Brayden supplies the real booking destination (Calendly/Cal.com URL, a real inbox, or a phone number). CC then changes `BOOKING_HREF` in `src/components/ui/Button.jsx` (one line; every CTA reads it), rebuilds and relints, pushes to `main`, and reports the hash for independent Vercel verification. Full record in [[Restorix Memories]].
-
-<details><summary>Original spec</summary>
-
-**Why this exists:** Every hero/homepage prompt since 637 has been explicitly preview-only — the finalized design has been living in the artifact / local file `restorix/marketing-design-direction-v3.html` (currently Version 7, hero locked to "2:14 a.m." per Prompt 641), and `restorix-marketing` itself has never been touched. Brayden has now approved the direction and wants it live on restorix.co. **This prompt is the one that actually authorizes touching `restorix-marketing` and pushing to its `main`.**
-
-**What to do:**
-
-1. Treat `restorix/marketing-design-direction-v3.html` (Version 7) as the source of truth for the new homepage — hero through Closing, all sections as currently in that file.
-2. Implement it as the real production homepage inside the `restorix-marketing` repo, in whatever form matches how that repo is actually built (component files if that's its pattern, a single page if it's simpler — look at the existing repo structure first, don't assume). This is a port/implementation pass, not a copy-paste of the static preview file — bring over the design faithfully but make it fit the real codebase's conventions.
-3. **Before wiring any CTA**, find what the *currently live* restorix.co's "Book a Strategy Call" button actually does — a booking/calendar tool link, a contact form, a phone number, whatever it really is — and wire every CTA in the new homepage to that same real destination. The preview file's CTAs are placeholder `#call` anchors; don't ship placeholder links to production.
-4. Preserve everything the live site has that the static preview file doesn't carry: real `<head>` meta/OG tags, favicon, analytics/tracking scripts, any cookie/consent banner, footer legal links, and any other real page/route the current site has (privacy policy, terms, etc. — don't lose them). The preview file only had to look right; production has to actually work right.
-5. Build clean, lint clean, and do a real visual check (not just code review) at a normal desktop width and a phone width before pushing — same standard as every preview round.
-6. Commit and push to `restorix-marketing`'s `main`. Commit subject: `Prompt 642: ship new homepage design to production`.
-
-**Report back:** the commit hash you pushed, exactly what the CTA now links to (and where you confirmed that from), and confirmation that meta/analytics/footer/legal-page plumbing from the current live site was preserved. I'll independently verify the Vercel deployment reaches READY and that restorix.co's alias is actually serving it — don't mark this "shipped," just report what you pushed and let that verification happen separately.
-
-</details>
-
+_Prompt 643 pushed 2026-09-23 (also closes Prompt 642): new homepage on `restorix-marketing` `main` @ **`aa14628`** (on top of `a606d22`, the 642 port). Every Book-a-Strategy-Call CTA is now a plain `<button>` with no destination or handler, pixel-identical to before, and verified inert with real clicks. The dead mailto is gone from source and bundle. Build/lint clean; clean at 1440px and 375px. **Awaiting the manager chat's independent Vercel READY + restorix.co alias check; not marked shipped.** The real booking pipeline (lead → closer → Zoom) is a separate future build and gets wired into `BookingButton`. Full record in [[Restorix Memories]]._
 
 _Prompt 641 delivered 2026-09-23 (preview only, not deployed): hero locked to **2:14 a.m.** in https://claude.ai/artifact/H1BbeGhrjAy2C5BQQWYEvk (Version 7). The other two concepts and all concept tag bars and their CSS/JS were deleted, leaving one hero (`id="top"`). The message thread is byte-identical. A faint constellation canvas (same language as the System chart, ambient only, quieter behind the headline) now sits behind the hero. Left column cut to timestamp + headline + one line ('Restorix answers every inquiry in seconds, day or night.') + the booking button: the body paragraph and the '30 minutes…' note are gone. Real-render checked at 1440px and 390px; a canvas zero-width sizing bug was caught and fixed. Approved sections byte-identical. Full record in [[Restorix Memories]]._
 

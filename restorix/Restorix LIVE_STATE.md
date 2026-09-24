@@ -16,7 +16,7 @@ tags:
 
 ### Recently shipped (archive)
 
-**⛔ Prompt 642 — BLOCKED, built not pushed** (CC 2026-09-23): the v3 homepage is fully ported into `restorix-marketing` on local branch `prompt-642-new-homepage` @ `a606d22` (build/lint clean, pixel-matched to the preview at 1440px, clean at 375px). **Not pushed: `main` is still `beea4e1`.** Waiting on Brayden for a real booking destination, because the live CTA mailto (hello@restorix.io) is a dead inbox. One-line swap of `BOOKING_HREF` in `ui/Button.jsx`, then push. Full record in [[Restorix Memories]].
+**Prompt 643 — PUSHED, pending Vercel verification** (CC 2026-09-23): the new homepage (v3 design, 2:14 a.m. hero) is on `restorix-marketing` `main` @ `aa14628` (includes the 642 port `a606d22`). The booking CTAs are styled normally but inert, a plain `<button>` with no destination, until the lead → closer → Zoom pipeline is built. The manager chat checks deployment READY + the restorix.co alias. Full record in [[Restorix Memories]].
 
 **Latest shipped: Prompt 641** (CC 2026-09-23, preview only) — **homepage hero converged**: the '2:14 a.m.' hero (dark, after-hours text-back thread) is now the single hero in the v3 preview (https://claude.ai/artifact/H1BbeGhrjAy2C5BQQWYEvk, Version 7), with a faint constellation canvas behind it and a trimmed left column (timestamp, headline, one line, booking button). The rest of the page is byte-identical. Still preview-only; nothing in `restorix-marketing` changed. Full record in [[Restorix Memories]].
 
