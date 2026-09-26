@@ -17,6 +17,29 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-09-26 — Prompt 652 executed (CC): Settings toggle-knob overflow + tab-reset-on-every-save both fixed — two one-line diffs, both root causes proven with real harnesses, not guessed
+
+**[CC | 2026-09-26 — Prompt 652 — SHIPPED. `restorix-portal` (checked out locally as `restorix-setter-portal`) `main` @ `7dd66d3`, pushed. Frontend only, no migration.]**
+
+**Why:** Brayden found two real bugs using Settings, both from his own screenshots — toggle knobs overflowing the track when ON, and any settings save kicking the page back to the Profile tab.
+
+**Bug 1 — toggle knob overflow, root cause:** [[Switch.jsx]] (`src/components/ui/Switch.jsx`) — the single shared `Switch` component used by every toggle in the app (Notifications + Call & Booking's Auto-open Meeting Room, nothing else defines a toggle switch) — positioned its knob with only `top-0.5` and no explicit `left`. With `left: auto` and no sibling to establish a static position, the browser's fallback isn't reliably `0`, so the ON-state `translate-x-[22px]` could push the knob past the track's right edge. Fix: explicit `left-0.5` base position (matching `top-0.5`) plus standard `translate-x-0`/`translate-x-5` for off/on instead of the ad-hoc `translate-x-0.5`/`translate-x-[22px]` pair — now provably symmetric (2px margin both sides, both states).
+
+**Bug 2 — tab reset on every save, root cause:** `App.jsx`'s `Gate` component wraps the *entire* routed app tree (`Layout` + every page, including `Settings`) and returns a full-page "Loading…" screen whenever `useAuth()`'s `loading` is true. `useAuth.jsx` computed `loading = session === undefined || profileLoading`, and `profileLoading` flips `true` on *every* `fetchProfile()` call — including the `refreshProfile()` that every Settings save/toggle triggers after its RPC succeeds (`BasicInfoCard`, `NotificationsPanel.toggle`, `BookingPanel.persist`, `ThemeForm.choose`, `TimezoneForm.save` all call it). So each save unmounted and remounted the *whole* `<Routes>` tree — not just the one card that saved — which reset `CloserSettingsHub`'s `useState('profile')` tab back to its default. This wasn't a redirect and wasn't URL-driven; it was a full component-tree remount triggered by an over-broad loading flag. Fix: `loading = session === undefined || (profileLoading && !profile)` — only gate the whole app when there's genuinely no profile yet (first load); a refresh of an *already-loaded* profile no longer blanks the page, since `profile` stays non-null (the old value) while the refetch is in flight.
+
+**Why this generalizes beyond Settings:** any page that calls `refreshProfile()` after a mutation (not just Settings) was hitting this same full-app remount. The fix removes the bug everywhere `refreshProfile()` is called, not just in the two tabs Brayden screenshotted.
+
+**Verification approach — no `test_closer` login exists in this checkout (same standing gap since Prompt 609), so both bugs were proven with real, running harnesses instead of code-only review:**
+- **Bug 1**: a static HTML harness served the actual built Tailwind CSS (`dist/assets/index-CJzfWSqI.css`) and rendered the real `Switch` markup in both states, then measured `getBoundingClientRect()` in a live browser — OFF knob spans 2–22px, ON knob spans 22–42px, both fully inside the 44px track with symmetric 2px margins. This measures actual computed pixels, not just class names — catches the exact class of bug that caused Bug 1 in the first place (a class that looks right in source but resolves wrong at runtime).
+- **Bug 2**: a second harness (React UMD + Babel standalone, no build step) structurally mirrored `Gate` + `AuthProvider`'s state shape + a `CloserSettingsHub`-shaped component with its own tab state, with a toggle to swap in the *old* vs *new* loading formula. Ran the exact save sequence (switch tab → trigger a simulated `refreshProfile` → wait) against both: **old formula reproduced the bug exactly** (spinner flashes, tab reverts to "profile" afterward); **new formula does not** (no spinner, tab stays on "appearance" throughout and after). This is a causal proof the diagnosed mechanism is the real one, not just a plausible story.
+- Both harness files were written to `dist/` (gitignored) and deleted after use — never committed.
+
+**Verified live**: `dpl_EwaJPQD1GuM64eEtnbPgmxYHG8z1` reached `state: READY`, `aliasError: null`, aliased to `portal.restorix.co`/`portal.suretix.co`/`restorix-portal-ohvara.vercel.app`. Fetched the live page directly and confirmed the served bundle filenames (`index-D85_A_fK.js`, `index-CJzfWSqI.css`) match the local build's content hashes exactly — byte-identical, not just "build succeeded."
+
+**Scope held exactly**: `git diff --stat` — 2 files, 3 insertions/3 deletions (`Switch.jsx` 2 lines, `useAuth.jsx` 1 line). No save/persistence/RPC logic touched, per the prompt's explicit "what must not change." Build clean; lint unchanged (23 pre-existing warnings, same baseline as 646/648/650/651).
+
+**Not click-verified as `test_closer`** — same standing gap since 609. Brayden should still do one real pass in the live app: toggle a few switches (Notifications + Call & Booking) and confirm the knob looks right in both states, and change a setting on Appearance/Notifications/Call & Booking and confirm the active tab doesn't jump back to Profile.
+
 ### 2026-09-22 — Prompt 626 executed (CC): Username replaced with a self-service Email row in Settings — shipped clean, but both of the prompt's own investigate-first steps ran into a real Supabase-MCP-tooling ceiling, flagged rather than guessed past
 
 **[CC | 2026-09-22 — Prompt 626 — SHIPPED. `restorix-portal` (checked out locally as `restorix-setter-portal`) `main` @ `679faf7`, pushed. Frontend only, no migration.]**
