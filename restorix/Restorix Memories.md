@@ -17,6 +17,48 @@ Persistent context and knowledge for Restorix, retained across sessions. Mirrors
 
 ## Hard-Won Lessons
 
+### 2026-09-26 — Prompt 654 executed (CC): "Custom Date" pill off-center bug traced to asymmetric container padding, fixed once at the shared component
+
+**[CC | 2026-09-26 — Prompt 654 — SHIPPED. `restorix-portal` (checked out locally as `restorix-setter-portal`) `main` @ `6e9a470`, pushed. Frontend only, no migration.]**
+
+**Why:** Brayden's own screenshot (Stats page) — the "Custom Date" pill's label wasn't centered inside the pill.
+
+**Root cause, confirmed not guessed:** [[CustomDatePicker.jsx]] — the pill's outer container had asymmetric horizontal padding (`pl-4 pr-1.5`, i.e. 16px left vs. 6px right) to leave room for an optional trailing clear (X) button. Whenever that X button wasn't rendered — the default/common state, no range picked yet — the label button (itself `text-center`, correctly centered within its own box) sat inside a pill whose two edges weren't symmetric, so the whole label visibly leaned right of the pill's true center. Measured on the actual old markup: **8px off-center**.
+
+**Confirmed single shared component:** grepped the whole repo for "Custom Date" and `CustomDatePicker` — only `Stats.jsx` and `TeamActivity.jsx` render it, both as a bare `<CustomDatePicker .../>` with no wrapper style overrides. One component fix covers both pages; no per-page patching needed.
+
+**Fix:** container padding made symmetric (`px-4`) with `justify-center`; the clear button switched from sharing flex space (`ml-1`, pushing the label left) to `absolute right-1.5 top-1/2 -translate-y-1/2`, with a conditional `pr-7` added only when a range is selected to reserve room for it so the X can't overlap the label. Click behavior (open picker / clear range) untouched — layout classes only.
+
+**Verification:**
+- `npm run build` clean; `oxlint` unchanged at 23 pre-existing warnings (same baseline as 646–653).
+- **Static harness, real built CSS, measured not eyeballed**: old vs. new markup rendered side by side from the actual `dist/assets/index-JEpk9WFE.css`, each button's true center measured against its pill's true center via `getBoundingClientRect()`. Old: **+8px** (the bug, matching the screenshot). New, no range: **0px** — dead center. New, range selected: **-6px** — the label sits slightly left of full-pill-center to make room for the X, an intentional tradeoff for a label+clear-button layout; screenshot confirms it reads as balanced, not off-center.
+- Internal pill centering doesn't depend on viewport width (fixed-content-width chip, not a responsive layout), so no separate phone-width render check was needed beyond the harness screenshot.
+- **Verified live**: `dpl_8J2eN7R3unpy4USuVEPqsvyn5z7y` `state: READY`, `aliasError: null`, aliased to `portal.restorix.co`/`portal.suretix.co` (Vercel MCP, team `ohvara`, matched by full commit SHA `6e9a470...`). Downloaded the live-served `/assets/index-Dx7SGzp1.js` directly — byte-identical (`diff -q`) to the local build, contains the new `pr-7` class marker (1 occurrence) and the clear-button aria-label string.
+- Not click-verified as `test_closer` (same standing login gap since Prompt 609 — no `.env.local` in this checkout).
+
+### 2026-09-26 — Prompt 653 executed (CC): Meeting Room reordered, Recent Calls removed, Recordings + Camera & Mic Check built for real — a real `getUserMedia()` denial exercised in the Browser pane, not a coded assumption
+
+**[CC | 2026-09-26 — Prompt 653 — SHIPPED. `restorix-portal` (checked out locally as `restorix-setter-portal`) `main` @ `6dd81d3`, pushed. Frontend only, no migration.]**
+
+**Why:** Brayden's own layout pass on the live Meeting Room page — move the stat tiles up, drop the redundant Recent Calls section, and make the "Coming to the Meeting Room" card's two Soon placeholders (Recordings, Camera & Mic Check) real now that 649's tab-capture recording actually exists.
+
+**What shipped, in [[MeetingRoom.jsx]]:**
+1. **Reorder**: the 4-tile `RoomStats` strip now leads the page; the `MeetingStatusCard`/`RoomCheckCard` hero grid moved below it. Same components, same props, just moved — no data-logic touched.
+2. **Recent Calls removed entirely**: `RecentCallsCard` function, its only render call, the now-orphaned `OutcomeBadge` import, and the `RECENT_CALLS_LIMIT` constant all deleted. Grepped the repo before and after — zero remaining references anywhere.
+3. **Recordings, made real**: `RecordingsCard` reads the same `useMyStrategyRecordings()` hook (`hooks/useCalls.js`) My Recordings' Closer tab already uses — no new query, no new table. Shows the single most-recent tab-capture recording (facility, when, duration, Saved/Couldn't save) and a "View all N recordings" link. Deliberately a *summary*, not a duplicate of My Recordings' full table.
+4. **Camera & Mic Check, made real**: `CameraMicCheckCard` — a genuine self-test independent of Zoom's embedded SDK (matches 649's own pattern of using plain browser media APIs, not Zoom). `getUserMedia({video, audio})` is requested only on click ("Run check"), never on page load. On success: a live `<video>` preview plus a mic-level bar driven by a Web Audio `AnalyserNode` reading RMS off the raw time-domain signal — nothing is recorded or saved, it's read-only. `NotAllowedError`/`SecurityError` → "access was denied"; `NotFoundError`/`OverconstrainedError` → "no camera or microphone was found"; anything else → a generic honest failure. No state fakes a passing check.
+5. **Deep link added**: `RecordingsCard`'s link and the existing `RecordingSaveBanner`'s "My Recordings" link (`CallRecordingStatus.jsx`) both point at `/my-calls?tab=closer` now. `MyCalls.jsx` gained a small `useSearchParams`-driven effect (`isCloser && searchParams.get('tab') === 'closer'`) so a closer arriving from either link lands straight on their recordings tab instead of the default Setter tab — a real (small) UX bug this prompt's own "link into My Recordings' Closer tab" wording surfaced, not scope creep.
+
+**Untouched, confirmed by diff scope:** `MeetingStatusCard`/Calls-table logic, `useStrategyCalls`, the 15-minute join-window gating math, Call Prep, and the constellation-dots background.
+
+**Verification — same standing gap since Prompt 609 (no `.env.local` in this checkout, CC can't log in as `test_closer`):**
+- `npm run build` clean; `oxlint` unchanged at 23 pre-existing warnings (same baseline as 646–652).
+- **Static harness, real built CSS**: a throwaway local HTML page (served with `python -m http.server`, loading the actual `dist/assets/index-jqlbeeHE.css`) reproduced both new cards' real Tailwind markup, screenshotted at desktop and 375px mobile — the mobile screenshot confirms the two cards genuinely stack via `grid-cols-1 lg:grid-cols-2`, not just "should stack" from the class name.
+- **Real device-API exercise, not a code-review guess**: clicking "Run check" in the harness inside the Claude Browser pane triggered a *real* `navigator.mediaDevices.getUserMedia()` call. The pane itself blocks camera/mic device capture at the platform level, so the call genuinely rejected with `NotAllowedError` — this exercised the actual denied-state code path end to end (error name → copy → red "Try again" UI) rather than assuming the catch block would work. This is a stronger check than the harnesses used for 650/652 (which only measured CSS/state, since there was no external API to actually invoke).
+- **Verified live**: `dpl_FdWycLQttjRwHNbfgWtoPABtV8Sk` reached `state: READY`, `aliasError: null`, aliased to `portal.restorix.co`/`portal.suretix.co` (checked via Vercel MCP `list_deployments`/`get_deployment`, team `ohvara`, matched by full commit SHA `6dd81d3...`). The live-served `/assets/index-9Z4ItJmr.js` is byte-identical (`diff -q`) to the local build; grepped it directly and confirmed "In the Meeting Room" present (1), the new Recordings/Camera-check copy strings present, and zero occurrences of "Recent Calls".
+
+**Not click-verified as `test_closer`** — same standing gap since 609. Brayden should still do one real pass: confirm the reordered page at real desktop/phone width, glance at Recordings once a real call has recorded, and click "Run check" on a real machine with an actual camera/mic to see the live preview + level meter (the sandbox only proved the *denied* path, not the *active* path, since it has no real devices to grant).
+
 ### 2026-09-26 — Prompt 652 executed (CC): Settings toggle-knob overflow + tab-reset-on-every-save both fixed — two one-line diffs, both root causes proven with real harnesses, not guessed
 
 **[CC | 2026-09-26 — Prompt 652 — SHIPPED. `restorix-portal` (checked out locally as `restorix-setter-portal`) `main` @ `7dd66d3`, pushed. Frontend only, no migration.]**
