@@ -1510,3 +1510,53 @@ Two more Suretix build prompts (550, 551) written into [[Restorix LIVE_STATE]]'s
   - (c) If that Zoom account is on free Basic, (b) should show the "plan doesn't support" message instead. That is the real test of the failure state. No Basic test account was available to CC.
   - (d) 647's blockers still stand: webhook secret, `recording.completed` subscription, paid plan, upload limit.
   **Lesson**: Zoom's granular scope names describe an endpoint, not a feature. `cloud_recording:*:recording_settings` sounds like the on/off switch but only covers one recording's sharing settings. Before asking anyone to add a scope in Marketplace, look up the exact endpoint in Zoom's scope table. [[Restorix CC Queue]] item deleted; **queue is now empty.**
+- **[CC | 2026-09-25 — Prompt 649 BUILT + DEPLOYED, recorder proven in real Chrome; not yet run on a real Zoom call: strategy calls recorded via in-browser tab capture, replacing Zoom cloud recording]** `restorix-setter-portal` (GitHub/Vercel `restorix-portal`) commit `ae8dd47`, pushed `origin/main`.
+  **What shipped:**
+  1. **`src/lib/callRecorder.js`** (new).
+     - `startCallRecording()` runs from the Join click itself. Browsers only allow the share prompt during a user gesture, so `getDisplayMedia` and the `AudioContext` are created before any `await`.
+     - The prompt uses `preferCurrentTab`, `selfBrowserSurface:'include'`, and `surfaceSwitching`/`systemAudio`/`monitorTypeSurfaces:'exclude'`. Video is 15fps max.
+     - **Mix:** tab audio (the lead, as played by the Zoom SDK) and `getUserMedia` mic audio (the closer: echoCancellation, noiseSuppression, AGC) go into one `MediaStreamDestination`, recorded with the tab video as VP8/Opus webm at 300k/64k.
+     - **A recording missing a side never starts.** No tab-audio track → `off:no_tab_audio`. Mic rejected → `off:no_mic`. Share cancelled → `off:declined`. No API support → `off:unsupported`. In every case the devices are released and the call carries on.
+     - **Parts:** the Supabase org is on the **Free plan** (checked via `get_organization`: `plan: free`), whose 50MB per-file upload cap can't be raised. So a new `MediaRecorder` starts on the same stream every 15 minutes or at 40MB, whichever comes first. The new part starts before the old one stops, so there is no gap.
+     - Each finished part gets `fix-webm-duration` (new dep, MIT, ~28KB; MediaRecorder webm has no duration, so the player can't show length or seek). It is then uploaded to `call-recordings/{closer}/{lead}/{uuid}-partN.webm` as soon as it finishes, rather than all at the end. So a closed tab loses at most the current part, and less is held in memory.
+     - After the upload, one `zoom_recordings` row is written per part. A failed upload (after one retry) writes a `failed` row with the storage error, so an over-size file is visible, not silent.
+     - The browser's own "Stop sharing" button → phase `stopped`. What was captured is still saved.
+     - A call that never reaches `joined` (SDK error, closed while connecting) is **discarded**, not uploaded.
+     - A `beforeunload` warning is shown while recording or saving.
+  2. **Lead matching:** the same `leads.zoom_meeting_id` that `create-zoom-meeting` writes. Meeting Room now passes `leadId: lead.id` in all 3 `onJoin` payloads. The row stores `lead_id`, `closer_id`, and `zoom_meeting_id` (the meeting number).
+  3. **Migration `prompt649_tab_capture_recordings`** (applied via MCP; file `supabase/migrations/20260925_prompt649_tab_capture_recordings.sql`).
+     - `zoom_recordings` gains `source` ('zoom_cloud' default | 'tab_capture') and `part_number`. `zoom_file_id` is now nullable.
+     - New insert-only policy on `zoom_recordings`. Allowed only when: source is tab_capture; there is no zoom_file_id; `closer_id = auth.uid()`; status is stored or failed; the lead is assigned to the caller; and the path sits under `{uid}/{lead}/`.
+     - New `storage.objects` insert policy for `call-recordings/{uid}/{own assigned lead}/…`.
+     - **RLS proven by an SQL simulation** as `test_closer` (`set local role authenticated` + JWT claims, all in a DO block that raised at the end, so everything rolled back; 0 rows or objects left afterwards). 9/9 cases behaved correctly:
+       - Allowed: an object on own lead, and own stored and failed rows.
+       - Denied: another lead, another closer's folder, a `zoom_cloud` spoof, a foreign path, and inserting as another closer.
+       - 647's select policy then made the object signable.
+     - Security advisors: nothing new.
+  4. **UI:**
+     - `ZoomCallModal.jsx` got two optional, **additive** props: `onStatusChange` (reports connecting/joined/ended/error) and `recordingIndicator` (rendered beside the status line). The Leave Call button also got `shrink-0 whitespace-nowrap`, because at 390px the longer indicator text wrapped it onto two lines. **The join/leave/destroyClient code is unchanged.** `loadZoomEmbedded.js` is untouched.
+     - New `CallRecordingStatus.jsx`, which provides:
+       - The in-call indicator: "Choose 'Share' to record this call…", a pulsing red "Recording", "Recording stopped — …", or "Not recording this call — {why}".
+       - A Meeting Room banner after the call: "Saving… keep this tab open", "saved to My Recordings" (link), or "Couldn't save: {error}" / "Only part saved".
+     - My Recordings Closer tab: the empty state loses the Soon badge (recording is live) and its copy now says calls are recorded from the browser tab. Rows show "Part N" when N > 1.
+  5. **647/648 cleanup:**
+     - 648's Settings "Cloud recording" row, and the `useZoomRecordingSetting`/`useEnableZoomCloudRecording` hooks, were **removed**. It could only ever say "plan doesn't support" on Basic. `Settings.jsx` and `useZoom.js` are byte-identical to `0cc4ba3~1` (checked with `git diff`).
+     - `auto_recording:'cloud'` was **reverted** in `create-zoom-meeting` (v4 deployed; read-back matches the repo apart from CRLF). It had zero upside on Basic, and 0 leads have ever had a Zoom meeting created with it, so it was never proven harmless on a Basic account. This removes the risk that it breaks meeting creation.
+     - `zoom-recording-webhook` (647) and `zoom-recording-setting` (648) are left **deployed and unused**, with their source kept in the repo so deploy and git don't drift. The MCP has no delete tool; Brayden can delete them in the dashboard if he wants.
+     - Meeting Room's "Recordings & transcripts" Soon card was **left as-is** (not asked for). It's now half-true, since recordings exist and transcripts don't. Flag it for a copy tweak.
+  **Verified:**
+  - `npm run build` clean; `oxlint` 23 warnings, all pre-existing, none in the touched files.
+  - **Real-Chrome recorder harness** (Chrome 154 via playwright-core, `--auto-accept-this-tab-capture`, the real `callRecorder.js` with only `supabase` mocked and parts shortened to 4s). The "lead" was a 1000 Hz tone played out loud by the tab. The "mic" was a 440 Hz input stream never played out loud, which matches how a real mic relates to tab output. Results were analysed with ffmpeg bandpass + volumedetect:
+    - **Premise confirmed:** recording only the tab-capture audio gave 1000 Hz at −21 dB but 440 Hz at −50 dB, which is the noise floor. Tab capture does **not** hear the closer's mic.
+    - **Mixed recording:** three parts, each with both sides clearly present. Mic −3 dB and tab −18/−32/−22 dB, against a 2500 Hz reference of −47/−56/−53. `ffprobe` durations were 4.0/4.0/1.9s, so the duration fix works.
+    - First attempt caught a harness bug: with `--use-fake-device-for-media-stream`, Chrome returns a fake display stream, not real tab capture, and the tab tone was absent. That flag was dropped and the mic simulated in-page instead.
+    - Paths: full → requesting, recording, saving:3, saved:3 (3 uploads + 3 stored rows, display tracks ended); decline → off:declined, 0 uploads; mic denied → off:no_mic, display tracks released; never joined → discarded, 0 uploads; stop-sharing → stopped, saved:1; upload error → one retry, then a `failed` row with the error and `save_failed`.
+  - **UI harness** (`harness-649.*` in the repo root, deleted before commit): every indicator and banner state rendered with the app's CSS at 1440 and 390 with 0 horizontal overflow. Screenshots were checked, which is how the 390px button wrap above was caught and fixed.
+  - **Verified live** (Prompt 620 rule): `dpl_EYrjfHP15UMqLhAY1devbfkcvTeG` `READY`, `aliasError: null`, aliased to `portal.restorix.co`/`portal.suretix.co`. The served `/assets/index-Cwb4fLRg.js` is **byte-identical** (`cmp`) to the local build. It contains `tab_capture`, `preferCurrentTab`, "Not recording this call" and "Saving the call recording", and no longer contains "Turn on cloud recording".
+  **NOT verified — needs Brayden:**
+  - (a) **One real test call** as `test_closer`, in desktop Chrome or Edge: book a call, Join, accept the share prompt (keep "Also share tab audio" ticked), talk with a second device as the lead, leave, wait for the "saved" banner, then **play it back** from My Recordings → Closer and confirm both voices. CC can't log in as `test_closer` or be a second Zoom participant. One real-world unknown: the Zoom SDK's remote audio must play through the tab; the harness proved generic tab audio is captured, but not the SDK's output specifically.
+  - (b) **Consent/legal:** Zoom cloud recording showed participants a "this meeting is being recorded" notice. Tab capture shows the lead **nothing**. In all-party-consent states (CA, FL, PA, WA, etc.) the closer should disclose the recording verbally, or the booking confirmation should mention it. This is Brayden's decision.
+  - (c) **Mute:** the recorder takes the mic directly, so it keeps recording the closer even while they're muted in Zoom. If they pick a different mic inside Zoom, the recording uses the browser's default mic instead. Decide whether either matters.
+  - (d) Firefox and Safari can't capture tab audio. There the call runs with "Not recording this call — tab audio wasn't shared", which is honest, not silent.
+  - (e) 647/648's Zoom-side blockers (webhook secret, event subscription, scopes, paid plan) are **moot**. Nothing needs doing in Zoom Marketplace.
+  **Lessons:** (1) Check the Supabase plan before designing uploads: Free has a hard 50MB per-file cap, so long media must be split into parts. (2) `--use-fake-device-for-media-stream` also fakes `getDisplayMedia`, so a tab-capture test run with it proves nothing. Simulate the mic in-page instead. [[Restorix CC Queue]] item deleted; **queue is now empty.**
