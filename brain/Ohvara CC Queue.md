@@ -18,5 +18,3 @@ tags:
 > - **Numbering:** next prompt number = one past the highest referenced anywhere in the vault — the counter is shared across Ohvara AND Restorix. Check [[LIVE_STATE]] + [[Memories]] AND [[Restorix LIVE_STATE]] + [[Restorix Memories]] + [[Restorix CC Queue]] before assigning a number.
 > - One `## Prompt NNN — <title>` heading per item. Put the full spec inline. Order = execution order.
 > - **git commit + push this file right after editing it, don't leave it as an uncommitted local change** — an uncommitted queue edit sitting next to CC's own uncommitted state edits in the same repo is exactly what let a queued item get wiped out on 2026-09-30, before this file existed.
-
-*(empty — Prompt 662 shipped 2026-09-30, see [[Memories]])*

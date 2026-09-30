@@ -30,6 +30,10 @@ tags:
 
 ---
 
+**Prompt 663 shipped 2026-09-30 (`6720f10`, migration 106 live)** — Cancellations role rebuilt as a work desk (stat strip, On your desk / Up next / With the team, focused 4-step work view, Claim next loop, race-safe claim). New additive `policies` columns: `fulfillment_claimed_at`, `fulfillment_completed_at` (trigger-stamped), `cancellation_substatus`, `cancellation_confirmation`, `cancellation_notes`. ⚠️ Needs Brayden to eyeball it logged in as a Cancellations user — screenshots from a mock harness are in `media/p663-cancellations/`. Full detail: [[Memories]] 2026-09-30.
+
+---
+
 **Prompt 661: Ohvara Dashboard — strip to Agent Submissions + Cancellation Fulfillment, scaffold room for what's next**
 
 Context for CC: Brayden's goal for `ohvara-dashboard` now is narrow — an agent logs in, submits a new-business deal (current carrier being replaced included), and a small cancellation-fulfillment team (a couple of reps) claims it and works the cancellation through to done. That flow already exists for real: `agent/Submissions.jsx` (New Submission + Cancellation Calendar tabs, Prompt 423) and `fulfillment/FulfillmentQueue.jsx` (claim/complete handoffs) are both live and wired directly to the real `policies`/`policy_fulfillment_details` tables via PostgREST. Everything else in the app is left over from one or two earlier pivots (the SMB cold-calling rep/setter pipeline, then a client-facing AI-agent-SaaS pivot) and reads as confirmed dead: `leads`/`calls`/`appointments`/`batch_assignments`/`reminder_log`/`re_engagement_log`/`no_answer_queue`/`follow_up_queue`/`closer_rotation` are all at 0 rows in prod as of this scoping, and `[[ohvara_legacy_setter_pipeline_dead]]` already documents the first pivot's own cleanup.
