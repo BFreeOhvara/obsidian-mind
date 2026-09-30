@@ -32,7 +32,7 @@ tags:
 
 ---
 
-*(Queue is now empty — nothing left to build until Brayden queues something new.)*
+*(Prompt 661 shipped 2026-09-30 `0f153fd` — dashboard stripped to Submissions + Cancellations queue; see Memories. Open follow-ups: delete unused edge-function sources/undeploy, drop-nothing-in-DB stays.)*
 
 ---
 
