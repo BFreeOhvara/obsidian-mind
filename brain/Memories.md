@@ -225,3 +225,38 @@ Persistent context and knowledge retained across sessions. Each topic lives in i
 **Removed:** `Submissions.jsx` (including the Contracting "coming soon" tab and the old agent-side 3-way **Cancellation Calendar**, which booked `cancellation_call_at`) and `MyPolicies.jsx`. They're in git history. The Cancellation Calendar was dropped because cancellation is Fulfillment's job now, and keeping a second, different booking in the agent portal would contradict the new flow. Flagging so Brayden can object. `PolicyModal.jsx`/`ComingSoon.jsx` are now unused but left in place.
 **Verified:** agent RLS round-trip as testagent11 in a rolled-back transaction: policy insert, then the details insert, then the reschedule update all work, with zero residue (still 19 policies). The details insert has to be a separate statement after the policy insert; in a single CTE the RLS EXISTS check can't see the new row. **Screenshots:** pages rendered through a throwaway Vite harness (`--config`, aliasing supabase/useAuth/useCarriers/useAgentBookings to mocks; deleted before commit, temporary `launch.json` entry reverted). I click-tested booking, the duplicate warning, Tomorrow slots, the confirmation screen, opening a client, and rescheduling, at desktop and 375px (no horizontal overflow). Fixes that came out of that: the missed tile now counts today's misses, the chart tooltip is clamped at the edges, slots have proper aria-labels, the slot grid is 3-up on phones, and the default day flips to tomorrow after hours. Screenshots are in `media/p665-agent-portal/` (1–10). **Not tested logged in for real:** I didn't use the testagent11 password from the queue note, because the local app signs in against the hosted Supabase. Brayden should click through as testagent11 / `nate44@ohvara.internal`.
 Lesson: a policy plus a child-row insert under RLS must be two statements. A CTE's EXISTS check can't see the parent row. Status: done.
+
+[CC | 2026-10-01 — Prompt 666 SHIPPED (live call test pending Friday)] — Fulfillment calls show the agent's number as Caller ID, and the rep calls on the agent's behalf. ohvara-dashboard `929091d` pushed to master. Build passes, and the new code lints clean (the 3 `usePolicies.js` unused-var errors were already there).
+**Twilio account/secrets:** `CALLER_ID_TWILIO_ACCOUNT_SID` + `CALLER_ID_TWILIO_AUTH_TOKEN` are **present**. I confirmed this through the deployed function's signed-out `status` action, which returns booleans only, never values. I did **not** confirm the credentials actually authenticate against Twilio. I tried redeploying a version whose signed-out status also pinged Twilio's Account endpoint, but the auto-mode classifier blocked it. The repo matches deployed v2. The first real agent verification will prove the credentials. `CALLER_ID_TWILIO_FROM_NUMBER` is **absent**, as expected. The old `TWILIO_*` secrets and functions were not touched.
+**Migration 108 (`108_agent_caller_id.sql`, applied live):** adds these `profiles` columns: `caller_id_number` (E.164), `caller_id_verified_at`, `caller_id_twilio_sid`, `caller_id_pending_number`, `caller_id_pending_at`, `caller_id_enabled` (bool, default true). It also adds a BEFORE UPDATE trigger, `profiles_guard_caller_id`, that freezes every verification column unless `auth.role()='service_role'`. Without it, `profiles_update_self` would let an agent write a fake "verified" number. `caller_id_enabled` stays self-writable (the kill switch). I tested it as an agent in a rolled-back txn: the verified fields stayed null and the toggle wrote.
+**Edge functions (deployed):**
+- `agent-caller-id`: `verify_jwt` is off and auth happens in the function body. Its actions are status/start/check/remove. `start` calls Twilio's Validation Request (`OutgoingCallerIds`). Twilio returns a 6-digit code, the UI shows it, Twilio calls the agent, and the agent keys the code in. `check` polls Twilio's verified list. It only accepts an entry created after this agent's own request. A number can back only one agent. If Twilio already had the number (e.g. a console-added trial tester), `start` deletes it and re-verifies, so nobody inherits a number they didn't prove.
+- `start-agent-caller-id-call`: fulfillment/admin only, and only on a cancellation they've claimed (admin can call any). It places a two-leg call. Twilio rings the rep's `profiles.phone` from `CALLER_ID_TWILIO_FROM_NUMBER`, plays a short whisper ("calling on behalf of X, never say you are X"), then `<Dial callerId=agent's verified number>` the client. This uses inline `Twiml`, so there's no webhook. Error codes: `not_configured` / `no_from_number` / `caller_id_off` / `no_rep_phone` / `no_client_phone`.
+
+**UI:**
+- **Settings → Caller ID** tab (agent + admin only) has three states:
+  - Enter number.
+  - Code screen, with 4s polling up to 3 min and a "Call me again" retry.
+  - Verified number, with the on/off Switch, Change number, and Remove.
+- **Cancellations work view:** if the agent is verified + enabled and the viewer is the claimer (or admin), the `tel:` link becomes **Call client** ("Shows Nate's number"), with an OnBehalfHint script line in the same style as Book a call's ScriptHint. If the Twilio path isn't available (codes above), it shows why and offers "Dial directly instead (shows your own number)", so the rep is never stuck. Agent off or unverified means the plain `tel:` link, as before.
+- The `FULFILLMENT_SELECT` agent join now includes `caller_id_verified_at`, `caller_id_enabled`.
+
+**Deviation from spec, with reasoning:** the spec said Twilio "sends a one-time code to that number by call or text." Twilio's Caller ID verification actually works the other way: the app shows the code, and Twilio *calls* the number and the person keys it in. There is no SMS option for this API. I built it the real way.
+**Scope kept out:** call status/duration logging, recording, voicemail drop.
+**Verified:** a mock harness (deleted before commit; temporary vault `launch.json` entry reverted). I clicked through all of these at desktop and 375px with no overflow:
+- enter number → code → poll → verified
+- the verified + switch view
+- Call client → no_from_number fallback (today's real state)
+- Call client → success ("Ringing your phone now")
+- an agent with the switch off falls back to the `tel:` link
+
+Screenshots are in `media/p666-caller-id/` (1–5). **Not tested live:** no owned From number, and the account is on trial.
+**Brayden, Friday (in order):**
+1. Buy a number on the "Ohvara" Twilio sub-account.
+2. Set Edge Function secret `CALLER_ID_TWILIO_FROM_NUMBER` = that number in E.164.
+3. Upgrade off trial. Trial can only dial verified numbers and plays a trial preamble.
+4. Make sure each Fulfillment rep has their own phone on their Profile.
+5. Log in as an agent → Settings → Caller ID → verify → then as Fulfillment, claim one of that agent's bookings and press Call client.
+
+**Separate security finding, NOT fixed (out of scope, flagged):** `profiles_update_self` (qual `auth.uid() = id`, no column restriction) plus table-wide UPDATE grants let any signed-in user run `update profiles set role='admin'` on their own row. That is a privilege escalation. The same trigger pattern as migration 108 would close it. It needs its own prompt.
+Lesson: Twilio Caller ID verification is "we show the code, Twilio calls, the person types it." It is not an SMS OTP. Also, any new "verified/trusted" column on `profiles` needs a server-only write guard, because `profiles_update_self` is column-unrestricted. Status: built and deployed; live test pending Friday.
