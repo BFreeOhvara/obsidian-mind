@@ -30,6 +30,10 @@ tags:
 
 ---
 
+**Prompt 665 shipped 2026-10-01 (`2b99a0a`, no migration)** — Agent portal rebuilt booking-first. Agent nav is now Work: Overview (`/agent`, new landing) · Book a call (`/agent/book`) · My Clients (`/agent/clients`) · Performance (`/agent/performance`) + Settings. Book a call asks only client name, phone, and the carrier they're leaving (optional), then a date + 30-minute slot. Hand-off to Fulfillment is unchanged (`fulfillment_assigned`, stage Pending, `scheduled_call_at`). `SLOTS` is now 30-minute, 9:00 AM–4:00 PM. Old Submissions/My Policies URLs redirect. Admin's nav group is now Agents: Book a call / Clients / Performance, all company-wide. ⚠️ Brayden should look at it logged in as testagent11. The screenshots are from a mock harness, in `media/p665-agent-portal/`. Full detail: [[Memories]] 2026-10-01.
+
+---
+
 **Prompt 663 shipped 2026-09-30 (`6720f10`, migration 106 live)** — Cancellations role rebuilt as a work desk (stat strip, On your desk / Up next / With the team, focused 4-step work view, Claim next loop, race-safe claim). New additive `policies` columns: `fulfillment_claimed_at`, `fulfillment_completed_at` (trigger-stamped), `cancellation_substatus`, `cancellation_confirmation`, `cancellation_notes`. ⚠️ Needs Brayden to eyeball it logged in as a Cancellations user — screenshots from a mock harness are in `media/p663-cancellations/`. Full detail: [[Memories]] 2026-09-30.
 
 ---
