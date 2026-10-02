@@ -470,3 +470,5 @@ Status: done. Next in [[Ohvara CC Queue]]: 671 (Team activity tab).
 **Lesson:** when a "team-wide" view needs rows that RLS correctly hides, don't widen RLS. Use a SECURITY DEFINER function with a fixed, already-stripped output shape, so the privacy guarantee lives in the schema and doesn't depend on the UI remembering not to render fields.
 
 Status: done. Next in [[Ohvara CC Queue]]: 672 (Pipeline / funnel view), then 673 (Stripe billing, likely blocked on keys), 675 (visual refresh round 3).
+
+[CC | 2026-10-02 — P671 follow-up: profiles PII flag spun off] — After the P671 log: confirmed both repos are clean and pushed (vault `101374c`, ohvara-dashboard `c8bb58a`). Queued the `profiles_select` over-exposure (any signed-in user can read every profile's email/phone/caller_id/stripe_account_id) as a one-click background-task chip in the CC desktop app ("Lock down profiles read access"). It is NOT in [[Ohvara CC Queue]] and has no prompt number yet. Manager chat: give it a number and queue it if Brayden doesn't start the chip. No code change. Status: done.
