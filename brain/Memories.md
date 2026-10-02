@@ -596,3 +596,20 @@ Status: done.
 **Lesson:** when a paid-access feature is blocked on the payment provider, ship the state + UI behind a DB kill switch defaulting off, and have the UI probe the (missing) edge function for `configured`. Everything lands and is verifiable now, and going live is a secret + one function deploy, with no client redeploy.
 
 Status: partial, blocked on Brayden (Stripe key). 673 stays in [[Ohvara CC Queue]] marked blocked; next runnable item is 675.
+
+[CC | 2026-10-02 — Prompt 675 shipped: account menu cleanup + Restorix background dropped] ohvara-dashboard `ed8bded` pushed to master, no migration. **Verified live:** portal.ohvara.com serves `index-BwWDZ2C9.js`, identical to the local build. 673 was skipped (still blocked on `STRIPE_SECRET_KEY`).
+
+**What changed (`Sidebar.jsx`, `DashboardLayout.jsx`, `index.css`, `Settings.jsx` comment):**
+1. **Popup items.** The panel had "Profile & settings" + "Sign out". Brayden read the first as two entries. Now it's **Settings** (→ `/settings`, which defaults to the Profile tab) + **Sign out**. `/profile` still redirects to `/settings#profile` for old links.
+2. **Outline → white.** Checked computed styles in the harness: the `Avatar` circle has no border, outline or shadow. The only grey line in that spot is the account card's 1px `var(--border)` (#2A2A3A). That's now `var(--sidebar-card-border)` (new token, `#FFFFFF`, both modes). If Brayden meant a ring around the initials circle itself, that's a separate small change.
+3. **Chevron removed** from the card's right edge (`ChevronUp` import dropped).
+4. **Background.** Picked option (a), something distinct. `ParticleField.jsx` deleted and `--particle-*` tokens removed. New `.app-backdrop` layer: two static radial gradients, accent blue `rgba(75,121,206,.22)` from the top-right and sidebar navy `rgba(25,44,79,.85)` from the bottom-left. Light mode uses teal at .16/.10. Tokens are `--backdrop-glow-a/b`. No canvas, no JS, no animation, so it's also cheaper than the particle loop. Offset past the sidebar at md+ like the old layer.
+
+**Verified:** throwaway `.harness/` mock (resolveId swap of supabase/useAuth). Checked dark with the popup open, light with the popup open, and 375px (scrollWidth = clientWidth, no overflow). No console errors. Lint on changed files shows only the pre-existing `DashboardLayout.jsx` set-state-in-effect error. Build clean. Harness deleted; vault `launch.json` restored byte-for-byte. Screenshots (before + 3 after) in `media/p675-account-cleanup/`.
+
+**Brayden to confirm:** (1) the white outline landed where he meant (card vs avatar ring); (2) the new backdrop reads as intentional, not just "dark". Fallback is one line: delete the `.app-backdrop` div.
+
+**Lesson:** when a visual note names an element ("grey outline on the bubble"), check computed styles before editing. Here the named element had no outline at all, and the real one was on its container.
+
+Status: done. Queue now holds only 673 (blocked on Stripe key).
+

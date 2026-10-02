@@ -21,7 +21,7 @@ tags:
 
 ## Prompt 673 — Agent billing: $350/week flat retainer via Stripe
 
-> **⛔ CC status 2026-10-02: PARTIAL, blocked on Brayden.** Scaffolding shipped (`8bcb971`, mig 113): schema, Settings → Billing tab, admin column and the access gate, with enforcement off. Remaining: the Stripe edge functions + webhook. These wait on `STRIPE_SECRET_KEY` being set in Supabase secrets; see [[LIVE_STATE]]'s blocked section and [[Memories]] 2026-10-02. **CC: skip this item until Brayden confirms the key is in, and run 675 next.**
+> **⛔ CC status 2026-10-02: PARTIAL, blocked on Brayden.** Scaffolding shipped (`8bcb971`, mig 113): schema, Settings → Billing tab, admin column and the access gate, with enforcement off. Remaining: the Stripe edge functions + webhook. These wait on `STRIPE_SECRET_KEY` being set in Supabase secrets; see [[LIVE_STATE]]'s blocked section and [[Memories]] 2026-10-02. **CC: skip this item until Brayden confirms the key is in.** (675 shipped 2026-10-02; nothing else is queued.)
 
 **Hard prerequisite, blocks everything past schema/UI scaffolding — same category as Prompt 393 (Daily.co) and Prompt 666 (Twilio): CC cannot create third-party accounts.** Brayden needs a Stripe account (confirm whether one already exists before assuming it doesn't) and real API keys handed over as Supabase secrets before billing logic can be built. If not available when CC picks this up, stop at that point, build what's ready, and flag blocked exactly like 393/666 — don't guess at a workaround.
 
@@ -34,19 +34,3 @@ tags:
 **Not yet decided, Opus's call once building:** grace-period behavior on a failed payment (immediate access cutoff vs. some buffer) and exactly what "access paused" looks like in the UI (locked overlay vs. read-only) — document the decision and why in the ship note.
 
 **Log in the ship note:** whether a Stripe account/keys were present and usable (and whether it's the same account as the old dead Payouts integration or a new one), the exact migration applied, and — if blocked — exactly what Brayden needs to go create, mirroring how Prompt 393/666's blockers are written.
-
-## Prompt 675 — Visual refresh round 3: account menu cleanup + drop the Restorix background
-
-Direct follow-up to 674, based on Brayden looking at the shipped result. Colors are confirmed correct now — don't touch those again. Four small, specific fixes:
-
-**1. Remove "Profile" from the bottom-left account popup entirely.**
-674 moved profile editing into Settings, but the popup (click the "Test Agent" bubble, bottom-left) still shows both "Profile" and "Settings" as separate menu items. Remove the "Profile" entry completely — Settings is now the only way in, since it already contains what Profile used to show. The popup should end up with just Settings + Sign out (Sign out from 674's spec).
-
-**2. Bubble outline color.**
-The circular avatar/initials bubble next to "Test Agent" currently has a gray outline/ring. Change it to white.
-
-**3. Remove the small arrow on the right side of the account box.**
-There's a chevron/arrow on the right edge of that bottom-left box — remove it.
-
-**4. Drop the Restorix background — don't reuse it, even restyled.**
-674 left this open-ended ("keep the background, maybe differentiate it"). Brayden's now explicit: he does **not** want Ohvara running the same particle/dot background as Restorix Portal, full stop — he'd rather have **no background at all** than the identical one. Real creative freedom if you want to design something distinct for Ohvara instead (his words), but if nothing distinct is worth the build cost right now, just remove the background entirely rather than leave Restorix's version in place. Priority order: (a) something visually distinct for Ohvara, or failing that (b) plain/no background — never (c) the current Restorix-identical one.

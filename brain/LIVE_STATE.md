@@ -30,6 +30,10 @@ tags:
 
 ---
 
+**Prompt 675 shipped 2026-10-02 (`ed8bded`, no migration, live on portal.ohvara.com). Round three of the visual refresh.** The bottom-left account popup is now just **Settings** + **Sign out** (the old "Profile & settings" label is gone; Settings still opens on the Profile tab). The account card's outline is white and the chevron on its right edge is removed. The Restorix dot-network background is **deleted** (`ParticleField.jsx` removed). Ohvara now has its own static backdrop: a soft accent-blue glow from the top-right and a sidebar-navy glow from the bottom-left (teal in light mode), pure CSS, no animation. **Brayden:** (1) the avatar circle itself never had an outline; the only grey line there was the account card's border, so that's what went white. Say so if you meant a ring around the initials circle instead. (2) Look at the new backdrop live. If you'd rather have none, it's one line to remove. Screenshots in `media/p675-account-cleanup/`. Full detail: [[Memories]] 2026-10-02.
+
+---
+
 **Prompt 673 PARTIAL 2026-10-02 (`8bcb971`, migration 113 live, live on portal.ohvara.com). ⛔ Stripe side blocked on Brayden.** Agent billing ($350/week, agent pays Ohvara) is wired up but not switched on. Profiles have billing status columns, agents can't change their own. Agents get a **Settings → Billing** tab that says "Billing isn't connected yet, nothing is being charged." Admin's Users & Access has a **Billing** column. A lock screen + 48h failed-payment grace banner exist behind `app_settings.agent_billing_enforced`, which is **off**. Nobody is locked out or charged today. **Brayden: put your Stripe test secret key in Supabase as `STRIPE_SECRET_KEY`** (see blocked section below). Full detail: [[Memories]] 2026-10-02.
 
 ---
