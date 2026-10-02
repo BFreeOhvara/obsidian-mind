@@ -39,16 +39,6 @@ tags:
 
 **Log in the ship note:** whether a Stripe account/keys were present and usable (and whether it's the same account as the old dead Payouts integration or a new one), the exact migration applied, and — if blocked — exactly what Brayden needs to go create, mirroring how Prompt 393/666's blockers are written.
 
-## Prompt 678 — Remove Training and Performance from the agent sidebar
-
-Brayden's own reasoning, direct: there's nothing to train an agent on (they already know how to close, the portal's only job is submitting a cancellation ticket), and the Performance tab doesn't serve a clear purpose right now either. This reverses Prompt 670 (Training tab) and removes Performance.
-
-**1. Remove the Training nav item + page/route.** Reverses Prompt 670. Remove the nav item and route (`/agent/training` or equivalent) and its page component. Leave the underlying migration 110 (`agent_training_modules`) schema alone unless trivially safe to also clean up — don't force a migration rollback for a UI-only ask.
-
-**2. Remove the Performance nav item + page/route.** Same treatment — remove nav + route + page component, leave any underlying data/schema alone unless trivial.
-
-**3. Fix the now-broken sidebar groupings.** Current agent sidebar groups (from Prompt 676): Today (Overview) / Work (Book a call, My Clients) / Performance (Performance, Team) / Resources (Training) / Account (Settings). Removing Performance leaves that group with only Team in it; removing Training leaves Resources empty. Don't leave orphaned/empty group headers — fold Team into an existing group (Work is the obvious fit) and drop the now-empty Resources group entirely. Final shape should read cleanly with no single-item or empty sections — Opus's call on exact final grouping, just don't leave the structural leftovers.
-
 ## Prompt 679 — Messages: agents and Fulfillment can message each other
 
 Brayden's ask, direct: a message system so agents and the Fulfillment team can talk to each other, either direction — not a specific one-way notification, real back-and-forth messaging.
