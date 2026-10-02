@@ -353,3 +353,45 @@ Lessons:
 - In this Git Bash tool, heredoc'd node scripts containing backticks/template literals can fail to parse. Write the script with the Write tool and run it.
 
 Status: done. Next in [[Ohvara CC Queue]]: 670 (Training tab).
+
+[CC | 2026-10-02 — Prompt 670 SHIPPED: agent Training tab] ohvara-dashboard `8701dfa` pushed to master. **Verified live:** portal.ohvara.com serves `index-v5EbJ3B_.js`, identical to the local build. Migration `110_agent_training_modules.sql` applied live.
+
+**What it is:** a new Training page at `/agent/training`, in the sidebar under Work after Performance (agent) and under Agents (admin).
+- Four short modules: How the service works / Getting the client on the phone / Booking the 30-minute slot / After the hand-off.
+- Each module has a 16:9 video frame (YouTube embed when a module has a `youtubeId`; until then a "Video coming soon" frame), key points, and, where relevant, "What to say" script callouts.
+- A progress card shows x/4 and turns green on completion with the finish date.
+- "Mark as done" saves progress and moves to the next module.
+
+**Content is a DRAFT, needs Brayden's review.** It lives in one file, `src/data/agentTraining.js`, and was written only from what the portal already does: Book a call's fields, slots and warnings, the two Underwriting Team script lines already on Book a call, and the statuses in My Clients/Overview. **None of it was ported from the pre-pivot setter training** (`training-videos.md` / flashcards / quizzes were for selling AI receptionists). To change content, edit the text in that file. To add videos, set `youtubeId` per module. Keep module `id`s stable, because renaming one resets everyone's tick for it.
+
+**Lock pattern, adapted:** the old setter "Complete Training to Unlock Your Leads" veil (MyLeads.jsx, Prompts 283/297/300, deleted in 661) is re-pointed at the modules themselves. Module N is locked until N-1 is done, shown as a blurred and dimmed preview under a centered lock card with a "Continue training" button. **Decision: it does NOT gate Book a call or any real work.** The content is still a draft, and the live team is already booking. If Brayden wants a hard gate later, it's a small wrap around Book a call that checks `training_progress.unlocked_at`. None of the old leads/appointments logic came back.
+
+**Data:** reused the existing empty `training_progress` table (migration 020, PK `rep_id`, self-RLS `tp_rep_own`) instead of making a new one.
+- Migration 110 adds `modules_completed jsonb default '[]'`.
+- `unlocked_at` is stamped the first time all four modules are done.
+- The old setter columns are left in place, unused.
+- I did not use `profiles.training_completed`: migration 109 makes it admin-only, so agents can't set it themselves.
+
+**Privacy fix in the same migration:** `tp_staff_select` let role `admin` OR `agent` read every row. `agent` was the old staff/closer role before migration 107's rename, so every agent could read every other agent's progress. It's replaced by `tp_admin_select` (`is_admin()`).
+
+**Verified live in a rolled-back transaction:**
+- An agent sees only their own row (1).
+- An agent's update to another user's row touches 0 rows.
+- An agent's insert for another user is blocked (42501).
+- Admin sees all rows (2).
+- Zero residue afterwards.
+
+**Admin view:** all modules are unlocked for review, there are no tick buttons, and a "Team progress" list shows each active agent's x/4 and status (Not started / In progress / Done + date). testagent11 is labelled "test account".
+
+**Small refactor:** `ScriptHint` moved from BookCall.jsx into the shared `AgentUI.jsx`. Book a call is unchanged.
+
+**Verified:**
+- Lint is clean on every changed file, and the build is clean.
+- Throwaway mock harness (`.harness/` Vite config aliasing supabase/useAuth). Clicked through: locked module → veil → Continue training; mark done ×4 → auto-advance + complete state; admin team list; dark 1440, light 375 with no horizontal overflow; scroll-to-module on phone; no console errors.
+- The harness was deleted, and the vault `launch.json` temp entry was restored byte-for-byte.
+
+**Not tested logged in for real.** Same standing gap: Brayden should open it as testagent11.
+
+**Lesson:** a pre-pivot RLS policy that names a role renamed since (`closer`→`agent`, migration 107) silently changes who it grants access to. Re-check policies that mention a renamed role when reusing old tables.
+
+Status: done. Next in [[Ohvara CC Queue]]: 671 (Team activity tab).

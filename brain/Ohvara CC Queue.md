@@ -19,14 +19,6 @@ tags:
 > - One `## Prompt NNN — <title>` heading per item. Put the full spec inline. Order = execution order.
 > - **Committing this file:** CC's Ohvara session has standing `git add`/`commit`/`push` permission as of 2026-10-01 (added after the Prompt 664 blocker), so CC's own next ship sweeps up and commits whatever's sitting here uncommitted — a manager chat queuing an item does **not** need to separately commit/push it by hand. (Historical note: this rule originally asked for an immediate manual commit, after an uncommitted queue edit got wiped on 2026-09-30 — the real cause turned out to be the device-bridge connection itself dropping mid-write, not uncommitted git state, and a manual commit wouldn't have protected against that anyway. The re-read-to-verify rule above is the real safeguard.)
 
-## Prompt 670 — Agent Training tab
-
-Add a Training section to the agent portal (new nav item under Work or its own section, Opus's call on placement).
-
-**Don't reuse pre-pivot content blindly — check first.** The vault already has `training-videos.md` and `training-flashcard-content.md`, but these were built 2026-06-22 for the old **appointment-setter** business (selling AI receptionists/automation, pre-pivot cold-calling model) — see `ohvara_legacy_setter_pipeline_dead.md`. That's the wrong business model for the current cancellation-focused agent role. Don't port this content in as-is; it needs genuinely new material anchored to what agents actually do now (get the client on the phone, book a 30-min slot, hand off to Fulfillment) — content creation itself can be a follow-up if Brayden needs to supply/approve topics, but the mechanism (tab, video/content display, maybe a simple completion checklist) can be built now with placeholder/sample content.
-
-**Worth checking, not assuming:** the old setter portal's "Complete Training to Unlock Your Leads" gated-lock pattern Brayden saw on that stale `/setter` page — if a locked-until-trained UI component already exists in git history, it may be adaptable (different gate condition, same visual pattern) rather than building from scratch. Don't resurrect any of its actual old business logic (leads/appointments tables) — those are confirmed dead per `ohvara_legacy_setter_pipeline_dead.md`.
-
 ## Prompt 671 — Team activity tab
 
 A team-wide visibility view for agents — what's happening across the whole team today/this week (bookings made, cancellations closed), not just their own numbers. Think simple activity feed and/or lightweight leaderboard (e.g. most bookings this week, most cancellations closed this week) — motivational/visibility, not a deep analytics tool.
