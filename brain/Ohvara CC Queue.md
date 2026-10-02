@@ -38,17 +38,3 @@ tags:
 **Not yet decided, Opus's call once building:** grace-period behavior on a failed payment (immediate access cutoff vs. some buffer) and exactly what "access paused" looks like in the UI (locked overlay vs. read-only) — document the decision and why in the ship note.
 
 **Log in the ship note:** whether a Stripe account/keys were present and usable (and whether it's the same account as the old dead Payouts integration or a new one), the exact migration applied, and — if blocked — exactly what Brayden needs to go create, mirroring how Prompt 393/666's blockers are written.
-
-## Prompt 679 — Messages: agents and Fulfillment can message each other
-
-Brayden's ask, direct: a message system so agents and the Fulfillment team can talk to each other, either direction — not a specific one-way notification, real back-and-forth messaging.
-
-**Check for reusable infrastructure before building from scratch.** A `team_messages` table and a `team_messages_notify()` trigger already exist in this Supabase project (confirmed via Prompt 664's recon — used by the old pre-pivot Team/My Calls pages, migration 107 already rewrote `team_messages_notify()`'s role string literals from 'closer' to 'agent'). Check whether this table's shape (sender, recipient/thread, body, timestamps) is adaptable for agent↔fulfillment messaging, or whether it's tied too tightly to the old model to reuse cleanly — don't guess, inspect the actual schema first and document the decision in the ship note either way.
-
-**Scope, real latitude (Opus's call), but think through the natural shape rather than building a generic open inbox:** messaging likely makes most sense scoped to a client/submission thread (the agent who submitted it + whichever Fulfillment rep is working it) rather than a free-form DM system, since that's how the rest of the portal is organized (per-submission, not per-person). But a simpler agent-to-Fulfillment-team-generally channel is also reasonable if a per-submission thread adds too much complexity for this pass — pick whichever is honestly simpler to build well, document the choice and why.
-
-**Privacy/scoping, think it through, don't guess carelessly:** an agent should only see their own threads/messages, never another agent's conversations with Fulfillment. Fulfillment reps likely need visibility across agents (or at least whichever submissions they're assigned to) — same RLS-scoping discipline as Prompt 671's team activity feed.
-
-**New nav item** for both agent and fulfillment roles (exact label/placement Opus's call — fits naturally near Work for agents, near the Fulfillment queue for that role).
-
-Unread-message indicator (a badge/count) is a reasonable nice-to-have if it's not much extra work riding on the same build; not required if it meaningfully expands scope — Opus's call, flag what was skipped if anything.
