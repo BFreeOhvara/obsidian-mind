@@ -32,11 +32,3 @@ tags:
 **Don't guess at a fix — reproduce for real first** with actual console/network output (login as `testagent11` / `nate44@ohvara.internal`). Leading hypothesis to check, not assume: a race where `fetchProfile`'s `profiles` query runs immediately after `signInWithPassword` resolves, before the new session's JWT is fully usable by RLS — failing silently (only `console.error`, nothing surfaces to the `error` state) and leaving `profile` null forever since nothing retries it, versus a cold reload where `getSession()` + `fetchProfile` only run once the session is already fully established. Also check whether this reproduces on admin/fulfillment logins too, or only this account/role — Brayden's only hit it on `testagent11` so far.
 
 Fix the actual root cause. If, after real investigation, a forced reload-after-sign-in genuinely turns out to be the honest fix rather than a bandaid over an unhandled error, say so and why in the ship note.
-
-## Prompt 668 — Security: `profiles_update_self` lets any signed-in user grant themselves admin
-
-Carried over verbatim from Prompt 666's ship note, flagged there as a real finding, not yet fixed: the `profiles_update_self` RLS policy (`auth.uid() = id`, no column restriction) combined with table-wide UPDATE grants lets **any signed-in user** run the equivalent of `update profiles set role = 'admin' where id = auth.uid()` on their own row. That's a live privilege escalation — any agent or fulfillment account (including the test accounts) can currently make themselves admin.
-
-Fix it the same way migration 108 (Prompt 666) protected the new caller-ID columns: a `BEFORE UPDATE` trigger that freezes `role` (and audit for other sensitive columns while in there — `is_active`, `username` if it's used for login resolution, anything else self-writable that shouldn't be) unless `auth.role() = 'service_role'`. Verify in a rolled-back transaction as a non-admin: confirm `role` can't be self-escalated, and confirm an actual admin-performed role change (via the existing admin user-management edge functions / service role) still works end to end.
-
-This is a security fix — prioritize it over cosmetic work, same standard as every other data-integrity prompt in this vault.

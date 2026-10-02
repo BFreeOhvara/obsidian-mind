@@ -30,7 +30,7 @@ tags:
 
 ---
 
-**Security fix 2026-10-01 (`e9dcefd`, migration 109 live, unnumbered, found during Prompt 666):** any signed-in user could make themselves admin by updating `role` on their own `profiles` row. That's closed now. A trigger rejects non-admin, direct-from-API changes to `role`, `is_active`, `upline_id`, the Stripe fields, and system bookkeeping columns. Admins, edge functions, and server-side functions are unaffected. Full detail: [[Memories]] 2026-10-01.
+**Prompt 668 shipped 2026-10-01 (`e9dcefd`, migration 109 live). Security fix found during Prompt 666:** any signed-in user could make themselves admin by updating `role` on their own `profiles` row. That's closed now. A trigger rejects non-admin, direct-from-API changes to `role`, `is_active`, `upline_id`, the Stripe fields, and system bookkeeping columns. Admins, edge functions, and server-side functions are unaffected. Full detail: [[Memories]] 2026-10-01.
 
 ---
 
