@@ -537,3 +537,62 @@ Status: done.
 **Lesson:** when a filter's buckets and a funnel's steps disagree (funnel steps are cumulative, filters are exclusive), show both explicitly: cumulative numbers for the steps, an exclusive bar for "where they are now", and let the exclusive one drive the filter. Don't make cumulative numbers clickable filters.
 
 Status: done.
+
+[CC | 2026-10-02 — Prompt 673 PARTIAL: agent billing scaffolding shipped, Stripe side ⛔ BLOCKED on Brayden] ohvara-dashboard `8bcb971` pushed to master, migration 113 applied live. **Verified live:** portal.ohvara.com serves `index-DhRsN6Bu.js`, identical to the local build. Nothing changes for anyone today: enforcement is off.
+
+**Stripe account / keys (the spec asked for this):**
+- `STRIPE_SECRET_KEY` is **not set**. It's absent from the `secrets` table (0 Stripe rows) and LIVE_STATE's secrets line lists it missing. Only the old static `STRIPE_*_LINK_*` payment links are set.
+- A Stripe account **did** exist pre-pivot: one profile still carries an old Connect `stripe_account_id` from the dead Payouts system. So Brayden very likely has a Stripe account already and can reuse it. The new build uses Stripe **Customers + Subscriptions** (agent pays Ohvara), not Connect (Ohvara paid reps). Different objects, same account is fine.
+- Not touched: `Payouts.jsx`, `commission_payouts`, `stripe_account_id`, `stripe_onboarding_complete`, the old Connect edge functions.
+
+**Migration 113 `113_agent_billing` (exact):**
+- `profiles` gains `billing_status` text not null default 'none', check in (none, active, past_due, lapsed, canceled, exempt). It also gains `stripe_customer_id`, `stripe_subscription_id`, `billing_current_period_end`, `billing_grace_until` and `billing_updated_at`, plus partial unique indexes on the two Stripe ids.
+- Every non-agent row is set to `exempt`.
+- `app_settings` gains `agent_billing_enforced` boolean default **false** and `agent_billing_weekly_cents` int default 35000 (display price only; the Stripe Price is what's charged).
+- `profiles_guard_privileged()` (109) is redefined with the 6 billing columns added, so an agent can't mark themselves paid.
+- The new columns are not in mig 112's directory grant. Teammates can't read each other's billing. Own row comes via `get_my_profile()`, everyone via `admin_list_profiles()` (both `select *`).
+- **Dry run in a rolled-back transaction as testagent11:**
+  - Setting own `billing_status` or `billing_grace_until` → 42501.
+  - Direct `select billing_status` → 42501.
+  - `get_my_profile()` returns `none`.
+  - Reading app_settings works; updating it → 0 rows.
+  - Self timezone update still works. Admin setting an agent's status works.
+  - Roles came out agent=none, admin/fulfillment=exempt.
+
+**Client (all inert until enforcement is on):**
+- `lib/billing.js`: status labels, `billingAccess(profile, enforced)`, and `invokeBilling(action)`, which calls the not-yet-built `agent-billing` edge fn.
+- **Settings → Billing tab** (agent only): $350/week copy, status pill + date line, Subscribe (Checkout) / Manage billing / Update card / Renew or manage (Customer Portal). It probes `agent-billing {action:'status'}`. That function doesn't exist yet, so the panel shows "Billing isn't connected yet, nothing is being charged" (same pattern as Caller ID). It lights up with no client deploy once the function ships.
+- **`BillingGate`** wraps every page in DashboardLayout. When it's locked: a lock screen with a Go to Billing link. Settings and the sidebar stay reachable. During grace: a warning banner on every page.
+- **Users & Access**: new Billing column (Current / Payment failed / Lapsed / Cancelled / Not subscribed, plus a renews/grace/ends date). Non-agents show "—".
+
+**Decisions (spec left these to Opus):**
+- **Grace:** a failed renewal → `past_due` with `billing_grace_until` = failure + **48h**. Full access plus a banner while Stripe retries. After that, locked.
+- **Cancel:** cancel-at-period-end keeps access through the paid week. Renewing while still in the paid week goes through the Customer Portal (un-cancels the same subscription) rather than Checkout, which would create a second one.
+- **"Paused" looks like** a full lock screen in place of the page, not a read-only overlay. A half-working portal invites "why can't I book?" confusion. Settings stays open so paying is one click away.
+- **Fulfillment keeps working** clients the agent already booked either way. The client shouldn't pay for the agent's card bouncing.
+- **Gate is UI-only for v1.** RLS doesn't check billing. A lapsed agent with dev tools could still hit the API. That's acceptable for a $350/week retainer among known agents; revisit if it matters.
+
+**Verified UI:**
+- Lint is clean on changed files. The only error is the pre-existing `DashboardLayout.jsx:97` set-state-in-effect. Build is clean.
+- Throwaway `.harness/` mock (resolveId swap of supabase/useAuth, state via query string). All of these behaved:
+  - none, past_due in grace (banner), past_due grace over (locked), canceled in period (open), canceled expired (locked)
+  - lapsed with enforcement off (open), lapsed on /settings (open)
+  - button sets for none / canceled / past_due
+  - admin Users column with all 6 statuses
+  - 375px (no overflow)
+- No console errors. Harness deleted; vault `launch.json` restored byte-for-byte.
+
+**⛔ What Brayden needs to do (CC can't create accounts or enter keys):**
+1. Log into the existing Stripe account (or create one if it's gone). **Test mode first.**
+2. Copy the **test** secret key (`sk_test_…`, Developers → API keys) and add it as a Supabase Edge Function secret named `STRIPE_SECRET_KEY` (Supabase dashboard → Edge Functions → Secrets). Don't paste it in chat.
+3. Tell Eagle/Falcon it's in. CC then creates the $350/week Product+Price, the webhook endpoint and the Customer Portal config through the Stripe API.
+4. One more paste after that: the webhook's signing secret (`whsec_…`, Stripe → Developers → Webhooks → the new endpoint) as Supabase secret `STRIPE_WEBHOOK_SECRET`. CC will say when it's ready.
+
+**Remaining build once the key exists (next CC pass on 673):**
+- `agent-billing` edge fn with actions `status` / `checkout` (subscription mode, creates or reuses the Customer) / `portal`.
+- `agent-billing-webhook` (verify signature) handling checkout.session.completed, customer.subscription.updated/deleted, invoice.paid and invoice.payment_failed. Writes the 113 columns with the service role.
+- End-to-end test with test card 4242 + a declining card. Mark testagent11 `exempt`. Then flip `app_settings.agent_billing_enforced = true` and swap in the live key, both with Brayden's go-ahead.
+
+**Lesson:** when a paid-access feature is blocked on the payment provider, ship the state + UI behind a DB kill switch defaulting off, and have the UI probe the (missing) edge function for `configured`. Everything lands and is verifiable now, and going live is a secret + one function deploy, with no client redeploy.
+
+Status: partial, blocked on Brayden (Stripe key). 673 stays in [[Ohvara CC Queue]] marked blocked; next runnable item is 675.

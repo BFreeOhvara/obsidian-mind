@@ -21,6 +21,8 @@ tags:
 
 ## Prompt 673 — Agent billing: $350/week flat retainer via Stripe
 
+> **⛔ CC status 2026-10-02: PARTIAL, blocked on Brayden.** Scaffolding shipped (`8bcb971`, mig 113): schema, Settings → Billing tab, admin column and the access gate, with enforcement off. Remaining: the Stripe edge functions + webhook. These wait on `STRIPE_SECRET_KEY` being set in Supabase secrets; see [[LIVE_STATE]]'s blocked section and [[Memories]] 2026-10-02. **CC: skip this item until Brayden confirms the key is in, and run 675 next.**
+
 **Hard prerequisite, blocks everything past schema/UI scaffolding — same category as Prompt 393 (Daily.co) and Prompt 666 (Twilio): CC cannot create third-party accounts.** Brayden needs a Stripe account (confirm whether one already exists before assuming it doesn't) and real API keys handed over as Supabase secrets before billing logic can be built. If not available when CC picks this up, stop at that point, build what's ready, and flag blocked exactly like 393/666 — don't guess at a workaround.
 
 **Business model, Brayden's own framing — direction of money matters, this is NOT agent commissions:** agents pay **Ohvara** (not the reverse) a flat recurring retainer — $350/week per agent — for portal access and that week's batch of client cancellations to be worked. If they want the service again the following week, they pay $350 again. This is a weekly recurring subscription gating portal access, not a one-time charge and not a payout to agents.

@@ -30,6 +30,10 @@ tags:
 
 ---
 
+**Prompt 673 PARTIAL 2026-10-02 (`8bcb971`, migration 113 live, live on portal.ohvara.com). ⛔ Stripe side blocked on Brayden.** Agent billing ($350/week, agent pays Ohvara) is wired up but not switched on. Profiles have billing status columns, agents can't change their own. Agents get a **Settings → Billing** tab that says "Billing isn't connected yet, nothing is being charged." Admin's Users & Access has a **Billing** column. A lock screen + 48h failed-payment grace banner exist behind `app_settings.agent_billing_enforced`, which is **off**. Nobody is locked out or charged today. **Brayden: put your Stripe test secret key in Supabase as `STRIPE_SECRET_KEY`** (see blocked section below). Full detail: [[Memories]] 2026-10-02.
+
+---
+
 **Prompt 672 shipped 2026-10-02 (`1a34ba6`, no migration, live on portal.ohvara.com). Pipeline view, built into My Clients, not a new tab.** My Clients already listed the same clients with a stage filter, so a separate funnel page would have duplicated it. A **Pipeline** card now sits above the list: Booked → Picked up → Cancelled with conversion % and median time between steps, a bar showing where everyone stands now, and a This week / This month / All time range (by booking date). The bar's legend (All · Booked · Not picked up · In progress · Cancelled) is the list's status filter. "Not picked up" is its own bucket now instead of hiding inside Booked. Filter and range are in the URL, and Overview's stat tiles now link straight into the matching slice. Admin gets the same card company-wide, scoped by the agent filter. Screenshots (mock harness) in `media/p672-pipeline/`. **Brayden: open My Clients as testagent11 once real bookings exist.** Full detail: [[Memories]] 2026-10-02.
 
 ---
@@ -87,6 +91,18 @@ Context for CC: Brayden's goal for `ohvara-dashboard` now is narrow — an agent
 - Nav/role labeling: the `fulfillment` role's visible label should read as the cancellation team to whoever logs in — ask Brayden for the exact wording he wants rather than guessing it.
 
 Brayden's own framing, worth keeping in mind while building rather than executing this literally: the goal is a couple of people whose only job is cancelling policies, and agents whose only job is submitting — the trimmed app should read as smooth and obvious for both logins, even though the cancellation-call automation itself isn't built yet.
+
+---
+
+### ⛔ BLOCKED ON BRAYDEN — Prompt 673's agent billing needs a Stripe key
+
+Schema, Settings → Billing tab, admin column and the access gate are shipped (`8bcb971`, mig 113), with enforcement off. The Stripe calls (Checkout, Customer Portal, webhook) can't be built or tested without a key, and **CC cannot create accounts or enter API keys**. A Stripe account very likely already exists: the pre-pivot payouts system used Stripe Connect, and one profile still has an old Connect id. Brayden needs to:
+1. Log into Stripe (create an account only if the old one is gone). Stay in **test mode**.
+2. Developers → API keys → copy the **test** secret key (`sk_test_…`).
+3. Supabase dashboard → Edge Functions → Secrets → add `STRIPE_SECRET_KEY` with that value. Don't paste it into chat.
+4. Tell Eagle/Falcon it's in. CC then builds the `agent-billing` + `agent-billing-webhook` functions and creates the $350/week price, the webhook endpoint and the Customer Portal config through the API. After that, one more paste: the webhook signing secret (`whsec_…`) as `STRIPE_WEBHOOK_SECRET`.
+
+Going live afterwards is three steps, each with Brayden's go-ahead: swap in the live key, flip `agent_billing_enforced`, and mark test accounts `exempt`. No client redeploy is needed.
 
 ---
 
