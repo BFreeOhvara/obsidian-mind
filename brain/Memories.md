@@ -516,3 +516,24 @@ The dead `useHierarchy.useAgents` select dropped `email, username`. Writes are u
 **Gotcha for future work:** a new client read of any profile column outside the directory set now fails with 42501. Read your own row via `useAuth().profile` / `get_my_profile()`, other users' full rows via `admin_list_profiles()` (admin), or add a new narrow definer RPC. Don't re-grant the column.
 
 Status: done.
+
+[CC | 2026-10-02 — Prompt 672 SHIPPED: pipeline/funnel view, folded into My Clients] ohvara-dashboard `1a34ba6` pushed to master. **Verified live:** portal.ohvara.com serves `index-uO3t5YC1.js`, identical to the local build. No migration, no data change.
+
+**Overlap call (the spec asked for it):** not a new tab. My Clients (`/agent/clients`) already listed every booked client with a Booked / In progress / Cancelled filter and per-client progress steps, about 80% of the ask. What was missing was the funnel itself (conversion between steps), "Not picked up" as its own slice, and a time range. Those went into My Clients.
+
+**What shipped:**
+- New `components/agent/Pipeline.jsx` card above the list, header "Pipeline" with a This week / This month / All time range (by `created_at`, same `startOfWeek`/`startOfMonth` as Overview/Performance).
+- Three steps: **Booked** (count) → **Picked up** (inProgress + cancelled, % of booked, median hours from booking to `fulfillment_claimed_at`) → **Cancelled** (% of picked up, median claimed → `fulfillment_completed_at`). Negative durations are dropped from the medians.
+- A stacked bar of where everyone in range stands now: Booked (grey) / Not picked up (warning) / In progress (info) / Cancelled (success). Its legend chips are the status filter (click again to clear), and unselected segments dim.
+- `lib/agentBookings.js`: new `bucketOf(p, now)` + `BUCKETS`/`BUCKET`/`RANGES`, so every client lands in exactly one bucket. "Booked" in the filter now means waiting and *not* past its time; past-time ones are under "Not picked up" (matches the existing StagePill, which already showed them that way). `median` moved here from Performance.jsx (shared now).
+- Filter + range live in the URL (`?stage=missed&range=week`). Range + agent filter (admin) scope both the card and the list; search only narrows the list.
+- Overview tiles are clickable: Booked this week → `?range=week`, With Fulfillment → My Clients, Cancelled this week → `?stage=cancelled`, Not picked up → `?stage=missed`. Cancelled this week deliberately does NOT add `range=week`: the tile counts completions this week, the range is by booking date, so they'd disagree.
+- The segmented status filter was removed (the Pipeline legend replaces it). Book a call moved to the search row.
+
+**Verified:** lint clean on changed files, build clean. Throwaway mock harness (`.harness/` Vite config swapping supabase/useAuth via a resolveId plugin, 12 sample bookings across 2 agents): agent dark 1440 (all time + this week + this month), stage filter + range persisting together in the URL, light 375 (no horizontal overflow), admin dark, Overview tile → `/agent/clients?range=week`. No console errors. One fix out of it: the three steps were vertically misaligned on phones (center-aligned against the chevron), now top-aligned. Harness deleted; vault `launch.json` restored byte-for-byte. Screenshots in `media/p672-pipeline/`.
+
+**Not tested logged in for real** (standing gap), and the live DB has 0 bookings, so the card shows zeros until the team books.
+
+**Lesson:** when a filter's buckets and a funnel's steps disagree (funnel steps are cumulative, filters are exclusive), show both explicitly: cumulative numbers for the steps, an exclusive bar for "where they are now", and let the exclusive one drive the filter. Don't make cumulative numbers clickable filters.
+
+Status: done.

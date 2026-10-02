@@ -30,6 +30,10 @@ tags:
 
 ---
 
+**Prompt 672 shipped 2026-10-02 (`1a34ba6`, no migration, live on portal.ohvara.com). Pipeline view, built into My Clients, not a new tab.** My Clients already listed the same clients with a stage filter, so a separate funnel page would have duplicated it. A **Pipeline** card now sits above the list: Booked → Picked up → Cancelled with conversion % and median time between steps, a bar showing where everyone stands now, and a This week / This month / All time range (by booking date). The bar's legend (All · Booked · Not picked up · In progress · Cancelled) is the list's status filter. "Not picked up" is its own bucket now instead of hiding inside Booked. Filter and range are in the URL, and Overview's stat tiles now link straight into the matching slice. Admin gets the same card company-wide, scoped by the agent filter. Screenshots (mock harness) in `media/p672-pipeline/`. **Brayden: open My Clients as testagent11 once real bookings exist.** Full detail: [[Memories]] 2026-10-02.
+
+---
+
 **Profiles PII lockdown shipped 2026-10-02 (`1a681a0`, migration 112, live; no prompt number).** Signed-in users can no longer read other users' email/phone/username/caller ID number/Stripe id. Only the directory columns (name, avatar, role, active, caller-ID on/off) are visible team-wide. Your own full row and admin's Users list now come through definer RPCs (`get_my_profile`, `admin_list_profiles`). **Brayden: sign in once as admin (Users & Access loads) and as testagent11 (Settings shows your own phone/caller ID).** Full detail: [[Memories]] 2026-10-02.
 
 ---

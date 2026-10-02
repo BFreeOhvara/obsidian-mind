@@ -19,12 +19,6 @@ tags:
 > - One `## Prompt NNN — <title>` heading per item. Put the full spec inline. Order = execution order.
 > - **Committing this file:** CC's Ohvara session has standing `git add`/`commit`/`push` permission as of 2026-10-01 (added after the Prompt 664 blocker), so CC's own next ship sweeps up and commits whatever's sitting here uncommitted — a manager chat queuing an item does **not** need to separately commit/push it by hand. (Historical note: this rule originally asked for an immediate manual commit, after an uncommitted queue edit got wiped on 2026-09-30 — the real cause turned out to be the device-bridge connection itself dropping mid-write, not uncommitted git state, and a manual commit wouldn't have protected against that anyway. The re-read-to-verify rule above is the real safeguard.)
 
-## Prompt 672 — Pipeline / funnel view tab
-
-A fuller view of an agent's own clients moving through the funnel (Booked → With Fulfillment → Cancelled / Not Picked Up) than the Overview stat tiles currently give — essentially an explorable version of what's already being counted there.
-
-**Check for overlap before building new.** This likely overlaps heavily with the existing My Clients page (`/agent/clients`). Assess whether this is genuinely a new tab or whether My Clients should just grow filters/a funnel visualization — Opus's call, but don't duplicate a page that already does 80% of this.
-
 ## Prompt 673 — Agent billing: $350/week flat retainer via Stripe
 
 **Hard prerequisite, blocks everything past schema/UI scaffolding — same category as Prompt 393 (Daily.co) and Prompt 666 (Twilio): CC cannot create third-party accounts.** Brayden needs a Stripe account (confirm whether one already exists before assuming it doesn't) and real API keys handed over as Supabase secrets before billing logic can be built. If not available when CC picks this up, stop at that point, build what's ready, and flag blocked exactly like 393/666 — don't guess at a workaround.
