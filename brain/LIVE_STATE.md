@@ -34,7 +34,7 @@ tags:
 
 ---
 
-**Prompt 673 PARTIAL 2026-10-02 — scaffolding live (`8bcb971`, mig 113); `agent-billing` edge fn deployed (`5b7f4e3`, v1). ⛔ Waiting on `STRIPE_WEBHOOK_SECRET`.** Agent billing ($350/week, agent pays Ohvara). `STRIPE_SECRET_KEY` (test) is set. Settings → Billing now shows the Subscribe button to agents (test mode); without the webhook secret, status only syncs when the agent reopens Billing. Enforcement (`app_settings.agent_billing_enforced`) is **off**; nobody is locked out or charged. See blocked section below. Full detail: [[Memories]] 2026-10-02.
+**Prompt 673 PARTIAL 2026-10-02 — scaffolding live (`8bcb971`, mig 113); `agent-billing` edge fn deployed (`07a44ee`, v3), webhook live, **test-mode E2E passed** (subscribe → active, cancel → canceled, renew → active). Go-live pending Brayden.** Agent billing ($350/week, agent pays Ohvara). `STRIPE_SECRET_KEY` (test) is set. Settings → Billing now shows the Subscribe button to agents (test mode); without the webhook secret, status only syncs when the agent reopens Billing. Enforcement (`app_settings.agent_billing_enforced`) is **off**; nobody is locked out or charged. See blocked section below. Full detail: [[Memories]] 2026-10-02.
 
 ---
 
@@ -98,7 +98,7 @@ Brayden's own framing, worth keeping in mind while building rather than executin
 
 ---
 
-### ⛔ BLOCKED ON BRAYDEN — Prompt 673: deploy ✅, webhook secret ✅. E2E test waits on Brayden signing in as Test Agent (localhost:5173)
+### ⏸ PENDING BRAYDEN'S GO-AHEAD — Prompt 673 go-live. Deploy ✅ (v3), webhook ✅, test-mode E2E ✅ 2026-10-02 (subscribe/portal/cancel/renew). Failed-renewal path not yet exercised. Go-live = live key + live webhook secret + flip `agent_billing_enforced`, only on Brayden's say-so.
 
 `STRIPE_SECRET_KEY` (test) is in. The `agent-billing` edge function is written, unit-tested and pushed (`5b7f4e3`), but **CC's auto-mode classifier denied the deploy**. It handles Checkout, Customer Portal, a status re-sync, and the Stripe webhook at a `/webhook` subpath. The $350/week Price, Product and Portal config create themselves on first use. Brayden:
 1. ✅ **Deployed 2026-10-02** (v1; `status` reports configured, test mode). Was: tell CC to deploy and approve the prompt, or run `supabase functions deploy agent-billing --no-verify-jwt --project-ref jjextitmbptoaolacocs` from `ohvara-dashboard`. `--no-verify-jwt` is required (Stripe's webhook has no user JWT; the function checks users itself).
