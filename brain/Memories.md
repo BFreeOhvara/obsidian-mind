@@ -718,3 +718,13 @@ Status: done. Queue now holds only 673 (go-live waits on Brayden).
 Lesson: when a theme's tokens "exist" but the effect looks missing, check the alpha against that theme's base colour before assuming the wiring is broken.
 
 Status: done. Queue now holds only 673 (go-live waits on Brayden).
+
+[CC | 2026-10-02 — Prompt 682 shipped: Fulfillment Overview trim + sample data] ohvara-dashboard `575c624` pushed to master. **Verified live:** portal.ohvara.com serves `index-BubEF6iA.js`, same as the local build. No migration. 673 skipped (still waiting on Brayden's go-live go-ahead).
+
+**What changed:** (1) Header clock is now a dominant 44px accent chip (`LiveClock` got an opt-in `large` prop, so the agent Overview's small clock is untouched). (2) "Open my desk" / "Open the desk" button removed; the clock is the only element beside the date. Desk still reachable via Work -> Fulfillment. (3) "The team" section removed, along with its per-rep computation, `Num` helper and now-unused imports. Lint + build clean.
+
+**⚠️ SEEDED TEST DATA IN THE LIVE DB (for visual review only):** 13 `policies` rows (+13 `policy_fulfillment_details`), all on Test Agent (`nate44`) / Test Fulfill, named `Test Client — Sample Data N`, phone `555-0100N`, `notes` = `P682 SAMPLE DATA - fake client for visual review, safe to delete`. Mix: 6 Complete (5 this week, 3 this month, 1 from September to show it's excluded), 3 In Progress claimed by Test Fulfill (one overdue, one due in <1h), 4 Pending/unclaimed (one stale at 30h). Populates the tiles (5 cancelled this week, 3 this month, 4 waiting), 4 calls today, an attention banner. No notifications were fired. **To clear when Brayden is done reviewing:** `delete from policy_fulfillment_details where policy_id in (select id from policies where notes like 'P682 SAMPLE%'); delete from policies where notes like 'P682 SAMPLE%';` — wait for his say-so.
+
+**Not done:** a real signed-in visual check (no creds, same standing gap) — Brayden should log in as Test Fulfill and look.
+
+Status: done. Queue now holds only 673 (go-live waits on Brayden).
