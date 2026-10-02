@@ -472,3 +472,47 @@ Status: done. Next in [[Ohvara CC Queue]]: 671 (Team activity tab).
 Status: done. Next in [[Ohvara CC Queue]]: 672 (Pipeline / funnel view), then 673 (Stripe billing, likely blocked on keys), 675 (visual refresh round 3).
 
 [CC | 2026-10-02 — P671 follow-up: profiles PII flag spun off] — After the P671 log: confirmed both repos are clean and pushed (vault `101374c`, ohvara-dashboard `c8bb58a`). Queued the `profiles_select` over-exposure (any signed-in user can read every profile's email/phone/caller_id/stripe_account_id) as a one-click background-task chip in the CC desktop app ("Lock down profiles read access"). It is NOT in [[Ohvara CC Queue]] and has no prompt number yet. Manager chat: give it a number and queue it if Brayden doesn't start the chip. No code change. Status: done.
+
+[CC | 2026-10-02 — profiles PII lockdown SHIPPED (migration 112)] — This was the background-task chip from the P671 follow-up, done in-session at Brayden's request. It has no prompt number. ohvara-dashboard `1a681a0` (code) + `370e146` (migration note) pushed to master. **Verified live:** portal.ohvara.com serves `index-BZ3mkggR.js`, identical to the local build.
+
+**Problem:** `profiles_select` = `auth.uid() IS NOT NULL`, and `authenticated` had SELECT on every column. Any signed-in agent or Fulfillment user could read every profile's email, phone, username, caller_id_number, caller_id_twilio_sid, stripe_account_id, npn and eo_*.
+
+**Fix: column-level, not row-level.** Teammates do need each other's directory fields:
+- An agent sees which Fulfillment rep picked up their client.
+- Fulfillment sees the agent's name and whether Caller ID is on.
+- About 30 other tables' RLS policies check `profiles.role`.
+
+So the row policy stays, and the grant shrinks:
+- `authenticated` can now SELECT only `id, role, full_name, avatar_url, avatar_color, is_active, created_at, upline_id, caller_id_verified_at, caller_id_enabled`.
+- `anon` lost all access, read and write. Login still resolves usernames via the `resolve_login_email` definer RPC, and signup goes through claim-invite.
+- TRUNCATE (which bypasses RLS) is revoked from `authenticated`.
+
+Full rows go through two new SECURITY DEFINER RPCs:
+- `get_my_profile()` returns the caller's own row. `useAuth.fetchProfile` now uses it.
+- `admin_list_profiles()` returns every row, admin only, and nothing for anyone else. useProfiles' `useAllProfiles/useClosers/useAdmins/useReps` (Users & Access) now use it, with filters/order still applied server-side.
+
+The dead `useHierarchy.useAgents` select dropped `email, username`. Writes are unchanged: the UPDATE grants, self/admin update policies and the 108/109 guard triggers all stay.
+
+**Recon behind it:**
+- Grepped every `.from('profiles')` read and every `profiles!fk` embed. All live embeds only use full_name / caller_id flags.
+- Every edge function reads profiles with the service role.
+- Every other table's RLS subquery uses only `id` and `role`.
+- No views or realtime publication on profiles.
+- `pg_stat_statements` shows PostgREST updates use `RETURNING $const`, so updates never need column SELECT.
+
+**Verified:**
+- Dry run of the full migration in a rolled-back transaction, per role:
+  - Agent: `select *` and other users' `email` → 42501. The directory, its own full row via the RPC, its own `is_active`, and the bookings embeds all work. `admin_list_profiles` → 0 rows. Self-updates (timezone, phone, avatar, npn, last_login_at) work. Role escalation is still blocked by the 109 guard. Updating another user's row touches 0 rows. Filtering by a hidden column (`where email is not null`) → 42501, which closes that side channel.
+  - Fulfillment: the queue embed (full_name + caller_id flags) works. `phone` / `caller_id_number` → 42501.
+  - Admin: `admin_list_profiles` returns all 3 rows with emails, filtered lists work, the rep_credentials policy still resolves, and admin updates to other rows work.
+  - anon: denied, `resolve_login_email` works.
+- **Rollout in three steps so sign-in never broke:** `112a_profile_read_rpcs` (additive) → client deploy, waited for the live bundle hash → `112b_profiles_column_scoped_select` (the grants).
+- Live REST probes as anon: `profiles` → 42501, `get_my_profile` → 42501, `resolve_login_email` works.
+- Postgres logs after the switch show only those two probe denials, with no errors from signed-in users.
+- Build clean. Lint on the changed files shows only the pre-existing `useAuth.jsx` react-refresh error (same as baseline).
+
+**Not tested logged in for real** (standing gap): Brayden should sign in once as admin (Users & Access list loads) and as testagent11 (Settings shows own phone/caller ID).
+
+**Gotcha for future work:** a new client read of any profile column outside the directory set now fails with 42501. Read your own row via `useAuth().profile` / `get_my_profile()`, other users' full rows via `admin_list_profiles()` (admin), or add a new narrow definer RPC. Don't re-grant the column.
+
+Status: done.

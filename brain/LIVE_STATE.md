@@ -30,6 +30,10 @@ tags:
 
 ---
 
+**Profiles PII lockdown shipped 2026-10-02 (`1a681a0`, migration 112, live; no prompt number).** Signed-in users can no longer read other users' email/phone/username/caller ID number/Stripe id. Only the directory columns (name, avatar, role, active, caller-ID on/off) are visible team-wide. Your own full row and admin's Users list now come through definer RPCs (`get_my_profile`, `admin_list_profiles`). **Brayden: sign in once as admin (Users & Access loads) and as testagent11 (Settings shows your own phone/caller ID).** Full detail: [[Memories]] 2026-10-02.
+
+---
+
 **Prompt 671 shipped 2026-10-02 (`c8bb58a`, migration 111, live on portal.ohvara.com). New Team tab** at `/agent/team` (sidebar after Performance, agent + admin): this week's leaderboard (Bookings / Cancellations closed, Monday to now, ties share a rank, your own row highlighted) + a 7-day activity feed ("Jordan booked a call with Fulfillment", "Rego closed a cancellation"). **Privacy:** data comes from a new `team_activity()` SECURITY DEFINER RPC that returns only kind/time/agent first name/avatar — no client name, phone or carrier, and `policies` RLS is untouched. Live DB has 0 bookings, so the page is empty until the team books. **Brayden: open it as testagent11 once real bookings exist.** Full detail: [[Memories]] 2026-10-02.
 
 ---
