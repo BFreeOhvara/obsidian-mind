@@ -30,6 +30,10 @@ tags:
 
 ---
 
+**Prompt 671 shipped 2026-10-02 (`c8bb58a`, migration 111, live on portal.ohvara.com). New Team tab** at `/agent/team` (sidebar after Performance, agent + admin): this week's leaderboard (Bookings / Cancellations closed, Monday to now, ties share a rank, your own row highlighted) + a 7-day activity feed ("Jordan booked a call with Fulfillment", "Rego closed a cancellation"). **Privacy:** data comes from a new `team_activity()` SECURITY DEFINER RPC that returns only kind/time/agent first name/avatar — no client name, phone or carrier, and `policies` RLS is untouched. Live DB has 0 bookings, so the page is empty until the team books. **Brayden: open it as testagent11 once real bookings exist.** Full detail: [[Memories]] 2026-10-02.
+
+---
+
 **Prompt 674 shipped 2026-10-02 (`3b8a53d`, live on portal.ohvara.com). Round two of the visual refresh:** Ohvara's own colours are back (navy sidebar + blue-grey text in dark, teal family in light, restored verbatim from pre-669). Restorix's layout and type stay. The bottom-left account card now has no On Duty toggle and no Profile item, and the divider above it is gone. Clicking it slides up a panel with **Profile & settings** and **Sign out**. Profile is now the first tab of Settings, and `/profile` redirects there. **Brayden: (1) look at the colours live; (2) you trailed off mid-sentence about one more item for that slide-up panel. I shipped Sign out + a Profile & settings shortcut. Confirm or correct.** Full detail: [[Memories]] 2026-10-02.
 
 ---

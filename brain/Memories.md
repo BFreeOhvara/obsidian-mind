@@ -435,3 +435,38 @@ The Settings → Appearance theme swatches now preview the restored palettes.
 **Lesson:** "restore" from a reviewer can mean layout/feel, not colours. When a refresh changes both, ship them as separable token layers, so one can be reverted without the other.
 
 Status: done. Next in [[Ohvara CC Queue]]: 671 (Team activity tab).
+
+[CC | 2026-10-02 — Prompt 671 SHIPPED: agent Team activity tab] ohvara-dashboard `c8bb58a` pushed to master. **Verified live:** portal.ohvara.com serves `index-DZeySjej.js`, identical to the local build. Migration `111_team_activity_feed.sql` applied live.
+
+**What it is:** a new Team page at `/agent/team`, in the sidebar after Performance (agent: Work group; admin: Agents group), Trophy icon.
+- 4 tiles: Team booked today / Team booked this week / Cancellations closed (this week) / You this week (your bookings + "#2 of 4"). Admin gets "Agents active" instead of "You".
+- **Leaderboard** "This week's leaders" (Monday to now, same `startOfWeek` as Overview): a segmented toggle between Bookings and Cancellations closed. Ties share a rank (1, 2, 2, 4), and whoever got there first lists first. Your own row is tinted with a "You" pill.
+- **Activity feed** for the last 7 calendar days, grouped Today / Yesterday / weekday date: "Jordan booked a call with Fulfillment" and "Rego closed a cancellation", plus the time. Your own events read "You". Refetches every 60s, shows 40 at a time with Show more.
+- "Closed a cancellation" credits the **booking agent** when Fulfillment marks the row Complete (`fulfillment_completed_at`). The Fulfillment rep isn't named.
+
+**Privacy / RLS decision (spec asked for this to be documented):**
+- `policies` RLS is **unchanged**: an agent still reads only their own rows + downline. Widening it would have handed every agent every teammate's client names and phones.
+- Instead there's one `SECURITY DEFINER` function, `team_activity(p_since)`, with a fixed output: `kind` ('booked'|'cancelled'), `at`, `agent_id`, `agent_first_name` (first word of full_name), `avatar_url`, `avatar_color`. No client name, phone, carrier, policy id or Fulfillment rep column exists in the result, so the browser can't leak what it never gets. The name and avatar come from `profiles`, which every signed-in user can already read, so nothing new about agents is exposed.
+- Callable only by agent/admin (`is_team_member()`). Fulfillment gets 0 rows. `EXECUTE` is revoked from anon/public and granted to authenticated.
+- The window is clamped to the last 35 days and 500 rows: a live feed, not a history export. Only active `role='agent'` profiles count. Test accounts are filtered client-side via `excludeTestAccounts` (same as every team rollup).
+
+**Verified live in a rolled-back transaction:** a temporary second agent "Bobby" (auth user + profile) with one Pending booking and one Complete booking.
+- testagent11 calling `team_activity` got Bobby's 3 events with first name only.
+- testagent11 reading Bobby's `policies` directly got 0 rows (RLS still holds).
+- Fulfillment got 0 rows. Admin got 3.
+- `anon` has no execute privilege.
+- Zero residue afterwards (3 profiles, 3 auth users, 19 policies).
+
+**Verified UI:**
+- Lint is clean on the changed files, and the build is clean.
+- Throwaway mock harness (`.harness/` Vite config aliasing supabase/useAuth, sample events including the test account to confirm it's filtered). Checked agent dark 1440, the Cancellations toggle, light 375 (no horizontal overflow), admin, and the empty state. No console errors.
+- Harness deleted; vault `launch.json` restored byte-for-byte.
+- One fix out of that: the feed first spanned 8 calendar days, now exactly 7.
+
+**Live data note:** the live DB has 0 bookings (`fulfillment_assigned`), so the real page shows the empty states until the team books. **Not tested logged in for real** (standing gap).
+
+**Flag, pre-existing and not touched:** `profiles_select` is `auth.uid() IS NOT NULL`, so any signed-in user (agent or Fulfillment) can read every profile's email, phone, `caller_id_number`, `stripe_account_id`, etc. This predates 671, which adds nothing new. It's worth a scoped fix (column-limited view or RPC for teammate lookups) before more real agents join.
+
+**Lesson:** when a "team-wide" view needs rows that RLS correctly hides, don't widen RLS. Use a SECURITY DEFINER function with a fixed, already-stripped output shape, so the privacy guarantee lives in the schema and doesn't depend on the UI remembering not to render fields.
+
+Status: done. Next in [[Ohvara CC Queue]]: 672 (Pipeline / funnel view), then 673 (Stripe billing, likely blocked on keys), 675 (visual refresh round 3).

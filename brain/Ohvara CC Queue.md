@@ -19,12 +19,6 @@ tags:
 > - One `## Prompt NNN — <title>` heading per item. Put the full spec inline. Order = execution order.
 > - **Committing this file:** CC's Ohvara session has standing `git add`/`commit`/`push` permission as of 2026-10-01 (added after the Prompt 664 blocker), so CC's own next ship sweeps up and commits whatever's sitting here uncommitted — a manager chat queuing an item does **not** need to separately commit/push it by hand. (Historical note: this rule originally asked for an immediate manual commit, after an uncommitted queue edit got wiped on 2026-09-30 — the real cause turned out to be the device-bridge connection itself dropping mid-write, not uncommitted git state, and a manual commit wouldn't have protected against that anyway. The re-read-to-verify rule above is the real safeguard.)
 
-## Prompt 671 — Team activity tab
-
-A team-wide visibility view for agents — what's happening across the whole team today/this week (bookings made, cancellations closed), not just their own numbers. Think simple activity feed and/or lightweight leaderboard (e.g. most bookings this week, most cancellations closed this week) — motivational/visibility, not a deep analytics tool.
-
-**Privacy matters here — think it through, don't guess carelessly.** Agents should see teammate activity at a reasonable level (first name, what happened, when) but not other agents' full client PII (phone numbers, etc.) they have no business reason to see. Document the RLS/query scoping decision in the ship note.
-
 ## Prompt 672 — Pipeline / funnel view tab
 
 A fuller view of an agent's own clients moving through the funnel (Booked → With Fulfillment → Cancelled / Not Picked Up) than the Overview stat tiles currently give — essentially an explorable version of what's already being counted there.
@@ -45,3 +39,18 @@ A fuller view of an agent's own clients moving through the funnel (Booked → Wi
 
 **Log in the ship note:** whether a Stripe account/keys were present and usable (and whether it's the same account as the old dead Payouts integration or a new one), the exact migration applied, and — if blocked — exactly what Brayden needs to go create, mirroring how Prompt 393/666's blockers are written.
 
+## Prompt 675 — Visual refresh round 3: account menu cleanup + drop the Restorix background
+
+Direct follow-up to 674, based on Brayden looking at the shipped result. Colors are confirmed correct now — don't touch those again. Four small, specific fixes:
+
+**1. Remove "Profile" from the bottom-left account popup entirely.**
+674 moved profile editing into Settings, but the popup (click the "Test Agent" bubble, bottom-left) still shows both "Profile" and "Settings" as separate menu items. Remove the "Profile" entry completely — Settings is now the only way in, since it already contains what Profile used to show. The popup should end up with just Settings + Sign out (Sign out from 674's spec).
+
+**2. Bubble outline color.**
+The circular avatar/initials bubble next to "Test Agent" currently has a gray outline/ring. Change it to white.
+
+**3. Remove the small arrow on the right side of the account box.**
+There's a chevron/arrow on the right edge of that bottom-left box — remove it.
+
+**4. Drop the Restorix background — don't reuse it, even restyled.**
+674 left this open-ended ("keep the background, maybe differentiate it"). Brayden's now explicit: he does **not** want Ohvara running the same particle/dot background as Restorix Portal, full stop — he'd rather have **no background at all** than the identical one. Real creative freedom if you want to design something distinct for Ohvara instead (his words), but if nothing distinct is worth the build cost right now, just remove the background entirely rather than leave Restorix's version in place. Priority order: (a) something visually distinct for Ohvara, or failing that (b) plain/no background — never (c) the current Restorix-identical one.
