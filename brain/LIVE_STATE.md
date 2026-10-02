@@ -30,6 +30,10 @@ tags:
 
 ---
 
+**Prompt 669 shipped 2026-10-02 (`8236a27`, live on portal.ohvara.com). Round one of the visual refresh:** the agent portal now uses Restorix Portal's design system. Tokens, fonts (Space Grotesk headings, Manrope text, JetBrains Mono numbers), sidebar, header and the Overview / Book a call / My Clients / Performance / Settings pages were all changed. Behavior is unchanged. Fulfillment/Admin pages pick up the new colors and fonts but weren't laid out again. Also fixed: a saved light theme went back to dark on every reload. Before/after screenshots are in `media/p669-agent-portal-refresh/`. **Brayden: compare against Restorix and send round-two notes.** Full detail: [[Memories]] 2026-10-02. P667's `?authdebug` logging was removed in `c27c7a7`.
+
+---
+
 **Prompt 668 shipped 2026-10-01 (`e9dcefd`, migration 109 live). Security fix found during Prompt 666:** any signed-in user could make themselves admin by updating `role` on their own `profiles` row. That's closed now. A trigger rejects non-admin, direct-from-API changes to `role`, `is_active`, `upline_id`, the Stripe fields, and system bookkeeping columns. Admins, edge functions, and server-side functions are unaffected. Full detail: [[Memories]] 2026-10-01.
 
 ---

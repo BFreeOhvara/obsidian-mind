@@ -1,4 +1,6 @@
 ---
+date: 2026-06-07
+updated: 2026-10-02
 description: "Ohvara design system — color tokens, typography, anti-rules. Read before touching any UI component."
 tags:
   - brain
@@ -8,6 +10,20 @@ tags:
 # Ohvara Design System
 
 > Read before touching any UI component.
+
+## v14 (2026-10-02, Prompt 669): current. Supersedes the token tables below where they conflict.
+
+Brayden asked for the agent portal to match Restorix Portal's look, so the dashboard now uses Restorix's design system with Ohvara's brand hues. The live source of truth is `ohvara-dashboard/src/index.css` and `src/lib/exportStyles.js`. The v1–v13 history below is kept as a record.
+
+- **Surfaces:** page `--bg-base`, then cards `--bg-surface`, then inner rows and controls `--bg-elevated`, then `--bg-muted`. Borders are 1px hairlines in both modes. The old 3px teal light-mode border is gone.
+- **Dark:** page `#0A0A0F`, card `#13131A`, inner `#1C1C26`, accent `#4B79CE`, eyebrow `--accent-deep` `#A9C0EE`.
+- **Light:** page `#E8ECF2`, card `#FFFFFF`, inner `#F3F6F9`, text navy `#0A1F44`, accent teal `#007A69` (5.3:1 on white), eyebrow `#00695B`.
+- **Sidebar:** sits on the card surface (`--bg-sidebar`) in both modes. The solid navy/teal fill is retired. To bring it back, set `--bg-sidebar` to `#192C4F` (dark) or `#008674` (light).
+- **Type:** Space Grotesk for display headings, Manrope for UI text (14px / 400 body), JetBrains Mono for every number. Labels use the `.eyebrow` style: mono caps, 0.14em tracking, `--accent-deep`.
+- **Shapes:** cards have a 16px radius, buttons are fully rounded, controls are 40px tall with an 8px radius, and segmented tabs sit in one bordered box with a solid accent on the active tab.
+- **Background:** Restorix's dot-network canvas (`ParticleField`), coloured by `--particle-line` / `--particle-dot`.
+
+Full record: [[Memories]] 2026-10-02 · screenshots in `media/p669-agent-portal-refresh/`.
 
 ## Color Tokens
 

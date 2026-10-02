@@ -19,16 +19,37 @@ tags:
 > - One `## Prompt NNN — <title>` heading per item. Put the full spec inline. Order = execution order.
 > - **Committing this file:** CC's Ohvara session has standing `git add`/`commit`/`push` permission as of 2026-10-01 (added after the Prompt 664 blocker), so CC's own next ship sweeps up and commits whatever's sitting here uncommitted — a manager chat queuing an item does **not** need to separately commit/push it by hand. (Historical note: this rule originally asked for an immediate manual commit, after an uncommitted queue edit got wiped on 2026-09-30 — the real cause turned out to be the device-bridge connection itself dropping mid-write, not uncommitted git state, and a manual commit wouldn't have protected against that anyway. The re-read-to-verify rule above is the real safeguard.)
 
-## Prompt 667 — Agent sign-in succeeds but the page doesn't react until reload
+## Prompt 670 — Agent Training tab
 
-**Confirmed real bug, not a guess — evidence already gathered:**
-- `auth.users.last_sign_in_at` for `testagent11` (id `3f2b2df7-40b1-4921-80e2-09981c819642`) updated to the exact moment Brayden clicked Sign In, reporting no visible reaction — so `supabase.auth.signInWithPassword()` is succeeding server-side. This is not a credentials, RLS, or `is_active` problem — all checked, all fine.
-- Closing and reopening the login page immediately lands him on the right dashboard — so the persisted session + a cold-load profile fetch + redirect chain all work correctly.
-- The break is specifically between "the sign-in call resolves" and "the UI reacts" — no error shown, no visible "Signing in…" state Brayden noticed, no navigation.
-- **Not a Prompt 665 regression.** 665's own ship note says this path was never live-tested (mock harness only, explicitly flagged: "Brayden should click through as testagent11 for real") and the sign-in/redirect mechanics themselves weren't touched by 665 beyond the post-login target path changing. This looks pre-existing, just never actually hit until now.
+Add a Training section to the agent portal (new nav item under Work or its own section, Opus's call on placement).
 
-**Relevant code:** `src/pages/Login.jsx` (`handleSubmit`, the `useEffect` that calls `navigate()` once `profile` is set), `src/hooks/useAuth.jsx` (the `onAuthStateChange` listener, `fetchProfile`, the `profileUserId.current === session.user.id` dedupe guard).
+**Don't reuse pre-pivot content blindly — check first.** The vault already has `training-videos.md` and `training-flashcard-content.md`, but these were built 2026-06-22 for the old **appointment-setter** business (selling AI receptionists/automation, pre-pivot cold-calling model) — see `ohvara_legacy_setter_pipeline_dead.md`. That's the wrong business model for the current cancellation-focused agent role. Don't port this content in as-is; it needs genuinely new material anchored to what agents actually do now (get the client on the phone, book a 30-min slot, hand off to Fulfillment) — content creation itself can be a follow-up if Brayden needs to supply/approve topics, but the mechanism (tab, video/content display, maybe a simple completion checklist) can be built now with placeholder/sample content.
 
-**Don't guess at a fix — reproduce for real first** with actual console/network output (login as `testagent11` / `nate44@ohvara.internal`). Leading hypothesis to check, not assume: a race where `fetchProfile`'s `profiles` query runs immediately after `signInWithPassword` resolves, before the new session's JWT is fully usable by RLS — failing silently (only `console.error`, nothing surfaces to the `error` state) and leaving `profile` null forever since nothing retries it, versus a cold reload where `getSession()` + `fetchProfile` only run once the session is already fully established. Also check whether this reproduces on admin/fulfillment logins too, or only this account/role — Brayden's only hit it on `testagent11` so far.
+**Worth checking, not assuming:** the old setter portal's "Complete Training to Unlock Your Leads" gated-lock pattern Brayden saw on that stale `/setter` page — if a locked-until-trained UI component already exists in git history, it may be adaptable (different gate condition, same visual pattern) rather than building from scratch. Don't resurrect any of its actual old business logic (leads/appointments tables) — those are confirmed dead per `ohvara_legacy_setter_pipeline_dead.md`.
 
-Fix the actual root cause. If, after real investigation, a forced reload-after-sign-in genuinely turns out to be the honest fix rather than a bandaid over an unhandled error, say so and why in the ship note.
+## Prompt 671 — Team activity tab
+
+A team-wide visibility view for agents — what's happening across the whole team today/this week (bookings made, cancellations closed), not just their own numbers. Think simple activity feed and/or lightweight leaderboard (e.g. most bookings this week, most cancellations closed this week) — motivational/visibility, not a deep analytics tool.
+
+**Privacy matters here — think it through, don't guess carelessly.** Agents should see teammate activity at a reasonable level (first name, what happened, when) but not other agents' full client PII (phone numbers, etc.) they have no business reason to see. Document the RLS/query scoping decision in the ship note.
+
+## Prompt 672 — Pipeline / funnel view tab
+
+A fuller view of an agent's own clients moving through the funnel (Booked → With Fulfillment → Cancelled / Not Picked Up) than the Overview stat tiles currently give — essentially an explorable version of what's already being counted there.
+
+**Check for overlap before building new.** This likely overlaps heavily with the existing My Clients page (`/agent/clients`). Assess whether this is genuinely a new tab or whether My Clients should just grow filters/a funnel visualization — Opus's call, but don't duplicate a page that already does 80% of this.
+
+## Prompt 673 — Agent billing: $350/week flat retainer via Stripe
+
+**Hard prerequisite, blocks everything past schema/UI scaffolding — same category as Prompt 393 (Daily.co) and Prompt 666 (Twilio): CC cannot create third-party accounts.** Brayden needs a Stripe account (confirm whether one already exists before assuming it doesn't) and real API keys handed over as Supabase secrets before billing logic can be built. If not available when CC picks this up, stop at that point, build what's ready, and flag blocked exactly like 393/666 — don't guess at a workaround.
+
+**Business model, Brayden's own framing — direction of money matters, this is NOT agent commissions:** agents pay **Ohvara** (not the reverse) a flat recurring retainer — $350/week per agent — for portal access and that week's batch of client cancellations to be worked. If they want the service again the following week, they pay $350 again. This is a weekly recurring subscription gating portal access, not a one-time charge and not a payout to agents.
+
+**Don't confuse this with, or build on top of, the old dead Payouts system.** `ohvara_legacy_setter_pipeline_dead.md` confirms `Payouts.jsx` / `/admin/payouts` already exists in the codebase from the pre-pivot model — it paid "reps" **via Stripe** against the old `commission_payouts`/`appointments`/`leads` tables, which are emptied and unused. That page is unreachable from nav but still present. This new prompt is the opposite direction of money flow and a different Stripe integration (Billing/Subscriptions, not payouts) — don't revive or extend the old page/tables; this is a fresh build, though the fact Stripe was integrated before may mean an existing Stripe account/connection to check on, worth asking Brayden about directly rather than assuming a clean slate.
+
+**Technical shape (real latitude, Opus's call):** Stripe Billing/Subscriptions with a weekly recurring price; a webhook handler for payment success/failure that flips a `billing_status` (new column, migration needed — flag it) on `profiles`, gating portal access when unpaid; an agent-facing billing view (Settings is the obvious place) showing current status and next charge date, using Stripe-hosted Checkout/Customer Portal rather than a custom card form to stay out of PCI scope. Admin-side visibility for Brayden into who's current/who's lapsed.
+
+**Not yet decided, Opus's call once building:** grace-period behavior on a failed payment (immediate access cutoff vs. some buffer) and exactly what "access paused" looks like in the UI (locked overlay vs. read-only) — document the decision and why in the ship note.
+
+**Log in the ship note:** whether a Stripe account/keys were present and usable (and whether it's the same account as the old dead Payouts integration or a new one), the exact migration applied, and — if blocked — exactly what Brayden needs to go create, mirroring how Prompt 393/666's blockers are written.
+

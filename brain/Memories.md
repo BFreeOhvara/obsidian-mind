@@ -298,3 +298,58 @@ Lesson: on any table where RLS is row-scoped but grants are table-wide, privileg
 [CC | 2026-10-02 — Prompt 667 BLOCKED (recon only, not shipped)] — Read useAuth.jsx + Login.jsx; no code changes. Could not reproduce the "sign-in succeeds, UI does not react" bug: needs a real testagent11 login against hosted Supabase and no password was available (will not type account passwords into non-local logins). Code notes: fetchProfile failures only console.error and leave profile null with no retry and no Login error if the fetch hangs; the queue hypothesis (profiles query racing the new session JWT) is plausible but unconfirmed. Proposed: add flagged step-by-step logging, deploy, Brayden clicks through once and pastes output (or pastes DevTools console/network himself). Queue item 667 left in place. Status: waiting on Brayden.
 
 [CC | 2026-10-02 — Prompt 667 instrumentation shipped (bug not yet root-caused)] — ohvara-dashboard ea358dd pushed to master (Vercel deploys): flagged step logging in useAuth.jsx/Login.jsx (signInWithPassword, onAuthStateChange events, fetchProfile start/resolve/5s-pending, Login redirect effect). Enable: open ohvara-dashboard.vercel.app/login?authdebug=1 (persists in localStorage; ?authdebug=0 clears). Brayden: sign in as testagent11 with DevTools Console open, paste the [authdebug] lines. Remove logging once fixed. Queue item 667 stays. Status: waiting on output.
+
+
+[Eagle | 2026-10-02 — Prompt 667 resolved: not a code bug, closing the queue item] Root-caused via direct reproduction, not guesswork. Signed in as testagent11 myself through the live portal.ohvara.com login (real browser automation, not a mock) and it worked cleanly — authdebug log trace showed the full chain (signInWithPassword resolve → onAuthStateChange SIGNED_IN → fetchProfile start/resolve → redirect effect) completing in under 2 seconds with no stalls. So the app code itself is fine; nothing to fix there. Then had Brayden test in an Incognito/Private window on his own machine — worked instantly for him too. Back in his normal Opera GX window it still failed even after he cleared history/cache, which pointed at site-scoped data (most likely a stuck service worker or stale IndexedDB/localStorage for the portal.ohvara.com origin) surviving a plain cache clear since that's a separate category from "cookies and site data" in Chromium browsers. Conclusion: this was never an app bug — it's local browser state stuck in Brayden's one profile for this one origin. Gave him two options: keep using Incognito (works, zero risk), or clear "Cookies and other site data" specifically for portal.ohvara.com via the site/lock icon next to the address bar. The `?authdebug=1` debug logging added in commit ea358dd (flagged console.log statements in useAuth.jsx/Login.jsx) can be removed on CC's next Ohvara pass — it did its job, the trace is captured above, no further live debugging needed. **Prompt 667 removed from [[Ohvara CC Queue]] — nothing left for CC to build or fix here.**
+
+[CC | 2026-10-02 — Prompt 669 SHIPPED: agent portal visual refresh, round one] ohvara-dashboard `8236a27` is pushed to master. **Verified live:** portal.ohvara.com serves `index-maIm4GOP.js`, byte-identical to the local build. The Vercel MCP only sees an old, dormant `ohvara-dashboard` project on the "BFree" team (last deploys BLOCKED), so the bundle hash was the check. No migration, no data/logic change.
+
+**Audit (Restorix `restorix-setter-portal` vs Ohvara):**
+- Restorix uses layered surface tokens (base < surface < elevated < muted), 1px alpha hairlines, 16px `rounded-card` cards, mono `.eyebrow` labels in an `--accent-deep` shade, and Space Grotesk + Manrope type.
+- Its buttons are fully rounded. Its tables sit in a card with an eyebrow header band. Its sidebar is on the card surface with grouped eyebrow labels. Its header is 64px with a display title and subtitle. A dot-network canvas sits behind the content.
+- Ohvara still ran the Claude Design export port (P327): a solid navy/teal sidebar, 13px/600 Geist everywhere, 8px cards, and 3px teal borders with teal text in light mode.
+
+**What changed. Shared, so every page inherits it:**
+- `index.css` tokens re-laid on Restorix's ladder with Ohvara's hues. Dark keeps the v12 blue `#4B79CE`. Light is navy text `#0A1F44` with teal accent `#007A69` (5.3:1 on white, checked with the WCAG formula).
+- New `.eyebrow`, `.nav-item`, `.menu-row`, `.icon-btn` and `.particle-layer` classes.
+- Fonts are self-hosted: `@fontsource/space-grotesk` + `manrope` added, `geist` + `playfair-display` removed.
+- `exportStyles.js` (same export names): 16px cards, 40px controls on the canvas, pill buttons, plus new `eyebrow`/`sectionTitle`/`DISPLAY`.
+- `Segmented`, `Switch` and the `ExportForm` dropdown restyled; the dropdown's hardcoded `#13131F` replaced.
+- `BugReportButton`'s hardcoded `#13131F` swapped for tokens.
+
+**Shell:**
+- `Sidebar.jsx` rewritten: 240px rail on the card surface, logo + display wordmark in a 64px header, eyebrow groups, rounded active rows. The account card at the bottom expands in place with the duty toggle, Profile and Sign out. Collapse and the phone drawer are kept. The dead `MobileAppBox` is removed.
+- `DashboardLayout`: 64px surface header, 1280px main.
+- `ParticleField.jsx` is ported from Restorix. Colors come from the `--particle-*` tokens via `getComputedStyle`. Pointer tracking is on window: Restorix's parent listener never fires behind a `pointer-events:none` layer, so its cursor repel never ran.
+
+**Pages:**
+- **Overview:** greeting + date + LiveClock chip + Book a call, then 4 eyebrow tiles (Not picked up tints amber when >0), then a tinted attention banner over the missed list, then one "Your calls" table with Today / Coming up group rows (Restorix's Strategy Calls), replacing the two half-cards.
+- **Book a call:** numbered step badges, tinted script callout, Today/Tomorrow as a segmented control, solid-accent selected slot, a tinted footer bar for the booking summary, and the day's calls as a compact list card.
+- **My Clients:** one list card with an eyebrow header. The detail opens in place under its row: elevated panel, accent left rule, display-font name, solid green progress checks.
+- **Performance:** eyebrow tiles, section headings above the cards, the admin per-agent table in Restorix's table shell, and a taller chart.
+- **Settings:** the 220px side rail became a full-width segmented tab bar (Restorix's Settings hub). Panel type was bumped to the 14px scale. Theme swatches show the new palettes.
+
+**Behavior-adjacent decisions:**
+1. "Booked" stage pill changed from accent to a neutral `muted` tone. Accent made Booked look the same as In progress (both blue) in dark, and as Cancelled (teal vs green) in light.
+2. Stat numbers stay JetBrains Mono, not Restorix's Space Grotesk, per DESIGN.md's numbers-in-mono rule. Easy to flip if Brayden prefers Restorix's exact look.
+3. The brand-coloured sidebar fill is retired to match Restorix. Reverting it is one token, `--bg-sidebar`.
+
+**Bug fixed along the way:** a saved light theme reverted to dark on every reload. `data-theme` was only set when a component called `useTheme()`, and the only caller was Settings → Appearance. `useTheme.js` now applies it at module load (imported in `main.jsx`). Verified by reloading in the harness.
+
+**Scope:** Fulfillment/Admin pages weren't laid out again. They inherit the tokens, fonts and shared styles; I checked both render cleanly.
+
+**Verified:**
+- Build is clean.
+- Lint on the changed files shows only the one pre-existing DashboardLayout `set-state-in-effect` error, one fewer than before because `MobileAppBox` is gone.
+- Throwaway mock harness: `.harness/` Vite config aliasing supabase/useAuth to mocks with sample bookings. It was deleted, and the temporary `launch.json` entry was reverted byte-for-byte.
+- Clicked through all 5 pages in dark + light at 1440 and 375px: no horizontal overflow and no console errors. Also checked the admin view, the Fulfillment page, the phone drawer, the Settings tabs, and switching theme through Appearance.
+
+Before/after screenshots are in `media/p669-agent-portal-refresh/` (8 before, 15 after). DESIGN.md got a v14 section. **Not tested logged in for real**, same standing gap: Brayden should open the real portal as testagent11 and send round-two notes.
+
+**Also:** removed P667's `?authdebug` logging per Eagle's close-out note (`c27c7a7`, a clean revert of `ea358dd`).
+
+Lessons:
+- A theme that only applies when a settings component mounts silently fails on reload. Apply persisted UI state at module load.
+- In this Git Bash tool, heredoc'd node scripts containing backticks/template literals can fail to parse. Write the script with the Write tool and run it.
+
+Status: done. Next in [[Ohvara CC Queue]]: 670 (Training tab).
