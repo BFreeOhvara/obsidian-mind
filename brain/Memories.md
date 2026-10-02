@@ -728,3 +728,7 @@ Status: done. Queue now holds only 673 (go-live waits on Brayden).
 **Not done:** a real signed-in visual check (no creds, same standing gap) — Brayden should log in as Test Fulfill and look.
 
 Status: done. Queue now holds only 673 (go-live waits on Brayden).
+
+[CC | 2026-10-02 — Prompt 683 shipped: Getting Paid promoted to its own Work nav tab] ohvara-dashboard `717b0c0` pushed to master (local `vite build` clean; Vercel deploy not separately checked). No migration. Fulfillment-rep nav: **Getting Paid** (Wallet icon) added to the Work group after Pipeline, new route `/fulfillment/getting-paid` (fulfillment role only) with a thin page wrapping the unchanged `GettingPaidPanel`. The rep's Settings tab is removed; admin's **Fulfillment Pay** Settings tab is untouched. Label kept as "Getting Paid" per spec; Brayden can rename after seeing it live. **Not done:** signed-in visual check (no creds, same standing gap). Lesson: read-modify-write on this queue file raced before (P683 vanished once) — re-read right before editing.
+
+Status: done. Queue now holds only 673 (go-live waits on Brayden).
