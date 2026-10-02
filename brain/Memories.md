@@ -395,3 +395,43 @@ Status: done. Next in [[Ohvara CC Queue]]: 670 (Training tab).
 **Lesson:** a pre-pivot RLS policy that names a role renamed since (`closer`→`agent`, migration 107) silently changes who it grants access to. Re-check policies that mention a renamed role when reusing old tables.
 
 Status: done. Next in [[Ohvara CC Queue]]: 671 (Team activity tab).
+
+[CC | 2026-10-02 — Prompt 674 SHIPPED: visual refresh round 2 (Ohvara colours back + account card cleanup)] ohvara-dashboard `3b8a53d` pushed to master. **Verified live:** portal.ohvara.com serves `index-DaXduQDF.js`, identical to the local build. No migration, no data change.
+
+**1. Colours restored, not guessed.** Every colour token that existed before 669 was diffed against `ea358dd` (the pre-669 commit) and restored verbatim in `src/index.css`:
+- Dark: navy sidebar `#192C4F`, text `#FFF`/`#93A6C4`/`#5E7195`/`#45566F`, `--bg-panel` `#0F2850`, `--hover-bg` `#27272E`, white `--sidebar-border`, status dims 0.10/0.25, info `#3B82F6`.
+- Light: the whole teal family (page `#F3F4F6`, teal sidebar `#008674`, text `#016F62`, accent `#024F46`, teal borders, the old status colours).
+- The `aside` token overrides that make text readable on the coloured rail are back too.
+
+669's layout, type and shapes are kept: Space Grotesk/Manrope, 16px cards, pill buttons, eyebrows, and segmented tabs. **Decision:** light mode stays at 1px borders, not the export's 3px, because that's layout, not colour.
+
+Tokens 669 introduced were re-derived from the old palette: `--bg-muted`, `--accent-deep` (light `#024F46`), `--border-strong`, plus aside-scoped `--bg-surface`/`--bg-muted`/`--accent-deep`. On the navy rail the active nav row keeps white text with an accent icon (the pre-669 look), because blue-on-navy text was too dark.
+
+The Settings → Appearance theme swatches now preview the restored palettes.
+
+**Particles:** kept the effect. In light mode it's tied to the restored logo-sidebar teal (`0,134,116`), which differs from Restorix's blue. In dark mode it's Ohvara's own `#4B79CE`, which is close to Restorix's `#3a63d6`. Density and motion are unchanged. A further visual split wasn't worth the complexity.
+
+**2. On Duty removed.** It was only ever rendered for `role === 'agent'`, so no Fulfillment/admin view had it. Nothing server-side read it: it was a localStorage-only `ohvara-duty` flag, "wire to transfer routing when that exists". So removing it touches no other role and no routing.
+
+**3. Profile moved to Settings.**
+- `ProfilePanel` (Profile.jsx, now a named export) is the first tab of Settings and the default tab, matching Restorix.
+- `/profile` is now a `<Navigate to="/settings#profile">` redirect, so old links still land.
+- The standalone page and its close-X are gone.
+- Settings tab state is now tied to the router location key, so following a `#profile` deep link while already on another Settings tab actually switches tabs.
+
+**4. Divider removed.** The `borderTop` wrapper above the account card is gone. It moved because the card expands in place and pushed the wrapper's top edge up.
+
+**5. Slide-up panel.** It now mirrors Restorix's `AccountPopover` exactly: the card grows upward from the bottom edge, with a chevron. It contains **Profile & settings** (→ `/settings#profile`) and **Sign out**. In light mode the danger colour inside the teal rail goes to near-white `#FFE4E4`, because dark red on teal was unreadable. **OPEN for Brayden:** the trailing-off "one more thing" for this panel. I shipped Sign out + the Profile & settings shortcut. He needs to confirm or correct.
+
+**Verified:**
+- Build is clean.
+- Lint is clean on the changed files (only the pre-existing DashboardLayout `set-state-in-effect` error remains).
+- Throwaway mock harness (`.harness/` Vite config aliasing supabase/useAuth, `?role=` override): agent dark 800px, account panel open, Profile & settings → Profile tab, Appearance → Light, deep-link back to Profile from another tab, `/profile` redirect, 375px light (no horizontal overflow, drawer + panel), and Fulfillment + admin roles in dark. No console errors.
+- The harness was deleted, and the vault `launch.json` was restored byte-for-byte.
+- DESIGN.md has a v15 section.
+
+**Not tested logged in for real** (standing gap): Brayden should open it as testagent11.
+
+**Lesson:** "restore" from a reviewer can mean layout/feel, not colours. When a refresh changes both, ship them as separable token layers, so one can be reverted without the other.
+
+Status: done. Next in [[Ohvara CC Queue]]: 671 (Team activity tab).

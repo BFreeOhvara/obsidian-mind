@@ -30,6 +30,10 @@ tags:
 
 ---
 
+**Prompt 674 shipped 2026-10-02 (`3b8a53d`, live on portal.ohvara.com). Round two of the visual refresh:** Ohvara's own colours are back (navy sidebar + blue-grey text in dark, teal family in light, restored verbatim from pre-669). Restorix's layout and type stay. The bottom-left account card now has no On Duty toggle and no Profile item, and the divider above it is gone. Clicking it slides up a panel with **Profile & settings** and **Sign out**. Profile is now the first tab of Settings, and `/profile` redirects there. **Brayden: (1) look at the colours live; (2) you trailed off mid-sentence about one more item for that slide-up panel. I shipped Sign out + a Profile & settings shortcut. Confirm or correct.** Full detail: [[Memories]] 2026-10-02.
+
+---
+
 **Prompt 669 shipped 2026-10-02 (`8236a27`, live on portal.ohvara.com). Round one of the visual refresh:** the agent portal now uses Restorix Portal's design system. Tokens, fonts (Space Grotesk headings, Manrope text, JetBrains Mono numbers), sidebar, header and the Overview / Book a call / My Clients / Performance / Settings pages were all changed. Behavior is unchanged. Fulfillment/Admin pages pick up the new colors and fonts but weren't laid out again. Also fixed: a saved light theme went back to dark on every reload. Before/after screenshots are in `media/p669-agent-portal-refresh/`. **Brayden: compare against Restorix and send round-two notes.** Full detail: [[Memories]] 2026-10-02. P667's `?authdebug` logging was removed in `c27c7a7`.
 
 ---

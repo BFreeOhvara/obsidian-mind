@@ -11,7 +11,16 @@ tags:
 
 > Read before touching any UI component.
 
-## v14 (2026-10-02, Prompt 669): current. Supersedes the token tables below where they conflict.
+## v15 (2026-10-02, Prompt 674): current. Ohvara's own colours are back.
+
+Brayden's call on the v14 result: Restorix's *layout and feel* stays, but the colours go back to Ohvara's own. Every colour token that existed before Prompt 669 is restored verbatim from the pre-669 commit (`ea358dd`): v13's dark palette (navy sidebar `#192C4F`, white / `#93A6C4` / `#5E7195` text, `--bg-panel` `#0F2850`, white sidebar divider) and the teal light family (page `#F3F4F6`, teal sidebar `#008674`, teal text `#016F62`, accent `#024F46`), plus the `aside` token overrides that make text readable on the coloured rail.
+
+- **Kept from v14:** type (Space Grotesk / Manrope / JetBrains Mono), 16px cards, pill buttons, 40px controls, eyebrow labels, segmented tabs, the 64px header, and 1px borders. Light mode does **not** go back to the export's 3px borders, because that's layout, not colour.
+- **New tokens from v14, re-derived from this palette:** `--bg-muted`, `--accent-deep`, `--border-strong`. Inside the sidebar, `--bg-surface`, `--bg-muted` and `--accent-deep` are overridden too. On the navy rail, the active nav row keeps white text with an accent icon, because blue text on navy is too dark.
+- **Particles:** the same Restorix canvas, coloured from Ohvara's own accent: blue in dark, logo-sidebar teal `0,134,116` in light (v14 used `#007A69`).
+- **Account card:** Restorix's AccountPopover pattern. It expands upward in place and offers Profile & settings and Sign out. There's no duty toggle, no Profile item, and no divider above it.
+
+## v14 (2026-10-02, Prompt 669): colours superseded by v15. Layout/type/shape rules still current.
 
 Brayden asked for the agent portal to match Restorix Portal's look, so the dashboard now uses Restorix's design system with Ohvara's brand hues. The live source of truth is `ohvara-dashboard/src/index.css` and `src/lib/exportStyles.js`. The v1–v13 history below is kept as a record.
 
