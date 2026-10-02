@@ -657,3 +657,18 @@ Status: partial, blocked on Brayden (deploy + webhook secret). 673 stays in [[Oh
 **Going live still needs Brayden's explicit go-ahead (not done):** swap `STRIPE_SECRET_KEY` to the live key, create the live webhook endpoint + live `STRIPE_WEBHOOK_SECRET`, flip `app_settings.agent_billing_enforced = true`, and decide whether Test Agent becomes `exempt`. The Price/Product/Portal config self-create in live mode too.
 
 Status: 673 Stripe build done + verified in test mode; go-live pending Brayden. Next runnable: 676.
+
+
+[CC | 2026-10-02 — Prompt 676 shipped: account card outline removed, agent sidebar grouped] ohvara-dashboard `4031b13` pushed to master, no migration. **Verified live:** portal.ohvara.com serves `index-4J2tArj2.js`, same as the local build. 673 skipped (waiting on Brayden's go-live go-ahead).
+
+**What changed (`Sidebar.jsx`, `index.css`):**
+1. **No outline on the account card.** Removed 675's border. The card already used `--bg-elevated`, the same fill as the active nav row, so it now looks like the selected Overview row. Computed: border 0px; card bg = active-row bg in both modes (`rgb(21,55,97)` dark, `rgba(255,255,255,.14)` light).
+2. **Popup is Sign out only.** The Settings row is gone from the popup. Settings stays in the sidebar under Account. `onNavigate` prop removed from `AccountCard`.
+3. **White divider.** Token `--sidebar-card-border` renamed to `--sidebar-card-divider` (`#FFFFFF`) and used for the popup's top border. Verified computed `rgb(255,255,255)` in both modes.
+4. **Agent groups**, copied from Restorix Portal's `Layout.jsx` labels: Today (Overview) / Work (Book a call, My Clients) / Performance (Performance, Team) / Resources (Training) / Account (Settings). Admin and fulfillment nav left as they were (the spec only named the agent sidebar).
+
+**Verified:** throwaway `.harness/` (Sidebar alone, `useAuth` swapped via resolveId) on port 5180. Dark: screenshot plus computed styles. Light: computed styles only, because the pane's screenshot timed out. No Vite error overlay. ESLint clean on `Sidebar.jsx`, build clean. Harness deleted and vault `launch.json` restored (vault git status clean).
+
+**Brayden to confirm:** whether Admin's 5-item "Agents" list should get the same grouping.
+
+Status: done. Queue now holds only 673 (go-live waits on Brayden).

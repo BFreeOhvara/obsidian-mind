@@ -21,7 +21,7 @@ tags:
 
 ## Prompt 673 — Agent billing: $350/week flat retainer via Stripe
 
-> **✅ E2E PASSED IN TEST MODE 2026-10-02 (CC).** Subscribe (4242) → webhook → `active`, Manage billing → portal, cancel → `canceled` (access through Oct 9), renew → `active`. Detail: [[Memories]] 2026-10-02 "P673 e2e". **Not yet exercised:** a failed *renewal* (`past_due` + 48h grace). It needs a renewal to come due (Test Agent's renews Oct 9) or a Stripe test clock. **Remaining CC work waits on Brayden's go-ahead:** live key, flip `agent_billing_enforced`, mark test accounts exempt. Until then, CC skips this item; next runnable is 676.
+> **✅ E2E PASSED IN TEST MODE 2026-10-02 (CC).** Subscribe (4242) → webhook → `active`, Manage billing → portal, cancel → `canceled` (access through Oct 9), renew → `active`. Detail: [[Memories]] 2026-10-02 "P673 e2e". **Not yet exercised:** a failed *renewal* (`past_due` + 48h grace). It needs a renewal to come due (Test Agent's renews Oct 9) or a Stripe test clock. **Remaining CC work waits on Brayden's go-ahead:** live key, flip `agent_billing_enforced`, mark test accounts exempt. Until then, CC skips this item; nothing else is queued.
 
 > **✅ FULLY UNBLOCKED 2026-10-02 — Brayden created the Stripe webhook endpoint (sandbox) and confirmed `STRIPE_WEBHOOK_SECRET` is set in Supabase secrets.** Both `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` are now in place. **CC: run the end-to-end test (card 4242 + a declining card) per [[LIVE_STATE]] step 4, confirm the webhook actually fires and updates `billing_status`, then report back — going live (real key, enforcement on) still needs Brayden's explicit go-ahead, don't flip that on your own.**
 
@@ -38,19 +38,3 @@ tags:
 **Not yet decided, Opus's call once building:** grace-period behavior on a failed payment (immediate access cutoff vs. some buffer) and exactly what "access paused" looks like in the UI (locked overlay vs. read-only) — document the decision and why in the ship note.
 
 **Log in the ship note:** whether a Stripe account/keys were present and usable (and whether it's the same account as the old dead Payouts integration or a new one), the exact migration applied, and — if blocked — exactly what Brayden needs to go create, mirroring how Prompt 393/666's blockers are written.
-
-## Prompt 676 — Visual refresh round 4: account popup cleanup + sidebar groupings
-
-Direct follow-up to 675, based on Brayden looking at the shipped result. Four fixes:
-
-**1. Revert the white outline from 675 — the bubble should have no outline at all.**
-675 added a white outline around the avatar bubble; Brayden's now clarified he doesn't want an outline/ring there at all — he wants it to look like the "Overview" nav item does when selected: just the fill color, no outline. Remove the ring/outline entirely rather than changing its color again.
-
-**2. Remove "Settings" from the account popup menu — Sign out only.**
-When clicking the "Test Agent" bubble, the popup currently shows Settings as a clickable item above Sign out. Remove that menu item from the popup completely — **Settings stays as its own sidebar tab** (already under Account in the left nav, don't touch that), it just shouldn't also be clickable from inside this popup. The popup's only action should be Sign out.
-
-**3. Make the divider line in the popup white, not gray.**
-There's a horizontal divider line inside the popup (between the name/avatar header area and the menu item(s) below). Currently gray — change it to white. This applies after item 2 above, so it'll be the line directly above "Sign out" once Settings is removed from the popup.
-
-**4. Group the left sidebar into sub-sections like Restorix Portal does.**
-Right now everything (Overview, Book a call, My Clients, Performance, Team, Training) sits flat under one "Work" heading — 6 items, no further structure. Restorix Portal's sidebar breaks things into multiple labeled groups (e.g. a "Resources" section separate from core work items). Reorganize Ohvara's agent sidebar the same way — split the current flat Work list into logical sub-groups (for example, core daily-task items stay under Work; Training, and possibly Team, move into a new Resources-style group) — real latitude on exact grouping/naming, Opus's call, just don't leave it as one flat 6-item list. Settings stays under Account as-is.
