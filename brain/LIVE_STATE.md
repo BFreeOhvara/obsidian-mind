@@ -34,7 +34,7 @@ tags:
 
 ---
 
-**Prompt 673 PARTIAL 2026-10-02 (`8bcb971`, migration 113 live, live on portal.ohvara.com). ⛔ Stripe side blocked on Brayden.** Agent billing ($350/week, agent pays Ohvara) is wired up but not switched on. Profiles have billing status columns, agents can't change their own. Agents get a **Settings → Billing** tab that says "Billing isn't connected yet, nothing is being charged." Admin's Users & Access has a **Billing** column. A lock screen + 48h failed-payment grace banner exist behind `app_settings.agent_billing_enforced`, which is **off**. Nobody is locked out or charged today. **Brayden: put your Stripe test secret key in Supabase as `STRIPE_SECRET_KEY`** (see blocked section below). Full detail: [[Memories]] 2026-10-02.
+**Prompt 673 PARTIAL 2026-10-02 — scaffolding live (`8bcb971`, mig 113); Stripe edge fn built (`5b7f4e3`) but ⛔ NOT DEPLOYED (CC classifier denied the deploy).** Agent billing ($350/week, agent pays Ohvara). `STRIPE_SECRET_KEY` (test) is set. Settings → Billing tab still reads "Billing isn't connected yet" until `agent-billing` is deployed; it lights up with no client redeploy. Enforcement (`app_settings.agent_billing_enforced`) is **off**; nobody is locked out or charged. See blocked section below. Full detail: [[Memories]] 2026-10-02.
 
 ---
 
@@ -98,15 +98,13 @@ Brayden's own framing, worth keeping in mind while building rather than executin
 
 ---
 
-### ⛔ BLOCKED ON BRAYDEN — Prompt 673's agent billing needs a Stripe key
+### ⛔ BLOCKED ON BRAYDEN — Prompt 673: deploy `agent-billing`, then the webhook secret
 
-Schema, Settings → Billing tab, admin column and the access gate are shipped (`8bcb971`, mig 113), with enforcement off. The Stripe calls (Checkout, Customer Portal, webhook) can't be built or tested without a key, and **CC cannot create accounts or enter API keys**. A Stripe account very likely already exists: the pre-pivot payouts system used Stripe Connect, and one profile still has an old Connect id. Brayden needs to:
-1. Log into Stripe (create an account only if the old one is gone). Stay in **test mode**.
-2. Developers → API keys → copy the **test** secret key (`sk_test_…`).
-3. Supabase dashboard → Edge Functions → Secrets → add `STRIPE_SECRET_KEY` with that value. Don't paste it into chat.
-4. Tell Eagle/Falcon it's in. CC then builds the `agent-billing` + `agent-billing-webhook` functions and creates the $350/week price, the webhook endpoint and the Customer Portal config through the API. After that, one more paste: the webhook signing secret (`whsec_…`) as `STRIPE_WEBHOOK_SECRET`.
-
-Going live afterwards is three steps, each with Brayden's go-ahead: swap in the live key, flip `agent_billing_enforced`, and mark test accounts `exempt`. No client redeploy is needed.
+`STRIPE_SECRET_KEY` (test) is in. The `agent-billing` edge function is written, unit-tested and pushed (`5b7f4e3`), but **CC's auto-mode classifier denied the deploy**. It handles Checkout, Customer Portal, a status re-sync, and the Stripe webhook at a `/webhook` subpath. The $350/week Price, Product and Portal config create themselves on first use. Brayden:
+1. **Deploy it**, either way works: tell CC to deploy and approve the prompt, or run `supabase functions deploy agent-billing --no-verify-jwt --project-ref jjextitmbptoaolacocs` from `ohvara-dashboard`. `--no-verify-jwt` is required (Stripe's webhook has no user JWT; the function checks users itself).
+2. **Stripe (test mode) → Developers → Webhooks → Add endpoint.** URL: `https://jjextitmbptoaolacocs.supabase.co/functions/v1/agent-billing/webhook`. Events: `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.paid`, `invoice.payment_failed`.
+3. On that endpoint, reveal the **Signing secret** (`whsec_…`) and add it in Supabase → Edge Functions → Secrets as `STRIPE_WEBHOOK_SECRET`. Don't paste it in chat.
+4. Tell Eagle/Falcon. CC then runs the end-to-end test (card 4242 + a declining card) and, with Brayden's go-ahead, goes live: live key, flip `agent_billing_enforced`, mark test accounts `exempt`.
 
 ---
 

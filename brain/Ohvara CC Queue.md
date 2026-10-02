@@ -21,7 +21,9 @@ tags:
 
 ## Prompt 673 — Agent billing: $350/week flat retainer via Stripe
 
-> **⛔ CC status 2026-10-02: PARTIAL, blocked on Brayden.** Scaffolding shipped (`8bcb971`, mig 113): schema, Settings → Billing tab, admin column and the access gate, with enforcement off. Remaining: the Stripe edge functions + webhook. These wait on `STRIPE_SECRET_KEY` being set in Supabase secrets; see [[LIVE_STATE]]'s blocked section and [[Memories]] 2026-10-02. **CC: skip this item until Brayden confirms the key is in.** (675 shipped 2026-10-02; nothing else is queued.)
+> **⛔ 2026-10-02 (CC, second pass): code done, deploy blocked.** `agent-billing` edge fn is built, unit-tested and pushed (`5b7f4e3`), but the CC auto-mode classifier denied `deploy_edge_function`. Brayden needs to deploy it (or allow the deploy), then create the webhook endpoint and set `STRIPE_WEBHOOK_SECRET`. Exact steps: [[LIVE_STATE]] "BLOCKED ON BRAYDEN — Prompt 673". After that, CC's remaining work is the end-to-end test + go-live. Next runnable item for CC is 676.
+
+> **✅ UNBLOCKED 2026-10-02 — Brayden confirmed `STRIPE_SECRET_KEY` is set in Supabase secrets** (sandbox/test key, `sk_test_...`, from a Stripe Sandbox under the existing Ohvara Stripe account — the account itself is a leftover from a pre-pivot AI-agency idea and currently unused for anything live, but the sandbox keeps this build fully isolated from it regardless). Scaffolding already shipped (`8bcb971`, mig 113): schema, Settings → Billing tab, admin column and the access gate, with enforcement off. **CC: resume this item — build the Stripe edge functions + webhook now that the secret is in place.** A second secret, `STRIPE_WEBHOOK_SECRET`, will be needed once the webhook endpoint exists — flag that back to Brayden/Eagle when you reach that point rather than guessing a value.
 
 **Hard prerequisite, blocks everything past schema/UI scaffolding — same category as Prompt 393 (Daily.co) and Prompt 666 (Twilio): CC cannot create third-party accounts.** Brayden needs a Stripe account (confirm whether one already exists before assuming it doesn't) and real API keys handed over as Supabase secrets before billing logic can be built. If not available when CC picks this up, stop at that point, build what's ready, and flag blocked exactly like 393/666 — don't guess at a workaround.
 
@@ -34,3 +36,19 @@ tags:
 **Not yet decided, Opus's call once building:** grace-period behavior on a failed payment (immediate access cutoff vs. some buffer) and exactly what "access paused" looks like in the UI (locked overlay vs. read-only) — document the decision and why in the ship note.
 
 **Log in the ship note:** whether a Stripe account/keys were present and usable (and whether it's the same account as the old dead Payouts integration or a new one), the exact migration applied, and — if blocked — exactly what Brayden needs to go create, mirroring how Prompt 393/666's blockers are written.
+
+## Prompt 676 — Visual refresh round 4: account popup cleanup + sidebar groupings
+
+Direct follow-up to 675, based on Brayden looking at the shipped result. Four fixes:
+
+**1. Revert the white outline from 675 — the bubble should have no outline at all.**
+675 added a white outline around the avatar bubble; Brayden's now clarified he doesn't want an outline/ring there at all — he wants it to look like the "Overview" nav item does when selected: just the fill color, no outline. Remove the ring/outline entirely rather than changing its color again.
+
+**2. Remove "Settings" from the account popup menu — Sign out only.**
+When clicking the "Test Agent" bubble, the popup currently shows Settings as a clickable item above Sign out. Remove that menu item from the popup completely — **Settings stays as its own sidebar tab** (already under Account in the left nav, don't touch that), it just shouldn't also be clickable from inside this popup. The popup's only action should be Sign out.
+
+**3. Make the divider line in the popup white, not gray.**
+There's a horizontal divider line inside the popup (between the name/avatar header area and the menu item(s) below). Currently gray — change it to white. This applies after item 2 above, so it'll be the line directly above "Sign out" once Settings is removed from the popup.
+
+**4. Group the left sidebar into sub-sections like Restorix Portal does.**
+Right now everything (Overview, Book a call, My Clients, Performance, Team, Training) sits flat under one "Work" heading — 6 items, no further structure. Restorix Portal's sidebar breaks things into multiple labeled groups (e.g. a "Resources" section separate from core work items). Reorganize Ohvara's agent sidebar the same way — split the current flat Work list into logical sub-groups (for example, core daily-task items stay under Work; Training, and possibly Team, move into a new Resources-style group) — real latitude on exact grouping/naming, Opus's call, just don't leave it as one flat 6-item list. Settings stays under Account as-is.

@@ -613,3 +613,28 @@ Status: partial, blocked on Brayden (Stripe key). 673 stays in [[Ohvara CC Queue
 
 Status: done. Queue now holds only 673 (blocked on Stripe key).
 
+
+[CC | 2026-10-02 — Prompt 673 second pass: `agent-billing` Stripe edge fn built, ⛔ deploy blocked] ohvara-dashboard `5b7f4e3` pushed to master. No migration, no client change. **Not deployed:** the CC auto-mode classifier denied `deploy_edge_function` (same handoff as earlier DDL/deploy blocks). Nothing changed for anyone: the Billing tab still says "not connected" and enforcement is off.
+
+**Stripe account / keys:** `STRIPE_SECRET_KEY` is set (Brayden, test key from a Stripe Sandbox under the existing Ohvara account, which is a leftover from the pre-pivot AI-agency idea). That account is separate from the dead Payouts/Connect integration's usage; this build uses Customers + Subscriptions only and never touches `stripe_account_id`, `Payouts.jsx` or `commission_payouts`. `STRIPE_WEBHOOK_SECRET` is not set yet. It can't be until the endpoint exists.
+
+**What `agent-billing` does (one function, not two):**
+- `POST /agent-billing {action}` from the app:
+  - `status`: signed out → `{configured, mode, webhook_configured}` booleans only. Signed in → also re-syncs the agent's newest subscription from Stripe, so a missed or late webhook heals when they open Billing.
+  - `checkout` (agent only): creates or reuses the Stripe Customer (saves `stripe_customer_id`). Refuses with `already_subscribed` if a live sub exists and syncs it instead. Cancels leftover `unpaid`/`incomplete` subs. Returns a Checkout URL (subscription mode, `client_reference_id` + `subscription_data.metadata.profile_id`).
+  - `portal` (agent only): Customer Portal URL on Ohvara's own portal config.
+- `POST /agent-billing/webhook` from Stripe: verifies `Stripe-Signature` (5-min skew, multiple `v1` for secret rolls). Takes only the subscription id from the event and re-fetches the subscription, so out-of-order events can't write stale state. Non-2xx on Stripe/DB failure so Stripe retries.
+- **Why one function:** the subscription → profile mapping lives in one place, and multi-file deploys via MCP are untested here.
+- Price (`lookup_key ohvara_agent_weekly`, weekly, amount from `app_settings.agent_billing_weekly_cents`), Product and Portal config (found by `metadata.ohvara=agent_billing`; cancel at period end, card update, invoices, no plan switching) are **created on first use**. The only manual Stripe step is the webhook endpoint. If the display price changes, a new Price takes over the lookup key; existing subs stay on the old price.
+- Stripe-Version pinned to `2024-06-20`. Event parsing handles both old and new (basil) invoice shapes.
+- `return_url` is allow-listed (portal.ohvara.com, ohvara-dashboard.vercel.app, localhost). Anything else falls back to prod, so no open redirect.
+
+**Status mapping:** active/trialing → `active` (or `canceled` if cancel_at_period_end); past_due → `past_due` with grace = first failure + 48h, kept across later retries; incomplete → ids only, no access; canceled/unpaid/incomplete_expired/paused → `lapsed`. `exempt` profiles are never overwritten. Late events for an old, dead subscription are ignored.
+
+**Verified:** esbuild syntax check clean. A scratch node harness ran the real helpers, 12/12 pass: form encoding (nested + arrays), signature valid / rolled secret / tampered body / stale timestamp / missing header, both invoice shapes, non-subscription checkout ignored, open-redirect blocked, localhost allowed. Confirmed `profiles.email` exists. **Not verified:** any real Stripe call (needs the deploy), and the end-to-end subscribe/decline test.
+
+**⛔ What Brayden needs to do:** (1) deploy, either by approving it in CC or `supabase functions deploy agent-billing --no-verify-jwt --project-ref jjextitmbptoaolacocs`; (2) in Stripe test mode, add webhook endpoint `https://jjextitmbptoaolacocs.supabase.co/functions/v1/agent-billing/webhook` with events checkout.session.completed, customer.subscription.created/updated/deleted, invoice.paid, invoice.payment_failed; (3) set its signing secret as Supabase secret `STRIPE_WEBHOOK_SECRET`. Then CC does the e2e test and, with his go-ahead, go-live (live key, flip `agent_billing_enforced`, mark test accounts exempt).
+
+**Lesson:** for a Stripe integration where CC can't hold the key, make every Stripe object the code needs (price, product, portal config) self-provisioning and idempotent by lookup key/metadata. The only human step is then the webhook endpoint, which needs the dashboard anyway for its signing secret.
+
+Status: partial, blocked on Brayden (deploy + webhook secret). 673 stays in [[Ohvara CC Queue]] with a blocker note; next runnable item is 676.
