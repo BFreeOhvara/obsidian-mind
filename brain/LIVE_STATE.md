@@ -34,7 +34,7 @@ tags:
 
 ---
 
-**Prompt 673 PARTIAL 2026-10-02 — scaffolding live (`8bcb971`, mig 113); Stripe edge fn built (`5b7f4e3`) but ⛔ NOT DEPLOYED (CC classifier denied the deploy).** Agent billing ($350/week, agent pays Ohvara). `STRIPE_SECRET_KEY` (test) is set. Settings → Billing tab still reads "Billing isn't connected yet" until `agent-billing` is deployed; it lights up with no client redeploy. Enforcement (`app_settings.agent_billing_enforced`) is **off**; nobody is locked out or charged. See blocked section below. Full detail: [[Memories]] 2026-10-02.
+**Prompt 673 PARTIAL 2026-10-02 — scaffolding live (`8bcb971`, mig 113); `agent-billing` edge fn deployed (`5b7f4e3`, v1). ⛔ Waiting on `STRIPE_WEBHOOK_SECRET`.** Agent billing ($350/week, agent pays Ohvara). `STRIPE_SECRET_KEY` (test) is set. Settings → Billing now shows the Subscribe button to agents (test mode); without the webhook secret, status only syncs when the agent reopens Billing. Enforcement (`app_settings.agent_billing_enforced`) is **off**; nobody is locked out or charged. See blocked section below. Full detail: [[Memories]] 2026-10-02.
 
 ---
 
@@ -98,10 +98,10 @@ Brayden's own framing, worth keeping in mind while building rather than executin
 
 ---
 
-### ⛔ BLOCKED ON BRAYDEN — Prompt 673: deploy `agent-billing`, then the webhook secret
+### ⛔ BLOCKED ON BRAYDEN — Prompt 673: webhook endpoint + secret (deploy done)
 
 `STRIPE_SECRET_KEY` (test) is in. The `agent-billing` edge function is written, unit-tested and pushed (`5b7f4e3`), but **CC's auto-mode classifier denied the deploy**. It handles Checkout, Customer Portal, a status re-sync, and the Stripe webhook at a `/webhook` subpath. The $350/week Price, Product and Portal config create themselves on first use. Brayden:
-1. **Deploy it**, either way works: tell CC to deploy and approve the prompt, or run `supabase functions deploy agent-billing --no-verify-jwt --project-ref jjextitmbptoaolacocs` from `ohvara-dashboard`. `--no-verify-jwt` is required (Stripe's webhook has no user JWT; the function checks users itself).
+1. ✅ **Deployed 2026-10-02** (v1; `status` reports configured, test mode). Was: tell CC to deploy and approve the prompt, or run `supabase functions deploy agent-billing --no-verify-jwt --project-ref jjextitmbptoaolacocs` from `ohvara-dashboard`. `--no-verify-jwt` is required (Stripe's webhook has no user JWT; the function checks users itself).
 2. **Stripe (test mode) → Developers → Webhooks → Add endpoint.** URL: `https://jjextitmbptoaolacocs.supabase.co/functions/v1/agent-billing/webhook`. Events: `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.paid`, `invoice.payment_failed`.
 3. On that endpoint, reveal the **Signing secret** (`whsec_…`) and add it in Supabase → Edge Functions → Secrets as `STRIPE_WEBHOOK_SECRET`. Don't paste it in chat.
 4. Tell Eagle/Falcon. CC then runs the end-to-end test (card 4242 + a declining card) and, with Brayden's go-ahead, goes live: live key, flip `agent_billing_enforced`, mark test accounts `exempt`.

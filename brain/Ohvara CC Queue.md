@@ -21,7 +21,7 @@ tags:
 
 ## Prompt 673 — Agent billing: $350/week flat retainer via Stripe
 
-> **⛔ 2026-10-02 (CC, second pass): code done, deploy blocked.** `agent-billing` edge fn is built, unit-tested and pushed (`5b7f4e3`), but the CC auto-mode classifier denied `deploy_edge_function`. Brayden needs to deploy it (or allow the deploy), then create the webhook endpoint and set `STRIPE_WEBHOOK_SECRET`. Exact steps: [[LIVE_STATE]] "BLOCKED ON BRAYDEN — Prompt 673". After that, CC's remaining work is the end-to-end test + go-live. Next runnable item for CC is 676.
+> **⛔ 2026-10-02 (CC): `agent-billing` deployed (v1, `5b7f4e3`), waiting on the webhook secret.** Brayden needs to create the Stripe webhook endpoint and set `STRIPE_WEBHOOK_SECRET`. Exact steps: [[LIVE_STATE]] "BLOCKED ON BRAYDEN — Prompt 673". After that, CC's remaining work is the end-to-end test + go-live. Next runnable item for CC is 676.
 
 > **✅ UNBLOCKED 2026-10-02 — Brayden confirmed `STRIPE_SECRET_KEY` is set in Supabase secrets** (sandbox/test key, `sk_test_...`, from a Stripe Sandbox under the existing Ohvara Stripe account — the account itself is a leftover from a pre-pivot AI-agency idea and currently unused for anything live, but the sandbox keeps this build fully isolated from it regardless). Scaffolding already shipped (`8bcb971`, mig 113): schema, Settings → Billing tab, admin column and the access gate, with enforcement off. **CC: resume this item — build the Stripe edge functions + webhook now that the secret is in place.** A second secret, `STRIPE_WEBHOOK_SECRET`, will be needed once the webhook endpoint exists — flag that back to Brayden/Eagle when you reach that point rather than guessing a value.
 
