@@ -30,6 +30,10 @@ tags:
 
 ---
 
+**Security fix 2026-10-01 (`e9dcefd`, migration 109 live, unnumbered, found during Prompt 666):** any signed-in user could make themselves admin by updating `role` on their own `profiles` row. That's closed now. A trigger rejects non-admin, direct-from-API changes to `role`, `is_active`, `upline_id`, the Stripe fields, and system bookkeeping columns. Admins, edge functions, and server-side functions are unaffected. Full detail: [[Memories]] 2026-10-01.
+
+---
+
 **Prompt 666 shipped 2026-10-01 (`929091d`, migration 108 live), live call test still to do Friday.** Fulfillment can now call a client so the client sees the *agent's* number, and the rep says they're calling on the agent's behalf. Agents verify their cell once in **Settings → Caller ID**: Twilio calls them and they key in a 6-digit code shown on screen. The same tab has the agent's on/off kill switch. In the Cancellations work view, **Call client** rings the rep's own phone first, then connects them to the client. The rep needs a phone saved on their Profile. A visible "calling on behalf of {agent}, never say you are them" script line sits right under it. If the agent hasn't verified or has switched it off, it's the plain `tel:` link, same as before. Edge functions `agent-caller-id` + `start-agent-caller-id-call` are deployed. `CALLER_ID_TWILIO_ACCOUNT_SID`/`_AUTH_TOKEN` are confirmed set. **⚠️ Brayden, Friday:** (1) buy a Twilio number on the "Ohvara" sub-account and add it as Edge Function secret `CALLER_ID_TWILIO_FROM_NUMBER` (E.164, e.g. `+16025550100`). Until then, Call client says "No Twilio number to place calls from yet" and offers the direct dial. (2) Upgrade off trial, since trial can only call verified numbers. (3) Verify a real agent number and place one live test call. Screenshots (mock harness) are in `media/p666-caller-id/`. Full detail: [[Memories]] 2026-10-01.
 
 ---

@@ -260,3 +260,37 @@ Screenshots are in `media/p666-caller-id/` (1–5). **Not tested live:** no owne
 
 **Separate security finding, NOT fixed (out of scope, flagged):** `profiles_update_self` (qual `auth.uid() = id`, no column restriction) plus table-wide UPDATE grants let any signed-in user run `update profiles set role='admin'` on their own row. That is a privilege escalation. The same trigger pattern as migration 108 would close it. It needs its own prompt.
 Lesson: Twilio Caller ID verification is "we show the code, Twilio calls, the person types it." It is not an SMS OTP. Also, any new "verified/trusted" column on `profiles` needs a server-only write guard, because `profiles_update_self` is column-unrestricted. Status: built and deployed; live test pending Friday.
+
+[CC | 2026-10-01 — Profiles self-escalation FIXED (migration 109, unnumbered)] — This came out of the Prompt 666 finding, and Brayden asked for it to be done in-session. ohvara-dashboard `e9dcefd` pushed to master.
+**The hole:** `profiles_update_self` is `using (auth.uid() = id)` with no column limit, and `authenticated` holds UPDATE on every profiles column. So any signed-in agent or Fulfillment user could run `update profiles set role='admin'` on their own row from the browser console and become admin. They could also re-activate themselves, re-point `upline_id`, or swap `stripe_account_id`.
+**The fix:** migration `109_profiles_guard_privileged_columns.sql`, applied live. It adds a BEFORE UPDATE trigger, `profiles_guard_privileged`. When `current_user in ('authenticated','anon')` and the caller is not an admin (`is_admin()`), it raises 42501 ("Only an admin can change that part of a profile") if any of these change:
+- `role`, `is_active`, `upline_id`
+- `stripe_account_id`, `stripe_onboarding_complete`
+- `training_completed`, `last_batch_assigned_local_date`
+- `leaderboard_rank1_notified_month`, `goal_50/100_notified_month`
+- `created_at`
+
+**Who can still write those columns:**
+- Admins, via `profiles_admin_update`.
+- Edge functions using the service role (`current_user=service_role`).
+- The three postgres-owned security-definer functions that write profiles (`assign_daily_batches`, `recompute_leaderboard_rank`, `check_goal_milestones`), because `current_user=postgres` inside them.
+
+I chose `current_user` over `auth.role()` on purpose. Those definer functions fire from an agent's own request, so `auth.role()` there is still `authenticated`, and an `auth.role()` check would have broken the leaderboard and goal notifications.
+Self-service columns the app writes stay open:
+- Profile: name/email/phone/username, avatar
+- Settings: timezone, weekend leads, licensing, `caller_id_enabled`
+- Overview scope, `also_writes_business`
+
+I grepped every client `profiles` write to confirm none touch a guarded column.
+**Verified in rolled-back transactions, all correct:**
+1. Agent setting `role='admin'` is blocked.
+2. Agent setting `is_active` is blocked.
+3. Agent self-service fields are allowed.
+4. A payload with `role` unchanged is allowed (uses `is distinct from`).
+5. Admin changing another user's role and `is_active` is allowed.
+6. Service role setting `upline_id` / `last_batch_assigned_local_date` is allowed.
+7. A temp postgres-owned definer function called by an agent can write `goal_50`/`leaderboard` months.
+
+I confirmed zero residue afterwards, and both guard triggers (108 + 109) are present. I also corrected the misleading comment in `useSettings.js`.
+**Not touched:** I did not audit email/username edits. A user can set their own `profiles.email` to another person's address, but sign-in still needs that person's password, so it's not an escalation. It's worth a look if usernames ever become trust-bearing.
+Lesson: on any table where RLS is row-scoped but grants are table-wide, privileged columns need a trigger guard. In that guard, use `current_user` (API role vs. definer owner), not `auth.role()`, or server-side bookkeeping functions get blocked too. Status: done.
