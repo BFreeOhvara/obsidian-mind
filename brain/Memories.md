@@ -829,3 +829,16 @@ Status: done. Queue holds 673 only (waits on Brayden's go-live go-ahead).
 Lesson: changing a filter's default means auditing every deep link into the page, since links that relied on "no param = all" quietly change meaning.
 
 Status: done. Queue holds 673 only (waits on Brayden's go-live go-ahead).
+
+[CC | 2026-10-03 — Prompt 688 shipped: agent-side "Not picked up" → "Not started" copy rename] ohvara-dashboard `a15c50f` pushed. `vite build` passes. Copy only: no logic, data or migration change, `fulfillment_started_at` flag untouched. Not checked in a browser (no agent login).
+
+**Changed** (wording matches Fulfillment Overview's "Not started yet" concept):
+1. Overview tile: "Not picked up" → "Not started", sub "booked time passed, rep hasn't started".
+2. Overview attention banner: now "N booked times passed and the assigned rep hasn't started the call(s) yet."
+3. `StagePill` (`AgentUI.jsx`) and `BUCKET.missed` label (`agentBookings.js`, feeds My Clients status pill + pipeline bar) → "Not started". Comments updated.
+
+**Left alone, flag for Brayden/Eagle:** (a) `fulfillment/Pipeline.jsx:181` still says "Not picked up" on the Fulfillment side, which is out of scope until the Fulfillment polish pass. (b) `agent/Clients.jsx:220` timeline step "Picked up by <rep> / Fulfillment" is claim-era wording too but wasn't named in the prompt, so left; easy follow-up if wanted.
+
+Lesson: when a status is renamed on one side of the portal, grep both sides for the old label so the leftovers get queued deliberately instead of found by eye.
+
+Status: done. Queue holds 673 only (waits on Brayden's go-live go-ahead).
