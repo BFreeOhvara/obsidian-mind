@@ -785,3 +785,17 @@ Lesson: when a flag means two things ("has a rep" = "in progress"), auto-filling
 
 Status: done. Queue now holds 673 (waits on Brayden) and 685 (next).
 
+[CC | 2026-10-02 — Prompt 685 shipped: automatic hours from the scheduled shift, no clock-in, smaller header clock] ohvara-dashboard `60ad943` pushed to master. **Verified live:** portal.ohvara.com serves `index-BdTjpWLv.js`, same as the local build. No migration. 673 skipped (still waiting on Brayden's go-live go-ahead).
+
+**What changed:**
+1. **Manual clock-in/out is gone from the UI.** Deleted `ClockCard` and removed it from the Fulfillment Overview and Getting Paid. Removed the admin "On the clock" dot and "Close shift" tool.
+2. **Hours are computed from the schedule.** New `shiftSegments`/`workedHours` in `lib/payPeriod.js`: for each scheduled day in the Mon-Sun period, the shift (start to end, local time) counts as worked. Today's shift accrues as the day goes, so Estimated Pay climbs through the week; a past week shows the full total. Verified by script: Wed 3pm on a Mon-Fri 9-5 shift = 22h, last week = 40h, no shift = 0. Getting Paid tiles read "Hours worked"; the Time log became a **Shift log** (one row per scheduled day, "upcoming" for future days). The admin Fulfillment Pay table and per-rep editor use the same math.
+3. **Header clock smaller:** `LiveClock large` 44px -> 30px (padding and radius trimmed to match). The agent Overview's small clock is untouched.
+
+**Decision on the time-entry infrastructure:** migration 115's `fulfillment_time_entries` table and its guard trigger are left in the DB, untouched. I removed all frontend code that read or wrote it (`useClockIn`, `useClockOut`, `useTimeEntries`, `useAdminCloseEntry`) since nothing uses it now. **Flag: it's dead weight.** An admin-only override for days a rep didn't work their full shift would be a better fit as a per-day adjustment on top of the schedule, not a revival of clock punches. Say if you want that; otherwise the table can be dropped in a later migration.
+
+**Caveats:** shift times are read in the viewer's local timezone (same as before), so an admin in a different zone from a rep sees that rep's hours shifted by the offset only if the shift crosses midnight in the viewer's zone; the daily total is unaffected. Hours assume every scheduled shift was worked; there is no way to dock a missed day until the override above exists. **Not done:** signed-in visual check (no creds, same standing gap).
+
+Lesson: when replacing a manual input with a derived value, delete the UI and its hooks together but leave the data layer for the owner to decide on.
+
+Status: done. Queue now holds only 673 (go-live waits on Brayden).
