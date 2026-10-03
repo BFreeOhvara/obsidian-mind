@@ -799,3 +799,19 @@ Status: done. Queue now holds 673 (waits on Brayden) and 685 (next).
 Lesson: when replacing a manual input with a derived value, delete the UI and its hooks together but leave the data layer for the owner to decide on.
 
 Status: done. Queue now holds only 673 (go-live waits on Brayden).
+
+[CC | 2026-10-02 — Prompt 686 shipped: My Pipeline matches Restorix (coloured pills, full-width search, row size, contained scroll)] ohvara-dashboard `610f182` pushed. `vite build` passes. **Not checked in a browser:** the page needs an agent login, which CC can't enter, so the layout is unseen. No migration.
+
+**What changed:**
+1. **Each status has its own colour, "All" pill removed.** Booked purple, Not picked up amber, In progress blue, Cancelled green. Chips tint at rest and strengthen when selected; clicking the selected chip clears the filter. `Pipeline` got a `showAll` prop (default true), so Fulfillment's team Pipeline keeps its All pill and neutral chips.
+2. **Row badges follow the same colours** (item 1's optional part, done): `STAGE.booked` tone went `muted` to new `purple`, which also recolours Booked on Overview and Fulfillment pills. Booked's chip dot is purple too.
+3. **Full-width search** on its own row. Count/agent filter/range chip/Book a call sit on the row beneath it.
+4. **Count label** is "13 leads" (filtered count), not "X of Y clients".
+5. **Taller rows:** `ClientRow` got a `tall` prop (22px vertical padding vs 14px), used only on My Pipeline.
+6. **Contained scroll:** page column is `calc(100dvh - 160px)` (header 64 + main padding 32/64), the list card is `flex:1; overflow-y:auto` with a sticky header row, so only the list scrolls. Filter/search/query logic untouched.
+
+**Caveat:** the 160px figure is hard-coded to the layout's header and padding. If DashboardLayout's main padding changes, a page scrollbar can return.
+
+Lesson: a shared component needs a defaulted prop for a one-page change, so other pages keep their look.
+
+Status: done. Queue holds 673 only (waits on Brayden's go-live go-ahead).
