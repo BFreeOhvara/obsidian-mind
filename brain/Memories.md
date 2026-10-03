@@ -732,3 +732,56 @@ Status: done. Queue now holds only 673 (go-live waits on Brayden).
 [CC | 2026-10-02 — Prompt 683 shipped: Getting Paid promoted to its own Work nav tab] ohvara-dashboard `717b0c0` pushed to master (local `vite build` clean; Vercel deploy not separately checked). No migration. Fulfillment-rep nav: **Getting Paid** (Wallet icon) added to the Work group after Pipeline, new route `/fulfillment/getting-paid` (fulfillment role only) with a thin page wrapping the unchanged `GettingPaidPanel`. The rep's Settings tab is removed; admin's **Fulfillment Pay** Settings tab is untouched. Label kept as "Getting Paid" per spec; Brayden can rename after seeing it live. **Not done:** signed-in visual check (no creds, same standing gap). Lesson: read-modify-write on this queue file raced before (P683 vanished once) — re-read right before editing.
 
 Status: done. Queue now holds only 673 (go-live waits on Brayden).
+
+[CC | 2026-10-02 — Prompt 684 recon only, paused on model-upgrade flag] No code changed, nothing committed to ohvara-dashboard. 673 skipped (still waiting on Brayden's go-live go-ahead). 684 is labeled "Opus job" and touches DB triggers plus agent, fulfillment and messages semantics, so CC flagged it and stopped for a model switch. **Recon findings:** (1) `scheduled_call_at` is a real agent-picked 30-minute slot (`lib/scheduling.js`), safe to route against. (2) Call client (P666) lives only in `FulfillmentQueue.jsx` WorkView; Twilio never live-tested (`CALLER_ID_TWILIO_FROM_NUMBER` unset, account on trial) — Brayden must buy a number and upgrade. (3) Claiming is client-side only (`useClaimCancellation`, "Claim & start" on desk + Pipeline); agent side's `stageOf` treats any `assigned_fulfillment_id` as "In progress", and `useRescheduleBooking` is guarded on unassigned, so both break once rows are auto-assigned. **Planned design:** BEFORE INSERT/UPDATE trigger (migration 116) picks a rep: skip reps with an open call within 30 min of the slot, then least-loaded, then longest-since-last-assigned; overflow still assigned (never orphaned) and flagged if every rep conflicts. Assignment leaves stage `Pending`; a new `fulfillment_started_at` flips it to `In Progress` on first action so agent "Booked/In progress" stay meaningful. Reschedule guard moves to stage `Pending`; "Release" becomes "Pass to another rep" RPC; desk rebuilt around one active record with the call control on top; tile copy reworked. Status: superseded — shipped on Opus, see the next entry.
+
+[CC | 2026-10-02 — Prompt 684 shipped: Fulfillment desk auto-assignment, no claiming] ohvara-dashboard `8577c91` pushed to master. **Verified live:** portal.ohvara.com serves `index-ChbV6d9h.js`, same as the local build. **Migration 116 applied live.** 673 skipped (still waiting on Brayden's go-live go-ahead).
+
+**What the recon found:** (1) the times on desk cards are `scheduled_call_at`, a real 30-minute slot the agent picks in Book a call, so routing uses it. (2) Call client (P666) already did what "dial pad / call system" asked for. It only needed to move to the top of the desk. **Not built:** a free-type numeric dial pad. That's a separate, smaller add if Brayden still wants one.
+
+**Assignment (migration 116, all in the DB so it happens no matter who has a page open):**
+- `fulfillment_pick_rep` picks a rep in this order: (a) skip any rep with an open call within 30 minutes of the slot (per rep, so two reps can share a slot), (b) fewest open items, (c) longest since their last assignment.
+- **Decision: least-loaded, not round robin.** Round robin keeps feeding a rep who's buried in "waiting on carrier" items. Least-loaded corrects itself.
+- **Decision: when every rep already has a call in that half hour, it still assigns to the least-loaded rep instead of leaving it unassigned.** An unassigned booking would sit where no one sees it. The desk shows an "Overlaps another call" pill so the overlap is visible.
+- A `BEFORE INSERT/UPDATE` trigger assigns on booking. On reschedule (not-started items only) it re-checks the rep and keeps them if they're free at the new time.
+- `fulfillment_pass_on(policy)` replaces "Release to queue". The rep or an admin hands the item to a different rep and it resets to not-started. Errors if nobody else is free.
+- `fulfillment_assign_unassigned()`: the desk calls it on load to place anything booked while no rep was active.
+- A new `fulfillment_assigned` notification goes to the rep (the bell opens the item on the desk).
+- **Assigned is not started.** New column `fulfillment_started_at` is stamped server-side and can't be spoofed. An item stays `Pending` until the rep's first action (call client, set a carrier status, save notes), then goes `In Progress`.
+- `fulfillment_claimed_at` now means "assigned at".
+- Backfill: started_at = claimed_at for the 3 in-progress rows. The 4 unassigned P682 sample rows went to Test Fulfill, with no notifications.
+
+**Frontend:**
+- Desk rebuilt around one active record:
+  - **Priority order:** mid-carrier-call, then calls due now or overdue, then started items waiting on carrier/client, then later calls, then no-time items.
+  - The record pins in the URL once the rep acts on it, so a priority change can't swap the client out from under them.
+  - Mark cancelled shows "Just finished", then "Next: <name>".
+  - Rest of the queue is listed underneath. Admin sees every rep's desk with the rep named, and can Reassign.
+- Tiles: On your desk / Calls left today / Needs attention / Cancelled today.
+- Agent side: `stageOf` now says In progress only once the rep has started, so "Booked" and "Not picked up" still mean something. Reschedule is now guarded on stage Pending, not on unassigned (it would otherwise have broken, since every booking now has a rep).
+- Pipeline: claim button removed, "Unclaimed" → "Unassigned", timeline is Booked → Assigned → Started → Cancelled.
+- Overview: "Waiting to claim" → "Not started yet".
+- Stale/overdue flags reworked for items assigned days ahead.
+- Claim-era copy updated in Messages and the page subtitle.
+
+**Verified:**
+- Rolled-back live transactions, using Test Agent temporarily flipped to a second rep:
+  - least-loaded pick; same-slot booking goes to the other rep; triple-booking overflows to the least-loaded rep
+  - reschedule keeps a free rep, moves off a conflict
+  - notification fires
+  - started_at stamped and can't be spoofed
+  - pass_on works; a non-assignee is blocked
+  - `fulfillment_pick_rep` can't be called directly
+- ESLint clean on touched files, apart from the 3 `usePolicies.js` errors that were already there. Build clean.
+- Mock-harness check: rep dark/light, rep 375px with no horizontal scroll, admin. Pinning and Mark cancelled → Next click-through pass. Harness deleted before commit.
+
+**Not done:**
+- Real signed-in click-through (no creds, same standing gap).
+- The multi-rep logic has only been exercised in tests. Only one active rep (Test Fulfill) exists, so it gets a real workout once headcount grows.
+
+**Brayden to do:** Call client is still untested live. `CALLER_ID_TWILIO_FROM_NUMBER` is unset and Twilio is on trial: buy a number on the sub-account and upgrade off trial. Until then the desk falls back to a plain dial from the rep's phone.
+
+Lesson: when a flag means two things ("has a rep" = "in progress"), auto-filling it breaks every reader of the second meaning. Split it into its own state before automating.
+
+Status: done. Queue now holds 673 (waits on Brayden) and 685 (next).
+

@@ -38,3 +38,13 @@ tags:
 **Not yet decided, Opus's call once building:** grace-period behavior on a failed payment (immediate access cutoff vs. some buffer) and exactly what "access paused" looks like in the UI (locked overlay vs. read-only) — document the decision and why in the ship note.
 
 **Log in the ship note:** whether a Stripe account/keys were present and usable (and whether it's the same account as the old dead Payouts integration or a new one), the exact migration applied, and — if blocked — exactly what Brayden needs to go create, mirroring how Prompt 393/666's blockers are written.
+
+## Prompt 685 — Drop manual clock-in, compute hours from scheduled shift automatically; shrink header clock
+
+Direct follow-up to the Fulfillment Overview/Getting Paid build (681/683), based on Brayden looking at the live Overview page.
+
+**1. Remove the manual clock-in/out system entirely — hours should be automatic, not punched in.** Brayden: doesn't want a "Clock in" button or "Off the clock" state at all; reps should just have automatic work hours based on their set shift. Remove the "Off the clock ... Clock in" card from the Overview page, and the equivalent clock in/out control on the Getting Paid page. Replace the "hours logged" calculation (wherever it's shown — Overview tiles if relevant, Getting Paid's Hours Logged / Estimated Pay) so it's computed automatically from the rep's scheduled shift (already set by admin in Settings → Fulfillment Pay — shift days/start/end) intersected with the current pay period, rather than from actual clock-in/out timestamps. In short: assume a rep worked their assigned shift automatically; no punching in required.
+
+**Don't destructively drop the underlying time-entry infrastructure (migration 115's `fulfillment_time_entries` table/trigger)** built for this — just stop surfacing the manual clock UI to reps and stop depending on actual entries for the hours/pay math. If Opus judges there's still a clean use for it (e.g. an admin-only correction/override tool for days a rep didn't work their full scheduled shift), that's fine to keep latitude on, but document the decision either way in the ship note. If it's genuinely dead weight with automatic scheduling in place, flag that too rather than leaving silently unused code.
+
+**2. Shrink the large header clock a bit.** Prompt 682 made it "exponentially larger" per Brayden's ask at the time; now he wants it dialed back down — his words, "a little bit smaller." Real latitude on exact sizing, Opus's call — just noticeably smaller than its current size, not a full revert to the original small clock.
