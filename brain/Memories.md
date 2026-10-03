@@ -794,7 +794,7 @@ Status: done. Queue now holds 673 (waits on Brayden) and 685 (next).
 
 **Decision on the time-entry infrastructure:** migration 115's `fulfillment_time_entries` table and its guard trigger are left in the DB, untouched. I removed all frontend code that read or wrote it (`useClockIn`, `useClockOut`, `useTimeEntries`, `useAdminCloseEntry`) since nothing uses it now. **Flag: it's dead weight.** An admin-only override for days a rep didn't work their full shift would be a better fit as a per-day adjustment on top of the schedule, not a revival of clock punches. Say if you want that; otherwise the table can be dropped in a later migration.
 
-**Caveats:** shift times are read in the viewer's local timezone (same as before), so an admin in a different zone from a rep sees that rep's hours shifted by the offset only if the shift crosses midnight in the viewer's zone; the daily total is unaffected. Hours assume every scheduled shift was worked; there is no way to dock a missed day until the override above exists. **Not done:** signed-in visual check (no creds, same standing gap).
+**Caveats:** shift times are read in the viewer's local timezone (same as before), so an admin and a rep in different zones can see slightly different accrued hours for the current day. Hours assume every scheduled shift was worked; there is no way to dock a missed day until the override above exists. **Not done:** signed-in visual check (no creds, same standing gap).
 
 Lesson: when replacing a manual input with a derived value, delete the UI and its hooks together but leave the data layer for the owner to decide on.
 
