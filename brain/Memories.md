@@ -815,3 +815,17 @@ Status: done. Queue now holds only 673 (go-live waits on Brayden).
 Lesson: a shared component needs a defaulted prop for a one-page change, so other pages keep their look.
 
 Status: done. Queue holds 673 only (waits on Brayden's go-live go-ahead).
+
+[CC | 2026-10-03 — Prompt 687 shipped: My Pipeline popup, Booked default, search across all statuses, layout] ohvara-dashboard `02f66b6` pushed. `vite build` + eslint pass. **Not checked in a browser again:** still no agent login available to CC, so the page is unseen. No migration.
+
+**What changed:**
+1. **Lead detail is a popup** (`ClientModal` in `Clients.jsx`, portal, same overlay/surface as `PolicyModal`, Esc/backdrop closes, scroll-locked). Same content as before; the inline accent bar/border was dropped from `ClientDetail`. The open lead is looked up from all rows, so an Overview link (`?open=`) opens it whichever pill is selected.
+2. **Default pill is Booked** (`?stage=` absent = booked; clearing a pill writes `stage=all`). Because of that, Overview's "Booked this week" and "With Fulfillment" tiles now link with `stage=all` so they keep showing every status.
+3. **Search ignores the pills:** the status filter only applies when the box is empty. Range chip and admin agent filter still scope it.
+4. **Book a call button removed** from the page.
+5. **Lead count moved above the search bar, right-aligned** (same row as the admin agent filter / range chip).
+6. **Pills are one connected rounded bar** (`Pipeline` `grouped` mode, only when `showAll={false}`, so Fulfillment's Pipeline is untouched). Per-status colours kept.
+
+Lesson: changing a filter's default means auditing every deep link into the page, since links that relied on "no param = all" quietly change meaning.
+
+Status: done. Queue holds 673 only (waits on Brayden's go-live go-ahead).
