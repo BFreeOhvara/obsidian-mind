@@ -879,3 +879,14 @@ Status: done. Queue holds 673 only (waits on Brayden's go-live go-ahead).
 Lesson: before writing a trigger function over a policies column, check its real type (`\d policies`); enums don't implicitly cast to `text` function params. Run the rollback test straight after apply, because a broken AFTER trigger blocks every write to the table.
 
 Status: done. Queue holds 673 (waits on Brayden), 691, 692.
+
+
+[CC | 2026-10-04 — Prompt 691 shipped: agent Billing promoted to its own tab] ohvara-dashboard `407810e` pushed to master. No migration. `vite build` passes; lint clean on touched files (one pre-existing `set-state-in-effect` error in DashboardLayout.jsx:101, untouched). **Not checked in a browser** (no agent login). 673 skipped (still waiting on Brayden's go-live go-ahead).
+
+Same treatment as P683's Getting Paid. `BillingPanel` moved verbatim from `Settings.jsx` to `components/agent/BillingPanel.jsx`; new page `pages/agent/Billing.jsx` at `/agent/billing` (agent-only, like the old tab). Sidebar: "Billing" (CreditCard icon) under Work after Activity, before Team. The Billing tab is gone from Settings.
+- **Links repointed:** BillingGate's "Go to Billing" / "Fix payment" now go to `/agent/billing`, and the lock screen lets `/agent/billing` through as well as `/settings`. The Stripe return URL in `lib/billing.js` is now `/agent/billing`.
+- **Old links still work:** `/settings#billing` redirects to `/agent/billing`. That covers bookmarks and Stripe sessions opened before the move. The `agent-billing` edge fn's `DEFAULT_RETURN` (used only when a return_url fails the origin allowlist) still says `/settings#billing`. It was left alone to avoid a redeploy for no gain, since the redirect catches it. Change it next time that function gets deployed (P692 will likely touch it).
+
+Lesson: when moving a page, grep for its hash/route in edge functions and return URLs too, not just nav. Billing had links in the gate, the Stripe return URL and the edge fn default.
+
+Status: done. Queue holds 673 (waits on Brayden) and 692.

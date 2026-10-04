@@ -40,10 +40,6 @@ tags:
 
 **Log in the ship note:** whether a Stripe account/keys were present and usable (and whether it's the same account as the old dead Payouts integration or a new one), the exact migration applied, and — if blocked — exactly what Brayden needs to go create, mirroring how Prompt 393/666's blockers are written.
 
-## Prompt 691 — Promote agent Billing out of Settings into its own top-level tab
-
-Same treatment Prompt 683 already gave Fulfillment's "Getting Paid" panel — Billing is something an agent will check regularly (current status, days until the next $350/week charge, per Prompt 677's countdown), not a configure-once setting. Move the existing `BillingPanel` out of Settings and into its own top-level nav item under Work, alongside Book a call / My Pipeline / Activity. Keep its current content and functionality as-is (status, countdown, Stripe-hosted Checkout/Customer Portal links) — this is a navigation/placement change only, not a rebuild. Remove the now-duplicate Billing tab from inside Settings once promoted.
-
 ## Prompt 692 — Three-tier agent billing by weekly submission cap: $350 (7/week), $500 (14/week), room for a third tier
 
 Extends Prompt 673's billing build, doesn't replace it. Brayden wants a second, higher-priced tier so agents have an upgrade option, not just one flat plan. Decided differentiator (confirmed with Brayden directly, not guessed): a **weekly submission cap**. Standard ($350/week) caps how many cancellation submissions get worked per week; Premium ($500/week) raises or removes that cap. Ties the upgrade directly to what agents are actually paying for (volume of work done), and is easy to meter since submissions are already tracked per agent.
