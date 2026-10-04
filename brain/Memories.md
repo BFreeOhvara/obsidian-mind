@@ -863,3 +863,19 @@ Status: done. Queue holds 673 only (waits on Brayden's go-live go-ahead).
 Lesson: before building "live" state, check whether the system emits any real start/end event; when it doesn't, make the declaration explicit and add a staleness flag instead of implying liveness.
 
 Status: done. Queue holds 673 only (waits on Brayden's go-live go-ahead).
+
+[CC | 2026-10-04 — Prompt 690 shipped: agent Activity tab (chronological log)] ohvara-dashboard `8936b99` pushed to master. **Migration 118 applied live** (`policy_events`). `vite build` passes, lint clean on touched files. Trigger tested live inside a rolled-back block. RLS checked with a simulated agent JWT: the agent reads its own events and can't insert. **Not checked in a browser** (no agent login). 673 skipped (still waiting on Brayden's go-live go-ahead).
+
+**Recon: there was no event history.** `policies` only held current state (P689's derived status). There was no trail of No answer → In progress → Rescheduling, only the last outcome plus an attempt count. Building the tab meant adding a log first.
+
+**Migration 118:** `policy_events` (policy, agent, kind, from_status, actor id/name/role, detail jsonb, at). An AFTER INSERT/UPDATE trigger on `policies` (`policy_events_log`) writes it, so every path is captured the same way without app code remembering to log: rep RPCs, Mark cancelled, pass-on, admin edits and the agent moving the time. Status comes from `policy_agent_status()`, a SQL mirror of `stageOf()`. An event fires only when what the agent *sees* changes. A repeat "Call client" while live logs nothing.
+- Kinds: `booked`, `in_progress`, `no_answer`, `rescheduling` (with reason), `cancelled` (with confirmation), and `moved` (booked time changed; not logged once cancelled). A status going back to Booked logs `booked` with `from_status` set ("Back to Booked").
+- RLS: select only, `exists (policies row)`, so it inherits policies RLS (agent: own + downline; admin: all; fulfillment: assigned pool). No write policies, and insert/update/delete revoked from anon/authenticated.
+- **Backfill (22 rows, `detail.backfilled = true`, no actor):** only what timestamps prove. That's 13 bookings, 3 latest Rescheduling outcomes and 6 cancellations. Attempts before 2026-10-04 were never recorded and were not invented; the page footer says so.
+- **Gotcha hit:** `fulfillment_stage` is an enum (`fulfillment_stage_status`), so passing it to a `text` function failed. The first apply briefly put a trigger live that would have errored on every policy update. It was caught by the rollback test minutes later and fixed with `::text` (follow-up migration `118b_policy_events_enum_cast`; the repo's 118 file has the final version).
+
+**UI:** `/agent/activity`, "Activity" nav item under Work after My Pipeline (History icon); admin gets it in the Agents group and sees every agent (test account held out, agent named per row). The feed is reverse-chronological and grouped by day (Team-feed style). Each row shows client name, status pill, what changed and who did it ("Sam (Fulfillment) started a call (attempt 2)", "Call ended: needs another call · Waiting on client", "Call moved to …"), plus the time. Fulfillment messages are read straight from `policy_messages` (not copied) as a one-line preview, and tapping one opens `/messages?thread=`. Tapping an event opens the client popup on My Pipeline (`?stage=all&open=`). Filters: Everything / Status changes / Messages, and 7 / 30 / 90 days. Polls every 30s.
+
+Lesson: before writing a trigger function over a policies column, check its real type (`\d policies`); enums don't implicitly cast to `text` function params. Run the rollback test straight after apply, because a broken AFTER trigger blocks every write to the table.
+
+Status: done. Queue holds 673 (waits on Brayden), 691, 692.
