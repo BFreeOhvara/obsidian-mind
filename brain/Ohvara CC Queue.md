@@ -80,19 +80,3 @@ tags:
 - **Stop at:** a real SMS-capable Twilio number + completed A2P 10DLC registration. Check first whether the existing `CALLER_ID_TWILIO_FROM_NUMBER` is already SMS-capable before assuming a second number is needed. Flag exactly what Brayden needs to go do, mirroring how Prompt 393/666/673's blockers are written, and build/verify everything that doesn't depend on it in the meantime.
 
 Scope note: still layers on top of Prompt 695's No answer status/color/layout work, which stands as-is — this prompt is the automated recovery behavior running underneath that same status.
-
-## Prompt 698 — Activity page: fix how Prompt 694 actually shipped (box sizing, row-clean bottom edge, date nav pulled outside the box + made clickable)
-
-Brayden reviewed the live build of Prompt 694 and it's not quite right — four fixes to the same page, no change to the underlying single-day query/event log itself.
-
-**1. Remove the footer disclaimer text entirely** ("Activity is logged from Oct 4, 2026. Bookings from before then show their booking, their latest call outcome and their cancellation, but not every call attempt in between. Tap a row to open the client.") — gone, not just shortened.
-
-**2. Make the list box bigger.** Expand it to use the space freed by removing the footer text above, and generally extend it further down the page — close to the bottom of the viewport, not flush against it, leaving a reasonable margin. Internal-scroll-only behavior from 694's original spec stays: the box itself scrolls, the page around it does not.
-
-**3. The box must not cut a row in half at its bottom edge on a fresh load.** Right now the box's fixed height ends mid-row (see "Test Client Sample Data 8 BOOKED" sliced at the bottom in the screenshot). On initial render for a given day, size/clip the visible area so it only ever shows complete rows — if the next row doesn't fully fit, it shouldn't be partially shown, the box's resting state should end cleanly at the last fully-visible row. The user can still scroll to see more rows below that point; this is about the default/initial display only, not about disabling scroll.
-
-**4. Pull the date-nav control (the arrows + "October 2 · Friday" label) out of the box and place it above the box as its own separate element** — this currently reads as merged into the box's top edge/header; Restorix's My Recordings page (the original reference for this whole feature) has it floating above a separate bordered list, not inside it. Match that.
-
-**5. Make the date label itself clickable, opening a calendar/month picker** for jumping directly to an arbitrary date — not just incremental day-by-day via the arrows. Same interaction Restorix's own date control supports: open the picker, step back a month if needed, click the exact day. This is specifically so going back further than a day or two doesn't mean spamming the arrow repeatedly.
-
-Scope note: still page-chrome only — the single-day query, per-entry row content, and the rest of 694's spec (tabs removed, messages excluded) are unaffected and already correct; this is only the four things above.

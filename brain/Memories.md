@@ -960,3 +960,14 @@ Status: built and deployed, inert. 696 stays in [[Ohvara CC Queue]] with a block
 [CC | 2026-10-04 — Prompt 697 shipped: agent sidebar Billing above Settings] ohvara-dashboard `0433007` pushed to master. One-line reorder in `Sidebar.jsx` (Account group: Billing, then Settings). No migration, no other nav change. Not built or checked in a browser (agent-auth gated, two-line array swap). 673 and 696 skipped (both waiting on Brayden). Next in queue: 698.
 
 Status: shipped.
+
+[CC | 2026-10-04 — Prompt 698 shipped: Activity page layout fixes] ohvara-dashboard `179f8eb` pushed to master. `vite build` passes, eslint clean. **Not browser-verified** (agent-auth gated). No migration; query and row content untouched.
+
+- Footer disclaimer (GapNote) removed.
+- Date control moved out of the box to sit above it as its own element: ← [calendar icon · October 4 · Today] →. The label is a button that opens a month picker (prev/next month, click a day, future days disabled, closes on outside click or Esc). Built from agent tokens in `Activity.jsx`; `DayFilterBar`'s calendar not reused (hard-coded dark panel, rep-dialer baggage).
+- Box now sized to the viewport: its top to ~68px above the bottom (main's 64px bottom padding + border, so the page itself doesn't scroll). `fit()` measures rows (`data-row`) and, when the day overflows, pulls the box bottom up to the end of the last fully-visible row so a fresh load never slices one. Re-runs on data change and window resize; scrolling inside still reaches the rest. If every row fits, the box keeps the full available height (min 160px).
+- To eyeball when logged in: a day with many events (clean bottom edge), a day with few/none, a narrow window, and the picker jumping back a month+.
+
+Lesson: to end a scroll box on a whole row, measure the rows' offsets and set the box height to the last full row's bottom, rather than guessing a row height.
+
+Status: shipped. Queue now holds 673 (waits on Brayden's go-ahead) and 696 (waits on SMS-capable Twilio number + A2P 10DLC).
