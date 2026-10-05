@@ -39,3 +39,75 @@ tags:
 **Not yet decided, Opus's call once building:** grace-period behavior on a failed payment (immediate access cutoff vs. some buffer) and exactly what "access paused" looks like in the UI (locked overlay vs. read-only) — document the decision and why in the ship note.
 
 **Log in the ship note:** whether a Stripe account/keys were present and usable (and whether it's the same account as the old dead Payouts integration or a new one), the exact migration applied, and — if blocked — exactly what Brayden needs to go create, mirroring how Prompt 393/666's blockers are written.
+
+## Prompt 695 — My Pipeline: visual cleanup pass + drop "Rescheduling" (merge into No answer)
+
+Direct follow-up to Prompt 686's visual pass and Prompt 689's status model — Brayden reviewed the live page and wants four layout fixes plus a status-model simplification.
+
+**1. The row connector line should render after every row, including the last.** Right now each row's call-time icon has a vertical line running down to the next row's icon, but the last row has no line below it since there's no next row to connect to. Keep drawing that trailing segment on the last row too, even with nothing below it to connect to — don't conditionally suppress it just because it's the final row.
+
+**2. Remove the "19 older records from the pre-pivot submission flow aren't shown here" footer line entirely**, and grow the list box to fill the vertical space that frees up.
+
+**3. Collapse the header onto one line.** Right now the status-filter pills sit on their own row, then there's a visible gap, then "N leads" sits right-aligned on its own row just above the search bar — reads as an awkward double gap. Merge these onto a single row: status pills on the left, "N leads" on the right, same line. Then normalize the vertical rhythm so three gaps read as even: (header row → search bar) should equal (search bar → list box), not one row floating with extra space above it.
+
+**4. Remove the "Rescheduling" status entirely — merge its leads into "No answer."**
+
+Brayden's own reasoning, worked through live with Eagle: a booked call either gets answered or it doesn't. "No answer" already covers a call that never connects. What Prompt 689 added — the "call connected, but the carrier didn't confirm cancellation" outcome — got built as its own "Rescheduling" status, but functionally it needs the exact same remediation as a true no-answer: get the lead back on the books and try again. Brayden asked directly what that remediation flow should look like — answered and decided below.
+
+**Decision (Eagle's call):**
+- Both failure outcomes — call never connects, *and* call connects but doesn't resolve — now land on the single "No answer" status. Don't keep two statuses that both just mean "try again."
+- The live-call mechanics from Prompt 689 (In progress = literally live, the live indicator, call start/end tracking) are unchanged — only the terminal "not resolved" outcome changes: it now flips to No answer instead of to Rescheduling.
+- **Remediation path — reuse what already exists, don't build new UI:** a No-answer lead gets a clear re-book action on its row (reuse the existing Book-a-call flow, pre-filled with that lead's client/policy info) rather than a bespoke "reschedule" control. Taking that action sets a new scheduled time and flips status back to Booked, same as a first-time booking. No separate queue/section needed — the No-answer pill plus a re-book action on the row is enough, consistent with how Booked/In progress/Cancelled already work here.
+- **Data migration — handle existing rows, don't just drop the value.** Any leads currently sitting in Rescheduling need to move to No answer as part of this change. Check whether `status` is a native Postgres enum or a text column with a check constraint before altering it — a native enum type can't have a value dropped directly (requires recreating the type) — document whichever path was taken and why in the ship note.
+- Anything else keyed off "Rescheduling" (Activity log entries from Prompt 690, Needs-attention surfacing from 689, Overview tiles) needs to key off No answer instead — grep for the old status value across the codebase rather than only fixing the one place it's visibly rendered.
+
+**5. Recolor the remaining statuses** (Cancelled's existing green is untouched, not part of this prompt):
+- No answer → gray
+- Booked → blue
+- In progress → yellow
+- Apply the same colors to the per-row status badges in the STATUS column, not just the filter pills, per the consistency note already flagged in Prompt 686.
+
+Scope note: this touches My Pipeline's layout/chrome, the status enum/constraint, the call-end resolution logic from Prompt 689, and anywhere else "Rescheduling" is read or written. Don't touch Book a call's own form beyond making sure it's reachable/pre-fillable from a No-answer row.
+
+## Prompt 696 — No-answer recovery: text → text → one locked retry call → confirm number → morning+evening text next day → hand off to the agent
+
+**Blocked on a real external step, same category as Stripe/Twilio-voice (Prompts 393/666/673): needs an SMS-capable Twilio number registered for A2P 10DLC before any SMS actually sends.** CC should build everything up to that point and stop there, flagged exactly like those — don't guess at a workaround.
+
+**Sixth and final pass — supersedes the version just before this one in this file. Brayden confirmed this is the last open piece of the design.** Only change from the prior pass is pinning down exact Phase 2 timing.
+
+**Phase 1 — the locked retry day (unchanged):**
+
+1. Original booked call ends in **No answer.** Immediately, a text fires (agent must have the opt-in toggle on, per this prompt's first pass): acknowledges the missed call, says a retry is already locked for the same time tomorrow, gives the self-serve reschedule link (with an "ASAP" option, not just specific times). **If the client uses that link to pick a new date/time, the lead flips straight back to Booked — done, no further steps.**
+2. At that same moment, the next-day retry slot is reserved for real in the actual assignment/booking system (Prompt 684's logic) — **must block double-booking.**
+3. If no response by the next morning (~9:00–9:30 AM local, configurable): a second text fires, same reschedule link, reminding them of today's scheduled retry.
+4. If still no reply: the locked retry call happens at the original time.
+   - Resolves → Cancelled, done.
+   - No answer again → stays status **No answer**. Full cap on Phase 1: one retry day, two texts, two calls total — not an open loop.
+
+**Checkpoint: pause everything, require the agent to confirm the number.** After the second no-answer, stop all automated texting and stop auto-booking any further retry calls. The lead surfaces with an explicit "Confirm this is the right number for this client" action. Nothing further runs until the agent does that — and the agent can do this at any time of day, which is what this pass pins down.
+
+**Phase 2 — post-confirmation, exactly one day, two texts, then hand off (this is the piece that changed):**
+
+- The agent can confirm the number at any time of day — don't fire anything the moment they confirm. **Wait for the next fresh calendar day after confirmation**, then:
+  - A **morning text** (~9:00–9:30 AM local, same default as Phase 1's reminder time), same reschedule link.
+  - An **evening text** later that same day (default ~6:00–7:00 PM local — real latitude on the exact hour, Opus's/CC's call, just make it configurable rather than hardcoded) — same reschedule link.
+- **If there's no response to either of those two texts by end of that day, the agent gets notified to call the client themselves and try to rebook.** This is the full and final cap on Phase 2 — exactly one day, two texts, no calendar slot reserved at any point in this phase, then a clean handoff to a human. Automation for this lead ends there.
+
+**Surfacing, not a new status:** keep the attempt/phase visible on the No-answer badge wherever it shows (My Pipeline, Needs Attention) — e.g. "No answer · retry tomorrow," "No answer · needs number check," "No answer · follow-up (AM sent)," "No answer · follow-up (PM sent)," "No answer · call agent directly."
+
+**What CC should build now, up to the blocker:**
+- The Settings opt-in toggle (unchanged, default off, one-time consent).
+- Per-lead attempt tracking: phase (1 or 2), both Phase-1 texts' sent/responded state, the retry call outcome, confirmed-number flag + timestamp, Phase-2's AM/PM text sent/responded state.
+- Text 1 (immediate) + the self-serve reschedule link with specific-time and ASAP options, parsed only through that link flow — not freeform reply parsing.
+- The real, slot-blocking next-day retry booking — reuse Prompt 684's assignment/slot logic, must prevent double-booking.
+- Text 2 (next-morning reminder, ~9 AM default, configurable).
+- The hard pause + "confirm the number" agent action after the second no-answer — confirmable at any time, doesn't trigger anything until the next calendar day.
+- Phase 2: the next-day AM + PM texts, same reschedule-link mechanism, no calendar slot reserved.
+- The final handoff notification to the agent ("call this client yourself and rebook") once both Phase 2 texts are exhausted with no resolution — this ends the automated flow for that lead.
+- **Stop at:** a real SMS-capable Twilio number + completed A2P 10DLC registration. Check first whether the existing `CALLER_ID_TWILIO_FROM_NUMBER` is already SMS-capable before assuming a second number is needed. Flag exactly what Brayden needs to go do, mirroring how Prompt 393/666/673's blockers are written, and build/verify everything that doesn't depend on it in the meantime.
+
+Scope note: still layers on top of Prompt 695's No answer status/color/layout work, which stands as-is — this prompt is the automated recovery behavior running underneath that same status.
+
+## Prompt 697 — Agent sidebar: swap order of Settings and Billing under Account
+
+Trivial nav-order fix. Both stay under the ACCOUNT group (no change from Prompt 693's grouping decision) — just flip their order: **Billing on top, Settings below it** (currently Settings is above Billing). No other change to either page or to any other nav group.

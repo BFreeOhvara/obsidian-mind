@@ -919,3 +919,14 @@ Status: done. 692 cleared from [[Ohvara CC Queue]]. Queue now holds 673 (waits o
 - `vite build` passes; the one eslint error in `Sidebar.jsx` (setState in effect, line 100) predates this and is untouched. Not browser-verified (login-gated; no preview run).
 
 Status: done. 693 cleared from [[Ohvara CC Queue]]. Queue now holds only 673 (waits on Brayden's go-live).
+
+[CC | 2026-10-04 — Prompt 694 shipped: Activity page, one day at a time] ohvara-dashboard `8533ea7` pushed to master. `vite build` passes, eslint clean on touched files. **Not browser-verified** (login-gated, no agent session). No migration.
+
+- Removed the Everything / Status changes / Messages tabs and the filter logic behind them. Messages are gone from this feed entirely (`useReceivedMessages` deleted; Messages page is the one place for them).
+- Removed the 7/30/90-day selector and the range query. New header bar "← October 4 · Today →" steps exactly one local calendar day per click; forward arrow disabled on today. Selection is stored as days-back-from-today, so "Today" stays pinned across midnight.
+- `usePolicyEvents(day, agentId)` now queries one local day (`at >= midnight AND < next midnight`). The list sits in a fixed-height box (`min(520px, 60vh)`) and scrolls inside it; the "Show more" pager is gone. A day with no events still shows its header with an empty note.
+- Row content, icons and the `policy_events` log untouched. Did not reuse `DayFilterBar` (it is the rep-dialer calendar with graded-call star and hard-coded dark panel); built a small prev/next bar from agent tokens instead.
+
+Lesson: when a spec says "match the pattern on page X", check whether the repo's existing component carries unrelated baggage before reusing it.
+
+Status: done. 694 cleared from [[Ohvara CC Queue]]. Queue now holds 673 (waits on Brayden), 695, 696 (partly blocked on Twilio SMS/A2P), 697.
