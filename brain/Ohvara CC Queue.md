@@ -40,20 +40,20 @@ tags:
 
 **Log in the ship note:** whether a Stripe account/keys were present and usable (and whether it's the same account as the old dead Payouts integration or a new one), the exact migration applied, and — if blocked — exactly what Brayden needs to go create, mirroring how Prompt 393/666's blockers are written.
 
-## Prompt 692 — Three-tier agent billing by weekly submission cap: $350 (7/week), $500 (14/week), room for a third tier
+## Prompt 693 — Agent sidebar: remove Team, move Billing into Account, keep Activity in Work
 
-> **🟡 BUILT + DEPLOYED 2026-10-04 (CC), STRIPE SANDBOX E2E PENDING.** Migration 119 live, `agent-billing` redeployed, UI pushed (`499fe71`, `82c9509`). Cap trigger verified in a rolled-back DB test. **Remaining: the Stripe-side run as Test Agent** (Premium price creation, Subscribe/Upgrade through the portal, webhook sets `billing_tier`) needs Brayden to sign in as Test Agent in the browser pane. Delete this item once that passes. Detail: [[Memories]] 2026-10-04 "P692".
+Regrouping decision, Brayden + Eagle, grounded in what each item actually is rather than just chronological add order:
 
-Extends Prompt 673's billing build, doesn't replace it. Brayden wants a second, higher-priced tier so agents have an upgrade option, not just one flat plan. Decided differentiator (confirmed with Brayden directly, not guessed): a **weekly submission cap**. Standard ($350/week) caps how many cancellation submissions get worked per week; Premium ($500/week) raises or removes that cap. Ties the upgrade directly to what agents are actually paying for (volume of work done), and is easy to meter since submissions are already tracked per agent.
+**1. Remove the "Team" nav item entirely** (page/route too, same treatment as Training/Performance's earlier removal) — Brayden's standing position, no longer needed on the agent side.
 
-**Cap numbers — Brayden gave exact figures, use these, not a placeholder:** agents submit Monday–Friday only. Standard ($350/week): cap at **7 submissions/week** (roughly 1/day — an agent doing one deal a day is fully served by the base tier). Premium ($500/week): cap at **14 submissions/week** (roughly 2-3/day). Brayden also floated **a possible third, higher tier later** — not committed yet, still thinking it over, so don't build a third tier now, but **design the cap/tier system so adding one later is a config change, not a rebuild** (e.g. a small tiers table/config with price, cap, and Stripe price ID per row, rather than two tiers hardcoded as a boolean/if-else). Make the cap values themselves configurable regardless, since Brayden may still want to tune 7/14 after seeing real usage.
+**2. Move "Billing" out of Work and into Account, alongside Settings.** Reasoning: Billing is about the agent's own account standing (subscription, usage cap, upgrade), not a client-facing task the way Book a call / My Pipeline / Activity are — it belongs with Settings as "things about you," not "things you do for a client." Restorix doesn't offer a clean precedent here (their Commissions sits under a "Performance" group Ohvara doesn't have, since Performance was removed earlier), so Account is the better fit for Ohvara specifically.
 
-**Why a submission cap, specifically — worth noting in the UI/messaging, not just backend logic:** Brayden's own reasoning for picking this differentiator over just a price difference: it also discourages account sharing. If the cap is the real bottleneck (not login access), there's little incentive for one agent to share credentials with others — more people using one account still can't submit more than the tier allows. Keep that in mind as a secondary benefit, not something separate to build (no login-sharing prevention logic needed here, the cap itself does the work).
+**3. Keep Activity in Work**, alongside Book a call and My Pipeline — it's the history view of the same client-work My Pipeline shows the current state of, so it stays grouped with that subject rather than getting its own category.
 
-**Stripe side:** add a second weekly-recurring Price (~$500) alongside the existing $350/week one. **Check whether this can be created directly via the Stripe API using the already-configured `STRIPE_SECRET_KEY`** (price creation is typically an API call, not an account-level dashboard step) before assuming Brayden needs to go click through the Stripe dashboard again like he did for the account/webhook setup in 673 — only fall back to asking him to create it manually if the API path doesn't work in this sandbox. Checkout needs to let the agent pick a tier when subscribing; the Customer Portal (already wired in 673) should be checked for whether it natively supports switching between the two prices, or whether an in-app upgrade/downgrade control is needed on top.
+**Final agent sidebar shape:**
+- TODAY: Overview
+- WORK: Book a call, My Pipeline, Activity
+- COMMUNICATIONS: Messages
+- ACCOUNT: Settings, Billing
 
-**Data/enforcement:** track which tier an agent is on (new column or derived from the Stripe price ID already being synced), and the weekly submission count against their tier's cap at the point of booking a new call — block or clearly message when at cap, with an upgrade path surfaced rather than just a dead end. Reuse the existing Monday–Sunday weekly boundary already established for billing periods and Fulfillment pay, for consistency.
-
-**UI:** wherever Billing is shown (per Prompt 691's promoted tab), display current tier, the cap, and usage this week (e.g. "5 of 7 used this week"), plus a clear upgrade control.
-
-**Standing rule, same as 673:** this stays in Stripe **sandbox/test mode** — no live charges, no enforcement flipped on for real, until Brayden gives an explicit separate go-ahead. Build and verify it the same way 673 was (real E2E test in sandbox), but don't go live on your own.
+Scope note: navigation/grouping only — don't touch any of these pages' actual content or functionality, just where they sit in the sidebar.
