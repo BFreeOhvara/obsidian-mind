@@ -956,3 +956,7 @@ Status: done except item 1 (blocked on clarification). 695 cleared from [[Ohvara
 Lesson: when a flow depends on an external channel that isn't ready, gate entry to it on a single server flag so no lead is half-processed, and build/test everything else against that flag.
 
 Status: built and deployed, inert. 696 stays in [[Ohvara CC Queue]] with a blocked banner; queue now holds 673 (waits on Brayden), 696 (waits on Twilio SMS/A2P), 697, 698.
+
+[CC | 2026-10-04 — Prompt 697 shipped: agent sidebar Billing above Settings] ohvara-dashboard `0433007` pushed to master. One-line reorder in `Sidebar.jsx` (Account group: Billing, then Settings). No migration, no other nav change. Not built or checked in a browser (agent-auth gated, two-line array swap). 673 and 696 skipped (both waiting on Brayden). Next in queue: 698.
+
+Status: shipped.

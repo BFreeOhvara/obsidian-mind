@@ -81,10 +81,6 @@ tags:
 
 Scope note: still layers on top of Prompt 695's No answer status/color/layout work, which stands as-is — this prompt is the automated recovery behavior running underneath that same status.
 
-## Prompt 697 — Agent sidebar: swap order of Settings and Billing under Account
-
-Trivial nav-order fix. Both stay under the ACCOUNT group (no change from Prompt 693's grouping decision) — just flip their order: **Billing on top, Settings below it** (currently Settings is above Billing). No other change to either page or to any other nav group.
-
 ## Prompt 698 — Activity page: fix how Prompt 694 actually shipped (box sizing, row-clean bottom edge, date nav pulled outside the box + made clickable)
 
 Brayden reviewed the live build of Prompt 694 and it's not quite right — four fixes to the same page, no change to the underlying single-day query/event log itself.
