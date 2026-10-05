@@ -39,21 +39,3 @@ tags:
 **Not yet decided, Opus's call once building:** grace-period behavior on a failed payment (immediate access cutoff vs. some buffer) and exactly what "access paused" looks like in the UI (locked overlay vs. read-only) — document the decision and why in the ship note.
 
 **Log in the ship note:** whether a Stripe account/keys were present and usable (and whether it's the same account as the old dead Payouts integration or a new one), the exact migration applied, and — if blocked — exactly what Brayden needs to go create, mirroring how Prompt 393/666's blockers are written.
-
-## Prompt 693 — Agent sidebar: remove Team, move Billing into Account, keep Activity in Work
-
-Regrouping decision, Brayden + Eagle, grounded in what each item actually is rather than just chronological add order:
-
-**1. Remove the "Team" nav item entirely** (page/route too, same treatment as Training/Performance's earlier removal) — Brayden's standing position, no longer needed on the agent side.
-
-**2. Move "Billing" out of Work and into Account, alongside Settings.** Reasoning: Billing is about the agent's own account standing (subscription, usage cap, upgrade), not a client-facing task the way Book a call / My Pipeline / Activity are — it belongs with Settings as "things about you," not "things you do for a client." Restorix doesn't offer a clean precedent here (their Commissions sits under a "Performance" group Ohvara doesn't have, since Performance was removed earlier), so Account is the better fit for Ohvara specifically.
-
-**3. Keep Activity in Work**, alongside Book a call and My Pipeline — it's the history view of the same client-work My Pipeline shows the current state of, so it stays grouped with that subject rather than getting its own category.
-
-**Final agent sidebar shape:**
-- TODAY: Overview
-- WORK: Book a call, My Pipeline, Activity
-- COMMUNICATIONS: Messages
-- ACCOUNT: Settings, Billing
-
-Scope note: navigation/grouping only — don't touch any of these pages' actual content or functionality, just where they sit in the sidebar.

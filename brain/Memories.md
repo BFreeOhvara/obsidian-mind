@@ -911,3 +911,11 @@ Status: partial. 692 stays in [[Ohvara CC Queue]] pending the Stripe sandbox run
 - Still sandbox; enforcement off; no go-live. Test Agent has 12 bookings this week, over the Standard cap of 7 but under Premium's 14.
 
 Status: done. 692 cleared from [[Ohvara CC Queue]]. Queue now holds 673 (waits on go-live) and 693.
+
+[CC | 2026-10-04 — Prompt 693 shipped: agent sidebar regrouped] ohvara-dashboard `48482e6` pushed to master. No migration. Navigation only; page content untouched.
+- **Final agent sidebar:** Today (Overview) / Work (Book a call, My Pipeline, Activity) / Communications (Messages) / Account (Settings, Billing).
+- **Team removed entirely:** deleted `pages/agent/Team.jsx` and `hooks/useTeamActivity.js`, dropped it from the agent *and admin* sidebars (admin's Agents group shared the same page, so keeping it there would have left a dead link), and removed its header entry in `DashboardLayout`. `/agent/team` now redirects to Overview, same as Training/Performance. The `team_activity()` RPC from P671 is left in the DB, unused.
+- **Billing** moved from Work to Account, after Settings. Route, lock screen, Fix payment link and Stripe return URL all still point at `/agent/billing`, so nothing else changed.
+- `vite build` passes; the one eslint error in `Sidebar.jsx` (setState in effect, line 100) predates this and is untouched. Not browser-verified (login-gated; no preview run).
+
+Status: done. 693 cleared from [[Ohvara CC Queue]]. Queue now holds only 673 (waits on Brayden's go-live).
