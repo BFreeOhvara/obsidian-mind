@@ -80,3 +80,36 @@ tags:
 - **Stop at:** a real SMS-capable Twilio number + completed A2P 10DLC registration. Check first whether the existing `CALLER_ID_TWILIO_FROM_NUMBER` is already SMS-capable before assuming a second number is needed. Flag exactly what Brayden needs to go do, mirroring how Prompt 393/666/673's blockers are written, and build/verify everything that doesn't depend on it in the meantime.
 
 Scope note: still layers on top of Prompt 695's No answer status/color/layout work, which stands as-is — this prompt is the automated recovery behavior running underneath that same status.
+
+## Prompt 699 — Activity page: date nav to the top right (sharing a row with the "Your activity" header), trailing line on the last row
+
+> **✅ ITEM 1 BUILT 2026-10-04 (CC, `7869424`).** Date nav is top right, sharing the header row. **Item 2 NOT built: Activity rows have no vertical connector to extend (only a horizontal divider), same gap as P695.** Waits on Brayden/Eagle: new vertical line between icons, or a bottom border under the last row? Until then, CC skips this item. Detail: [[Memories]] 2026-10-04 "P699".
+
+Follow-up to Prompt 698's build, which otherwise looks right to Brayden. Two small fixes.
+
+**1. Move the whole date-nav control (prev arrow, date label, next arrow, as one unit) from the top-left to the top-right of its row.** It currently reads as its own centered/left row below the "Your activity" header. Once it's right-aligned, put it on the **same row as the "Your activity" title** (title + "Newest first · updates every 30 seconds" subtext on the left, the date-nav control on the right, one row instead of two) — this frees up the vertical space the separate date-nav row was taking, so **the list box moves up and gets taller**, same freed-space-grows-the-box pattern as 698's box-sizing fix. If title+subtext is two lines, align the date-nav control to that block's own left edge, i.e., don't need literal single-row height — the point is no longer giving the date-nav its own full separate row.
+
+**2. Add a trailing connector line below the last row, even with nothing below it.** Same fix as Prompt 695 already did on My Pipeline, needed here too — right now each row's icon has a vertical line running down to the next row's icon, but the bottom row (today it's whatever row happens to be last for the selected day) has no line below it since there's no next row. Keep drawing that trailing segment on the last row too, don't conditionally suppress it just because it's the final row for that day.
+
+Scope note: page-chrome only, same as 694/698 — the single-day query and per-entry row content are unaffected.
+
+## Prompt 700 — Activity page: center the empty-day text vertically in the box
+
+Small follow-up, same page as 694/698/699. When a selected day has no activity, the box shows "Nothing happened on this day." That text currently sits near the top of the box (horizontally centered, but vertically high/top-anchored). Vertically center it in the box instead — direct center, not top-center — same box the row list would otherwise fill.
+
+## Prompt 701 — Messages: match Restorix's borderless full-bleed layout, auto-provision standing conversations with Fulfillment + Admin
+
+Brayden put Ohvara's agent-side Messages (`/agent/messages`) side by side with Restorix's own Messages page and wants two fixes.
+
+**1. Match Restorix's layout — no boxed/bordered panel.** Ohvara's Messages currently sits inside a visibly bordered card (distinct background/border framing the Conversations list + chat area) that doesn't reach the edges of the content area. Restorix's Messages has no such frame — the conversation list and chat pane sit directly against the page's own background and extend the full available width/height of the content area. Rebuild Ohvara's to match: remove the bordered container, let both panes fill the full screen the way Restorix's do.
+
+**2. Auto-provision standing conversations — don't require a client/lead first.** Right now Ohvara's Messages is empty until an agent opens a specific client in My Pipeline and taps "Message Fulfillment" — that's what creates a conversation. Brayden wants every agent to automatically have a standing conversation thread already sitting in their Conversations list from day one, with:
+   - **Every Fulfillment team member** (not client-scoped — a general line to each person on Fulfillment, same way Restorix's "Test Setter" thread is just already there, ready, even with zero messages).
+   - **Admin** (one standing thread per agent, automatically present).
+   - **Not** other agents — agent-to-agent messaging is explicitly out of scope here.
+
+   So with, say, 3 Fulfillment accounts today, every agent's Conversations list should show those 3 plus Admin, auto-created (or auto-synthesized as empty threads) the moment the agent account exists — not something the agent has to trigger by messaging about a specific client first.
+
+**Open question for CC to confirm with Brayden before removing anything, not to guess silently:** it's unclear whether this replaces the existing client-scoped "Message Fulfillment" flow (from My Pipeline) entirely, or sits alongside it as an additional set of general-purpose threads. Build the standing Fulfillment+Admin threads as described; if the existing per-client "Message Fulfillment" entry point would conflict or become redundant, flag that specifically in the ship note rather than deciding unilaterally which one to drop.
+
+Scope note: this is Messages' own layout and conversation-provisioning logic — don't touch Fulfillment's or Admin's own Messages views beyond whatever's needed so these new standing agent-initiated threads actually appear on their side too.

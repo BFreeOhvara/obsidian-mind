@@ -971,3 +971,12 @@ Status: shipped.
 Lesson: to end a scroll box on a whole row, measure the rows' offsets and set the box height to the last full row's bottom, rather than guessing a row height.
 
 Status: shipped. Queue now holds 673 (waits on Brayden's go-ahead) and 696 (waits on SMS-capable Twilio number + A2P 10DLC).
+
+[CC | 2026-10-04 — Prompt 699 partly shipped: Activity date nav to header row] ohvara-dashboard `7869424` pushed to master. `vite build` passes, eslint clean. **Not browser-verified** (agent-auth gated). No migration.
+
+- **Item 1 DONE:** the date control (← date · Today →) is now passed as `SectionHead`'s `action`, so it sits top right on the same row as "Your activity" + subtext (wraps under on a narrow window). Its own margin is gone, so the box moves up; `fit()` measures the box top, so it grows by the freed height. The month picker now opens right-aligned (`right: 0`) so it can't spill off the right edge.
+- **Item 2 NOT DONE (same gap as P695 item 1):** Activity rows have no vertical connector between icons. `FeedRow` draws only a horizontal 1px divider between rows (`borderTop` on every row but the first). There is no line to extend. **Needs Brayden/Eagle to say:** (a) add a new vertical timeline line joining the icon circles, ending in a trailing stub on the last row, or (b) mean the horizontal divider, i.e. add a bottom border under the last row. Not guessed.
+
+Lesson: when a follow-up prompt describes an element as already existing, grep for it before building; two prompts in a row (695, 699) described a connector line the code never had.
+
+Status: item 1 shipped; item 2 waits on clarification. P699 stays in queue (item 2 only); 700, 701 next.
