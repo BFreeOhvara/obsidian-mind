@@ -40,35 +40,6 @@ tags:
 
 **Log in the ship note:** whether a Stripe account/keys were present and usable (and whether it's the same account as the old dead Payouts integration or a new one), the exact migration applied, and — if blocked — exactly what Brayden needs to go create, mirroring how Prompt 393/666's blockers are written.
 
-## Prompt 695 — My Pipeline: visual cleanup pass + drop "Rescheduling" (merge into No answer)
-
-Direct follow-up to Prompt 686's visual pass and Prompt 689's status model — Brayden reviewed the live page and wants four layout fixes plus a status-model simplification.
-
-**1. The row connector line should render after every row, including the last.** Right now each row's call-time icon has a vertical line running down to the next row's icon, but the last row has no line below it since there's no next row to connect to. Keep drawing that trailing segment on the last row too, even with nothing below it to connect to — don't conditionally suppress it just because it's the final row.
-
-**2. Remove the "19 older records from the pre-pivot submission flow aren't shown here" footer line entirely**, and grow the list box to fill the vertical space that frees up.
-
-**3. Collapse the header onto one line.** Right now the status-filter pills sit on their own row, then there's a visible gap, then "N leads" sits right-aligned on its own row just above the search bar — reads as an awkward double gap. Merge these onto a single row: status pills on the left, "N leads" on the right, same line. Then normalize the vertical rhythm so three gaps read as even: (header row → search bar) should equal (search bar → list box), not one row floating with extra space above it.
-
-**4. Remove the "Rescheduling" status entirely — merge its leads into "No answer."**
-
-Brayden's own reasoning, worked through live with Eagle: a booked call either gets answered or it doesn't. "No answer" already covers a call that never connects. What Prompt 689 added — the "call connected, but the carrier didn't confirm cancellation" outcome — got built as its own "Rescheduling" status, but functionally it needs the exact same remediation as a true no-answer: get the lead back on the books and try again. Brayden asked directly what that remediation flow should look like — answered and decided below.
-
-**Decision (Eagle's call):**
-- Both failure outcomes — call never connects, *and* call connects but doesn't resolve — now land on the single "No answer" status. Don't keep two statuses that both just mean "try again."
-- The live-call mechanics from Prompt 689 (In progress = literally live, the live indicator, call start/end tracking) are unchanged — only the terminal "not resolved" outcome changes: it now flips to No answer instead of to Rescheduling.
-- **Remediation path — reuse what already exists, don't build new UI:** a No-answer lead gets a clear re-book action on its row (reuse the existing Book-a-call flow, pre-filled with that lead's client/policy info) rather than a bespoke "reschedule" control. Taking that action sets a new scheduled time and flips status back to Booked, same as a first-time booking. No separate queue/section needed — the No-answer pill plus a re-book action on the row is enough, consistent with how Booked/In progress/Cancelled already work here.
-- **Data migration — handle existing rows, don't just drop the value.** Any leads currently sitting in Rescheduling need to move to No answer as part of this change. Check whether `status` is a native Postgres enum or a text column with a check constraint before altering it — a native enum type can't have a value dropped directly (requires recreating the type) — document whichever path was taken and why in the ship note.
-- Anything else keyed off "Rescheduling" (Activity log entries from Prompt 690, Needs-attention surfacing from 689, Overview tiles) needs to key off No answer instead — grep for the old status value across the codebase rather than only fixing the one place it's visibly rendered.
-
-**5. Recolor the remaining statuses** (Cancelled's existing green is untouched, not part of this prompt):
-- No answer → gray
-- Booked → blue
-- In progress → yellow
-- Apply the same colors to the per-row status badges in the STATUS column, not just the filter pills, per the consistency note already flagged in Prompt 686.
-
-Scope note: this touches My Pipeline's layout/chrome, the status enum/constraint, the call-end resolution logic from Prompt 689, and anywhere else "Rescheduling" is read or written. Don't touch Book a call's own form beyond making sure it's reachable/pre-fillable from a No-answer row.
-
 ## Prompt 696 — No-answer recovery: text → text → one locked retry call → confirm number → morning+evening text next day → hand off to the agent
 
 **Blocked on a real external step, same category as Stripe/Twilio-voice (Prompts 393/666/673): needs an SMS-capable Twilio number registered for A2P 10DLC before any SMS actually sends.** CC should build everything up to that point and stop there, flagged exactly like those — don't guess at a workaround.
@@ -111,3 +82,19 @@ Scope note: still layers on top of Prompt 695's No answer status/color/layout wo
 ## Prompt 697 — Agent sidebar: swap order of Settings and Billing under Account
 
 Trivial nav-order fix. Both stay under the ACCOUNT group (no change from Prompt 693's grouping decision) — just flip their order: **Billing on top, Settings below it** (currently Settings is above Billing). No other change to either page or to any other nav group.
+
+## Prompt 698 — Activity page: fix how Prompt 694 actually shipped (box sizing, row-clean bottom edge, date nav pulled outside the box + made clickable)
+
+Brayden reviewed the live build of Prompt 694 and it's not quite right — four fixes to the same page, no change to the underlying single-day query/event log itself.
+
+**1. Remove the footer disclaimer text entirely** ("Activity is logged from Oct 4, 2026. Bookings from before then show their booking, their latest call outcome and their cancellation, but not every call attempt in between. Tap a row to open the client.") — gone, not just shortened.
+
+**2. Make the list box bigger.** Expand it to use the space freed by removing the footer text above, and generally extend it further down the page — close to the bottom of the viewport, not flush against it, leaving a reasonable margin. Internal-scroll-only behavior from 694's original spec stays: the box itself scrolls, the page around it does not.
+
+**3. The box must not cut a row in half at its bottom edge on a fresh load.** Right now the box's fixed height ends mid-row (see "Test Client Sample Data 8 BOOKED" sliced at the bottom in the screenshot). On initial render for a given day, size/clip the visible area so it only ever shows complete rows — if the next row doesn't fully fit, it shouldn't be partially shown, the box's resting state should end cleanly at the last fully-visible row. The user can still scroll to see more rows below that point; this is about the default/initial display only, not about disabling scroll.
+
+**4. Pull the date-nav control (the arrows + "October 2 · Friday" label) out of the box and place it above the box as its own separate element** — this currently reads as merged into the box's top edge/header; Restorix's My Recordings page (the original reference for this whole feature) has it floating above a separate bordered list, not inside it. Match that.
+
+**5. Make the date label itself clickable, opening a calendar/month picker** for jumping directly to an arbitrary date — not just incremental day-by-day via the arrows. Same interaction Restorix's own date control supports: open the picker, step back a month if needed, click the exact day. This is specifically so going back further than a day or two doesn't mean spamming the arrow repeatedly.
+
+Scope note: still page-chrome only — the single-day query, per-entry row content, and the rest of 694's spec (tabs removed, messages excluded) are unaffected and already correct; this is only the four things above.

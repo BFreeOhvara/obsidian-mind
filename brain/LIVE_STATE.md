@@ -30,6 +30,8 @@ tags:
 
 ---
 
+**Prompt 695 shipped 2026-10-04 (`ce15ced`, migration 121 live). Rescheduling is gone, merged into No answer (3 leads moved); No answer leads get a Re-book action (RPC `agent_rebook_call`, back to Booked at a new time). My Pipeline header is one row, footer removed, colours: No answer gray / Booked blue / In progress yellow. **Item 1 (trailing connector line) NOT built: no such element exists in My Pipeline, needs clarification.** Detail: [[Memories]] 2026-10-04.**
+
 **Prompt 693 shipped 2026-10-04 (`48482e6`, no migration). Agent sidebar regrouped: Today (Overview) / Work (Book a call, My Pipeline, Activity) / Communications (Messages) / Account (Settings, Billing). Team page, route and hook removed (admin's Team link too; `/agent/team` redirects to Overview). Full detail: [[Memories]] 2026-10-04.**
 
 **Prompt 692 built + deployed 2026-10-04 (`499fe71`/`82c9509`, migration 119 live, `agent-billing` redeployed). Agent billing is tiered by weekly submission cap: Standard $350 / 7, Premium $500 / 14, tiers are rows in `agent_billing_tiers` (third tier = insert). Cap enforced in the DB only when `agent_billing_enforced` is on (still off). Billing page has plan cards + usage meter; Book a call shows usage and an Upgrade path at cap. Stripe sandbox E2E passed 2026-10-04 (Test Agent upgraded Standard to Premium via the portal, webhook set the tier, 12 of 14; fixed one bug: one Stripe product per tier, migration 120, `af2d5ab`). Downgrade and Checkout-with-tier not exercised. Full detail: [[Memories]] 2026-10-04.**

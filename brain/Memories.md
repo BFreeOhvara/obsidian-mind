@@ -930,3 +930,15 @@ Status: done. 693 cleared from [[Ohvara CC Queue]]. Queue now holds only 673 (wa
 Lesson: when a spec says "match the pattern on page X", check whether the repo's existing component carries unrelated baggage before reusing it.
 
 Status: done. 694 cleared from [[Ohvara CC Queue]]. Queue now holds 673 (waits on Brayden), 695, 696 (partly blocked on Twilio SMS/A2P), 697.
+
+[CC | 2026-10-04 — Prompt 695 shipped: My Pipeline cleanup, Rescheduling merged into No answer] ohvara-dashboard `ce15ced` pushed to master. Migration 121 applied live (Supabase MCP). `vite build` passes. **Not browser-verified** (login-gated, no agent session).
+
+- **Status model:** `last_call_outcome` is a TEXT column with a CHECK constraint (not a native enum), so removal was a constraint swap, no type rebuild. Moved 3 leads Rescheduling -> No answer, 3 `policy_events` rows kind `rescheduling` -> `no_answer`, constraints now allow only `no_answer`. The events trigger was disabled for the backfill so no phantom "status changed" rows were logged (verified: event counts unchanged). `policy_agent_status`, `policy_events_log` rewritten; `fulfillment_end_call` still accepts `'rescheduling'` and maps it to no_answer so a stale browser tab survives the deploy. Optional reason (waiting carrier/client) now hangs off No answer; the reason picker shows on every No answer on the desk, the live-call panel lost its Rescheduling button. All code references swept (Activity, Overviews, flags, desk, Fulfillment Pipeline, usePolicies).
+- **Re-book:** new RPC `agent_rebook_call(policy, at)`: owning agent or admin only, only on a No answer that isn't live; sets the new time, clears outcome + reason, returns stage to Pending (autoassign re-picks a rep for the slot), keeps `call_attempts`/`last_call_at`. UI: a "Re-book" button on each No-answer row and a "Re-book a call" button in the lead popup, both using the existing slot picker. It does NOT reuse the Book-a-call page, because that page inserts a new policy and would duplicate the lead.
+- **Layout (items 2, 3):** removed the pre-pivot-records footer (list box grows into the space); status pills and "N leads" are now one row (pills left, count right), and the existing uniform 16px gap now separates header -> search -> list.
+- **Colours (item 5):** No answer gray, Booked blue, In progress yellow (amber `--warning`), Cancelled unchanged; the single `STAGE` map drives both the filter pills and the row badges, and Fulfillment's Pipeline picks them up too.
+- **NOT DONE, item 1 (trailing connector line):** nothing in My Pipeline draws a line between rows' call-time icons. `ClientRow` has no icon and no connector, and the popup's Progress list has none either. The only vertical connector in the codebase is the Fulfillment desk's "Work this cancellation" steps. Needs Brayden/Eagle to say which screen/element is meant before it can be built.
+
+Lesson: when a spec describes a visual element, grep for it before building; if it doesn't exist in the code, ask which screen is meant instead of inventing one.
+
+Status: done except item 1 (blocked on clarification). 695 cleared from [[Ohvara CC Queue]].
