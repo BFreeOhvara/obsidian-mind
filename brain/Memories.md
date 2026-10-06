@@ -989,3 +989,12 @@ Status: item 1 shipped; item 2 waits on clarification. P699 stays in queue (item
 Lesson: when a prompt's premise was wrong, the answer that comes back is usually the smaller change — reuse the existing element (here the row divider) rather than adding a new one.
 
 Status: shipped. Queue now holds 673 (waits on Brayden), 696 (waits on Twilio SMS/A2P), 700, 701 (next).
+
+[CC | 2026-10-05 — Prompt 700 shipped: Activity empty-day text vertically centered] ohvara-dashboard `96d654d` pushed to master. `vite build` passes. **Not browser-verified** (agent-auth gated). No migration.
+
+- The empty-state note in `Activity.jsx` is now wrapped in a `flex: 1` flex container (`alignItems`/`justifyContent: center`), so it fills the scroll box (a flex column) and sits at its exact center instead of top-anchored. Applies to both "Nothing happened on this day." and today's empty copy. Shared `EmptyNote` untouched.
+- Removed from [[Ohvara CC Queue]].
+
+Lesson: to center content in a flex-column box, give the child `flex: 1` + its own centering rather than editing the shared component's padding.
+
+Status: shipped. Queue now holds 673 (waits on Brayden), 696 (waits on Twilio SMS/A2P), 701 (next; has an open question to confirm with Brayden about the per-client "Message Fulfillment" flow).

@@ -81,10 +81,6 @@ tags:
 
 Scope note: still layers on top of Prompt 695's No answer status/color/layout work, which stands as-is — this prompt is the automated recovery behavior running underneath that same status.
 
-## Prompt 700 — Activity page: center the empty-day text vertically in the box
-
-Small follow-up, same page as 694/698/699. When a selected day has no activity, the box shows "Nothing happened on this day." That text currently sits near the top of the box (horizontally centered, but vertically high/top-anchored). Vertically center it in the box instead — direct center, not top-center — same box the row list would otherwise fill.
-
 ## Prompt 701 — Messages: match Restorix's borderless full-bleed layout, auto-provision standing conversations with Fulfillment + Admin
 
 Brayden put Ohvara's agent-side Messages (`/agent/messages`) side by side with Restorix's own Messages page and wants two fixes.
