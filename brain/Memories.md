@@ -980,3 +980,12 @@ Status: shipped. Queue now holds 673 (waits on Brayden's go-ahead) and 696 (wait
 Lesson: when a follow-up prompt describes an element as already existing, grep for it before building; two prompts in a row (695, 699) described a connector line the code never had.
 
 Status: item 1 shipped; item 2 waits on clarification. P699 stays in queue (item 2 only); 700, 701 next.
+
+[CC | 2026-10-05 — Prompt 699 item 2 shipped: divider under last Activity row] ohvara-dashboard `07f53c7` pushed to master. `vite build` passes, eslint clean. **Not browser-verified** (agent-auth gated). No migration.
+
+- Per Eagle's 2026-10-04 answer: `FeedRow` now gets a `last` prop and draws the same 1px `--border` rule as its `borderBottom` on the final row, so the list ends on a divider like every row pair above it. No new vertical connector. `fit()` measures `offsetTop + offsetHeight`, which includes the border, so the box-clean-edge logic is unaffected.
+- P699 fully shipped (item 1 in `7869424`); removed from [[Ohvara CC Queue]].
+
+Lesson: when a prompt's premise was wrong, the answer that comes back is usually the smaller change — reuse the existing element (here the row divider) rather than adding a new one.
+
+Status: shipped. Queue now holds 673 (waits on Brayden), 696 (waits on Twilio SMS/A2P), 700, 701 (next).

@@ -81,18 +81,6 @@ tags:
 
 Scope note: still layers on top of Prompt 695's No answer status/color/layout work, which stands as-is — this prompt is the automated recovery behavior running underneath that same status.
 
-## Prompt 699 — Activity page: date nav to the top right (sharing a row with the "Your activity" header), trailing line on the last row
-
-> **✅ ITEM 1 BUILT 2026-10-04 (CC, `7869424`).** Date nav is top right, sharing the header row. **Item 2 NOT built: Activity rows have no vertical connector to extend (only a horizontal divider), same gap as P695.** Waits on Brayden/Eagle: new vertical line between icons, or a bottom border under the last row? Until then, CC skips this item. Detail: [[Memories]] 2026-10-04 "P699".
-
-Follow-up to Prompt 698's build, which otherwise looks right to Brayden. Two small fixes.
-
-**1. Move the whole date-nav control (prev arrow, date label, next arrow, as one unit) from the top-left to the top-right of its row.** It currently reads as its own centered/left row below the "Your activity" header. Once it's right-aligned, put it on the **same row as the "Your activity" title** (title + "Newest first · updates every 30 seconds" subtext on the left, the date-nav control on the right, one row instead of two) — this frees up the vertical space the separate date-nav row was taking, so **the list box moves up and gets taller**, same freed-space-grows-the-box pattern as 698's box-sizing fix. If title+subtext is two lines, align the date-nav control to that block's own left edge, i.e., don't need literal single-row height — the point is no longer giving the date-nav its own full separate row.
-
-**2. Add a trailing connector line below the last row, even with nothing below it.** Same fix as Prompt 695 already did on My Pipeline, needed here too — right now each row's icon has a vertical line running down to the next row's icon, but the bottom row (today it's whatever row happens to be last for the selected day) has no line below it since there's no next row. Keep drawing that trailing segment on the last row too, don't conditionally suppress it just because it's the final row for that day.
-
-Scope note: page-chrome only, same as 694/698 — the single-day query and per-entry row content are unaffected.
-
 ## Prompt 700 — Activity page: center the empty-day text vertically in the box
 
 Small follow-up, same page as 694/698/699. When a selected day has no activity, the box shows "Nothing happened on this day." That text currently sits near the top of the box (horizontally centered, but vertically high/top-anchored). Vertically center it in the box instead — direct center, not top-center — same box the row list would otherwise fill.
