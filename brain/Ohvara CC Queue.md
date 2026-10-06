@@ -80,3 +80,11 @@ tags:
 - **Stop at:** a real SMS-capable Twilio number + completed A2P 10DLC registration. Check first whether the existing `CALLER_ID_TWILIO_FROM_NUMBER` is already SMS-capable before assuming a second number is needed. Flag exactly what Brayden needs to go do, mirroring how Prompt 393/666/673's blockers are written, and build/verify everything that doesn't depend on it in the meantime.
 
 Scope note: still layers on top of Prompt 695's No answer status/color/layout work, which stands as-is — this prompt is the automated recovery behavior running underneath that same status.
+
+## Prompt 704 — Messages: add an avatar circle to each conversation row
+
+Follow-up to Prompt 701. Brayden's fine keeping the conversation label text as-is ("Admin" stays "Admin," doesn't need to say "Brayden" or similar) — this is purely a missing visual element.
+
+**Add an avatar circle to the left of each conversation's name/subtitle in the Conversations list**, same pattern already used elsewhere in this app (the colored circle with initials — "TA" for Test Agent — shown bottom-left in the sidebar and top-right in the header) and the same pattern Restorix's own Messages page already has (the teal "TS" circle next to "Test Setter"). No profile picture exists for Admin or any Fulfillment account yet, so fall back to initials-in-a-colored-circle exactly like the existing account-switcher avatar does — e.g. "A" or similar for Admin, initials for each Fulfillment person's name. If a real profile picture gets added for an account later, show that instead of initials, same fallback pattern already governing the existing avatars elsewhere.
+
+Scope note: Conversations list row styling only — no change to conversation labels, the standing-thread provisioning from 701, or the chat pane itself.

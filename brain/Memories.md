@@ -1023,3 +1023,12 @@ Status: shipped. Queue now holds only 673 (waits on Brayden) and 696 (waits on T
 Lesson: when a UI status set diverges per audience, add a view-specific derivation next to the shared one instead of mutating the shared stage function.
 
 Status: shipped. Queue now holds only 673 (waits on Brayden) and 696 (waits on Twilio SMS/A2P).
+
+[CC | 2026-10-06 — Prompt 703 shipped: Activity date label fixed width] ohvara-dashboard `36a959e` pushed to master. `vite build` passes, eslint clean. **Not browser-verified** (agent-auth gated). No migration.
+
+- `Activity.jsx` date-nav label button now `width: 240` (was content-sized) with centered content; fits the longest string "September 29 · Wednesday" (~227px est. at 14px/600 + icon + padding). Neither arrow moves when the date changes.
+- Width is an estimate, not measured in a live browser; if Wednesday/September clips on a real render, bump the 240.
+
+Lesson: a right-aligned inline group with a content-sized middle element shifts every sibling to its left; fix with a fixed-width middle, not alignment tweaks.
+
+Status: shipped. Queue now 673 (waits on Brayden), 696 (waits on Twilio SMS/A2P), 704 next runnable.
