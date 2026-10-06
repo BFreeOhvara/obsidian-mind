@@ -1052,3 +1052,16 @@ Status: shipped. Queue now 673 (waits on Brayden) and 696 (waits on Twilio SMS/A
 Lesson: before deleting a widget whose label claims it drives another UI element, grep the hook's consumers — here it drove nothing, so the label was stale.
 
 Status: shipped. Queue now 673 (waits on Brayden) and 696 (waits on Twilio SMS/A2P); nothing runnable.
+
+[CC | 2026-10-06 — Prompt 707 shipped: My Pipeline trailing divider + centered placeholders portal-wide] ohvara-dashboard `4d0eb7c` pushed to master, no migration. `vite build` + eslint clean. **Not browser-verified** (login-gated).
+
+- **My Pipeline:** `ClientRow` got a `last` prop that draws the same 1px `--border` rule as `borderBottom` (identical to Activity's `FeedRow`); `Clients.jsx` passes it on the final row. Overview's ClientRow usages don't pass it, so unchanged.
+- **Activity Loading:** centered. The scroll box is already a flex column; the shared `EmptyNote` now fills it (below).
+- **Standing rule, done at the source:** `EmptyNote` (AgentUI) is now `flex: 1` + flex-centered on both axes, and `ListCard` becomes a flex column only when empty. In auto-height boxes the 32px padding still gives the old look; in fixed-height boxes the text lands dead center. Every `EmptyNote` caller inherits it, so future placeholders are right by default.
+- **Everywhere fixed/covered:** Activity (loading, empty day, error `p` centered too; dropped the 700 wrapper div, now redundant), My Pipeline (`ListCard` empty/loading — "No clients match" was in fact top-anchored inside the flex:1 card, contrary to the prompt's note), Messages (conversations list loading + "No conversations yet", made a flex column only while showing a placeholder; chat pane loading / "No messages yet" / "isn't available" via EmptyNote in its flex-column scroller), Fulfillment Pipeline + Overviews (ListCard/EmptyNote, auto-height so unchanged in look). "Pick a conversation" was already centered.
+- **Checked, left alone:** FulfillmentQueue's local dashed `EmptyNote` (inline notes, own bordered box already centered), notification-bell/bug-report dropdown empties (auto-height panels), BookCall/BillingGate/ComingSoon (standalone centered cards).
+- Removed from [[Ohvara CC Queue]].
+
+Lesson: fix a repeated layout bug in the shared placeholder component, not per page; the per-page fix (P700) left Loading and every other page with the same gap.
+
+Status: shipped. Queue now 673 (waits on Brayden's go-ahead) and 696 (waits on Twilio SMS/A2P); nothing runnable.
