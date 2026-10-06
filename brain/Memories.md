@@ -998,3 +998,15 @@ Status: shipped. Queue now holds 673 (waits on Brayden), 696 (waits on Twilio SM
 Lesson: to center content in a flex-column box, give the child `flex: 1` + its own centering rather than editing the shared component's padding.
 
 Status: shipped. Queue now holds 673 (waits on Brayden), 696 (waits on Twilio SMS/A2P), 701 (next; has an open question to confirm with Brayden about the per-client "Message Fulfillment" flow).
+
+[CC | 2026-10-05 — Prompt 701 shipped: Messages full-bleed + standing Fulfillment/Admin threads] ohvara-dashboard `2286ecb` pushed to master, migration 123 applied live. `vite build` passes, eslint clean on the new files (one pre-existing `set-state-in-effect` finding in DashboardLayout). **Not browser-verified** (login-gated, no credentials available to CC). DB side verified live in a rolled-back transaction as agent, fulfillment and admin.
+
+- **Layout:** `/messages` is full-bleed. `DashboardLayout` drops the page padding / 1280px cap for that path (same trick as Restorix's `isFullBleed`), and `Messages.jsx` lost its bordered `card`; both panes sit on the page background at `height: calc(100vh - 64px)` (`.messages-fill` in `index.css`, 56px mobile top bar below `md`). Header subtitle updated.
+- **Standing threads (migration 123):** `direct_messages` + `direct_message_reads`, RLS via `can_dm_thread(agent, peer)`, stamp + notify triggers, realtime. A thread is the pair (agent, rep id | NULL = Admin line) and is synthesized by `my_standing_threads()` even when empty, so there's nothing to provision. Agent sees every active Fulfillment rep plus Admin; a rep sees one per active agent; admin sees the Admin line per agent. No agent-to-agent. URL form `?dm=<agent id>.<rep id|admin>`; notifications link there. Sidebar badge now sums both thread kinds.
+- **Verified:** agent got Admin + the rep thread; rep saw the agent's message as 1 unread; admin saw only the Admin-line message and 0 agent<->rep rows.
+- **Decisions to confirm (Brayden/Eagle):** (1) **Open question from the prompt, not resolved:** the per-client "Message Fulfillment" button (My Pipeline / Fulfillment desk / Pipeline) was left untouched and both thread kinds now appear in one list. They don't conflict technically, but a Fulfillment rep gets two threads per agent (general + per-client), so say whether to drop the per-client flow. (2) Admin can read/write only the Admin line, not agent<->rep threads (the per-client threads still give admin read of everything, as before). (3) Deactivated agents/reps drop out of the standing list; their history stays in the table but isn't listed.
+- Removed from [[Ohvara CC Queue]].
+
+Lesson: when a thread list must show "everyone I could talk to", synthesize the pairs in an RPC instead of provisioning rows — no backfill, and new accounts appear instantly.
+
+Status: shipped. Queue now holds only 673 (waits on Brayden) and 696 (waits on Twilio SMS/A2P).

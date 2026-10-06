@@ -30,6 +30,8 @@ tags:
 
 ---
 
+**Prompt 701 shipped 2026-10-05 (`2286ecb`, migration 123 live). Messages is full-bleed (no card), and every account has standing threads with no client attached: agent <-> each Fulfillment rep + Admin, rep <-> each agent, admin <-> each agent (Admin line only). Synthesized, so nothing to provision. Per-client "Message Fulfillment" left as is; **Brayden: say whether to drop it now that general threads exist.** Not browser-verified. Detail: [[Memories]] 2026-10-05.**
+
 **Prompt 695 shipped 2026-10-04 (`ce15ced`, migration 121 live). Rescheduling is gone, merged into No answer (3 leads moved); No answer leads get a Re-book action (RPC `agent_rebook_call`, back to Booked at a new time). My Pipeline header is one row, footer removed, colours: No answer gray / Booked blue / In progress yellow. **Item 1 (trailing connector line) NOT built: no such element exists in My Pipeline, needs clarification.** Detail: [[Memories]] 2026-10-04.**
 
 **Prompt 693 shipped 2026-10-04 (`48482e6`, no migration). Agent sidebar regrouped: Today (Overview) / Work (Book a call, My Pipeline, Activity) / Communications (Messages) / Account (Settings, Billing). Team page, route and hook removed (admin's Team link too; `/agent/team` redirects to Overview). Full detail: [[Memories]] 2026-10-04.**
