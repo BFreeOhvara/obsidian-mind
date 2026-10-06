@@ -88,3 +88,11 @@ Follow-up to Prompt 701. Brayden's fine keeping the conversation label text as-i
 **Add an avatar circle to the left of each conversation's name/subtitle in the Conversations list**, same pattern already used elsewhere in this app (the colored circle with initials — "TA" for Test Agent — shown bottom-left in the sidebar and top-right in the header) and the same pattern Restorix's own Messages page already has (the teal "TS" circle next to "Test Setter"). No profile picture exists for Admin or any Fulfillment account yet, so fall back to initials-in-a-colored-circle exactly like the existing account-switcher avatar does — e.g. "A" or similar for Admin, initials for each Fulfillment person's name. If a real profile picture gets added for an account later, show that instead of initials, same fallback pattern already governing the existing avatars elsewhere.
 
 Scope note: Conversations list row styling only — no change to conversation labels, the standing-thread provisioning from 701, or the chat pane itself.
+
+## Prompt 705 — Settings → Profile: remove the monthly AP goal block entirely
+
+The "This month's AP goal — drives the progress bar on your Overview · resets unset every new month" block (the "Not set" input + Save button, below Save changes on the Profile tab) is leftover from the pre-pivot active-policy/AP model. Per the standing business-model note (Eagle, 2026-10-01 in Memories): this app doesn't track an active/in-force book of business anymore — agents only submit a client's existing policy to get it cancelled, there's no AP concept here. Remove this block completely from Settings → Profile.
+
+**Check the dependency before just deleting the widget:** its own label says it "drives the progress bar on your Overview" — if Overview still renders a progress bar keyed off this AP-goal value, removing only the Settings control would leave that bar orphaned (always unset, or referencing a column nothing writes to anymore). Find that Overview progress bar and remove it too, as part of this same prompt, rather than leaving a dead UI element behind. Document in the ship note whether Overview actually had this bar live or not, and what was removed.
+
+Scope note: Settings → Profile tab + whatever Overview element depends on this value. Don't touch the rest of Profile (name/email/phone/username) or any other Settings tab.

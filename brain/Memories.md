@@ -1032,3 +1032,13 @@ Status: shipped. Queue now holds only 673 (waits on Brayden) and 696 (waits on T
 Lesson: a right-aligned inline group with a content-sized middle element shifts every sibling to its left; fix with a fixed-width middle, not alignment tweaks.
 
 Status: shipped. Queue now 673 (waits on Brayden), 696 (waits on Twilio SMS/A2P), 704 next runnable.
+
+[CC | 2026-10-06 — Prompt 704 shipped: avatar circle on each Messages conversation row] ohvara-dashboard `ec8fb0e` pushed to master, **migration 124 applied live** (`124_message_thread_avatars.sql`). Lint + `vite build` clean. **Not browser-verified** (login-gated).
+
+- Each row in the Conversations list now has a 36px `Avatar` left of the name/subtitle (`Messages.jsx`, `ThreadRow`): photo if `avatar_url` is set, else two-initial colored circle from `avatar_color`, same shared component as the sidebar/header. The avatar shows the counterpart: for an agent, the Fulfillment rep (or "F" if no rep yet) / Admin ("A", no profile row so default blue); for rep/admin, the agent.
+- Migration 124 drops + recreates `my_message_threads()` and `my_standing_threads()` with avatar_url/avatar_color columns appended (bodies otherwise identical to 114/123). Done in the RPCs rather than a client-side profiles read so it doesn't depend on `profiles_select` staying open (pending lockdown chip). Verified via pg_proc: 15 and 13 columns.
+- Untouched: conversation labels, 701 standing threads, chat pane.
+
+Lesson: when a list needs extra per-row profile fields, extend the RPC that feeds it instead of adding a second profiles query that RLS tightening could break.
+
+Status: shipped. Queue now 673 (waits on Brayden) and 696 (waits on Twilio SMS/A2P).
