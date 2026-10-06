@@ -1010,3 +1010,16 @@ Status: shipped. Queue now holds 673 (waits on Brayden), 696 (waits on Twilio SM
 Lesson: when a thread list must show "everyone I could talk to", synthesize the pairs in an RPC instead of provisioning rows — no backfill, and new accounts appear instantly.
 
 Status: shipped. Queue now holds only 673 (waits on Brayden) and 696 (waits on Twilio SMS/A2P).
+
+[CC | 2026-10-05 — Prompt 702 shipped: My Pipeline Confirm number + Needs attention, In progress dropped] ohvara-dashboard `087b83b` pushed. `vite build` passes, eslint clean. **Not browser-verified** (login-gated). No migration.
+
+- **Status set (agent My Pipeline):** Booked / No answer / Confirm number / Needs attention / Cancelled. New `agentStageOf` + `AGENT_BUCKETS` in `src/lib/agentBookings.js`; Fulfillment's views still use `stageOf` (untouched, they keep their own In progress). Confirm number = `recovery_step 'number_check'` (purple), Needs attention = `'call_directly'` (amber), both only appear once 696's automation runs (texting is off, so they sit empty; not a bug).
+- **In progress:** gone as a pill. A live call (`call_live_since`) keeps the row Booked and shows the LiveDot pulse in the Booked pill; detail popup shows the live dot; Move-to-a-different-time hidden while live.
+- **Call-end wiring (the flagged concern):** nothing re-keyed. Resolution is column-driven (`call_live_since` / `last_call_outcome` / `recovery_step`); "in_progress" only exists as `policy_events.kind` (activity log) and the derived client-side stage, never as a stored status the resolution reads.
+- **Re-book:** removed from automated No-answer rows. "Call & rebook" (same slot-picker flow) on Needs attention rows; Confirm number rows get the one-tap button + popup form.
+- **Judgment call to confirm:** a No-answer lead with `recovery_step` null (flow not running, which is every lead while `sms_live` is off) still gets Re-book. Removing it would dead-end all of them until Twilio SMS is live. One-line change in `canRebook` (Clients.jsx) if Brayden wants it gone anyway.
+- **Not touched (out of scope):** agent Overview "No answer" tile still counts via `stageOf` (so it includes Confirm number / Needs attention leads) and links to `?stage=noAnswer`.
+
+Lesson: when a UI status set diverges per audience, add a view-specific derivation next to the shared one instead of mutating the shared stage function.
+
+Status: shipped. Queue now holds only 673 (waits on Brayden) and 696 (waits on Twilio SMS/A2P).
