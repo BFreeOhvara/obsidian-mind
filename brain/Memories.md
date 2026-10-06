@@ -1042,3 +1042,13 @@ Status: shipped. Queue now 673 (waits on Brayden), 696 (waits on Twilio SMS/A2P)
 Lesson: when a list needs extra per-row profile fields, extend the RPC that feeds it instead of adding a second profiles query that RLS tightening could break.
 
 Status: shipped. Queue now 673 (waits on Brayden) and 696 (waits on Twilio SMS/A2P).
+
+[CC | 2026-10-06 — Prompt 705 shipped: Settings → Profile monthly AP goal block removed] ohvara-dashboard `c30b6f9` pushed to master, no migration. `vite build` clean. **Not browser-verified** (login-gated).
+
+- Removed `MonthlyGoalField` (the "This month's AP goal" input + Save) and its render gate from `Profile.jsx`, plus the now-unused imports and stale comments. Deleted `src/hooks/useMonthlyGoals.js` — Profile was its only consumer.
+- **Overview check:** Overview had NO live goal progress bar. Nothing outside Profile.jsx referenced `useMonthlyGoal`/`useTeamMonthlyGoals`/`agent_monthly_goals`, so there was no orphaned Overview element to remove (that bar was already gone in earlier pivot cleanups).
+- **Left alone, flag for later:** the `agent_monthly_goals` table (mig 095) and `profiles.monthly_ap_goal` (mig 075) still exist; migration 090's milestone-notification trigger still reads `monthly_ap_goal`, and `NotificationBell` still maps `monthly_goal_milestone`. Not touched — out of scope, and dropping columns/triggers is destructive. Worth a cleanup prompt if Brayden wants the AP-goal model fully gone from the DB.
+
+Lesson: before deleting a widget whose label claims it drives another UI element, grep the hook's consumers — here it drove nothing, so the label was stale.
+
+Status: shipped. Queue now 673 (waits on Brayden) and 696 (waits on Twilio SMS/A2P); nothing runnable.

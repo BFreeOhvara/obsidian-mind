@@ -80,11 +80,3 @@ tags:
 - **Stop at:** a real SMS-capable Twilio number + completed A2P 10DLC registration. Check first whether the existing `CALLER_ID_TWILIO_FROM_NUMBER` is already SMS-capable before assuming a second number is needed. Flag exactly what Brayden needs to go do, mirroring how Prompt 393/666/673's blockers are written, and build/verify everything that doesn't depend on it in the meantime.
 
 Scope note: still layers on top of Prompt 695's No answer status/color/layout work, which stands as-is — this prompt is the automated recovery behavior running underneath that same status.
-
-## Prompt 705 — Settings → Profile: remove the monthly AP goal block entirely
-
-The "This month's AP goal — drives the progress bar on your Overview · resets unset every new month" block (the "Not set" input + Save button, below Save changes on the Profile tab) is leftover from the pre-pivot active-policy/AP model. Per the standing business-model note (Eagle, 2026-10-01 in Memories): this app doesn't track an active/in-force book of business anymore — agents only submit a client's existing policy to get it cancelled, there's no AP concept here. Remove this block completely from Settings → Profile.
-
-**Check the dependency before just deleting the widget:** its own label says it "drives the progress bar on your Overview" — if Overview still renders a progress bar keyed off this AP-goal value, removing only the Settings control would leave that bar orphaned (always unset, or referencing a column nothing writes to anymore). Find that Overview progress bar and remove it too, as part of this same prompt, rather than leaving a dead UI element behind. Document in the ship note whether Overview actually had this bar live or not, and what was removed.
-
-Scope note: Settings → Profile tab + whatever Overview element depends on this value. Don't touch the rest of Profile (name/email/phone/username) or any other Settings tab.
