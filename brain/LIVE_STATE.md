@@ -30,6 +30,8 @@ tags:
 
 ---
 
+**Prompt 704 shipped 2026-10-06 (`ec8fb0e`, migration 124 live). Messages conversation rows have an avatar circle (photo or two-initial colored fallback) for the counterpart; thread RPCs now return avatar_url/avatar_color. Not browser-verified. Detail: [[Memories]] 2026-10-06.**
+
 **Prompt 702 shipped 2026-10-05 (`087b83b`, no migration). My Pipeline statuses: Booked / No answer / Confirm number / Needs attention / Cancelled; In progress is a live pulse on Booked rows. Re-book removed from automated No-answer rows (kept only when `recovery_step` is null, i.e. texting off; Brayden to confirm). "Call & rebook" on Needs attention. New statuses stay empty until 696 SMS is live.**
 
 **Prompt 701 shipped 2026-10-05 (`2286ecb`, migration 123 live). Messages is full-bleed (no card), and every account has standing threads with no client attached: agent <-> each Fulfillment rep + Admin, rep <-> each agent, admin <-> each agent (Admin line only). Synthesized, so nothing to provision. Per-client "Message Fulfillment" left as is; **Brayden: say whether to drop it now that general threads exist.** Not browser-verified. Detail: [[Memories]] 2026-10-05.**
