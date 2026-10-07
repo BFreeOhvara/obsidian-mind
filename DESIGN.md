@@ -1,6 +1,6 @@
 ---
 date: 2026-06-07
-updated: 2026-10-02
+updated: 2026-10-07
 description: "Ohvara design system — color tokens, typography, anti-rules. Read before touching any UI component."
 tags:
   - brain
@@ -11,7 +11,19 @@ tags:
 
 > Read before touching any UI component.
 
-## v15 (2026-10-02, Prompt 674): current. Ohvara's own colours are back.
+## v16 (2026-10-07, Prompt 714): Overview pilot, the new visual language. Current for `/agent` only.
+
+Brayden called the agent Overview bland, rejected a flat v1, and approved a richer direction (quality bar: Watermelon UI dashboards). `/agent` is the pilot; the portal-wide rollout reads from this entry. Every other page still follows v15.
+
+- **Retired on pages in this language:** the no-`box-shadow`, no-gradient and JetBrains-Mono-for-every-number rules. Cards get a soft top-to-bottom gradient, an inset 1px top highlight and a long soft shadow; large numerals are Space Grotesk 600 with tabular figures. JetBrains Mono stays for small chart axis labels only.
+- **Tokens** (`src/index.css`, dark under `:root`, light under `[data-theme="light"]`): text `--ov-hi` / `--ov-mid` / `--ov-soft` / `--ov-mute` / `--ov-faint`, divider `--ov-line`; series A (Booked) `--ov-data-a` / `-tint` / `-bar` (gradient) / `-key`, series B (Cancelled) `--ov-data-b` / `-tint` / `-bar` / `-key`; trend `--ov-up` / `--ov-up-tint`, `--ov-stub`, chart `--ov-grid`; attention `--ov-warn` / `--ov-warn-tint`, `--ov-badge-bg` / `--ov-badge-fg`; hero `--ov-hero-soft` / `--ov-hero-dot` / `--ov-hero-btn-text` / `--ov-hero-btn-glow`.
+- **Four surface classes** (each with a light override): `.ov-card` (every card, radius 20, 18 on phones), `.ov-hero` (navy / teal gradient with two radial glows, radius 24, 22 on phones, white text in both themes), `.ov-attn` (card plus an amber top glow and amber border, only when something needs attention), `.ov-ghost` (secondary pill buttons). Helpers: `.ov-hero-chip`, `.ov-hero-btn`, `.ov-link` (clickable card: border one step brighter on hover, no lift), `.ov-grid`, `.ov-chart-bars`.
+- **Backdrop:** `.app-backdrop--v2` = two glows over a 24px dot grid (`#07080D` dark, `#EEF2F3` light), added by `DashboardLayout` on pages in this language.
+- **Type scale:** greeting 46px (32 phones), hero clock 64px with a 22px AM/PM (26/13 phones), trend-card numbers 52px (40 phones), chart totals 34px (30 phones), card titles 19px (18 phones); all Space Grotesk 600, negative tracking (-0.035em on the big ones).
+- **Colour discipline:** amber appears only in the attention panel; green only in the "N more" trend chip and the caught-up state. A "fewer" trend is neutral, not red. No all-caps eyebrow labels; sentence case.
+- **Guardrails:** depth comes only from the card gradient + inset highlight, the long shadow, and the hero/backdrop glows. No blur/glass, animated backgrounds, hover lifts or extra gradients. Touch targets 44px+ on phones.
+
+## v15 (2026-10-02, Prompt 674): current everywhere except pages on the v16 language. Ohvara's own colours are back.
 
 Brayden's call on the v14 result: Restorix's *layout and feel* stays, but the colours go back to Ohvara's own. Every colour token that existed before Prompt 669 is restored verbatim from the pre-669 commit (`ea358dd`): v13's dark palette (navy sidebar `#192C4F`, white / `#93A6C4` / `#5E7195` text, `--bg-panel` `#0F2850`, white sidebar divider) and the teal light family (page `#F3F4F6`, teal sidebar `#008674`, teal text `#016F62`, accent `#024F46`), plus the `aside` token overrides that make text readable on the coloured rail.
 

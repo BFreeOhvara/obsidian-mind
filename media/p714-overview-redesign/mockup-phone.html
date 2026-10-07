@@ -2,76 +2,104 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Ohvara Overview, phone</title>
+<title>Ohvara Overview v2, phone</title>
 
 </head>
 <body>
-<!-- Prompt 714 reference mockup (static). Token values are copied from ohvara-dashboard/src/index.css; in the real build use the var(--token) names, never these hexes. -->
+<!-- Prompt 714 v2 reference mockup (static, sample data). Approved direction. -->
 
 
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap">
 <style>
 body{margin:0}
 a{color:inherit;text-decoration:none}a:hover{color:inherit}
-.ov{--bg-base:#0A0A0F;--bg-sidebar:#192C4F;--bg-surface:#13131A;--bg-elevated:#1C1C26;--border:#2A2A3A;--border-strong:#3A3A4C;--text-primary:#FFFFFF;--text-secondary:#93A6C4;--text-muted:#5E7195;--accent:#4B79CE;--accent-deep:#A9C0EE;--warning:#F59E0B;--warning-bd:rgba(245,158,11,0.25);--success:#22C55E;--side-elevated:#153761;--side-text:#FFFFFF;--side-text-2:#93A6C4;--side-text-3:#5E7195;--side-border:rgba(240,240,245,0.9);--glow-a:rgba(75,121,206,0.22);--glow-b:rgba(25,44,79,0.85);--avatar:#F59E0B}
-.ov button{font-family:inherit;cursor:pointer}
+button{font-family:inherit;cursor:pointer}
 </style>
 
-<div class="ov" style="width: 390px; height: 844px; box-sizing: border-box; overflow: hidden; display: flex; flex-direction: column; background: var(--bg-base); color: var(--text-secondary); font-family: 'Manrope', system-ui, sans-serif; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased">
-<header style="height: 56px; flex-shrink: 0; display: flex; align-items: center; gap: 12px; padding: 0 16px; background: var(--bg-surface); border-bottom: 1px solid var(--border)">
-<button aria-label="Open menu" style="width: 44px; height: 44px; margin-left: -4px; border-radius: 999px; border: 1px solid var(--border); background: var(--bg-surface); color: var(--text-secondary); display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
-<span style="font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 500; color: var(--text-primary)">Overview</span>
+<div style="width: 390px; min-height: 1560px; box-sizing: border-box; display: flex; flex-direction: column; background: #07080D; color: #93A6C4; font-family: 'Manrope', system-ui, sans-serif; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; background-color: #07080D; background-image: radial-gradient(ellipse 70% 50% at 85% -10%, rgba(75,121,206,0.30) 0%, transparent 70%), radial-gradient(ellipse 50% 40% at 0% 0%, rgba(0,191,166,0.10) 0%, transparent 70%), radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px); background-size: auto, auto, 24px 24px">
+<header style="height: 60px; flex-shrink: 0; display: flex; align-items: center; gap: 12px; padding: 0 16px; background: rgba(7,8,13,0.6); border-bottom: 1px solid rgba(255,255,255,0.07)">
+<button aria-label="Open menu" style="width: 44px; height: 44px; margin-left: -4px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.04); color: #C9D4E8; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+<span style="flex: 1; font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 600; color: #FFFFFF">Overview</span>
+<span style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #FBBF24, #F59E0B); color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center">TA</span>
 </header>
-<main style="flex: 1; box-sizing: border-box; padding: 32px 16px 24px; display: flex; flex-direction: column; gap: 28px; background: radial-gradient(ellipse 90% 45% at 100% 0%, var(--glow-a) 0%, transparent 72%), radial-gradient(ellipse 90% 45% at 0% 100%, var(--glow-b) 0%, transparent 72%)">
-<section style="display: flex; flex-direction: column; gap: 20px">
-<div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.14em; color: var(--accent-deep)">TUESDAY · OCT 6<span style="margin: 0 8px; color: var(--text-muted)">/</span><span style="color: var(--text-primary)">10:47 PM</span></div>
-<div>
-<h1 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 500; line-height: 1.1; letter-spacing: -0.03em; color: var(--text-primary)">Good evening, Test</h1>
-<p style="margin: 8px 0 0; font-size: 15px; color: var(--text-secondary)">Nothing on the books today yet.</p>
+<main style="box-sizing: border-box; padding: 16px 16px 32px; display: flex; flex-direction: column; gap: 14px">
+<section style="display: flex; flex-direction: column; gap: 20px; padding: 22px 20px 20px; border-radius: 22px; background: radial-gradient(ellipse 60% 120% at 100% 0%, rgba(75,121,206,0.55) 0%, transparent 65%), radial-gradient(ellipse 40% 90% at 62% 110%, rgba(0,191,166,0.22) 0%, transparent 70%), linear-gradient(135deg, #16294C 0%, #0D1730 60%, #0A1024 100%); border: 1px solid rgba(255,255,255,0.10); box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), 0 30px 60px -30px rgba(0,0,0,0.8)">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<div style="display: inline-flex; align-items: center; gap: 8px; height: 30px; padding: 0 12px; border-radius: 999px; background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.12); color: #fff; font-size: 13px; font-weight: 600"><span style="width: 7px; height: 7px; border-radius: 50%; background: #34E0C4"></span>Tuesday, Oct 6</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 600; line-height: 1; letter-spacing: -0.03em; color: #fff; font-variant-numeric: tabular-nums">10:47<span style="margin-left: 5px; font-size: 13px; font-weight: 500; letter-spacing: 0; color: #B4C3DE">PM</span></div>
 </div>
-<button style="width: 100%; height: 50px; border: none; border-radius: 999px; background: var(--accent); color: #fff; font-size: 16px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18M12 13v5M9.5 15.5h5"/></svg>Book a call</button>
+<div>
+<h1 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 600; line-height: 1.08; letter-spacing: -0.035em; color: #fff">Good evening, Test</h1>
+<p style="margin: 8px 0 0; font-size: 15.5px; color: #B4C3DE">2 calls on the books today.</p>
+</div>
+<button style="width: 100%; height: 50px; border: none; border-radius: 999px; background: #fff; color: #0D1730; font-size: 16px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 9px; box-shadow: 0 10px 30px -10px rgba(127,166,242,0.9)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18M12 13v5M9.5 15.5h5"/></svg>Book a call</button>
 </section>
-<section style="display: flex; flex-direction: column; gap: 12px">
-<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
-<a href="#" style="display: flex; flex-direction: column; justify-content: flex-start; gap: 22px; min-height: 0; box-sizing: border-box; padding: 16px 18px 18px; border-radius: 16px; background: var(--bg-surface); border: 1px solid var(--border)">
-<div style="display: flex; align-items: center; justify-content: space-between; min-height: 20px">
-<span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.08em; white-space: nowrap; color: var(--accent-deep)">BOOKED THIS WEEK</span>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px">
+<a href="#" style="display: flex; flex-direction: column; gap: 16px; padding: 16px 16px 18px; border-radius: 18px; background: linear-gradient(180deg, rgba(255,255,255,0.055) 0%, rgba(255,255,255,0.02) 100%); border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 24px 48px -28px rgba(0,0,0,0.7)">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<span style="width: 34px; height: 34px; border-radius: 10px; background: rgba(75,121,206,0.18); color: #7FA6F2; display: flex; align-items: center; justify-content: center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18M12 13v5M9.5 15.5h5"/></svg></span>
+<div aria-hidden="true" style="display: flex; align-items: flex-end; gap: 3px; height: 30px"><span style="width: 6px; height: 15px; border-radius: 3px; background: #7FA6F2; opacity: 0.45"></span><span style="width: 6px; height: 30px; border-radius: 3px; background: #7FA6F2; opacity: 1"></span><span style="width: 6px; height: 4px; border-radius: 3px; background: rgba(255,255,255,0.10)"></span><span style="width: 6px; height: 4px; border-radius: 3px; background: rgba(255,255,255,0.10)"></span><span style="width: 6px; height: 4px; border-radius: 3px; background: rgba(255,255,255,0.10)"></span><span style="width: 6px; height: 4px; border-radius: 3px; background: rgba(255,255,255,0.10)"></span><span style="width: 6px; height: 4px; border-radius: 3px; background: rgba(255,255,255,0.10)"></span></div>
 </div>
 <div>
-<div style="font-family: 'JetBrains Mono', monospace; font-size: 44px; font-weight: 500; line-height: 1; letter-spacing: -0.04em; color: var(--text-primary); font-variant-numeric: tabular-nums">0</div>
-<div style="margin-top: 8px; font-size: 12.5px; line-height: 1.35; color: var(--text-secondary)">since Monday</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 40px; font-weight: 600; line-height: 1; letter-spacing: -0.035em; color: #FFFFFF; font-variant-numeric: tabular-nums">3</div>
+<div style="margin-top: 8px; font-size: 13.5px; font-weight: 600; color: #C9D4E8">Booked this week</div>
+<div style="margin-top: 8px; display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px; border-radius: 999px; background: rgba(34,197,94,0.14); color: #4ADE80; font-size: 12px; font-weight: 600"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg>1 more</div>
 </div>
 </a>
-
-<a href="#" style="display: flex; flex-direction: column; justify-content: flex-start; gap: 22px; min-height: 0; box-sizing: border-box; padding: 16px 18px 18px; border-radius: 16px; background: var(--bg-surface); border: 1px solid var(--border)">
-<div style="display: flex; align-items: center; justify-content: space-between; min-height: 20px">
-<span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.08em; white-space: nowrap; color: var(--accent-deep)">CANCELLED THIS WEEK</span>
+<a href="#" style="display: flex; flex-direction: column; gap: 16px; padding: 16px 16px 18px; border-radius: 18px; background: linear-gradient(180deg, rgba(255,255,255,0.055) 0%, rgba(255,255,255,0.02) 100%); border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 24px 48px -28px rgba(0,0,0,0.7)">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<span style="width: 34px; height: 34px; border-radius: 10px; background: rgba(0,191,166,0.16); color: #34E0C4; display: flex; align-items: center; justify-content: center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+<div aria-hidden="true" style="display: flex; align-items: flex-end; gap: 3px; height: 30px"><span style="width: 6px; height: 30px; border-radius: 3px; background: #34E0C4; opacity: 0.45"></span><span style="width: 6px; height: 30px; border-radius: 3px; background: #34E0C4; opacity: 1"></span><span style="width: 6px; height: 4px; border-radius: 3px; background: rgba(255,255,255,0.10)"></span><span style="width: 6px; height: 4px; border-radius: 3px; background: rgba(255,255,255,0.10)"></span><span style="width: 6px; height: 4px; border-radius: 3px; background: rgba(255,255,255,0.10)"></span><span style="width: 6px; height: 4px; border-radius: 3px; background: rgba(255,255,255,0.10)"></span><span style="width: 6px; height: 4px; border-radius: 3px; background: rgba(255,255,255,0.10)"></span></div>
 </div>
 <div>
-<div style="font-family: 'JetBrains Mono', monospace; font-size: 44px; font-weight: 500; line-height: 1; letter-spacing: -0.04em; color: var(--text-primary); font-variant-numeric: tabular-nums">0</div>
-<div style="margin-top: 8px; font-size: 12.5px; line-height: 1.35; color: var(--text-secondary)">old policy confirmed cancelled</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 40px; font-weight: 600; line-height: 1; letter-spacing: -0.035em; color: #FFFFFF; font-variant-numeric: tabular-nums">2</div>
+<div style="margin-top: 8px; font-size: 13.5px; font-weight: 600; color: #C9D4E8">Cancelled this week</div>
+<div style="margin-top: 8px; display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px; border-radius: 999px; background: rgba(34,197,94,0.14); color: #4ADE80; font-size: 12px; font-weight: 600"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg>1 more</div>
 </div>
 </a>
 </div>
-
-<div style="display: flex; flex-direction: column; justify-content: space-between; gap: 18px; min-height: 0; box-sizing: border-box; padding: 18px 18px 20px; border-radius: 16px; background: var(--bg-surface); border: 1px solid var(--warning-bd)">
-<div style="display: flex; align-items: center; gap: 10px; min-height: 36px">
-<span style="width: 8px; height: 8px; border-radius: 50%; background: var(--warning)"></span>
-<span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; color: var(--warning)">NEEDS YOUR ATTENTION</span>
-<span style="flex: 1"></span>
-<a href="#" style="flex-shrink: 0; height: 44px; padding: 0 18px; box-sizing: border-box; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--bg-elevated); color: var(--text-primary); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px">Review<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+<div style="display: flex; flex-direction: column; padding: 18px 18px 18px; border-radius: 18px; background: radial-gradient(ellipse 90% 45% at 50% 0%, rgba(245,158,11,0.16) 0%, transparent 70%), linear-gradient(180deg, rgba(255,255,255,0.055) 0%, rgba(255,255,255,0.02) 100%); border: 1px solid rgba(245,158,11,0.28); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 24px 48px -28px rgba(0,0,0,0.7)">
+<div style="display: flex; align-items: center; gap: 12px">
+<span style="width: 36px; height: 36px; border-radius: 11px; background: rgba(245,158,11,0.16); color: #FBBF24; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v5M12 16.5v.5"/><path d="M10.3 3.9 2.6 17.5A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></span>
+<h2 style="flex: 1; margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 600; letter-spacing: -0.01em; color: #FFFFFF">Needs your attention</h2>
+<span style="min-width: 30px; height: 30px; box-sizing: border-box; padding: 0 10px; border-radius: 999px; background: #F59E0B; color: #1A1203; font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center">3</span>
 </div>
+<p style="margin: 14px 0 6px; font-size: 14px; line-height: 1.5; color: #B4C3DE">These clients didn't pick up. Re-book a time, or Fulfillment will try again.</p>
+<div style="display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.07); ">
+<span style="width: 38px; height: 38px; flex-shrink: 0; border-radius: 50%; background: rgba(245,158,11,0.16); color: #FBBF24; font-size: 12.5px; font-weight: 700; display: flex; align-items: center; justify-content: center">DW</span>
+<div style="flex: 1; min-width: 0">
+<div style="font-size: 14.5px; font-weight: 600; color: #FFFFFF">Dana Whitfield</div>
+<div style="margin-top: 2px; font-size: 12.5px; color: #8697B5">Aetna · 2 tries, last on Monday</div>
+</div>
+<button style="height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.06); color: #fff; font-size: 13px; font-weight: 600">Re-book</button>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.07); ">
+<span style="width: 38px; height: 38px; flex-shrink: 0; border-radius: 50%; background: rgba(245,158,11,0.16); color: #FBBF24; font-size: 12.5px; font-weight: 700; display: flex; align-items: center; justify-content: center">MR</span>
+<div style="flex: 1; min-width: 0">
+<div style="font-size: 14.5px; font-weight: 600; color: #FFFFFF">Marcus Reyes</div>
+<div style="margin-top: 2px; font-size: 12.5px; color: #8697B5">Mutual of Omaha · 1 try, today</div>
+</div>
+<button style="height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.06); color: #fff; font-size: 13px; font-weight: 600">Re-book</button>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; padding: 14px 0; ">
+<span style="width: 38px; height: 38px; flex-shrink: 0; border-radius: 50%; background: rgba(245,158,11,0.16); color: #FBBF24; font-size: 12.5px; font-weight: 700; display: flex; align-items: center; justify-content: center">LP</span>
+<div style="flex: 1; min-width: 0">
+<div style="font-size: 14.5px; font-weight: 600; color: #FFFFFF">Lorraine Pruitt</div>
+<div style="margin-top: 2px; font-size: 12.5px; color: #8697B5">Transamerica · 2 tries, last on Friday</div>
+</div>
+<button style="height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.06); color: #fff; font-size: 13px; font-weight: 600">Re-book</button>
+</div>
+<a href="#" style="margin-top: 8px; height: 44px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.06); color: #fff; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px">Open in My Pipeline<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 20px; padding: 18px 18px 16px; border-radius: 18px; background: linear-gradient(180deg, rgba(255,255,255,0.055) 0%, rgba(255,255,255,0.02) 100%); border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 24px 48px -28px rgba(0,0,0,0.7)">
 <div>
-<div style="display: flex; align-items: baseline; gap: 14px; min-width: 0">
-<div style="font-family: 'JetBrains Mono', monospace; font-size: 52px; font-weight: 500; line-height: 1; letter-spacing: -0.04em; color: var(--warning); font-variant-numeric: tabular-nums">3</div>
-<div style="font-size: 17px; font-weight: 600; color: var(--text-primary); line-height: 1.25">clients didn't pick up</div>
+<h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 600; letter-spacing: -0.01em; color: #FFFFFF">Your last 7 days</h2>
+<div style="margin-top: 10px; display: flex; gap: 16px"><span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #C9D4E8"><span style="width: 10px; height: 10px; border-radius: 3px; background: #4B79CE"></span>Booked</span>
+<span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #C9D4E8"><span style="width: 10px; height: 10px; border-radius: 3px; background: #00BFA6"></span>Cancelled</span></div>
 </div>
-<div style="margin-top: 10px; font-size: 14px; color: var(--text-secondary)">Re-book a time, or Fulfillment will try again.</div>
+<div style="display: flex; gap: 28px"><div><div style="font-family: 'Space Grotesk', sans-serif; font-size: 30px; font-weight: 600; line-height: 1; letter-spacing: -0.03em; color: #FFFFFF">10</div><div style="margin-top: 6px; font-size: 13px; color: #8697B5">booked</div></div><div><div style="font-family: 'Space Grotesk', sans-serif; font-size: 30px; font-weight: 600; line-height: 1; letter-spacing: -0.03em; color: #FFFFFF">8</div><div style="margin-top: 6px; font-size: 13px; color: #8697B5">cancelled</div></div></div>
+<div style="display: flex; align-items: flex-end; gap: 2px; background-image: linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px); background-size: 100% 36px; background-position: 0 11px"><div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 10px"><div style="height: 120px; display: flex; align-items: flex-end; gap: 4px"><span style="width: 11px; height: 72px; border-radius: 4px 4px 2px 2px; background: linear-gradient(180deg, #7FA6F2, #4B79CE)"></span><span style="width: 11px; height: 36px; border-radius: 4px 4px 2px 2px; background: linear-gradient(180deg, #34E0C4, #00A892)"></span></div><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500; color: #5E7195; white-space: nowrap">30</span></div><div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 10px"><div style="height: 120px; display: flex; align-items: flex-end; gap: 4px"><span style="width: 11px; height: 36px; border-radius: 4px 4px 2px 2px; background: linear-gradient(180deg, #7FA6F2, #4B79CE)"></span><span style="width: 11px; height: 72px; border-radius: 4px 4px 2px 2px; background: linear-gradient(180deg, #34E0C4, #00A892)"></span></div><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500; color: #5E7195; white-space: nowrap">1</span></div><div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 10px"><div style="height: 120px; display: flex; align-items: flex-end; gap: 4px"><span style="width: 11px; height: 3px; border-radius: 4px 4px 2px 2px; background: linear-gradient(180deg, #7FA6F2, #4B79CE)"></span><span style="width: 11px; height: 3px; border-radius: 4px 4px 2px 2px; background: linear-gradient(180deg, #34E0C4, #00A892)"></span></div><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500; color: #5E7195; white-space: nowrap">2</span></div><div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 10px"><div style="height: 120px; display: flex; align-items: flex-end; gap: 4px"><span style="width: 11px; height: 108px; border-radius: 4px 4px 2px 2px; background: linear-gradient(180deg, #7FA6F2, #4B79CE)"></span><span style="width: 11px; height: 36px; border-radius: 4px 4px 2px 2px; background: linear-gradient(180deg, #34E0C4, #00A892)"></span></div><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500; color: #5E7195; white-space: nowrap">3</span></div><div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 10px"><div style="height: 120px; display: flex; align-items: flex-end; gap: 4px"><span style="width: 11px; height: 72px; border-radius: 4px 4px 2px 2px; background: linear-gradient(180deg, #7FA6F2, #4B79CE)"></span><span style="width: 11px; height: 72px; border-radius: 4px 4px 2px 2px; background: linear-gradient(180deg, #34E0C4, #00A892)"></span></div><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500; color: #5E7195; white-space: nowrap">4</span></div><div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 10px"><div style="height: 120px; display: flex; align-items: flex-end; gap: 4px"><span style="width: 11px; height: 36px; border-radius: 4px 4px 2px 2px; background: linear-gradient(180deg, #7FA6F2, #4B79CE)"></span><span style="width: 11px; height: 36px; border-radius: 4px 4px 2px 2px; background: linear-gradient(180deg, #34E0C4, #00A892)"></span></div><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500; color: #5E7195; white-space: nowrap">5</span></div><div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 10px"><div style="height: 120px; display: flex; align-items: flex-end; gap: 4px"><span style="width: 11px; height: 72px; border-radius: 4px 4px 2px 2px; background: linear-gradient(180deg, #7FA6F2, #4B79CE)"></span><span style="width: 11px; height: 36px; border-radius: 4px 4px 2px 2px; background: linear-gradient(180deg, #34E0C4, #00A892)"></span></div><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; color: #FFFFFF; white-space: nowrap">6</span></div></div>
 </div>
-</div>
-
-
-</section>
 </main>
 </div>
 
