@@ -81,16 +81,28 @@ tags:
 
 Scope note: still layers on top of Prompt 695's No answer status/color/layout work, which stands as-is — this prompt is the automated recovery behavior running underneath that same status.
 
-## Prompt 711 — Sidebar: move the bug button in from the floating corner, add a matching phone-icon button, both anchored above the account block, centered bug-report modal
+## Prompt 712 — Billing page: Premium cap 14→16 submissions/week, plan-card copy says "max of N submissions a week"
 
-Brayden compared Ohvara's sidebar to Restorix's directly (4 screenshots) and wants Ohvara to match Restorix's existing pattern in three ways.
+Brayden reviewed the live Billing page (`/agent/billing`, screenshot: Standard $350/wk · 7 submissions a week, Premium $500/wk · 14 submissions a week, currently the active plan).
 
-**1. Move the bug-report button out of its current floating bottom-right corner position and into the sidebar**, placed directly above the account-switcher block (the "Test Agent / AGENT" block at the bottom of the sidebar) — same spot and circular-icon style Restorix already uses.
+**1. Raise Premium's weekly submission cap from 14 to 16.** Find the actual source of truth for this limit (plan config/constant, DB column, wherever the enforcement check reads it — not just the display string) and change it there, so the real cap enforced on booking actually becomes 16, not just the number shown on the card. Standard's cap stays 7 — unchanged.
 
-**2. Add a second, matching icon button next to it — the phone icon Restorix shows in that same row.** Check what Restorix's phone-icon button actually does before building Ohvara's version: if an equivalent feature already exists somewhere in Ohvara (e.g. a mobile-app link, a QR/scan prompt, anything matching Restorix's intent), relocate it here rather than inventing new behavior. **If nothing equivalent exists in Ohvara yet, don't guess what it should do — flag this specific question back to Brayden/Eagle before building new functionality behind it**, and in the meantime it's fine to ship the bug-button move alone and hold the phone icon for a follow-up once its purpose is confirmed.
+**2. Reword both plan cards' submission line to make clear the number is a hard cap**, e.g. "max of 7 submissions a week" / "max of 16 submissions a week" (Brayden's own phrasing — exact wording is fine to match the page's existing tone, but it must read as a maximum, not just a flat count).
 
-**3. Anchor both icons to the account-switcher block, not to the fixed bottom of the viewport**, so they move together as a unit. Restorix's own behavior (shown across the screenshots) is the reference: when the account block expands — e.g. showing a "Sign out" option on click — the icon row slides up with it, keeping the same even spacing above the block at all times, rather than staying pinned to the bottom edge while the block grows underneath it.
+**3. Verify "Submissions this week — X of Y used" on the same page reads off the same single source of truth you changed in step 1**, so Premium shows "of 16" automatically once the cap is updated — don't hardcode 16 separately there if it's meant to derive from the plan's cap value. Flag in the ship note if this count is in fact a separate hardcoded value somewhere and had to be updated by hand.
 
-**4. Change the bug-report popup from a corner popup into a centered modal**, matching Restorix's exact pattern: a dimmed backdrop over the rest of the page, a centered dialog titled "Report a Bug," a "WHAT HAPPENED?" labeled textarea with placeholder "Describe what you were doing and what went wrong...", and Cancel / Submit buttons. Match this styling and copy, not just the general idea of a modal.
+Scope note: Billing page only — cap value + copy wording. Don't touch Stripe price IDs/amounts ($350/$500 stay the same), just the submission-count cap and its label.
 
-Scope note: sidebar chrome (icon row placement/anchoring) + the bug-report modal's presentation only — no change to what bug reports actually do with the submitted text, nav items, or the account-switcher block's own content.
+## Prompt 713 — URGENT/SECURITY: commission_schedule table is publicly readable+writable, enable RLS with a real policy
+
+**Priority: do this one first, ahead of anything else in the queue.** Supabase's own security advisor (confirmed independently by Eagle via the Supabase MCP tools, not just the alert email) flags `public.commission_schedule` on the `ohvara-dashboard` project (ref `jjextitmbptoaolacocs`) as ERROR-level: RLS is disabled on this table, meaning right now, live, anyone with the project URL can read and write all 2,860 rows over the REST API with zero authentication. No login needed to pull or tamper with the company's full carrier/product/tier commission-rate data.
+
+**Table shape:** `commission_schedule(id bigint pk, carrier text, type text, product text, tier integer, pct numeric)`. No owner/agent column — this is a shared global reference table (commission rates by carrier/product/tier), not per-user data. It's read by `compute_policy_estimated_commission()`, which is a `SECURITY DEFINER` function — so it runs with elevated privileges and will keep working regardless of what RLS policy you put on the table; you do not need to special-case that function.
+
+**Fix: enable RLS on this table and add an actual policy, don't just flip RLS on and leave it default-deny.** Suggested shape, adjust if the app's real access pattern differs:
+- `SELECT`: allow `authenticated` role (any logged-in agent/admin can see commission rates — reasonable since it's internal reference data, not secret-per-agent). Do NOT allow `anon`.
+- `INSERT`/`UPDATE`/`DELETE`: admin-only (match however admin-gating is already done elsewhere in this schema — there's an existing `is_admin()` helper function, reuse it rather than inventing a new check).
+
+Verify after: re-run the Supabase security advisor (or `get_advisors` type `security`) and confirm the `rls_disabled_in_public` finding for `commission_schedule` is gone, and manually confirm an anonymous/unauthenticated request can no longer read or write the table.
+
+**Not in scope for this item, but flag in the ship note for a possible follow-up prompt:** the same advisor scan also surfaced ~20 functions with a mutable `search_path` and ~77 `SECURITY DEFINER` functions callable by `anon`/`authenticated` that were likely not all audited for whether that's intentional, plus leaked-password-protection being off in Auth settings. None of those are the live data-exposure emergency this prompt addresses — don't scope-creep into fixing them here, just note in the ship note that a broader security-advisor cleanup pass may be worth queuing separately.
