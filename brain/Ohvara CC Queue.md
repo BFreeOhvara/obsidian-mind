@@ -80,3 +80,29 @@ tags:
 - **Stop at:** a real SMS-capable Twilio number + completed A2P 10DLC registration. Check first whether the existing `CALLER_ID_TWILIO_FROM_NUMBER` is already SMS-capable before assuming a second number is needed. Flag exactly what Brayden needs to go do, mirroring how Prompt 393/666/673's blockers are written, and build/verify everything that doesn't depend on it in the meantime.
 
 Scope note: still layers on top of Prompt 695's No answer status/color/layout work, which stands as-is — this prompt is the automated recovery behavior running underneath that same status.
+
+## Prompt 710 — Lead detail modal: verify the Progress skip-step oddity, drop Carrier confirmation #, rename "Leaving" to "Carrier"
+
+Three items from the same lead-detail modal on My Pipeline.
+
+**1. Progress tracker shows a skipped middle step — verify whether this is only sample-data, or a real logic gap.** On a Cancelled lead, the Progress list shows "Booked" (checked) and "Old policy cancelled" (checked) but "Waiting for Fulfillment to call" sits unchecked/skipped in between — reads inconsistent, like a step got jumped. Brayden flagged this looking at test data and isn't sure if it's just the seed data not populating that middle timestamp, or a real gap in how the resolution logic marks progress steps complete. **CC: check both** — if it's purely synthetic seed data that doesn't fill every stage realistically, fix the seed generator so sample leads show a coherent progression; separately, confirm the *real* booking → Fulfillment-call → resolution flow always marks every intervening progress step complete when a lead actually resolves (don't let a real lead end up looking like it skipped a step it didn't actually skip). Document which of the two (or both) was the actual cause in the ship note.
+
+**2. Remove the "Carrier confirmation #" field entirely.** Brayden's call: it's an unnecessary extra step for Fulfillment to capture when closing out a cancellation — drop the field from the detail modal, and drop whatever requirement/prompt asks Fulfillment to enter one when resolving a lead to Cancelled. No replacement field needed.
+
+**3. Rename "Leaving" to "Carrier" everywhere it's used as a label** — the My Pipeline table column header, the detail modal's field label (next to the carrier name, e.g. "Allstate"), and anywhere else this same label appears (check Book a call's own form if it has a "Leaving" field, and Overview/Activity if they reference it). Brayden's reasoning: "Leaving" assumes the client is departing that carrier entirely, but that's not always true — they might be closing out one policy with a carrier and opening a new one with the same carrier, so the label shouldn't imply departure. "Carrier" is accurate regardless of what's actually happening with that relationship.
+
+Scope note: this modal + wherever "Leaving"/Carrier confirmation # appear elsewhere in the portal per item 3's sweep — no change to the underlying Booked → Cancelled/No-answer resolution logic itself beyond what item 1's verification turns up.
+
+## Prompt 711 — Sidebar: move the bug button in from the floating corner, add a matching phone-icon button, both anchored above the account block, centered bug-report modal
+
+Brayden compared Ohvara's sidebar to Restorix's directly (4 screenshots) and wants Ohvara to match Restorix's existing pattern in three ways.
+
+**1. Move the bug-report button out of its current floating bottom-right corner position and into the sidebar**, placed directly above the account-switcher block (the "Test Agent / AGENT" block at the bottom of the sidebar) — same spot and circular-icon style Restorix already uses.
+
+**2. Add a second, matching icon button next to it — the phone icon Restorix shows in that same row.** Check what Restorix's phone-icon button actually does before building Ohvara's version: if an equivalent feature already exists somewhere in Ohvara (e.g. a mobile-app link, a QR/scan prompt, anything matching Restorix's intent), relocate it here rather than inventing new behavior. **If nothing equivalent exists in Ohvara yet, don't guess what it should do — flag this specific question back to Brayden/Eagle before building new functionality behind it**, and in the meantime it's fine to ship the bug-button move alone and hold the phone icon for a follow-up once its purpose is confirmed.
+
+**3. Anchor both icons to the account-switcher block, not to the fixed bottom of the viewport**, so they move together as a unit. Restorix's own behavior (shown across the screenshots) is the reference: when the account block expands — e.g. showing a "Sign out" option on click — the icon row slides up with it, keeping the same even spacing above the block at all times, rather than staying pinned to the bottom edge while the block grows underneath it.
+
+**4. Change the bug-report popup from a corner popup into a centered modal**, matching Restorix's exact pattern: a dimmed backdrop over the rest of the page, a centered dialog titled "Report a Bug," a "WHAT HAPPENED?" labeled textarea with placeholder "Describe what you were doing and what went wrong...", and Cancel / Submit buttons. Match this styling and copy, not just the general idea of a modal.
+
+Scope note: sidebar chrome (icon row placement/anchoring) + the bug-report modal's presentation only — no change to what bug reports actually do with the submitted text, nav items, or the account-switcher block's own content.

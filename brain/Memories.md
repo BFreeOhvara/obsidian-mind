@@ -1080,3 +1080,9 @@ Status: no work done; waiting on Brayden.
 Lesson: a styling-only prompt that names a colour by reference ("the divider's white") maps to an existing token; reuse the token rather than hardcoding a hex.
 
 Status: shipped and pushed. Queue now 673 and 696, both waiting on Brayden.
+
+[CC | 2026-10-07 — Prompt 709: Confirm number purple → teal, shipped (`ohvara-dashboard` `70dc4a1`)] 673 and 696 still wait on Brayden, so 709 was next runnable. Added `--teal / --teal-dim / --teal-bd` to `index.css` (dark #14B8A6, light #0F766E, matching the other status tokens' dim/border pattern) and switched `STAGE.confirmNumber` to a `teal` tone; added `teal` to the `TONE` map in `agentBookings.js` and the duplicate map in `FulfillmentQueue.jsx`. One token drives both the filter pill and the per-row badge. `--purple` tokens kept (still referenced by the tone maps). The row's "Confirm number" action button was already accent-colored, so untouched. `vite build` clean; not eyeballed (no agent creds this session). Queue re-read right before removing 709: a new 711 had been appended mid-session and was preserved.
+
+Lesson: re-reading the queue before the sweep write again caught a mid-session append (711); the rule works.
+
+Status: shipped and pushed. Queue now 673, 696 (blocked on Brayden), 710, 711.

@@ -30,6 +30,8 @@ tags:
 
 ---
 
+**Prompt 709 shipped 2026-10-07 (`70dc4a1`, no migration). "Confirm number" status is teal, not purple: new `--teal` tokens (dark #14B8A6, light #0F766E) in `index.css`, `teal` tone in the agent and Fulfillment tone maps. Filter pill and row badge change together; behavior, label and placement untouched.**
+
 **Prompt 705 shipped 2026-10-06 (`c30b6f9`, no migration). Settings → Profile AP goal block removed (plus unused `useMonthlyGoals.js`); Overview had no goal bar to remove. DB table/column/trigger for AP goals left in place. Detail: [[Memories]] 2026-10-06.**
 
 **Prompt 704 shipped 2026-10-06 (`ec8fb0e`, migration 124 live). Messages conversation rows have an avatar circle (photo or two-initial colored fallback) for the counterpart; thread RPCs now return avatar_url/avatar_color. Not browser-verified. Detail: [[Memories]] 2026-10-06.**
