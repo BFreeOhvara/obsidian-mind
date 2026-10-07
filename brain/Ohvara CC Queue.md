@@ -80,15 +80,3 @@ tags:
 - **Stop at:** a real SMS-capable Twilio number + completed A2P 10DLC registration. Check first whether the existing `CALLER_ID_TWILIO_FROM_NUMBER` is already SMS-capable before assuming a second number is needed. Flag exactly what Brayden needs to go do, mirroring how Prompt 393/666/673's blockers are written, and build/verify everything that doesn't depend on it in the meantime.
 
 Scope note: still layers on top of Prompt 695's No answer status/color/layout work, which stands as-is — this prompt is the automated recovery behavior running underneath that same status.
-
-## Prompt 712 — Billing page: Premium cap 14→16 submissions/week, plan-card copy says "max of N submissions a week"
-
-Brayden reviewed the live Billing page (`/agent/billing`, screenshot: Standard $350/wk · 7 submissions a week, Premium $500/wk · 14 submissions a week, currently the active plan).
-
-**1. Raise Premium's weekly submission cap from 14 to 16.** Find the actual source of truth for this limit (plan config/constant, DB column, wherever the enforcement check reads it — not just the display string) and change it there, so the real cap enforced on booking actually becomes 16, not just the number shown on the card. Standard's cap stays 7 — unchanged.
-
-**2. Reword both plan cards' submission line to make clear the number is a hard cap**, e.g. "max of 7 submissions a week" / "max of 16 submissions a week" (Brayden's own phrasing — exact wording is fine to match the page's existing tone, but it must read as a maximum, not just a flat count).
-
-**3. Verify "Submissions this week — X of Y used" on the same page reads off the same single source of truth you changed in step 1**, so Premium shows "of 16" automatically once the cap is updated — don't hardcode 16 separately there if it's meant to derive from the plan's cap value. Flag in the ship note if this count is in fact a separate hardcoded value somewhere and had to be updated by hand.
-
-Scope note: Billing page only — cap value + copy wording. Don't touch Stripe price IDs/amounts ($350/$500 stay the same), just the submission-count cap and its label.
