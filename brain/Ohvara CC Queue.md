@@ -92,17 +92,3 @@ Brayden reviewed the live Billing page (`/agent/billing`, screenshot: Standard $
 **3. Verify "Submissions this week — X of Y used" on the same page reads off the same single source of truth you changed in step 1**, so Premium shows "of 16" automatically once the cap is updated — don't hardcode 16 separately there if it's meant to derive from the plan's cap value. Flag in the ship note if this count is in fact a separate hardcoded value somewhere and had to be updated by hand.
 
 Scope note: Billing page only — cap value + copy wording. Don't touch Stripe price IDs/amounts ($350/$500 stay the same), just the submission-count cap and its label.
-
-## Prompt 713 — URGENT/SECURITY: commission_schedule table is publicly readable+writable, enable RLS with a real policy
-
-**Priority: do this one first, ahead of anything else in the queue.** Supabase's own security advisor (confirmed independently by Eagle via the Supabase MCP tools, not just the alert email) flags `public.commission_schedule` on the `ohvara-dashboard` project (ref `jjextitmbptoaolacocs`) as ERROR-level: RLS is disabled on this table, meaning right now, live, anyone with the project URL can read and write all 2,860 rows over the REST API with zero authentication. No login needed to pull or tamper with the company's full carrier/product/tier commission-rate data.
-
-**Table shape:** `commission_schedule(id bigint pk, carrier text, type text, product text, tier integer, pct numeric)`. No owner/agent column — this is a shared global reference table (commission rates by carrier/product/tier), not per-user data. It's read by `compute_policy_estimated_commission()`, which is a `SECURITY DEFINER` function — so it runs with elevated privileges and will keep working regardless of what RLS policy you put on the table; you do not need to special-case that function.
-
-**Fix: enable RLS on this table and add an actual policy, don't just flip RLS on and leave it default-deny.** Suggested shape, adjust if the app's real access pattern differs:
-- `SELECT`: allow `authenticated` role (any logged-in agent/admin can see commission rates — reasonable since it's internal reference data, not secret-per-agent). Do NOT allow `anon`.
-- `INSERT`/`UPDATE`/`DELETE`: admin-only (match however admin-gating is already done elsewhere in this schema — there's an existing `is_admin()` helper function, reuse it rather than inventing a new check).
-
-Verify after: re-run the Supabase security advisor (or `get_advisors` type `security`) and confirm the `rls_disabled_in_public` finding for `commission_schedule` is gone, and manually confirm an anonymous/unauthenticated request can no longer read or write the table.
-
-**Not in scope for this item, but flag in the ship note for a possible follow-up prompt:** the same advisor scan also surfaced ~20 functions with a mutable `search_path` and ~77 `SECURITY DEFINER` functions callable by `anon`/`authenticated` that were likely not all audited for whether that's intentional, plus leaked-password-protection being off in Auth settings. None of those are the live data-exposure emergency this prompt addresses — don't scope-creep into fixing them here, just note in the ship note that a broader security-advisor cleanup pass may be worth queuing separately.
