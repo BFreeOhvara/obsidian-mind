@@ -1106,3 +1106,10 @@ Status: shipped and pushed. Queue now 673, 696 (blocked on Brayden), 711.
 - Lesson: the existing `billing_status='exempt'` was webhook-adjacent state; a separate boolean is the right shape for "never billed", since Stripe sync can't overwrite it.
 
 Status: partial. 673 stays in [[Ohvara CC Queue]] (deploy + live e2e + flip); 696 still waits on Twilio SMS/A2P.
+
+### 2026-10-06 — "run the next Ohvara task": queue fully blocked, nothing shipped [CC]
+- Queue: 673 (blocked), 696 (blocked on Twilio SMS/A2P), 714 (⏸ HOLD on Brayden's mockup sign-off). Nothing actionable.
+- Retried the 673 `agent-billing` deploy: denied again by the auto-mode classifier (Production Deploy). Same fix as before: Brayden runs it himself, or adds a Bash allow rule for `npx supabase functions deploy` so CC can do it. `ohvara-dashboard` is clean at `d2d8fc4`, pushed.
+- Committed Eagle's uncommitted P714 queue item + `media/p714-overview-redesign/` mockups so they can't get lost.
+
+Status: no change. Next CC work needs one of: deploy permission (673), Brayden's live-card e2e (673), A2P number (696), or the P714 hold lifted.
