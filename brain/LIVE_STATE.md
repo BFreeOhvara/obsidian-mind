@@ -128,7 +128,7 @@ Brayden's own framing, worth keeping in mind while building rather than executin
 
 ---
 
-### ⏸ PENDING BRAYDEN'S GO-AHEAD — Prompt 673 go-live. Deploy ✅ (v3), webhook ✅, test-mode E2E ✅ 2026-10-02 (subscribe/portal/cancel/renew). Failed-renewal path not yet exercised. Go-live = live key + live webhook secret + flip `agent_billing_enforced`, only on Brayden's say-so.
+### ⏸ PENDING BRAYDEN — Prompt 673 go-live. 2026-10-06: live key + live webhook set; `billing_exempt` shipped (`d2d8fc4`, mig 128). Still needed: deploy `agent-billing` (classifier denied CC), live e2e with Brayden's real card, then flip `agent_billing_enforced`. Older notes: Prompt 673 go-live. Deploy ✅ (v3), webhook ✅, test-mode E2E ✅ 2026-10-02 (subscribe/portal/cancel/renew). Failed-renewal path not yet exercised. Go-live = live key + live webhook secret + flip `agent_billing_enforced`, only on Brayden's say-so.
 
 `STRIPE_SECRET_KEY` (test) is in. The `agent-billing` edge function is written, unit-tested and pushed (`5b7f4e3`), but **CC's auto-mode classifier denied the deploy**. It handles Checkout, Customer Portal, a status re-sync, and the Stripe webhook at a `/webhook` subpath. The $350/week Price, Product and Portal config create themselves on first use. Brayden:
 1. ✅ **Deployed 2026-10-02** (v1; `status` reports configured, test mode). Was: tell CC to deploy and approve the prompt, or run `supabase functions deploy agent-billing --no-verify-jwt --project-ref jjextitmbptoaolacocs` from `ohvara-dashboard`. `--no-verify-jwt` is required (Stripe's webhook has no user JWT; the function checks users itself).
