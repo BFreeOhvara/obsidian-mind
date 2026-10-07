@@ -1065,3 +1065,18 @@ Status: shipped. Queue now 673 (waits on Brayden) and 696 (waits on Twilio SMS/A
 Lesson: fix a repeated layout bug in the shared placeholder component, not per page; the per-page fix (P700) left Loading and every other page with the same gap.
 
 Status: shipped. Queue now 673 (waits on Brayden's go-ahead) and 696 (waits on Twilio SMS/A2P); nothing runnable.
+
+[CC | 2026-10-07 — "Run next Ohvara task": queue checked, nothing runnable] Read-only session, no code or vault edits besides this entry. Re-read [[Ohvara CC Queue]] twice from disk (second time after "retry"): still only Prompts 673 and 696, vault clean at `2d5ab8a`.
+- **673 (Stripe $350/week):** e2e passed in test mode 2026-10-02. Going live (live key, `agent_billing_enforced`, exempt test accounts) needs Brayden's explicit go-ahead. Failed-renewal path (`past_due` + 48h grace) still untested; needs Oct 9 renewal or a Stripe test clock.
+- **696 (no-answer recovery):** built through the SMS blocker (`95c04b0`, mig 122), `sms_live = false`. Needs an SMS-capable Twilio number with A2P 10DLC, then flip "Texting live" in Settings → Text follow-up.
+- Nothing newer in [[LIVE_STATE]] changes either status. Told Brayden both are blocked on him.
+
+Lesson: when every queue item is marked "CC skips until Brayden acts," report the blockers and stop; re-reading the queue on "retry" is cheap but won't change the answer.
+
+Status: no work done; waiting on Brayden.
+
+[CC | 2026-10-07 — Prompt 708: sidebar header restyle, shipped (`ohvara-dashboard` `e53a816`)] Queue's 673 and 696 are both still waiting on Brayden, so 708 was the next runnable item. It had been wiped from the queue by the known read/write race and was re-added before this session. All in `Sidebar.jsx`, no migration: (1) removed the header's `borderBottom` divider, (2) collapse button is now a rounded box (`borderRadius: 8`, 28px) outlined in `var(--sidebar-border)`, the colour the divider used, instead of the grey circle (inline override, so the shared `.icon-btn` used elsewhere is untouched), (3) the two-line "Ohvara / <Role> Portal" title is one "Ohvara Portal" line in the same display font/size/weight/white, for every role; the unused `PORTAL_LABELS` map is deleted. Header height stays 64px so nothing moves. `npm run build` clean; not eyeballed in a browser (no agent creds this session).
+
+Lesson: a styling-only prompt that names a colour by reference ("the divider's white") maps to an existing token; reuse the token rather than hardcoding a hex.
+
+Status: shipped and pushed. Queue now 673 and 696, both waiting on Brayden.
