@@ -81,18 +81,6 @@ tags:
 
 Scope note: still layers on top of Prompt 695's No answer status/color/layout work, which stands as-is — this prompt is the automated recovery behavior running underneath that same status.
 
-## Prompt 710 — Lead detail modal: verify the Progress skip-step oddity, drop Carrier confirmation #, rename "Leaving" to "Carrier"
-
-Three items from the same lead-detail modal on My Pipeline.
-
-**1. Progress tracker shows a skipped middle step — verify whether this is only sample-data, or a real logic gap.** On a Cancelled lead, the Progress list shows "Booked" (checked) and "Old policy cancelled" (checked) but "Waiting for Fulfillment to call" sits unchecked/skipped in between — reads inconsistent, like a step got jumped. Brayden flagged this looking at test data and isn't sure if it's just the seed data not populating that middle timestamp, or a real gap in how the resolution logic marks progress steps complete. **CC: check both** — if it's purely synthetic seed data that doesn't fill every stage realistically, fix the seed generator so sample leads show a coherent progression; separately, confirm the *real* booking → Fulfillment-call → resolution flow always marks every intervening progress step complete when a lead actually resolves (don't let a real lead end up looking like it skipped a step it didn't actually skip). Document which of the two (or both) was the actual cause in the ship note.
-
-**2. Remove the "Carrier confirmation #" field entirely.** Brayden's call: it's an unnecessary extra step for Fulfillment to capture when closing out a cancellation — drop the field from the detail modal, and drop whatever requirement/prompt asks Fulfillment to enter one when resolving a lead to Cancelled. No replacement field needed.
-
-**3. Rename "Leaving" to "Carrier" everywhere it's used as a label** — the My Pipeline table column header, the detail modal's field label (next to the carrier name, e.g. "Allstate"), and anywhere else this same label appears (check Book a call's own form if it has a "Leaving" field, and Overview/Activity if they reference it). Brayden's reasoning: "Leaving" assumes the client is departing that carrier entirely, but that's not always true — they might be closing out one policy with a carrier and opening a new one with the same carrier, so the label shouldn't imply departure. "Carrier" is accurate regardless of what's actually happening with that relationship.
-
-Scope note: this modal + wherever "Leaving"/Carrier confirmation # appear elsewhere in the portal per item 3's sweep — no change to the underlying Booked → Cancelled/No-answer resolution logic itself beyond what item 1's verification turns up.
-
 ## Prompt 711 — Sidebar: move the bug button in from the floating corner, add a matching phone-icon button, both anchored above the account block, centered bug-report modal
 
 Brayden compared Ohvara's sidebar to Restorix's directly (4 screenshots) and wants Ohvara to match Restorix's existing pattern in three ways.
