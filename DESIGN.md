@@ -1,6 +1,6 @@
 ---
 date: 2026-06-07
-updated: 2026-10-07
+updated: 2026-10-08
 description: "Ohvara design system — color tokens, typography, anti-rules. Read before touching any UI component."
 tags:
   - brain
@@ -11,7 +11,7 @@ tags:
 
 > Read before touching any UI component.
 
-## v16 (2026-10-07, Prompt 714): Overview pilot, the new visual language. Current for `/agent` and `/agent/book` (P715).
+## v16 (2026-10-07, Prompt 714): Overview pilot, the new visual language. Current for `/agent`, `/agent/book` (P715) and `/agent/clients` (P717).
 
 Brayden called the agent Overview bland, rejected a flat v1, and approved a richer direction (quality bar: Watermelon UI dashboards). `/agent` is the pilot; the portal-wide rollout reads from this entry. Every other page still follows v15.
 
@@ -23,6 +23,7 @@ Brayden called the agent Overview bland, rejected a flat v1, and approved a rich
 - **Colour discipline:** amber appears only in the attention panel; green only in the "N more" trend chip and the caught-up state. A "fewer" trend is neutral, not red. No all-caps eyebrow labels; sentence case.
 - **Guardrails:** depth comes only from the card gradient + inset highlight, the long shadow, and the hero/backdrop glows. No blur/glass, animated backgrounds, hover lifts or extra gradients. Touch targets 44px+ on phones.
 - **P716 — solid glass cards** (2026-10-08): `.ov-card` and `.ov-attn` are opaque in both themes (dark base `#161922`→`#10121A`, attn `#171820`→`#10121A`; light `#FFFFFF`→`#F2F7F6`, attn `#FFFFFF`→`#FBF6F1`), so the dot grid only shows between cards. The glass look comes from the bright inset top edge, a faint top-left corner sheen, the slight vertical shade, the border and the long shadow; light mode has the same cues.
+- **P717 — My Pipeline** (`/agent/clients`, 2026-10-08): the **tabs + rows + drawer** pattern for list pages. A "Find any client" `.ov-hero` with `.ov-hero-search` (searches every status; "/" focuses it; results dropdown is `.ov-card.ov-pop`), a "Your pipeline" `.ov-card` with a proportional status bar, a `.ov-range` switch and four status tabs (`.ov-tab`; selected = status tint gradient + edge border; chips that scroll below 640px), one list for the selected status (per-status columns `.ov-cols-{booked,noAnswer,needs,cancelled}`, clickable `.ov-row` rows, a table from 1024px and stacked `.ov-tile` cards below), and client details in a right-side `.ov-drawer` over `.ov-scrim` (full-screen sheet below 640px). Adds status tokens `--ov-st-{booked,noanswer,needs,cancelled}` each with `-tint` / `-edge`, plus `--ov-hover`, `--ov-table-head`, `--ov-scrim`, `--ov-live`; classes `.ov-tile` (small raised tile: date tile, drawer info tiles, phone cards), `.ov-solid` (white pill on dark, deep teal on light). Components in `AgentUI.jsx`: `ClientSearch`, `PipelineTabs`, `StatusList`, `StatusPill`, `ClientDrawer`, `InfoTile`, `StatusNote`, `Journey`. The four status colours are used everywhere a status shows on the page (tab dots, bar, avatars, pills, drawer tint).
 - **P715 — Book a call** (`/agent/book`, 2026-10-07): adds tokens `--ov-placeholder`, `--ov-pick` (selected day label + check), `--ov-seg-on` (filled weekly-meter segment) and classes `.ov-input` (48px input box, 50 on phones; `:focus-within` ring, `.is-error`), `.ov-choice` (day cards + time slots; `.is-on` = selected day), `.ov-slot-on` (selected slot gradient), `.ov-step` (1/2 badge), `.ov-note` (info box; `.is-warn` amber), `.ov-day` (container query: long date only when the card has room), `.ov-book` / `.ov-book-side` (two columns + sticky 380px summary at 1280px). Components in `AgentUI.jsx`: `StepHead`, `OvField`, `DayChoice`, `SlotGrid`, `BookingSummary` (+ phone bottom bar), `WeeklyUsage` (+ phone pill), `BookedCard`. Slot times are Space Grotesk, not mono.
 
 ## v15 (2026-10-02, Prompt 674): current everywhere except pages on the v16 language. Ohvara's own colours are back.
