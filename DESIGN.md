@@ -11,7 +11,7 @@ tags:
 
 > Read before touching any UI component.
 
-## v16 (2026-10-07, Prompt 714): Overview pilot, the new visual language. Current for `/agent` only.
+## v16 (2026-10-07, Prompt 714): Overview pilot, the new visual language. Current for `/agent` and `/agent/book` (P715).
 
 Brayden called the agent Overview bland, rejected a flat v1, and approved a richer direction (quality bar: Watermelon UI dashboards). `/agent` is the pilot; the portal-wide rollout reads from this entry. Every other page still follows v15.
 
@@ -22,6 +22,7 @@ Brayden called the agent Overview bland, rejected a flat v1, and approved a rich
 - **Type scale:** greeting 46px (32 phones), hero clock 64px with a 22px AM/PM (26/13 phones), trend-card numbers 52px (40 phones), chart totals 34px (30 phones), card titles 19px (18 phones); all Space Grotesk 600, negative tracking (-0.035em on the big ones).
 - **Colour discipline:** amber appears only in the attention panel; green only in the "N more" trend chip and the caught-up state. A "fewer" trend is neutral, not red. No all-caps eyebrow labels; sentence case.
 - **Guardrails:** depth comes only from the card gradient + inset highlight, the long shadow, and the hero/backdrop glows. No blur/glass, animated backgrounds, hover lifts or extra gradients. Touch targets 44px+ on phones.
+- **P715 — Book a call** (`/agent/book`, 2026-10-07): adds tokens `--ov-placeholder`, `--ov-pick` (selected day label + check), `--ov-seg-on` (filled weekly-meter segment) and classes `.ov-input` (48px input box, 50 on phones; `:focus-within` ring, `.is-error`), `.ov-choice` (day cards + time slots; `.is-on` = selected day), `.ov-slot-on` (selected slot gradient), `.ov-step` (1/2 badge), `.ov-note` (info box; `.is-warn` amber), `.ov-day` (container query: long date only when the card has room), `.ov-book` / `.ov-book-side` (two columns + sticky 380px summary at 1280px). Components in `AgentUI.jsx`: `StepHead`, `OvField`, `DayChoice`, `SlotGrid`, `BookingSummary` (+ phone bottom bar), `WeeklyUsage` (+ phone pill), `BookedCard`. Slot times are Space Grotesk, not mono.
 
 ## v15 (2026-10-02, Prompt 674): current everywhere except pages on the v16 language. Ohvara's own colours are back.
 
