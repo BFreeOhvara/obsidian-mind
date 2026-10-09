@@ -1396,3 +1396,8 @@ Status: 724 shipped and removed from [[Ohvara CC Queue]] (re-read right before r
 - DESIGN.md: P732 line added under v16, P723's "switched on the No answer count" corrected.
 - Status: P732 removed from [[Ohvara CC Queue]]. Queue now: P673 (needs Brayden's email alias + his card), P696, P725, P731 (all wait on Brayden).
 
+
+[CC | 2026-10-09 — "run the next Ohvara task": P673 step 1 blocked by classifier, nothing shipped]
+- Queue: P673, P696, P725, P731 all open; only P673 is CC-actionable. Brayden gave the throwaway agent's alias: `braydenohvara+agenttest@gmail.com`.
+- Step 1 (insert `test_1usd` row into `agent_billing_tiers`: 100 cents/week, cap 1, lookup key `ohvara_agent_test_1usd_weekly`, sort 99) was **denied by the auto-mode classifier** ([Modify Shared Resources]) on the live `execute_sql`. Nothing was written. Steps 2-6 not started (they depend on step 1 and on Brayden's card).
+- Brayden: either approve `execute_sql` for CC, or run the insert in the Supabase SQL editor: `insert into public.agent_billing_tiers (key, name, weekly_cents, weekly_cap, stripe_lookup_key, sort_order, is_active) values ('test_1usd','Test $1',100,1,'ohvara_agent_test_1usd_weekly',99,true);` Then say "go" and CC does step 2 (create the throwaway agent) next.
