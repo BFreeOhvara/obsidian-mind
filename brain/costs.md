@@ -24,6 +24,7 @@ tags:
 
 | Service | Status |
 |---|---|
+| **Anthropic API — carrier hours lookup (Prompt 728)** | Edge fn `carrier-hours` (Claude Haiku 5.5 + web search, max 4 searches). **Not** stubbed by `DEMO_MODE` (a stub would cache fake hours); its own switch is the `CARRIER_LOOKUP_LIVE` secret (default on) plus `app_settings.carrier_lookup_live` for agents (**off** until Brayden spot-checks lookups on Admin → Carrier hours; admins' "Look up again" always runs). Cost: **about 2–5 cents per new carrier, once** (web search $10 per 1,000 searches + a few thousand Haiku tokens); cached 180 days after, so most picks cost nothing. A saved 9–5 fallback is re-tried after 7 days. |
 | **Anthropic API** | **Stubbed as of 2026-06-21 (Prompt 25).** `DEMO_MODE=true` Supabase secret set on `jjextitmbptoaolacocs`; all three live Anthropic callers (`recommend-stack`, `generate-ai-script`, `score-roleplay`) check the flag first and return pre-baked/deterministic responses in the exact same shape as the real AI path — zero API calls made, verified live (`recommend-stack` test invoke returned the fallback stack in ~1s, no real-call latency). No real setters/clients yet, so nothing currently needs live AI. **To go live:** `supabase secrets set DEMO_MODE=false --project-ref jjextitmbptoaolacocs`, no code changes needed. Auto-reload still set ($10 trigger → $50 top-up) for whenever it's flipped back on. |
 
 ---
