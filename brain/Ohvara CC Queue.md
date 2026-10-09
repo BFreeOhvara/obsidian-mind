@@ -95,70 +95,71 @@ tags:
 
 Scope note: still layers on top of Prompt 695's No answer status/color/layout work, which stands as-is — this prompt is the automated recovery behavior running underneath that same status.
 
-## Prompt 725 — Billing: the comped account looks and behaves exactly like a paying Premium agent (no "Exempt" anywhere, full 16-booking cap)
+## Prompt 725 — Billing: the comped account looks and behaves exactly like a paying Premium agent
 
-> **✅ REQUESTED by Brayden 2026-10-09 (Eagle session): "I want all that taken out... I want it to look like as if I just have purchased the premium plan... I want the portal to just detect that I just have the premium plan, so I still have the 16 bookings and things like that. I'm not technically exempt, but I just don't pay."** CC: build this. No new mockup: the target is the existing Billing page in its normal paid state (the page as it already renders for an active Premium agent). **Run on Opus 5.5** (it replaces a database function that the booking cap trigger depends on).
+> **🟡 2026-10-09 CC: BUILT + PUSHED (`ohvara-dashboard` `693b45d`), only the migration is left — needs Brayden.** The auto-mode classifier denied `apply_migration` for `supabase/migrations/131_comped_agent_cap.sql` (committed in the repo). Brayden pastes that file into the Supabase SQL editor, or approves `apply_migration` for CC; then CC deletes this item. Until then Test Agent's bookings card says "Nothing limits your bookings" instead of N of 16. Full spec and ship note: [[Memories]] 2026-10-09 "P725". CC skips this item until it's applied.
 
-**What this is.** Today an account with `profiles.billing_exempt = true` (Brayden's Test Agent) sees a special "exempt preview": an "Exempt" chip, "Exempt accounts aren't charged.", a "Preview: your account is exempt…" banner, "Exempt accounts have no limit.", "Not charged while exempt", a dead Manage billing button, no Next charge date, no plan name on the Settings card, and **no weekly booking cap at all**. Brayden wants to test the product as a real top-tier agent, so all of that goes. The account should be **comped, not exempt**: it never pays and is never locked out, but everything the agent can see and every limit that applies behaves as on an active Premium plan.
+## Prompt 726 — My Pipeline layout: two equal boxes on the left, statuses on top of one fixed list box, "Needs you" becomes "Needs attention", no more page twitch
 
-Keep the `billing_exempt` column and its meaning **internally**: no Stripe customer, no gate lock, webhooks ignore the account, an agent can't change it themselves. Only the **agent-facing** presentation and the cap change. Don't rename the column. The admin Users page keeps showing "Exempt" for admins (that's how Brayden still sees who is comped); don't touch `src/pages/admin/Users.jsx` or the `exempt` entry in `BILLING_STATUS`.
+> **✅ APPROVED by Brayden 2026-10-09 (Falcon session): "Perfect. I love that. So now let's cue that for CC."** CC: build this. **Sonnet 5.5 is enough** (agent UI only, built from an approved mockup; no migration, no data changes).
 
-### 1. The Billing page (`src/components/agent/BillingPanel.jsx`)
+**Reference mockup (source of truth for sizes, colours, spacing):** `media/p726-my-pipeline-layout/mockup-dark.html` in the vault. It's interactive: click the status tabs; the dashed "Mockup only" toggle in the corner empties Needs attention to show the empty state (that toggle is **not** part of the build). `mockup-v1-not-used.html` beside it is the rejected first try; ignore it. Static with **sample data**: every name, city, carrier, time and count is made up. The sidebar and header are P722 context; build only the page body (plus the copy changes in section 5). Fonts fall back offline; the real build uses Space Grotesk and Manrope. No light or phone mockup: derive light from the existing v16 light tokens, and phone from P717's phone behaviour (section 4).
 
-Treat a comped account as **`status = 'active'` on its tier** for everything it renders. Introduce `const comped = !!profile.billing_exempt` and derive from it; remove the `exempt` branches (and the `Eye` import if unused).
+**What this is.** `/agent/clients` (`Clients.jsx` + the P717 components in `AgentUI.jsx`) gets a new layout. Same data, same hooks, same mutations, same drawer, same URL params (`open`, `rebook`, `stage`, `range`), same admin branch. Brayden's three problems, in his words:
+1. *"Needs you"* should be **"Needs attention"**, and it has two kinds: the agent has to **confirm the number**, or has to **call and rebook** the client on their own time.
+2. **The page twitches** when switching statuses: the list box's height follows the number of rows, so the page scrollbar appears and disappears and everything jumps sideways (e.g. empty Needs you → Cancelled). Every status has to sit still.
+3. He likes the bar and the status picker, but the page wastes the sides, and "Find any client" was too big for what it does. He wants **two identical-size boxes stacked on the left** and **the statuses on top of the box the clients are in**.
 
-- **Remove the preview banner** ("Preview: your account is exempt…"). Nothing replaces it.
-- **Hero (`planHero`):** the normal Active hero: chip **"Active"** (`is-active`), plan name, price, and the line **"Paid through Sun, Oct 11. Next charge of $500 on Mon, Oct 12, renews automatically."**, phone line "Next charge Mon, Oct 12", the Manage billing button (enabled, not dimmed), and the days-to-renewal ring.
-  - A comped account has no Stripe period, so its **renewal date is the end of its booking week**: use `usage.week_end` (Monday 00:00 in the agent's zone, from `useWeeklyUsage`) wherever the real build uses `profile.billing_current_period_end` (`periodEnd`, `days`, the "Paid through" day). Real paying agents keep using `billing_current_period_end` exactly as today.
-  - While `usage` is loading, fall back to the generic Active text ("Paid up. Renews automatically.") with no ring, as the code already does when the date is missing.
-- **Which plan:** `profile.billing_tier` (migration below sets it to `premium`). Keep the fallback to the plan with the most bookings if the tier is somehow missing.
-- **Bookings card:** the normal capped card (`BookingMeter` with `cap.used` / `cap.cap`, the 16 segments, "N left", note "Resets Monday at midnight. The limit is per account, not per person on the login."). At the cap it shows the paused message exactly as a real agent would; there is no next tier above Premium, so no upgrade button.
-  - Remove the "Exempt accounts have no limit." note and the `exempt` branch in `bookingsCard`.
-- **Plans section:** the current plan's footer note is the normal **"Renews Mon, Oct 12"** (from the derived date), not "Not charged while exempt". The other plan's switch button is enabled (`canSwitch` true for a comped account), with the normal "Switch to Standard / Upgrade" labels and helper text.
-- **Buttons:** Manage billing and Switch/Upgrade are **enabled** for a comped account (don't disable them just because Stripe isn't configured or the account is comped), and **`go()` no longer short-circuits on exempt**. A click goes to the `agent-billing` function, which already answers a comped account with **409 "Your account isn't billed."**; show that message in the existing error box. Nothing is ever opened in Stripe and nothing is charged. (This is the one honest seam: Brayden sees the real flow and the real message instead of a dead button.)
-- **"Billing isn't connected yet" note:** don't show it for a comped account (it has nothing to connect).
-- `status` for the unsubscribed/trial views and `subscribed` use the derived `'active'`, so a comped agent never lands on the "choose a plan" view.
+### 1. Desktop layout (≥ 1280px)
 
-### 2. Everywhere else the agent sees the account
+- Page body is a grid: `grid-template-columns: 400px minmax(0, 1fr)`, gap 20px, `max-width: 1680px`, centred. It **fills the height under the header and the page itself never scrolls** at this width. Do it with flex/grid height (`height: 100%` chain or `100dvh` minus the header from a single shared CSS variable), **not** a hard-coded pixel offset; Memories line ~813 records the last time a hard-coded 160px offset brought a page scrollbar back. If the viewport is too short for the content (under ~720px tall), let the page scroll normally rather than squashing.
+- **Left column:** two boxes with `grid-template-rows: 1fr 1fr`, gap 16px, so they are **always exactly the same height** whatever the data. Each box clips its own overflow; nothing in them may push the column taller.
+  - **Find any client** (the existing `ClientSearch` hero, restyled smaller as in the mockup): title 24px, the one-line subtitle, the search field (50px tall, placeholder "Name, phone, city or carrier", "/" focuses it as today; the results dropdown is unchanged). City now matches too (P724 added `client_city`). Under it, **"Recently booked"**: the agent's 3 most recently created bookings (any status, newest first, from the rows `useAgentBookings` already loads), each a row with the avatar in its status colour, name, "City, ST · Carrier" (just the carrier if no city) and a status pill. Clicking one opens that client exactly like a search pick does (`?open=<id>&stage=<tab>`). If the agent has no bookings, show "Nobody booked yet" with a Book a call link instead of the list.
+  - **Your pipeline** (`PipelineTabs`'s summary part): "Your pipeline", the big total + "· N cancelled", the range switch (This week / This month / All time, unchanged behaviour), the proportional bar (unchanged), then **a 2×2 grid of small tiles**, one per status: dot + name, count, and its share of the total as a % (0% when the total is 0; round so it reads cleanly). At the bottom, separated by a hairline: **"Next Fulfillment call"**: the soonest booked call still in the future (same rule as P723's `ComingUpCard`: `stageOf === 'booked'` and a future `scheduled_call_at`), as a date tile + "Name · time" (client time zone, P724's `callWhen`/`tz` rules) and an "Open" link to that client. If there isn't one: "No calls booked" + a Book a call link. The range switch changes the total, bar and tiles as it changes the counts today; the next call ignores the range.
+- **Right column: one list box** filling the full height.
+  - **Top of the box: the four status tabs in a row** (`grid-template-columns: repeat(4, 1fr)`, gap 10px, 16px padding, hairline under them). Same look and behaviour as P717's tabs: dot, name, sub-line, count; selected = status tint gradient + edge border + name in the status colour; a zero count is dimmed; arrow keys move between them; `?stage=` still wins on load; the page still opens on Booked. Sub-lines: Booked "Waiting for Fulfillment", No answer "Fulfillment will try again", Needs attention "**N to confirm · N to call**" (or "All caught up" at 0), Cancelled "Old policy cancelled".
+  - **Under the tabs: the list for the selected tab**, in a body that **scrolls inside the box** (`overflow-y: auto`, `scrollbar-gutter: stable`, thin scrollbar as in the mockup) with the column header row sticky at the top of that scroll area. The box never changes size when the tab or the number of rows changes.
+  - **Columns** (5-column grid, `minmax(0,1.5fr) minmax(0,1fr) 210px minmax(0,1fr) 150px`): keep each tab's current data and wording from P717 + P724 (client with "📍 City, ST · phone", carrier, the date tile + client-time call, status text, the chevron or action). The mockup's column titles are the guide: Booked "Client / Carrier they're leaving / Fulfillment call / Status"; No answer "Client / Carrier they're leaving / Next try / Status" (use whatever the No answer rows show today for the next try / recovery phase; don't invent data); Cancelled "Client / Carrier cancelled / Cancelled / Status". The separate "Booked · Waiting for Fulfillment · 5 clients" heading above the old list goes away (the selected tab says it).
+  - Cancelled paging ("Show N more") stays as is, inside the scroll area.
+  - **Empty states** sit centred in the same box (it does not shrink). Needs attention empty: green check tile, **"Nothing needs your attention"**, "When a number needs confirming or a client needs a call from you, they'll show up here." Other tabs keep their current empty copy, centred the same way.
+- The client drawer, scrim, reschedule / re-book / confirm-number flows inside it are unchanged.
 
-- **Header line (`DashboardLayout.jsx`, `BillingLine`):** a comped agent gets the same pieces as a paying one: the plan pill ("Premium") **and** "Next charge Mon, Oct 12" (use `usage.week_end` for a comped account). Remove the `!profile.billing_exempt` condition for the pill/next-charge logic.
-- **Settings account card (`src/pages/Settings.jsx`, `AccountCard`):** show "Agent · Premium" for a comped agent (treat comped as `running`; drop the `!profile.billing_exempt` condition). Update the comment above it.
-- **Sidebar user card** (bottom left, "Agent · Premium") already reads the plan; confirm it shows Premium for a comped agent and fix if it keys off status.
-- Search the repo for any other agent-facing text containing "exempt", "Exempt", "comped" or "Not charged" (components, hooks, edge function responses shown to agents) and remove or neutralise it. Allowed to stay: code comments, `billing.js` internals (`billingAccess` still never locks a comped agent), the admin Users page, the 409 message above.
+### 2. Needs attention: two groups inside the list
 
-### 3. Database (migration 131)
+The Needs attention tab shows its rows in **two groups**, each with a small header band (amber 3.5% tint, 30px amber icon tile, bold title + count in amber, one grey line under it). Only show a group that has rows.
 
-Next free number after P724's `130_client_city_timezone.sql`; check the folder and use the next one. Additive and safe:
+1. **Confirm the number** (phone icon). Line: "Fulfillment couldn't get through. Check the number with the client and it goes back to No answer for more tries." Rows: the P696 recovery phase `number_check`. Column 3 "What happened" = the existing phase text for it (e.g. "The number didn't connect"). Action: the existing **Confirm number** button (solid amber), same handler as today.
+2. **Call and rebook** (calendar icon). Line: "Texts and a retry call didn't reach them. Call them on your own time and book a new call." Rows: **everything else that lands on the needs tab today** (`tabOf(...) === 'needs'`, i.e. `call_directly` plus any non-recovery rows that already sit there for opted-out agents). Column 3 = the existing phase / reason text. Action: the existing **Rebook** button (amber ghost style), same handler as today (opens the drawer with `rebook=1`).
 
-1. **Replace `public.agent_weekly_usage`** (the version from `128_billing_exempt.sql`) so a comped agent gets its tier's cap. The only change is the `weekly_cap` column of the result:
-   - was: `case when v_role = 'agent' and not v_exempt and v_status <> 'exempt' then t.weekly_cap else null end`
-   - now: `case when v_role = 'agent' then t.weekly_cap else null end`
-   Everything else in the function stays identical (signature, `security definer`, grants, tz and week maths, the `enforced` flag). `policies_enforce_weekly_cap` reads this function, so the cap is enforced for the comped account the same as for a paying one, **when `app_settings.agent_billing_enforced` is on** (as for everyone). Read the trigger function from `119_agent_billing_tiers.sql` and any later replacement to confirm it has no separate exempt check; grep `supabase/` for `billing_exempt` in SQL (functions, policies, views) and report anything else that treats exempt as uncapped. Non-agents still get `null`.
-2. **Put the comped agent on Premium:** `update public.profiles set billing_tier = 'premium' where billing_exempt and role = 'agent' and exists (select 1 from public.agent_billing_tiers where key = 'premium');` The privileged-column guard only blocks `authenticated` users; a migration runs as the owner, so this is fine. Don't touch `billing_status`, Stripe ids or `billing_exempt`.
-3. Don't change the guard trigger, the webhook handler (`syncSubscription` keeps ignoring comped accounts) or `billingAccess`.
+The column header row for this tab reads "Client / Carrier they're leaving / What happened". No change to how a client moves between statuses; this is only how the tab is shown. If the mapping of rows to the two groups isn't as clean as above in the real code, pick the closest honest split and note it in the ship log.
 
-**Heads-up for the ship note:** with enforcement on, the comped account now **cannot make a 17th booking in a week** (the cap trigger refuses it, same message a paying agent gets). That is intended: Brayden wants to test the real limit. If he needs to book past it for a demo he can turn `agent_billing_enforced` off in `app_settings` or raise Premium's `weekly_cap`; don't build anything for that.
+### 3. Stop the twitch on every page
 
-### 4. Files and rules
+Add `scrollbar-gutter: stable` to whichever element is the app's page scroller (check whether that's `html` or DashboardLayout's main; put it on that one only so there's no double gutter). Check it on a page that scrolls (Activity) and one that doesn't (Overview): no sideways shift between them, and no visible empty strip in either theme. That fixes the jump on every page, not just this one.
 
-- **New:** `supabase/migrations/131_comped_agent_cap.sql` (or the next free number).
-- **Edit:** `src/components/agent/BillingPanel.jsx`, `src/components/layout/DashboardLayout.jsx`, `src/pages/Settings.jsx`, `src/lib/billing.js` only if a tiny helper (`isComped(profile)`) helps keep the three call sites consistent.
-- **No** changes to `AgentUI.jsx`, the admin pages, the edge functions, or Stripe/webhook logic. No new dependencies. Sentence case, existing tokens and classes.
-- Don't send test charges, don't open Stripe, and don't write test data to production.
+### 4. Narrower screens
 
-### 5. Verify and log
+- **1024–1279px:** the two left boxes sit side by side in a row above the list box (`grid-template-columns: 1fr 1fr`, same equal height), the list box below them; the page scrolls normally here (the list doesn't need its own scroll). Tabs stay 4 across if they fit, else 2×2 (P717's rule).
+- **Below 1024px / phones:** keep P717's behaviour: stacked boxes, the tabs as scrolling chips (44px touch targets), rows as stacked cards, the drawer as a full-screen sheet. Recently booked shows 3 rows; the 2×2 tiles stay 2×2. No horizontal scroll at 390px.
 
-- `vite build` passes. Render `/agent/billing`, the header line and the Settings account card through a throwaway Vite harness with mocked hooks, as earlier prompts did:
-  - **comped agent, Premium, 1 of 16 used:** looks identical to a paying Active Premium agent (chip "Active", the paid-through and next-charge line, the ring, 16 segments with "15 left", "Renews Mon, Oct 12" on the current plan, the Standard card's switch button enabled). **No** "Exempt", "Preview", "not charged", "no limit" text anywhere on the page (grep the rendered text).
-  - comped agent at **16 of 16:** the paused message, no upgrade button
-  - a **paying** Active agent: unchanged from today (still uses `billing_current_period_end`)
-  - the other statuses (`past_due`, `canceled`, none) unchanged
-  - click Manage billing on a comped account with the function mocked to return the 409: the "Your account isn't billed." message shows and nothing navigates
-  - phone width and light mode
-  Delete the harness.
-- Ship note in [[Memories]]. Say plainly it wasn't seen logged in, that the migration was or wasn't applied, and that the comped agent is now capped at 16 a week when billing enforcement is on. Brayden checks:
-  - Billing shows an Active Premium account with a next-charge date, and not a single word about exempt
-  - the header says Premium with a next charge date, and Settings says "Agent · Premium"
-  - the bookings card counts toward 16
-  - clicking Manage billing tells him "Your account isn't billed" and nothing opens
-- Update `DESIGN.md`: a comped account (`billing_exempt`) is presented as Active on its tier, its renewal date is the end of the booking week, and the cap applies; "Exempt" is admin-only wording.
+### 5. "Needs you" → "Needs attention" everywhere an agent sees it
+
+`grep -rn -i "need you\|needs you" src/` and change every **agent-facing** string: My Pipeline tab + empty state, the P722 header pill ("3 need you" → "3 need attention", "1 needs attention"), the sidebar badge's tooltip / aria-label, global search status pill / meta, the drawer's status pill / note, the Overview box if any copy still says "need you" (P723's box already reads "Needs your attention"; leave that). Keep the internal key `needs` and every `?stage=` value (`needs`, `needsAttention`, `confirmNumber`) working. Don't touch Fulfillment or admin wording unless it's the same shared string. Update [[DESIGN]] v16's P717 line (the label and the new layout) and add a "P726 — My Pipeline layout" line.
+
+### 6. Files and rules
+
+- Expect `src/pages/agent/Clients.jsx`, `src/components/agent/AgentUI.jsx` (`ClientSearch`, `PipelineTabs`, `StatusList`, new small pieces for Recently booked / status tiles / next call / the needs groups), `src/lib/agentBookings.js` (labels), `src/index.css`, the header/search/sidebar files for the copy only, `DashboardLayout.jsx` only if the height chain or the scrollbar-gutter needs it. No migration, no new hooks, no new dependencies.
+- Design tokens only (no hard-coded colours outside the existing `--ov-*` / status tokens; add tokens if one is missing). Light mode must work.
+- Don't touch Fulfillment's Pipeline page or `Pipeline.jsx`.
+
+### 7. Verify and log
+
+- `vite build` + eslint clean on touched files. Throwaway Vite harness with mocked hooks and sample rows (delete it, never commit), Playwright + local Chrome:
+  - 1920×930 and 1440×900, dark and light: click every tab, including an **empty** Needs attention, and **measure that the list box's and the left boxes' bounding rects don't change by a single pixel** and that the page has no scrollbar. Both left boxes the same height (measure).
+  - A long Booked list (20+ rows): scrolls inside the box, header row stays put, the page doesn't scroll.
+  - Needs attention with both groups, only one group, and none.
+  - 1100px (two left boxes side by side) and 390px phone (no horizontal scroll, chips, cards, sheet).
+  - Recently booked click and the Next call "Open" land on the right client's drawer and tab; empty versions of both.
+  - The scrollbar-gutter check from section 3.
+  - `grep` the rendered agent pages for "need you" / "Needs you": zero hits.
+- Ship note in [[Memories]]: say plainly it wasn't seen logged in. Brayden checks: (1) switching between every status on My Pipeline, nothing on the page moves; (2) the two left boxes are the same size; (3) Needs attention shows "Confirm the number" and "Call and rebook" with the right buttons; (4) a long list scrolls inside the box; (5) no "Needs you" anywhere; (6) dark, light and his phone.
