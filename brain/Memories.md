@@ -1237,3 +1237,7 @@ Status: 722 shipped and removed from [[Ohvara CC Queue]] (re-read right before r
 - Lesson: a `flex: 1 1 220px` child inside a column-direction flex container turns its basis into a **height** (a 220px blank gap on the phone header). Reset it to `flex: none` in the column layout.
 
 Status: 723 shipped and removed from [[Ohvara CC Queue]] (re-read right before removal). Queue now 673 (Brayden: deploy + live-card e2e), 696 (Twilio A2P), 724 (Book a call: city/state, client time zone), 725 (billing: comped agent looks like a paying Premium).
+
+
+[CC | 2026-10-09 — P723 wrap: vault sweep committed]
+- P723 is fully logged above (dashboard `18dec72`). Vault commit `9d968a2` ("Log P723 ship, clear from queue") also swept up the manager-chat leftovers: `CLAUDE.md`, `brain/model-check skill.md`, `media/p723-overview-final/`, `media/p724-book-a-call/`. Both repos pushed and clean. Queue now 673 (Brayden), 696 (Twilio A2P), 724, 725 (both Opus 5.5).
