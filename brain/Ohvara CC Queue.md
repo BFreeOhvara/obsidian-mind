@@ -98,3 +98,86 @@ Scope note: still layers on top of Prompt 695's No answer status/color/layout wo
 ## Prompt 725 — Billing: the comped account looks and behaves exactly like a paying Premium agent
 
 > **🟡 2026-10-09 CC: BUILT + PUSHED (`ohvara-dashboard` `693b45d`), only the migration is left — needs Brayden.** The auto-mode classifier denied `apply_migration` for `supabase/migrations/131_comped_agent_cap.sql` (committed in the repo). Brayden pastes that file into the Supabase SQL editor, or approves `apply_migration` for CC; then CC deletes this item. Until then Test Agent's bookings card says "Nothing limits your bookings" instead of N of 16. Full spec and ship note: [[Memories]] 2026-10-09 "P725". CC skips this item until it's applied.
+
+## Prompt 731 — Invite an agent: a pop-up in the account menu that sends a personal sign-up link by text or email
+
+> **✅ APPROVED by Brayden 2026-10-09 (Eagle session) after the "Ohvara Invite an Agent" canvas (https://claude.ai/artifact/3PfPYy9i8D8GfbS6A3LZUV; static copies in `media/p731-invite-an-agent/`).** His words: an agent should be able to invite another agent so it can "spider web". "Put it where [the account menu has] get phone app, report problem, theme and then invite another agent". "It's just a pop-up that looks like any other pop-up. You select if you want to send it via email or phone number, and then you type out their email or phone number. But I don't want them to be able to copy a link and send it. I want them to send it to phone numbers or emails specifically." And: "there's no concept of teams anyway... you're just inviting another agent to use the platform. You don't have any ties to them whatsoever through portals." Final copy: the only note in the pop-up is **"The link is single-use and expires in 7 days."** **Run on Opus 5.5** (new edge function that creates accounts' sign-up links, an RLS change on `rep_invites`, and a change to `claim-invite`).
+
+**What this is.** A small pop-up, not a page. The agent picks **Text message** or **Email**, types the number or address, presses **Send invite**, and Ohvara sends the person a personal link. The agent never sees or copies the link. The invited person signs up like any new agent (name, email, password, then picks and pays for a plan). **There is no team, no upline, no tie between the two accounts, and the inviter sees nothing of the invitee.** No new page, no new sidebar item, no list of sent invites for the agent.
+
+### 1. The pop-up (`src/components/shared/InviteAgentModal.jsx`, new)
+
+Build to the canvas (boards "Text", "Email", "Sent"). Same mechanics as `BugReportButton.jsx` (portal to `<body>`, dark overlay, click-outside and Escape close, `maxWidth` 460, autofocus the field), but in the v16 language of the canvas: pill buttons (`.ov-solid` white primary, `.ov-ghost` secondary), `--ov-*` tokens, sentence case, 20px display title.
+
+- **Title** "Invite an agent"; subtitle **"We send them a personal link to sign up for Ohvara. It only works for the number or email you enter."**; close X.
+- **Segmented control** "Text message | Email" (default Text). Switching clears the field and the error.
+- **Field** labelled "Their phone number" (phone icon, `formatPhoneInput`, US 10-digit) or "Their email" (mail icon). Focused style as the canvas.
+- **Note** (info-style box, lock icon): **"The link is single-use and expires in 7 days."** Nothing else in it. Don't add copy about teams, accounts or visibility.
+- **Buttons:** Cancel (ghost) and **Send invite** (white, user-plus icon). Disabled until the field is valid (email regex as `claim-invite`; phone = 10 digits, or 11 starting with 1). While sending: "Sending…", disabled.
+- **After sending:** the "Sent" board: a green check box, **"Invite sent to (713) 555-0142"** (or the email) and **"They'll get their own account once they sign up."**, buttons "Invite another" (resets to the form) and "Done".
+- **Errors** show above the buttons in the danger colour, using the function's message (e.g. "That person already has an account.", "You've sent a lot of invites today. Try again tomorrow.", "Couldn't send that. Try again.").
+- **A channel that isn't switched on yet:** on open, call the function's `status` action (below). If a channel isn't available its tab stays visible but muted; selecting it shows the note **"Texting invites is coming soon."** / **"Email invites are coming soon."** in place of the field and Send is disabled. Never let an agent "send" when nothing can go out.
+- Phone width: the modal is full width minus 16px padding, buttons stack on very narrow screens.
+
+**Menu.** `src/components/layout/AccountMenu.jsx` gets a new row **"Invite an agent"** (lucide `UserPlus`, same row style as "Get the phone app") **between "Get the phone app" and "Report a problem"**, with the same stagger timing (shift the later rows' delay by one step). New prop `onInvite`, wired where `onPhoneApp`/`onReport` are (the sidebar user card and the collapsed rail), opening the modal. **Agents only**: don't show it to admin, fulfillment or any other role (`profile.role === 'agent'`). Keyboard/menuitem behaviour unchanged. The row works on the collapsed rail's menu too.
+
+### 2. Sending — new edge function `send-agent-invite`
+
+`supabase/functions/send-agent-invite/index.ts`, **verify_jwt ON** (it's called from the signed-in app via `supabase.functions.invoke`). Service-role client for writes. Two actions:
+
+- `{ action: 'status' }` → `{ email: boolean, sms: boolean }`: `email` is true when `RESEND_API_KEY` and `INVITE_FROM_EMAIL` are set; `sms` is true when Twilio is configured (same lookup as `recovery-sms`: `RECOVERY_TWILIO_*` else `CALLER_ID_TWILIO_*`, from number) **and `recovery_config.sms_live` is true** (that flag means the number is SMS-capable and A2P-registered; don't build a second flag).
+- `{ action: 'send', channel: 'email' | 'sms', to }`:
+  1. Caller = the JWT's user; load the profile; require `role = 'agent'` (and `is_active`). Else 403.
+  2. Validate and normalise: email lowercased and trimmed; phone to E.164 (`toE164` as in `recovery-sms`). Else 400 "Enter a valid email" / "Enter a valid phone number".
+  3. Refuse if the channel isn't available (`status` says false): 409 "Email invites are coming soon." / "Texting invites is coming soon."
+  4. **Rate limit:** at most **10 invites per agent per rolling 24h** (count `rep_invites` rows by `created_by` and `created_at`) and at most **3 to the same destination per agent per 24h**. Else 429 with the message above.
+  5. **Existing account:** for email, if `auth.users` already has that email (`adminClient.auth.admin.listUsers` filtered, or a `profiles` email lookup if one exists; read how `claim-invite` reports "already exists"), return 409 "That person already has an account." (Accepted trade-off: it reveals that an address is registered; it's agents inviting people they know. Don't add the same check for phone numbers; there's nothing to look up.)
+  6. **Supersede:** delete any unused, unexpired invite this agent already sent to the same destination, so the destination has one live link.
+  7. Insert `rep_invites` (service role): `role = 'agent'`, `created_by` = caller, new random 12-char URL-safe token (same generator as the admin flow; read `useCreateInvite` in `useProfiles.js`), `expires_at = now + 7 days`, plus the new columns below.
+  8. **Send** with the link `${PUBLIC_APP_URL ?? 'https://portal.ohvara.com'}/join/<token>`:
+     - **Email** via Resend's HTTP API (`POST https://api.resend.com/emails`, `Authorization: Bearer $RESEND_API_KEY`), from `INVITE_FROM_EMAIL`, subject **"<Agent first name> invited you to Ohvara"**, short plain HTML: one line saying who invited them, one button "Create your account" to the link, and "This link works once and expires in 7 days." Reply-to the agent is **not** set (don't expose the agent's email).
+     - **SMS** via Twilio Messages (same call as `recovery-sms`): **"<Agent first name> invited you to Ohvara. Create your account: <link> (works once, expires in 7 days)."** Keep it under 160 chars, plus the carrier opt-out wording the existing recovery texts use.
+  9. If sending fails (non-2xx from Resend/Twilio), **delete the invite row you just inserted** and return 502 "Couldn't send that. Try again." Never leave a live token that nobody received. Log the provider's error server-side only.
+  10. On success return `{ ok: true }` and nothing else. **The response, logs and any column readable by the agent never include the token or link.**
+- CORS headers as the other functions. Don't write the destination or token to console logs.
+
+**Deploy:** this function needs deploying; the auto-mode classifier has blocked deploys before. If CC can't deploy it, commit it and tell Brayden the exact command (`supabase functions deploy send-agent-invite --project-ref jjextitmbptoaolacocs`, JWT verification left ON). It also needs **new secrets**: `RESEND_API_KEY` and `INVITE_FROM_EMAIL` (a sender on a domain verified in Resend). Texting reuses the existing Twilio secrets and waits on P696's A2P approval. List exactly what Brayden has to do in the ship note, mirroring how P673/P696's blockers are written. Build and verify everything that doesn't depend on those.
+
+### 3. Database (next free migration number; check the folder, P730 may have taken 134)
+
+1. `alter table public.rep_invites add column if not exists invited_email text, add column if not exists invited_phone text, add column if not exists channel text check (channel in ('email','sms'));` An invite sent this way has `channel` set; admin-made invite links (the existing Users page flow) leave them null and behave exactly as today.
+2. **Close the copy-the-link loophole.** Today `rep_invites_select` lets the creator read their own rows (tokens included) and `rep_invites_insert` lets any agent insert an `agent` invite (migration 072, role renamed by 107), so an agent could already mint and copy a link through the API. Replace them: **select = `public.is_admin()` only**, **insert = `public.is_admin()` only** (with `created_by = auth.uid()`), delete = admin only. The edge function inserts with the service role, which bypasses RLS. Grep for what used the old agent access: `useSentInvites` (`useProfiles.js`, My Calls Activity feed) and any Hierarchy `InvitePanel`; if something agent-facing breaks, remove that use rather than loosening the policy, and say what you removed in the ship note.
+3. Nothing else: no change to `profiles`, no new table, no change to billing or the cap.
+
+### 4. `claim-invite` (and the Join page)
+
+- **No upline for these invites.** In `claim` (supabase/functions/claim-invite/index.ts), **skip the `profiles.upline_id` update when `invite.channel` is not null.** The invitee is a free-standing agent: `upline_id` stays null, so the inviter can't see their bookings and the hierarchy/visibility functions (`can_view_agent`, `upline_of`) are untouched. Admin-made invites keep today's behaviour (creator becomes upline). Add `channel, invited_email` to `fetchValidInvite`'s select. Comment why.
+- **Email invites are locked to their address:** `check` additionally returns `{ valid, role, email }` where `email` is `invited_email` (null otherwise). `claim` rejects with 400 "This invite was sent to a different email address." if `invite.invited_email` is set and `email.trim().toLowerCase()` differs. `src/pages/Join.jsx` prefills that email and makes the field read-only when `check` returned one. SMS invites can't be matched to a phone; the token only ever goes to that number, single-use, and the form asks for the email as usual.
+- Keep `check` revealing nothing about who sent it. The Join page copy doesn't name the inviter (no inviter name, no "team"). Leave the rest of Join as it is; a new agent still lands on the plan gate (`BillingGate`) after signing in, same as any new agent.
+- Don't change expiry for admin links (7 days already), the 12-char token format or single-use marking.
+
+### 5. Admin visibility (small)
+
+Brayden wants to be able to see who brought someone in, nothing more. In `src/pages/admin/Users.jsx`'s pending-invite bar, show agent-sent invites as "Sent by <agent> to <phone/email>" with the **Copy button hidden** (the token is still readable by admin; it just isn't offered for these). Used invites keep `created_by` and `used_by`, so the "who invited whom" answer exists in the data; don't build a new view. No agent-facing list of sent invites.
+
+### 6. Files and rules
+
+- **New:** `src/components/shared/InviteAgentModal.jsx`, `supabase/functions/send-agent-invite/index.ts`, `supabase/migrations/<next>_agent_invites.sql`.
+- **Edit:** `src/components/layout/AccountMenu.jsx` and its caller(s), `src/components/layout/Sidebar` (or wherever `onReport` is wired), `src/hooks/useProfiles.js` (a `useSendAgentInvite` mutation and `useInviteStatus` query; remove or neutralise `useSentInvites` if the policy change breaks it), `supabase/functions/claim-invite/index.ts`, `src/pages/Join.jsx`, `src/pages/admin/Users.jsx`.
+- No new dependencies. Sentence case, existing tokens/classes. **Never send a real invite to a real person during testing**; mock `fetch` to Resend/Twilio. No test data left in production.
+
+### 7. Verify and log
+
+- `vite build` passes. Throwaway Vite harness with mocked hooks (as earlier prompts did), logged-in screens can't be seen:
+  - account menu shows "Invite an agent" between the phone app and Report a problem for an agent, and not for an admin; works on the collapsed rail
+  - pop-up: Text and Email tabs, validation, formatted phone, Send disabled until valid, sending state, sent screen with the right destination, "Invite another" resets, Escape/click-out close, error message shown
+  - a channel reported unavailable: muted tab, "coming soon" note, Send disabled
+  - copy audit: the rendered pop-up text contains no "team", "account" (outside the sent line) or "clients" wording beyond the approved strings
+  - phone width and light mode
+  - Join with an email-locked invite: email prefilled and read-only
+  Delete the harness.
+- Edge function logic with mocked Resend/Twilio/Supabase (Deno test or a Node shim): invalid input, non-agent caller, unavailable channel, rate limits (10/day, 3/destination), existing-account email, supersede, provider failure deletes the row and returns 502, success returns only `{ ok: true }`, token/link never in the response.
+- `claim-invite`: an invite with `channel` set leaves `upline_id` null; an admin invite still sets it; email mismatch rejected.
+- RLS: as an agent, `select`/`insert` on `rep_invites` returns nothing/denied (only if the migration is applied; otherwise state that it wasn't tested).
+- Ship note in [[Memories]]. Say plainly it wasn't seen logged in, whether the migration was applied and the function deployed, and **exactly what Brayden still has to do** (Resend account and domain verification, `RESEND_API_KEY`, `INVITE_FROM_EMAIL`, deploy, and that texting stays "coming soon" until P696's A2P is approved and `recovery_config.sms_live` is on). Brayden checks: the menu row, the pop-up in both modes, that an unavailable channel says "coming soon", and that nothing shows or copies a link.
+- Update `DESIGN.md`: Invite an agent is an account-menu pop-up; invites go by text/email only; invited agents have no upline and no tie to the inviter.
