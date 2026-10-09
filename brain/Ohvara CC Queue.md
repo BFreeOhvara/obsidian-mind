@@ -256,6 +256,8 @@ Brayden wants to be able to see who brought someone in, nothing more. In `src/pa
 
 ## Prompt 736 — Billing: show the card that's really on file, and receipts are emailed (no "Receipt" link)
 
+> **🟡 2026-10-09 CC: BUILT + PUSHED (`ohvara-dashboard` `5c6af83`). Not live yet; waiting on Brayden, in this order:** (1) redeploy `agent-billing`: `npx.cmd supabase functions deploy agent-billing --no-verify-jwt --project-ref jjextitmbptoaolacocs` from `C:\Users\freem\ohvara-dashboard` (CC can't deploy); (2) open Manage billing as Billing Test: Payment method should show his card (or "Link" / the wallet); if it still says "No card on file", send CC the function logs (`agent-billing overview card via=… type=…`) before anything else changes; (3) Stripe Dashboard (live mode) → Settings → Customer emails → turn on **Successful payments**, and confirm paid-invoice emails are on in Billing's subscription email settings, then tell CC: until then "Receipt emailed" is not confirmed to be true; (4) optional: Stripe → Settings → Branding. Then CC deletes this item. Ship note: [[Memories]] 2026-10-09 "P736".
+
 > **✅ Asked for by Brayden 2026-10-09 (Falcon session), from the first look at P734's Manage billing live as Billing Test. Sonnet 5.5** (one function lookup, one UI string; no migration, no new dependencies). `agent-billing` changes, so **Brayden redeploys** after it ships. Queued after P734 (P735 shipped).
 
 **What Brayden sees.** `/agent/billing?manage=1` as Billing Test (`braydenohvara+agenttest@gmail.com`, Test $1, active, next charge Fri Oct 16). The page works and he likes how it looks as built. Two things:
