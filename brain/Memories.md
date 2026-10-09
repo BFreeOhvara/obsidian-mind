@@ -1256,3 +1256,7 @@ Status: 723 shipped and removed from [[Ohvara CC Queue]] (re-read right before r
 - Lesson: in this Bash tool, heredocs containing JSX with backticks + apostrophes can fail to parse ("unexpected EOF looking for matching '") — write edit scripts with the Write tool and run them by path.
 
 Status: 724 shipped and removed from [[Ohvara CC Queue]] (re-read right before removal). Queue now 673 (Brayden: deploy + live-card e2e), 696 (Twilio A2P), 725 (billing: comped agent looks like a paying Premium, Opus 5.5).
+
+
+[CC | 2026-10-09 — P724 wrap: vault committed]
+- P724 is fully logged above (dashboard `5a3f138`, migration 130 applied). Vault commit `4b4d8ca` ("Log P724 ship, clear from queue") pushed Memories, LIVE_STATE, DESIGN.md and the queue removal. The temporary `p724-harness` entry in `.claude/launch.json` was added and removed in the same session (net no change). Both repos pushed and clean. Queue now 673 (Brayden), 696 (Twilio A2P), 725 (Opus 5.5).
