@@ -298,6 +298,8 @@ Today `defaultCard` looks at `subscription.default_payment_method`, then `custom
 
 ## Prompt 739 — Billing: the Payment method card says a method is on file (Link shows its email), and "Update card" becomes "Change payment method"
 
+> **🟡 2026-10-09 CC: BUILT + PUSHED (`ohvara-dashboard` `ed06527`). Not live yet; waiting on Brayden:** (1) redeploy `agent-billing` (core.ts changed; no other deploy, no migration): `npx.cmd supabase functions deploy agent-billing --no-verify-jwt --project-ref jjextitmbptoaolacocs` from `C:\Users\freem\ohvara-dashboard`; (2) as Billing Test reload Manage billing: the line reads "Link · <his Link email>", green "On file" pill, "Charged here every week.", button "Change payment method"; clicking it shows "Pay with a card instead / This replaces Link." above the card form. Then CC deletes this item. Ship note: [[Memories]] 2026-10-09 "P739".
+
 > **✅ REQUESTED by Brayden 2026-10-09 (Eagle session), with a screenshot of Billing as Billing Test showing "Link" and an "Update card" button:** "I'm fine with it being Link. Just add the email back, Link and then the email. But when you say Update card it makes it feel like there's no card on file, and when you click it there's no card details. I just don't think it's understood that there's a card on file." Agreed fix below. **Run on Sonnet 5.5** (wording and layout, plus one label in the existing function; no database).
 
 **Why it says "Link" (don't re-investigate).** Stripe doesn't expose the card inside a Link payment method (P737's logs: `link_card=no source=none`). That stays. We don't fight it; we make the card clearer around it.
