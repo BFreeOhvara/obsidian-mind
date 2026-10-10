@@ -295,3 +295,62 @@ Today `defaultCard` looks at `subscription.default_payment_method`, then `custom
 - Server: the mocked-Stripe checks in section 1.
 - **Deploy:** CC can't deploy functions; Brayden runs `npx.cmd supabase functions deploy agent-billing --no-verify-jwt --project-ref jjextitmbptoaolacocs` from `C:\Users\freem\ohvara-dashboard` (PowerShell needs `npx.cmd`). CC says exactly when. After the deploy, if the card still shows "No card on file", read the function logs (`via=` / `type=`) before changing anything else.
 - Ship note in [[Memories]]; say plainly it wasn't seen logged in, what was verified against mocks vs live, whether the function is deployed, and whether Brayden has switched on Stripe's receipt emails. Brayden checks as Billing Test: (1) Manage billing → Payment method shows his card (or "Link" / the wallet, whichever he paid with); (2) the Paid invoice row says "Receipt emailed" and nothing on the page opens Stripe; (3) once the Stripe toggle is on, his next real payment (or a new test subscription) puts a receipt in his inbox.
+
+## Prompt 739 — Billing: the Payment method card says a method is on file (Link shows its email), and "Update card" becomes "Change payment method"
+
+> **✅ REQUESTED by Brayden 2026-10-09 (Eagle session), with a screenshot of Billing as Billing Test showing "Link" and an "Update card" button:** "I'm fine with it being Link. Just add the email back, Link and then the email. But when you say Update card it makes it feel like there's no card on file, and when you click it there's no card details. I just don't think it's understood that there's a card on file." Agreed fix below. **Run on Sonnet 5.5** (wording and layout, plus one label in the existing function; no database).
+
+**Why it says "Link" (don't re-investigate).** Stripe doesn't expose the card inside a Link payment method (P737's logs: `link_card=no source=none`). That stays. We don't fight it; we make the card clearer around it.
+
+### 1. The Payment method card (`src/components/agent/ManageBilling.jsx`, section "2. Payment method")
+
+When `data.card` exists (and the account isn't past due), the row becomes:
+
+- **Line 1:** the method label, as today (15.5px/600), now with a small green **"On file"** pill right after it (check icon, same family as the Active chip on the Billing hero: the `is-active` colours, 12px/700, 22px high). Wraps under the label on a narrow screen.
+- **Line 2** (13.5px, `--ov-mute`): **"Charged here every week."**
+- **Button** on the right: **"Change payment method"** (ghost, `CreditCard` icon, same `ov-mb-btn`). It stays a ghost button; when `pastDue` it's `ov-solid` as today.
+- **Past due:** no "On file" pill (the warning note above already says the last payment failed); line 2 says **"We'll try this again once you change it."** Don't show a green pill next to a failed payment.
+- **No method at all (`!data.card`):** unchanged: "No card on file." and the **"Add card"** button.
+- Phone width: the row wraps, the button goes full width below the text.
+
+### 2. The form it opens
+
+Above `<CardForm>` inside `.ov-mb-cardbox`, add a short heading (15.5px/600) and one line (13.5px, mute) so the card form isn't a surprise:
+
+- Current method is Link (`data.card.kind === 'link'`): **"Pay with a card instead"** / **"This replaces Link."**
+- Current method is a card or wallet: **"Use a different card"** / **"This replaces {methodLabel(data.card)}."**
+- No method on file: no heading (as today).
+
+Leave the form, "Cancel" and "Save card" as they are, and the success notice ("{name} is now your card.").
+
+### 3. Link shows its email (`supabase/functions/agent-billing/core.ts`, `methodOf`)
+
+P737 removed the Link email from the result. Put it back, for the caller's own payment method only:
+
+- `pm.type === 'link'`: `label` = `Link · {pm.link.email}` when the email is present; if `linkCard` (brand + last4) was found, keep `Link · {Brand} ending ####` (never expected, but don't regress); with neither, just `Link`. Include `email` in the returned object too.
+- A card with the Link wallet (`wallet.type === 'link'`) keeps `Link · Visa ending ####`.
+- Update the comment above `methodOf` (it currently says the email is never put in the result) to say it's the agent's own email, shown only to them.
+- **Never log the email** (the existing log line stays as is). No change to `defaultMethod`'s lookup order, healing, or invoices.
+
+### 4. Other places that say "card"
+
+- `src/components/agent/BillingPanel.jsx` line ~207 (`action: { ...manage, label: 'Update card' }`): read the context. If it's the general shortcut to Manage billing, change it to **"Change payment method"**; if it's specifically the past-due prompt, keep "Update card".
+- The two past-due notes in ManageBilling ("Update your card below…", "Update your card and we'll try again.") become **"Update your payment method…"** for consistency.
+- Search `src/` for other agent-facing "Update card" text and make the same call. Don't touch admin pages.
+
+### 5. Files and rules
+
+- **Edit:** `src/components/agent/ManageBilling.jsx`, `supabase/functions/agent-billing/core.ts`, `src/components/agent/BillingPanel.jsx` (label only). Add the pill/heading styles to the existing stylesheet that holds `.ov-mb-*` next to the other billing classes.
+- No migration, no new dependency. Sentence case, existing tokens and classes.
+
+### 6. Verify and log
+
+- `vite build` passes. Throwaway Vite harness with the real `ManageBilling` and mocked `invokeBilling`, as P736/P737 did, dark and light, 1440 and 390:
+  - Link with email: "Link · name@example.com", green "On file" pill, "Charged here every week.", "Change payment method"
+  - a Visa: "Visa ending 4242", same pill and line
+  - past due: no pill, the retry line, solid button
+  - no method: "No card on file." and "Add card"
+  - clicking Change opens the form with the right heading ("Pay with a card instead / This replaces Link." for Link, "Use a different card / This replaces Visa ending 4242." for a card)
+- `methodOf` unit checks (a small Deno/Node shim): link with email, link without email, link with a card, card, card with Apple Pay, card with the Link wallet, bank account.
+- Ship note in [[Memories]]. Say plainly it wasn't seen logged in and that **`agent-billing` needs a redeploy** (core.ts changed; no other deploy and no migration). Brayden checks as Billing Test: the line reads "Link · his Link email", the green "On file" pill and "Charged here every week.", the button says "Change payment method", and clicking it shows "Pay with a card instead / This replaces Link." above the card form.
+- Update `DESIGN.md`: the Payment method card shows the method with an "On file" pill; the button is "Change payment method"; Link shows its email.
