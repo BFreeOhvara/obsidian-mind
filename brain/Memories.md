@@ -1559,3 +1559,8 @@ Status: 724 shipped and removed from [[Ohvara CC Queue]] (re-read right before r
 
 [CC | 2026-10-10 — P731 migration 135 applied]
 - Applied `135_agent_invites` live via Supabase `apply_migration` (file unchanged from the repo). Verified: `rep_invites` has `invited_email`, `invited_phone`, `channel`; policies are now select / insert / delete all admin-only (`is_admin()`; insert also `created_by = auth.uid()`). Not yet done: RLS re-test as an agent, and the deploys. **Order matters: deploy `claim-invite` only now that 135 is in (it reads `channel`), then `send-agent-invite`.** Still Brayden: both deploys and the Resend secrets. P731 banner in [[Ohvara CC Queue]] updated.
+
+[CC | 2026-10-10 — P731 RLS re-test passed, P731 deleted from queue]
+- **Brayden:** P731 deploys done (`claim-invite`, `send-agent-invite`). **RLS re-tested live as an agent** (Test Agent id, `set local role authenticated` + its JWT claims) inside one DO block that seeded an agent-sent invite and an admin invite and then rolled everything back by raising: agent `select` on `rep_invites` = 0 rows (sees neither test token), agent `insert` = denied by RLS, agent `delete` = 0 rows, agent `update` = 0 rows; an admin sees both test tokens, so the policies still work for admin. Afterwards 0 `rlstest` rows left. So an agent can't read or mint a token through the API; the edge function (service role) is the only writer.
+- **Not tested:** the edge functions end to end (no real invite sent; email needs Resend + `RESEND_API_KEY` / `INVITE_FROM_EMAIL`, texting waits on P696 A2P + `recovery_config.sms_live`), and the UI logged in. Until the Resend secrets are set both tabs say "coming soon".
+- **Queue:** P731 removed (re-read from disk right before the write). Left: P696, P736, P739.
