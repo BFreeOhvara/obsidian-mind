@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fulfillment Calendar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --page:#07080D;--page-img:radial-gradient(ellipse 70% 50% at 85% -10%,rgba(75,121,206,.30) 0%,transparent 70%),radial-gradient(rgba(255,255,255,.07) 1px,transparent 1px);
+  --sb:linear-gradient(180deg,#1A2C4E 0%,#132241 100%);--sb-text:#93A6C4;--sb-group:#6F84A8;--sb-active:rgba(255,255,255,.08);--sb-icon:#7FA6F2;
+  --hi:#FFFFFF;--mid:#C9D4E8;--soft:#B4C3DE;--mute:#8697B5;--faint:#5E7195;--line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.12);--stub:rgba(255,255,255,.06);--hover:rgba(255,255,255,.04);
+  --hd-bg:rgba(75,121,206,.18);--hd-bd:rgba(127,166,242,.30);--hd-fg:#7FA6F2;
+  --card:radial-gradient(120% 70% at 0% 0%,rgba(255,255,255,.045) 0%,transparent 60%),linear-gradient(180deg,#161922 0%,#10121A 100%);--card-bd:rgba(255,255,255,.09);--card-sh:inset 0 1px 0 rgba(255,255,255,.10),0 24px 48px -28px rgba(0,0,0,.8);
+  --primary:radial-gradient(ellipse 60% 120% at 100% 0%,rgba(75,121,206,.55) 0%,transparent 65%),radial-gradient(ellipse 40% 90% at 62% 110%,rgba(0,191,166,.22) 0%,transparent 70%),linear-gradient(135deg,#16294C 0%,#0D1730 60%,#0A1024 100%);
+  --bk:#60A5FA;--bk-tint:rgba(59,130,246,.16);--bk-tint2:rgba(59,130,246,.24);--bk-edge:rgba(96,165,250,.55);
+  --na:#A3B2CC;--na-tint:rgba(148,163,184,.14);--cx:#4ADE80;--cx-tint:rgba(34,197,94,.14);
+  --live:#F87171;--live-bg:rgba(239,68,68,.12);--live-bd:rgba(248,113,113,.35);
+  --amber:#FBBF24;--amber-bg:rgba(245,158,11,.10);--amber-bd:rgba(251,191,36,.35);
+  --sel:rgba(96,165,250,.14);--sel-bd:rgba(96,165,250,.6);--now:#34E0C4;
+}
+:root[data-theme="light"]{
+  --page:#EEF2F3;--page-img:radial-gradient(ellipse 70% 50% at 85% -10%,rgba(0,191,166,.22) 0%,transparent 70%),radial-gradient(rgba(2,79,70,.13) 1px,transparent 1px);
+  --sb:linear-gradient(180deg,#008674 0%,#006E60 100%);--sb-text:rgba(255,255,255,.86);--sb-group:rgba(255,255,255,.62);--sb-active:rgba(255,255,255,.18);--sb-icon:#FFFFFF;
+  --hi:#07332E;--mid:#0B4A43;--soft:#2C6159;--mute:#4F7F78;--faint:#7FA59F;--line:rgba(2,79,70,.12);--line2:rgba(2,79,70,.20);--stub:rgba(2,79,70,.07);--hover:rgba(2,79,70,.04);
+  --hd-bg:rgba(0,191,166,.14);--hd-bd:rgba(0,137,122,.30);--hd-fg:#00897A;
+  --card:radial-gradient(120% 70% at 0% 0%,#FFFFFF 0%,rgba(255,255,255,0) 60%),linear-gradient(180deg,#FFFFFF 0%,#F2F7F6 100%);--card-bd:rgba(2,79,70,.13);--card-sh:inset 0 1px 0 #FFFFFF,0 1px 2px rgba(7,51,46,.06),0 24px 48px -28px rgba(7,51,46,.34);
+  --primary:radial-gradient(ellipse 60% 120% at 100% 0%,rgba(52,224,196,.55) 0%,transparent 65%),linear-gradient(135deg,#00917D 0%,#026B5E 55%,#024F46 100%);
+  --bk:#1D4ED8;--bk-tint:#DCE8FB;--bk-tint2:#C9DBF8;--bk-edge:rgba(29,78,216,.45);
+  --na:#4F6B66;--na-tint:#E6EEEC;--cx:#0A6B33;--cx-tint:#DCF3E4;
+  --live:#B91C1C;--live-bg:#FDECEC;--live-bd:rgba(185,28,28,.30);
+  --amber:#B45309;--amber-bg:#FEF3C7;--amber-bd:rgba(180,83,9,.30);
+  --sel:#DCE8FB;--sel-bd:rgba(29,78,216,.55);--now:#00897A;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:var(--hi);background-color:var(--page);background-image:var(--page-img);background-size:auto,24px 24px;min-width:1280px}
+button{font-family:inherit;cursor:pointer;color:inherit}
+.app{display:flex;min-height:100vh}
+/* sidebar */
+aside{width:256px;flex:none;background:var(--sb);display:flex;flex-direction:column;padding:0 14px 12px;position:sticky;top:0;height:100vh}
+.brand{height:72px;display:flex;align-items:center;gap:9px;padding:0 4px;font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.035em;color:#fff}
+.grp{margin:0;padding:18px 12px 6px;font-size:12px;font-weight:600;color:var(--sb-group)}
+.nav{position:relative;display:flex;align-items:center;gap:12px;height:40px;padding:0 12px;border-radius:12px;font-size:14.5px;font-weight:500;color:var(--sb-text);text-decoration:none}
+.nav svg{stroke:currentColor}
+.nav.on{background:var(--sb-active);color:#fff;font-weight:600;box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 8px 20px -12px rgba(0,0,0,.6)}
+.nav.on svg{stroke:var(--sb-icon)}
+.nav.on::before{content:"";position:absolute;left:-12px;top:10px;bottom:10px;width:3px;border-radius:0 3px 3px 0;background:var(--sb-icon)}
+.me{margin-top:auto;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.05)}
+.av{width:36px;height:36px;border-radius:50%;background:#F59E0B;color:#1A1203;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px rgba(255,255,255,.18)}
+/* header */
+main{flex:1;min-width:0;display:flex;flex-direction:column}
+header{height:72px;flex:none;display:flex;align-items:center;gap:18px;padding:0 28px;border-bottom:1px solid var(--line)}
+.hicon{width:42px;height:42px;border-radius:13px;background:var(--hd-bg);border:1px solid var(--hd-bd);display:flex;align-items:center;justify-content:center;color:var(--hd-fg)}
+.crumb{font-size:14px;color:var(--mute)}
+.crumb b{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:600;letter-spacing:-.01em;color:var(--hi);margin-left:5px}
+.sub{font-size:13px;color:var(--mute);margin-top:1px}
+.bell{margin-left:auto;width:42px;height:42px;border-radius:13px;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;color:var(--mid)}
+.content{padding:28px 32px 36px;display:flex;flex-direction:column;gap:20px;max-width:1440px;width:100%;margin:0 auto}
+/* shared */
+.card{border-radius:20px;background:var(--card);border:1px solid var(--card-bd);box-shadow:var(--card-sh)}
+.h2{margin:0;font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:600;letter-spacing:-.01em}
+.chip{width:36px;height:36px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center}
+.iconbtn{width:36px;height:36px;border-radius:11px;border:1px solid var(--line2);background:transparent;display:flex;align-items:center;justify-content:center;color:var(--mid)}
+.iconbtn:hover{background:var(--hover)}
+.ghost{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line2);background:transparent;font-size:13.5px;font-weight:600;color:var(--mid)}
+.ghost:hover{background:var(--hover)}
+.primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:46px;padding:0 22px;border-radius:999px;font-size:14.5px;font-weight:700;color:#fff;background:var(--primary);border:1px solid rgba(255,255,255,.10);box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 10px 24px -14px rgba(0,0,0,.7)}
+.pill{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;font-size:12.5px;font-weight:700;white-space:nowrap}
+.p-bk{background:var(--bk-tint);color:var(--bk)}
+.p-na{background:var(--na-tint);color:var(--na)}
+.p-cx{background:var(--cx-tint);color:var(--cx)}
+.p-live{background:var(--live-bg);color:var(--live);border:1px solid var(--live-bd)}
+.p-late{background:var(--amber-bg);color:var(--amber)}
+.mono{font-family:'JetBrains Mono',monospace}
+.live-strip{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:16px;background:var(--live-bg);border:1px solid var(--live-bd);color:var(--live)}
+.live-strip .dot{width:10px;height:10px;border-radius:50%;background:var(--live);box-shadow:0 0 0 4px var(--live-bg)}
+.live-strip a{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:700;color:var(--live);text-decoration:none;cursor:pointer}
+/* calendar view */
+.cal-grid{display:grid;grid-template-columns:minmax(0,1fr) 440px;gap:20px;align-items:start}
+.month{padding:22px 24px 20px}
+.mhead{display:flex;align-items:center;gap:12px}
+.mhead .h2{flex:1;font-size:22px}
+.dow{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin:20px 0 8px}
+.dow span{font-size:12px;font-weight:600;color:var(--faint);padding-left:10px}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.day{position:relative;height:104px;border-radius:14px;border:1px solid var(--line);background:transparent;text-align:left;padding:10px 10px 10px;display:flex;flex-direction:column;transition:background .12s,border-color .12s}
+.day:hover{background:var(--hover);border-color:var(--line2)}
+.day .n{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:600;color:var(--mid);line-height:1}
+.day.out .n{color:var(--faint);opacity:.6}
+.day.out{opacity:.75}
+.day.today .n{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;margin:-6px 0 0 -6px;border-radius:50%;background:var(--bk);color:#fff}
+:root[data-theme="light"] .day.today .n{color:#fff}
+.day.sel{background:var(--sel);border-color:var(--sel-bd);box-shadow:inset 0 0 0 1px var(--sel-bd)}
+.day .cnt{margin-top:auto;font-size:12.5px;font-weight:600;color:var(--mid);white-space:nowrap}
+.day .cnt small{font-weight:500;color:var(--mute)}
+.bar{display:flex;gap:2px;height:5px;margin-top:7px;border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%}
+.legend{display:flex;gap:18px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--mute)}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.legend i{width:10px;height:10px;border-radius:3px;display:block}
+/* day agenda */
+.agenda{padding:22px 0 10px;display:flex;flex-direction:column;position:sticky;top:20px}
+.ahead{display:flex;align-items:center;gap:10px;padding:0 22px}
+.ahead .h2{flex:1}
+.asum{margin:6px 22px 0;font-size:14px;color:var(--soft)}
+.today-tag{display:inline-flex;align-items:center;height:22px;padding:0 8px;margin-left:8px;border-radius:999px;background:var(--bk-tint);color:var(--bk);font-family:'Plus Jakarta Sans';font-size:11.5px;font-weight:700;vertical-align:3px}
+.list{margin-top:14px;border-top:1px solid var(--line)}
+.row{width:100%;display:flex;align-items:center;gap:14px;padding:12px 22px;border:none;border-bottom:1px solid var(--line);background:transparent;text-align:left}
+.row:hover{background:var(--hover)}
+.row:focus-visible{outline:2px solid var(--bk);outline-offset:-2px}
+.tile{width:56px;height:46px;flex:none;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.tile b{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700}
+.tile s{text-decoration:none;margin-top:3px;font-size:10px;font-weight:700}
+.who{flex:1;min-width:0}
+.who .nm{display:block;font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who .ln{display:block;margin-top:2px;font-size:12.5px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row.done .nm{color:var(--mid)}
+.row.done .tile{opacity:.7}
+.chev{flex:none;color:var(--faint)}
+.nowline{display:flex;align-items:center;gap:10px;padding:0 22px;height:22px;font-size:11.5px;font-weight:700;color:var(--now)}
+.nowline::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--now)}
+.nowline::after{content:"";flex:1;height:1.5px;background:var(--now);opacity:.7}
+.empty{padding:40px 22px;text-align:center;color:var(--mute);font-size:14px}
+.afoot{padding:14px 22px 6px;font-size:12.5px;color:var(--faint)}
+/* call view */
+.back{display:inline-flex;align-items:center;gap:8px;font-size:14.5px;font-weight:600;color:var(--mid);background:none;border:none;padding:0}
+.back:hover{color:var(--hi)}
+.callhead{display:flex;align-items:center;gap:24px;padding:24px 26px}
+.callhead h1{margin:0;font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:600;letter-spacing:-.02em}
+.meta{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13.5px;color:var(--soft)}
+.meta span{display:inline-flex;align-items:center;gap:6px}
+.carrier{display:flex;align-items:center;gap:14px;padding:16px 22px;border-radius:16px;background:var(--amber-bg);border:1px solid var(--amber-bd)}
+.carrier .lbl{font-size:12px;font-weight:700;color:var(--amber)}
+.carrier .cn{font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:600;color:var(--hi)}
+.two{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px;align-items:start}
+.steps{padding:22px 24px}
+.step{display:flex;gap:14px;padding:14px 0;border-top:1px solid var(--line)}
+.step:first-of-type{border-top:none}
+.num{width:28px;height:28px;flex:none;border-radius:50%;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;color:var(--mid)}
+.step.cur .num{background:var(--bk);border-color:var(--bk);color:#fff}
+.step h3{margin:3px 0 4px;font-size:15px;font-weight:700}
+.step p{margin:0;font-size:13.5px;line-height:1.5;color:var(--mute)}
+.outs{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+textarea{width:100%;min-height:84px;margin-top:10px;padding:12px 14px;border-radius:12px;border:1px solid var(--line2);background:transparent;color:var(--hi);font:inherit;font-size:14px;resize:vertical}
+.intake{padding:22px 24px}
+.kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 20px;margin-top:16px}
+.kv dt{font-size:12px;font-weight:600;color:var(--mute)}
+.kv dd{margin:3px 0 0;font-size:14px;color:var(--hi)}
+.kv dd.missing{color:var(--faint)}
+.nextbar{display:flex;align-items:center;gap:14px;padding:14px 18px 14px 22px}
+.nextbar .lbl{font-size:12.5px;font-weight:600;color:var(--mute)}
+/* mock controls */
+.ctl{position:fixed;right:16px;bottom:16px;z-index:9;display:flex;gap:6px;padding:6px;border-radius:14px;background:rgba(10,12,20,.88);border:1px solid rgba(255,255,255,.14);box-shadow:0 14px 40px -12px rgba(0,0,0,.7);font-size:12.5px}
+.ctl button{height:30px;padding:0 11px;border-radius:9px;border:none;background:transparent;color:#C9D4E8;font-weight:600}
+.ctl button.on{background:rgba(255,255,255,.14);color:#fff}
+.ctl .sep{width:1px;background:rgba(255,255,255,.14);margin:4px 2px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+  <div class="brand"><svg width="30" height="26" viewBox="0 0 30 26" aria-hidden="true"><path d="M2 8 L13 13 L6 22 Q9 12 2 8Z" fill="#FFFFFF"/><path d="M22 1 L21 17 L28 20 L7 25 Q19 14 22 1Z" fill="#34E0C4"/></svg>Ohvara Portal</div>
+  <p class="grp">Today</p>
+  <a class="nav"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>Overview</a>
+  <p class="grp">Work</p>
+  <a class="nav on"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4"/></svg>Fulfillment</a>
+  <a class="nav"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>Pipeline</a>
+  <a class="nav"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4zM4 7a2 2 0 0 1 2-2h11M16 14h2"/></svg>Getting Paid</a>
+  <p class="grp">Communications</p>
+  <a class="nav"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg>Messages</a>
+  <p class="grp">Account</p>
+  <a class="nav"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.6 7.6 0 0 0 0-2l2-1.5-2-3.4-2.3.9a7.6 7.6 0 0 0-1.7-1L15 3.5h-4l-.4 2.5a7.6 7.6 0 0 0-1.7 1l-2.3-.9-2 3.4 2 1.5a7.6 7.6 0 0 0 0 2l-2 1.5 2 3.4 2.3-.9c.5.4 1.1.7 1.7 1l.4 2.5h4l.4-2.5c.6-.3 1.2-.6 1.7-1l2.3.9 2-3.4z"/></svg>Settings</a>
+  <div class="me"><span class="av">TF</span><span style="flex:1"><span style="display:block;font-size:14.5px;font-weight:600;color:#fff">Test Fulfill</span><span style="display:block;font-size:12.5px;color:var(--sb-text)">Fulfillment</span></span></div>
+</aside>
+
+<main>
+  <header>
+    <span class="hicon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4"/></svg></span>
+    <div><div class="crumb">Work /<b>Fulfillment</b></div><div class="sub" id="hsub">Your calls, day by day</div></div>
+    <span class="bell"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 21h4"/></svg></span>
+  </header>
+
+  <div class="content">
+    <div class="live-strip" id="live">
+      <span class="dot"></span>
+      <p style="flex:1;margin:0;font-size:14px;font-weight:500">You're on a call with Test Client Sample Data 14 · 12 min</p>
+      <a id="backToCall">Back to the call <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+
+    <!-- ============ CALENDAR VIEW ============ -->
+    <div id="calView" class="cal-grid">
+      <section class="card month">
+        <div class="mhead">
+          <h2 class="h2" id="mname">October 2026</h2>
+          <button class="ghost" id="todayBtn">Today</button>
+          <button class="iconbtn" aria-label="Previous month"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+          <button class="iconbtn" aria-label="Next month"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+        </div>
+        <div class="dow"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+        <div class="days" id="days"></div>
+        <div class="legend">
+          <span><i style="background:var(--cx)"></i>Cancelled</span>
+          <span><i style="background:var(--na)"></i>No answer</span>
+          <span><i style="background:var(--bk)"></i>Booked, still to call</span>
+        </div>
+      </section>
+
+      <section class="card agenda" id="agenda">
+        <div class="ahead">
+          <span class="chip" style="background:var(--bk-tint);color:var(--bk)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4"/></svg></span>
+          <h2 class="h2" id="dname">Saturday, October 10</h2>
+          <button class="iconbtn" id="prevDay" aria-label="Previous day"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+          <button class="iconbtn" id="nextDay" aria-label="Next day"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+        </div>
+        <p class="asum" id="dsum"></p>
+        <div class="list" id="rows"></div>
+        <p class="afoot">Times are yours (Central). Click a call to work it.</p>
+      </section>
+    </div>
+
+    <!-- ============ CALL VIEW ============ -->
+    <div id="callView" class="hidden" style="display:flex;flex-direction:column;gap:20px">
+      <div><button class="back" id="backBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg><span id="backLbl">Saturday, October 10</span></button></div>
+
+      <section class="card callhead">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><h1 id="cName">Test Client Sample Data 6</h1><span class="pill p-bk" id="cPill">Booked</span></div>
+          <div class="meta">
+            <span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><b id="cTime" style="color:var(--hi)">3:30 PM today</b>&nbsp;<span id="cLocal" style="color:var(--mute)">· 4:30 PM for the client (Eastern)</span></span>
+            <span>Booked by Test Agent · 2 days ago</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px">
+          <button class="primary" style="height:48px;padding:0 26px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>Call client</button>
+          <span class="mono" style="font-size:12px;color:var(--mute)">(555) 010-1006 · dials from your phone</span>
+          <button class="ghost"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg>Message agent</button>
+        </div>
+      </section>
+
+      <div class="carrier">
+        <span class="chip" style="background:rgba(251,191,36,.16);color:var(--amber)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-4 7 4v13M9 21v-6h6v6"/></svg></span>
+        <div style="flex:1"><div class="lbl">Cancel with</div><div class="cn">Mercury Insurance</div></div>
+        <div style="text-align:right;font-size:13px;color:var(--soft)"><div class="mono" style="color:var(--hi)">(800) 555-0142</div><div>Open until 7:00 PM your time</div></div>
+      </div>
+
+      <div class="two">
+        <section class="card steps">
+          <h2 class="h2" style="margin-bottom:6px">Work this call</h2>
+          <div class="step"><span class="num">1</span><div><h3>Client authorization</h3><p>Not yet collected. E-signature collection is coming soon, nothing to do here yet.</p></div></div>
+          <div class="step cur"><span class="num">2</span><div><h3>Call the client, then add the carrier</h3><p>Tap Call client. Once they're on, bring Mercury Insurance onto the line and cancel the old policy together.</p></div></div>
+          <div class="step"><span class="num">3</span><div style="flex:1"><h3>Record the result</h3><p>Pick what happened. The calendar updates on its own.</p>
+            <div class="outs">
+              <button class="ghost" style="color:var(--cx);border-color:color-mix(in srgb,var(--cx) 45%,transparent)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Old policy cancelled</button>
+              <button class="ghost"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2M16 3l5 5M21 3l-5 5"/></svg>No answer</button>
+            </div>
+            <textarea placeholder="Notes: who you spoke with, what they needed, anything the next person should know"></textarea>
+          </div></div>
+        </section>
+
+        <section class="card intake">
+          <div style="display:flex;align-items:center"><h2 class="h2" style="flex:1">Client intake</h2><span style="font-size:12.5px;color:var(--mute)">From the agent's booking</span></div>
+          <dl class="kv">
+            <div><dt>Full legal name</dt><dd>Test Client Sample Data 6</dd></div>
+            <div><dt>Date of birth</dt><dd class="missing">Not given</dd></div>
+            <div><dt>Lives in</dt><dd>Pensacola, FL</dd></div>
+            <div><dt>Email</dt><dd class="missing">Not given</dd></div>
+            <div><dt>Old policy</dt><dd>Mercury Insurance</dd></div>
+            <div><dt>New policy</dt><dd class="missing">Not given</dd></div>
+            <div><dt>Draft day</dt><dd class="missing">Not given</dd></div>
+            <div><dt>Beneficiary</dt><dd class="missing">Not given</dd></div>
+          </dl>
+          <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--line)"><dt style="font-size:12px;font-weight:600;color:var(--mute)">Agent's note</dt><p style="margin:4px 0 0;font-size:14px;color:var(--soft)">Prefers afternoons. Spouse may pick up.</p></div>
+        </section>
+      </div>
+
+      <section class="card nextbar">
+        <span class="lbl">Next on your calendar</span>
+        <span class="tile" style="width:52px;height:40px;background:var(--bk-tint);color:var(--bk)"><b style="font-size:14px">4:45</b><s>PM</s></span>
+        <span style="flex:1;font-size:14.5px;font-weight:600">Test Client Sample Data 10 <span style="font-weight:500;color:var(--mute)">· Mercury Insurance</span></span>
+        <button class="ghost" id="nextCall">Next call <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      </section>
+    </div>
+  </div>
+</main>
+</div>
+
+<div class="ctl" aria-label="Mockup controls">
+  <button id="tDark" class="on">Dark</button><button id="tLight">Light</button><span class="sep"></span>
+  <button id="liveOn" class="on">On a call</button><button id="liveOff">Not on a call</button>
+</div>
+
+<script>
+const TODAY = 10; // Sat Oct 10 2026, 2:18 PM Central
+let sel = 10, live = true;
+const rand = (s) => { let x = Math.sin(s * 9301 + 49297) * 233280; return x - Math.floor(x); };
+const counts = {s28:[3,1,0],s29:[4,1,0],s30:[2,1,0],1:[3,1,0],2:[3,1,0],3:[0,1,0],4:[0,1,0],5:[2,1,0],6:[3,1,0],7:[3,0,0],8:[3,1,0],9:[2,1,0],10:[1,1,5],11:[0,0,0],12:[0,0,5],13:[0,0,4],14:[0,0,6],15:[0,0,3],16:[0,0,4],17:[0,0,1],18:[0,0,0],19:[0,0,2],20:[0,0,1],21:[0,0,0],22:[0,0,1]};
+// [cancelled, no answer, still to call]
+const NAMES = ['Test Client Sample Data 4','Test Client Sample Data 5','Test Client Sample Data 14','Test Client Sample Data 6','Test Client Sample Data 10','Test Client Sample Data 11','Test Client Sample Data 3','Test Client Sample Data 8','Test Client Sample Data 15','Test Client Sample Data 16','Test Client Sample Data 17','Test Client Sample Data 2'];
+const CARRIERS = ['Mercury Insurance','State Farm','GEICO','Allstate','Mutual of Omaha','Aetna'];
+const TIMES = ['9:00','9:30','10:30','11:15','12:00','1:30','2:45','3:30','4:15','5:00','6:00'];
+
+const today = [
+  {t:'10:30',ap:'AM',name:'Test Client Sample Data 4',car:'State Farm',st:'cx',lbl:'Cancelled',done:true},
+  {t:'11:45',ap:'AM',name:'Test Client Sample Data 5',car:'GEICO',st:'na',lbl:'No answer',done:true,ln:'Texts sent · retry at 5:30 PM'},
+  {t:'2:00',ap:'PM',name:'Test Client Sample Data 14',car:'Allstate',st:'live',lbl:'On a call · 12 min'},
+  {now:true},
+  {t:'3:30',ap:'PM',name:'Test Client Sample Data 6',car:'Mercury Insurance',st:'bk',lbl:'Up next',ln:'4:30 PM for the client (Eastern)'},
+  {t:'4:45',ap:'PM',name:'Test Client Sample Data 10',car:'Mercury Insurance',st:'bk',lbl:'Booked'},
+  {t:'5:30',ap:'PM',name:'Test Client Sample Data 5',car:'GEICO',st:'na',lbl:'No answer · try 2',ln:'Second try, after texts'},
+  {t:'6:15',ap:'PM',name:'Test Client Sample Data 11',car:'Aetna',st:'bk',lbl:'Booked',ln:'7:15 PM for the client (Eastern)'},
+];
+
+function cellsFor(){
+  const out=[]; const sep=[28,29,30];
+  sep.forEach(d=>out.push({d,out:true,key:'s'+d}));
+  for(let d=1; d<=31; d++) out.push({d,key:d});
+  out.push({d:1,out:true,key:'n1'});
+  return out;
+}
+function dayRows(d){
+  if(d===TODAY) return today.map(r=> r.now? r : r.st==='live' && !live ? {...r,st:'cx',lbl:'Cancelled',done:true} : r);
+  const c = counts[d]; if(!c) return [];
+  const [cx,na,bk]=c; const rows=[]; let i=0;
+  const n=cx+na+bk; const times=TIMES.slice(0,n);
+  for(let k=0;k<n;k++){
+    const st = k<cx?'cx':k<cx+na?'na':'bk';
+    const [h,m]=times[k].split(':'); const H=+h; const ap = (H>=9&&H<12)?'AM':'PM';
+    rows.push({t:times[k],ap,name:NAMES[(d*3+k)%NAMES.length],car:CARRIERS[(d+k)%CARRIERS.length],st,lbl:st==='cx'?'Cancelled':st==='na'?'No answer':'Booked',done:st!=='bk'});
+  }
+  return rows;
+}
+const DOW=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+function dateName(d){ const dt=new Date(2026,9,d); return DOW[dt.getDay()]+', October '+d; }
+function short(d){ const dt=new Date(2026,9,d); return DOW[dt.getDay()].slice(0,3)+', Oct '+d; }
+
+function renderDays(){
+  const el=document.getElementById('days'); el.innerHTML='';
+  cellsFor().forEach(c=>{
+    const b=document.createElement('button'); b.className='day'+(c.out?' out':'')+(!c.out&&c.d===TODAY?' today':'')+(!c.out&&c.d===sel?' sel':'');
+    let cnt=null;
+    if(c.out) cnt=counts[c.key];
+    else if(!c.out) cnt=counts[c.d];
+    if(!c.out && c.d===TODAY) cnt = live?[1,1,4,1]:[2,1,4,0];
+    let html='<span class="n">'+c.d+'</span>';
+    if(cnt && cnt[0]+cnt[1]+cnt[2]+(cnt[3]||0)>0){
+      const n=cnt[0]+cnt[1]+cnt[2]+(cnt[3]||0);
+      const left=cnt[2];
+      html+='<span class="cnt">'+n+' call'+(n>1?'s':'')+(left&&left<n?' <small>· '+left+' left</small>':'')+'</span>';
+      html+='<span class="bar">'+(cnt[0]?'<i style="flex:'+cnt[0]+';background:var(--cx)"></i>':'')+(cnt[1]?'<i style="flex:'+cnt[1]+';background:var(--na)"></i>':'')+(cnt[3]?'<i style="flex:'+cnt[3]+';background:var(--live)"></i>':'')+(cnt[2]?'<i style="flex:'+cnt[2]+';background:var(--bk)"></i>':'')+'</span>';
+    }
+    b.innerHTML=html;
+    if(!c.out) b.onclick=()=>{sel=c.d; render();};
+    el.appendChild(b);
+  });
+}
+function tileStyle(st){ return st==='bk'?'background:var(--bk-tint);color:var(--bk)':st==='na'?'background:var(--na-tint);color:var(--na)':st==='live'?'background:var(--live-bg);color:var(--live)':'background:var(--cx-tint);color:var(--cx)'; }
+function pillCls(st){ return st==='bk'?'p-bk':st==='na'?'p-na':st==='live'?'p-live':'p-cx'; }
+function renderAgenda(){
+  const rows=dayRows(sel);
+  document.getElementById('dname').innerHTML=dateName(sel)+(sel===TODAY?'<span class="today-tag">Today</span>':'');
+  const real=rows.filter(r=>!r.now);
+  const done=real.filter(r=>r.done).length, left=real.length-done-(real.some(r=>r.st==='live')?1:0);
+  let sum = real.length? real.length+' call'+(real.length>1?'s':'') : 'No calls';
+  if(real.length){ if(sel<TODAY) sum+=' · all done'; else if(sel===TODAY) sum+=' · '+done+' done'+(live?' · 1 on a call':'')+' · '+left+' to go'; else sum+=' booked'; }
+  document.getElementById('dsum').textContent=sum;
+  const list=document.getElementById('rows'); list.innerHTML='';
+  if(!real.length){ list.innerHTML='<div class="empty">Nothing booked on '+short(sel)+'.</div>'; return; }
+  rows.forEach(r=>{
+    if(r.now){ const n=document.createElement('div'); n.className='nowline'; n.textContent='Now · 2:18 PM'; list.appendChild(n); return; }
+    const b=document.createElement('button'); b.className='row'+(r.done?' done':'');
+    const ln = r.ln? r.car+' · '+r.ln : r.car+' · from Test Agent';
+    b.innerHTML='<span class="tile" style="'+tileStyle(r.st)+'"><b>'+r.t+'</b><s>'+r.ap+'</s></span>'+
+      '<span class="who"><span class="nm">'+r.name+'</span><span class="ln">'+ln+'</span></span>'+
+      '<span class="pill '+pillCls(r.st)+'">'+(r.st==='cx'?'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>':'')+r.lbl+'</span>'+
+      '<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>';
+    b.onclick=()=>openCall(r);
+    list.appendChild(b);
+  });
+}
+function openCall(r){
+  document.getElementById('calView').classList.add('hidden');
+  document.getElementById('callView').classList.remove('hidden');
+  document.getElementById('backLbl').textContent=dateName(sel);
+  document.getElementById('cName').textContent=r.name;
+  const p=document.getElementById('cPill'); p.className='pill '+pillCls(r.st); p.textContent=r.lbl==='Up next'?'Booked':r.lbl;
+  document.getElementById('cTime').textContent=r.t+' '+r.ap+(sel===TODAY?' today':' · '+short(sel));
+  document.getElementById('hsub').textContent='Working '+r.name;
+  window.scrollTo(0,0);
+}
+function back(){
+  document.getElementById('callView').classList.add('hidden');
+  document.getElementById('calView').classList.remove('hidden');
+  document.getElementById('hsub').textContent='Your calls, day by day';
+}
+function render(){ renderDays(); renderAgenda(); document.getElementById('live').classList.toggle('hidden',!live); }
+document.getElementById('backBtn').onclick=back;
+document.getElementById('prevDay').onclick=()=>{ if(sel>1){sel--;render();} };
+document.getElementById('nextDay').onclick=()=>{ if(sel<31){sel++;render();} };
+document.getElementById('todayBtn').onclick=()=>{ sel=TODAY; render(); };
+document.getElementById('nextCall').onclick=()=>openCall(today[5]);
+document.getElementById('backToCall').onclick=()=>openCall(today[2]);
+const theme=(v)=>{ document.documentElement.dataset.theme=v; document.getElementById('tDark').classList.toggle('on',v==='dark'); document.getElementById('tLight').classList.toggle('on',v==='light'); };
+document.getElementById('tDark').onclick=()=>theme('dark');
+document.getElementById('tLight').onclick=()=>theme('light');
+document.getElementById('liveOn').onclick=()=>{live=true;document.getElementById('liveOn').classList.add('on');document.getElementById('liveOff').classList.remove('on');render();};
+document.getElementById('liveOff').onclick=()=>{live=false;document.getElementById('liveOff').classList.add('on');document.getElementById('liveOn').classList.remove('on');render();};
+render();
+</script>
+</body>
+</html>
