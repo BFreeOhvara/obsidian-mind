@@ -1589,3 +1589,31 @@ Status: 724 shipped and removed from [[Ohvara CC Queue]] (re-read right before r
 - **Verified:** `vite build` passes; eslint on the three touched files shows only one `react-hooks/set-state-in-effect` error at `DashboardLayout.jsx:244` (`setNavOpen` in an effect), which isn't on a line P742 touched. **Not verified:** no logged-in Playwright run and no screenshots (nothing was seen rendered, no left-edge measurements, no 1440/phone or light/dark pass), so item 1's alignment, the rail sizes and the avatar ring are untested visually.
 - **Brayden checks:** "Forgot password?" bottom-left under the box; collapsed arrow box smaller; collapsed avatar a smaller bare circle with a ring; Settings header shows "Test Agent"; **item 5 needs Opera GX**: click Current password and confirm no saved-login list appears. If it still shows, next options are a custom dot-rendering input (not a native text field) or moving the check into a modal; I haven't claimed it's fixed. New password / Confirm stay `type=password` (`autoComplete="new-password"`); Chromium may still offer saved logins/suggestions there, not checked.
 - **Vault:** DESIGN.md P742 line added; P742 removed from [[Ohvara CC Queue]]. Left in the queue: P696 (waits on A2P).
+
+[Eagle | 2026-10-10 — Queued P743: agent portal acceptance pass (QA checklist run by CC), Opus]
+- **Why:** Brayden asked whether the agent side is done and to "build a checklist … and have CC run through it". Honest answer given: feature-complete after P742, but many features were only tested on mock data ("not seen logged in"). CC can't sign in as a real agent (no passwords, no live writes), so P743 has it test with the code, a harness with a frozen clock, and rolled-back DO blocks against the live database, then report.
+- **Scope (8 sections, 29 checks + his live pass):** account and access; booking rules (30-minute notice, double-booking by instant, carrier hours, weekends, weekly cap of 16 / 7, trigger is BEFORE INSERT only and the other rules are UI-only, flagged as a finding); time zones (all US zones, split states, failed lookup, DST on Nov 1 2026 and Mar 14 2027, agent vs client zone, Monday reset); Change a booking; My Pipeline / Activity / Overview / Messages; billing (comped read-only, gate for every state, webhook failure path, which Stripe emails are confirmed); security (RLS as an agent, advisors, function JWT responses); every page in dark/light and four widths; flags for what's not live (texting, invites). Also re-proves P742's visuals, which CC never saw rendered.
+- **Rules for CC:** report in `brain/Agent Portal QA Report.md`, fix only small clear bugs (own `QA-n` commit each), everything else under Findings for Brayden, no real Stripe/text/email/invite sends, nothing left in the live database. Ends with a 15-minute live pass for Brayden in Opera GX.
+- **Brayden's decisions raised same day (not queued):** an agent has no way to withdraw a booking if the client backs out (he says that's by design: agents only change bookings; Cancelled means Fulfillment confirmed the old policy cancelled); Resend and Twilio A2P still open (Twilio account upgraded and funded, compliance profile Pending review).
+
+[CC | 2026-10-10 — P743 shipped: agent portal acceptance pass (Opus 5.5)]
+- **Report:** [[Agent Portal QA Report]]. 29 checks: **22 Pass, 2 Fixed, 3 Fail, 2 Can't test.** Evidence: 5 rolled-back live-DB DO blocks as Test Agent, 96/96 Node logic checks, and 338 Playwright checks on the real app (only `src/lib/supabase.js` swapped for an in-memory fake mirroring Test Agent's live statuses/times; frozen clock; browser-zone emulation; all outbound requests blocked).
+- **Fixed (`ohvara-dashboard`):**
+  - `52832ac` **QA-1**: reset day + billing week dates use the profile zone. A PT browser on a CT profile showed "Resets Sun".
+  - `14aeefb` **QA-2**: Messages inbox note said "oct 9" in lowercase.
+- **P742 now proven rendered:** Forgot password left edges 627/627/627; expand box 32×32; collapsed avatar 36×36 bare circle with ring; Settings header "Test Agent".
+- **Findings for Brayden (not built):**
+  1. Agents can update/delete their own `policies` rows directly (self-mark Cancelled, move an already-called time, delete).
+  2. Cap bypass: insert unassigned then flip (17/16), or delete a booking.
+  3. Notice / double-book / time-required are UI-only.
+  4. Carrier hours line shows "ET" / "9–5 Eastern" to agents.
+  5. Preferences zone card copy is wrong.
+  6. Profile default Chicago vs browser zone: Overview week ≠ meter for non-CT agents.
+  7. Failed loads look empty on Overview/Activity/Messages/Change.
+  8. Advisors: anon `resolve_login_email` exposes Brayden's email via `brayden11`, pre-pivot RPCs callable by anon, leaked-password off.
+  9. `run-migration-034` is public (verify_jwt off); cron `send-appointment-reminders` 404s every 5 min.
+  10. Comped "Next charge of $500" wording.
+- **Not tested:** live function JWT probe (blocked by the permission classifier; covered by code read + verify_jwt settings); live Stripe; Opera's saved-login dropdown; Stripe email toggles. The classifier also blocked writing live profile data to a fixture file, so the harness used synthetic names.
+- **Live DB after:** 0 QA rows; Test Agent unchanged (premium, comped, 26 bookings); `sms_live` false; enforcement on.
+- **Ready to call the agent side done?** Feature-wise yes. Before real agents use it: Findings 1–3 (server-side guards) plus Brayden's 15-minute live pass in the report.
+- **Lesson:** harness `page.clock.install` + `timezoneId` + a swapped `supabase.js` exercises the real app end to end. Keep the pattern for future QA; delete it afterward.
