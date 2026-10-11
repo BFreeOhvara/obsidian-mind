@@ -1617,3 +1617,18 @@ Status: 724 shipped and removed from [[Ohvara CC Queue]] (re-read right before r
 - **Live DB after:** 0 QA rows; Test Agent unchanged (premium, comped, 26 bookings); `sms_live` false; enforcement on.
 - **Ready to call the agent side done?** Feature-wise yes. Before real agents use it: Findings 1–3 (server-side guards) plus Brayden's 15-minute live pass in the report.
 - **Lesson:** harness `page.clock.install` + `timezoneId` + a swapped `supabase.js` exercises the real app end to end. Keep the pattern for future QA; delete it afterward.
+
+[Eagle | 2026-10-10 — Queued P744: branded invite email, design B "Hero" (Sonnet)]
+- **Why:** Resend is live (domain `ohvara.com` verified, `RESEND_API_KEY` + `INVITE_FROM_EMAIL` saved by Brayden; he received the plain test invite from `Ohvara <invites@ohvara.com>`). He wanted a banner and the logo in it. Eagle mocked three options on a Design canvas (A navy banner, B hero, C light); **he picked B**: navy `#0A1F44` hero with the 72px logo, "You're invited", teal `#00BFA6` button with navy text, fallback link, "Sent by Ohvara".
+- **Scope:** table-based inline-style HTML in `send-agent-invite/logic.ts` (`emailContent` gains `appUrl`); logo PNG at `public/email/ohvara-logo-email.png` (served from the portal host); plain-text version updated; subject, SMS and everything else untouched. Brayden redeploys the function after the logo is live, then tests with `braydenohvara+test2@gmail.com`.
+- **Flagged, not queued:** replies to `invites@ohvara.com` go nowhere (no `reply_to`, no inbox).
+
+### 2026-10-10 — CC shipped P744: branded invite email, design B "Hero" (`ohvara-dashboard` `fcd5746`)
+- **Built:** `emailContent(inviter, link, appUrl)` in `send-agent-invite/logic.ts` is now a table-based, inline-style email: navy `#0A1F44` hero with the logo, "OHVARA", "You're invited", the inviter line, a teal `#00BFA6` pill button (navy text, `bgcolor` cell for Outlook), hidden preheader, one-time/7-day note, fallback paste-link, "why you got this" line, "Sent by Ohvara". Inviter and link escaped everywhere. Plain-text version matches the spec. Subject and the SMS body unchanged; `deliver` passes the resolved `appUrl` through.
+- **Logo:** `public/email/ohvara-logo-email.png` (144×144, 5.4 KB, corners are exactly `#0A1F44` so it sits flush in the hero). **Verified live: `https://portal.ohvara.com/email/ohvara-logo-email.png` answers 200 `image/png`** (took ~2 min after the push; until then Vercel returns the SPA page).
+- **Checked:** Node check on `emailContent` all pass (logo on passed and default host, link in button + text, `<b>x</b>` escaped, preheader, 3.2 KB, no flex/grid/`var(`, text matches). Rendered in Chrome at 700 and 390 px: no horizontal scroll, hero/button/footer match the mockup. Harness deleted. `DESIGN.md` has an "Invite email" section. Note: the repo's eslint config doesn't lint `supabase/functions`, so "eslint clean" is vacuous for this file.
+- **Not seen in a real inbox.** **Brayden's checks** (send one invite to `braydenohvara+test2@gmail.com`, never a real agent): logo and navy hero show; button teal with navy text and opens signup; fallback link there; fine on phone and in Gmail dark mode; lands in Inbox, not Spam.
+- **Brayden must deploy the function (CC can't); the logo is already live:**
+  `supabase functions deploy send-agent-invite --project-ref jjextitmbptoaolacocs`
+- **Flagged, not built:** replies to `invites@ohvara.com` have no inbox. Later: `reply_to` = the inviting agent's email, or forward `invites@` to Brayden.
+- **Lesson:** host the image before deploying the function that references it; check the URL's content-type, not just the status (SPA hosts return 200 `text/html` for unbuilt paths).
