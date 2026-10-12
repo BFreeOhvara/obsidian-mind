@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pipeline</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="position:relative;width:1440px;height:900px;box-sizing:border-box;display:flex;overflow:hidden;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#FFFFFF;background-color:#07080D;background-image:radial-gradient(ellipse 70% 50% at 85% -10%, rgba(75,121,206,0.30) 0%, transparent 70%),radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px);background-size:auto,24px 24px">
+
+<aside style="width:256px;flex:none;box-sizing:border-box;background:linear-gradient(180deg,#1A2C4E 0%,#132241 100%);display:flex;flex-direction:column;padding:0 14px 12px">
+<div style="height:72px;display:flex;align-items:center;gap:11px;padding:0 4px">
+<span style="flex:1;display:flex;align-items:center;gap:9px">
+<svg width="30" height="26" viewBox="0 0 30 26" aria-hidden="true"><path d="M2 8 L13 13 L6 22 Q9 12 2 8Z" fill="#FFFFFF"/><path d="M22 1 L21 17 L28 20 L7 25 Q19 14 22 1Z" fill="#34E0C4"/></svg>
+<span style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.035em;white-space:nowrap">Ohvara Portal</span>
+</span>
+<span style="width:32px;height:32px;box-sizing:border-box;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;color:#93A6C4"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></span>
+</div>
+<sc-for list="{{nav}}" as="sec" hint-placeholder-count="4">
+<div>
+<p style="margin:0;padding:18px 12px 6px;font-size:12px;font-weight:600;color:#6F84A8">{{sec.label}}</p>
+<div style="display:flex;flex-direction:column;gap:2px">
+<sc-for list="{{sec.items}}" as="it" hint-placeholder-count="2">
+<a href="#" style="position:relative;display:flex;align-items:center;gap:12px;height:40px;padding:0 12px;border-radius:12px;font-size:14.5px;text-decoration:none;font-weight:{{it.weight}};color:{{it.color}};background:{{it.bg}}">
+<span style="position:absolute;left:-12px;top:10px;bottom:10px;width:3px;border-radius:0 3px 3px 0;background:#7FA6F2;display:{{it.bar}}"></span>
+<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="{{it.icon}}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{it.d}}"/></svg>
+<span style="flex:1">{{it.label}}</span>
+</a>
+</sc-for>
+</div>
+</div>
+</sc-for>
+<div style="flex:1"></div>
+<button type="button" style="display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;border:none;border-radius:16px;background:rgba(255,255,255,.05);text-align:left;font-family:inherit">
+<span style="width:36px;height:36px;border-radius:50%;background:#F59E0B;color:#1A1203;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px rgba(255,255,255,.18)">TF</span>
+<span style="flex:1;min-width:0"><span style="display:block;font-size:14.5px;font-weight:600;color:#FFFFFF">Test Fulfill</span><span style="display:block;font-size:12.5px;color:#93A6C4">Fulfillment</span></span>
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#93A6C4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 9l4-4 4 4M8 15l4 4 4-4"/></svg>
+</button>
+</aside>
+
+<main style="flex:1;min-width:0;display:flex;flex-direction:column">
+<header style="height:72px;flex:none;box-sizing:border-box;display:flex;align-items:center;gap:18px;padding:0 28px;border-bottom:1px solid rgba(255,255,255,.07)">
+<span style="width:42px;height:42px;box-sizing:border-box;border-radius:13px;background:rgba(75,121,206,.18);border:1px solid rgba(127,166,242,.30);display:flex;align-items:center;justify-content:center;color:#7FA6F2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg></span>
+<div style="flex:1">
+<div style="font-size:14px;color:#8697B5">Work <span style="margin:0 5px">/</span><span style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:600;letter-spacing:-.01em;color:#FFFFFF">Pipeline</span></div>
+<div style="font-size:13px;color:#8697B5;margin-top:1px">Every client on your book and where each cancellation stands</div>
+</div>
+<span style="width:42px;height:42px;box-sizing:border-box;border-radius:13px;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;color:#C9D4E8"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 21h4"/></svg></span>
+</header>
+
+<div style="flex:1;min-height:0;box-sizing:border-box;padding:24px 28px;display:grid;grid-template-columns:400px minmax(0,1fr);gap:20px">
+
+<div style="min-height:0;display:grid;grid-template-rows:repeat(2,minmax(0,1fr));gap:20px">
+
+<section style="min-height:0;box-sizing:border-box;display:flex;flex-direction:column;padding:22px;border-radius:20px;overflow:hidden;background:radial-gradient(ellipse 60% 120% at 100% 0%, rgba(75,121,206,0.55) 0%, transparent 65%), radial-gradient(ellipse 40% 90% at 62% 110%, rgba(0,191,166,0.22) 0%, transparent 70%), linear-gradient(135deg, #16294C 0%, #0D1730 60%, #0A1024 100%);border:1px solid rgba(255,255,255,.10);box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 30px 60px -30px rgba(0,0,0,.8)">
+<h2 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;line-height:1.15;letter-spacing:-.03em">Find any client</h2>
+<p style="margin:3px 0 0;font-size:13px;color:#B4C3DE">Name, phone or agent, across every status</p>
+<div style="margin-top:14px;display:flex;align-items:center;gap:10px;height:46px;box-sizing:border-box;padding:0 14px;border-radius:14px;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.14);color:#8FA3C6"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4"/></svg><span style="flex:1;font-size:14px">Search clients</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;padding:2px 6px;border-radius:6px;border:1px solid rgba(255,255,255,.16)">/</span></div>
+<div style="margin-top:16px;display:flex;justify-content:space-between;font-size:12.5px;font-weight:600;color:#B4C3DE"><span>Recently worked</span><span style="font-weight:500;opacity:.75">by you</span></div>
+<div style="margin-top:4px;display:flex;flex-direction:column">
+<sc-for list="{{recent}}" as="c" hint-placeholder-count="4">
+<div style="display:flex;align-items:center;gap:11px;padding:7px 10px;margin:0 -10px;border-radius:12px;background:{{c.hover}}">
+<span style="width:32px;height:32px;flex-shrink:0;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;background:{{c.tint}};color:{{c.fg}};box-shadow:inset 0 0 0 1.5px {{c.edge}}">TC</span>
+<span style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{c.name}}</span><span style="display:block;font-size:12px;color:#B4C3DE">{{c.sub}}</span></span>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section style="min-height:0;box-sizing:border-box;display:flex;flex-direction:column;padding:18px 20px;border-radius:20px;overflow:hidden;background:radial-gradient(120% 70% at 0% 0%, rgba(255,255,255,0.045) 0%, transparent 60%), linear-gradient(180deg, #161922 0%, #10121A 100%);border:1px solid rgba(255,255,255,.09);box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 24px 48px -28px rgba(0,0,0,.8)">
+<div style="font-size:13px;font-weight:600;color:#8697B5">Your pipeline</div>
+<div style="margin-top:2px;display:flex;align-items:baseline;gap:8px;font-size:14px;color:#B4C3DE"><b style="font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;letter-spacing:-.03em;line-height:1.1;color:#FFFFFF">31</b>clients · <span style="font-weight:600;color:#4ADE80">18 cancelled</span></div>
+<div style="margin-top:12px;display:flex;align-items:center;justify-content:space-between;height:40px;box-sizing:border-box;padding:0 14px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);font-size:14px;color:#C9D4E8"><span style="display:flex;align-items:center;gap:8px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8697B5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 20v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1M9.5 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM21 20v-1a4 4 0 0 0-3-3.9M16 4.1a3.5 3.5 0 0 1 0 6.8"/></svg>All agents</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8697B5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></div>
+<div style="margin-top:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;border-radius:999px;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.10)">
+<span style="height:30px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#8697B5">This week</span>
+<span style="height:30px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#8697B5">This month</span>
+<span style="height:30px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:#FFFFFF;color:#0B0D14">All time</span>
+</div>
+<div style="margin-top:14px;display:flex;gap:3px"><span style="flex:9 1 0;height:6px;border-radius:3px;background:#60A5FA"></span><span style="flex:4 1 0;height:6px;border-radius:3px;background:#A3B2CC;opacity:.35"></span><span style="flex:18 1 0;height:6px;border-radius:3px;background:#4ADE80;opacity:.35"></span></div>
+<div style="margin-top:8px">
+<sc-for list="{{sumRows}}" as="s" hint-placeholder-count="3">
+<div style="display:grid;grid-template-columns:10px minmax(0,1fr) auto 44px;gap:12px;align-items:center;padding:8px 2px;border-top:{{s.rule}}">
+<i style="width:8px;height:8px;border-radius:50%;background:{{s.c}}"></i>
+<span style="font-size:14px;font-weight:600;color:#C9D4E8">{{s.l}}</span>
+<span style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;text-align:right">{{s.n}}</span>
+<span style="font-size:13px;font-weight:600;color:#5E7195;text-align:right">{{s.p}}</span>
+</div>
+</sc-for>
+</div>
+<div style="flex:1"></div>
+<div style="padding-top:12px;display:flex;align-items:center;gap:12px;border-top:1px solid rgba(255,255,255,.07)">
+<span style="width:40px;height:44px;flex-shrink:0;border-radius:12px;background:rgba(255,255,255,.10);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1"><small style="font-size:10px;font-weight:700;letter-spacing:.06em;color:#60A5FA">OCT</small><b style="margin-top:4px;font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600">10</b></span>
+<span style="flex:1;min-width:0;font-size:12.5px;color:#8697B5">Your next call · 4:45 PM<b style="display:block;font-size:14px;font-weight:600;color:#FFFFFF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Test Client Sample Data 10</b></span>
+<span style="height:42px;padding:0 18px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);font-size:14px;font-weight:600;display:flex;align-items:center">Open</span>
+</div>
+</section>
+</div>
+
+<section style="min-height:0;min-width:0;display:flex;flex-direction:column;border-radius:20px;overflow:hidden;background:radial-gradient(120% 70% at 0% 0%, rgba(255,255,255,0.045) 0%, transparent 60%), linear-gradient(180deg, #161922 0%, #10121A 100%);border:1px solid rgba(255,255,255,.09);box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 24px 48px -28px rgba(0,0,0,.8)">
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:16px 16px 14px;border-bottom:1px solid rgba(255,255,255,.07)">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="3">
+<div style="display:grid;grid-template-columns:18px minmax(0,1fr) auto;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;background:{{t.bg}};border:1px solid {{t.bd}};box-shadow:{{t.glow}}">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{t.c}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{t.icon}}"/></svg>
+<span style="min-width:0"><b style="display:block;font-size:14px;font-weight:600;line-height:1.3;color:{{t.c}}">{{t.label}}</b><small style="display:block;margin-top:1px;font-size:12.5px;line-height:1.3;color:{{t.subFg}}">{{t.sub}}</small></span>
+<span style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:600;letter-spacing:-.02em;color:{{t.nFg}}">{{t.n}}</span>
+</div>
+</sc-for>
+</div>
+<div style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) 168px minmax(0,0.9fr) 128px;gap:14px;align-items:center;height:44px;padding:0 22px;font-size:12.5px;font-weight:600;color:#8697B5;background:#161922;border-bottom:1px solid rgba(255,255,255,.07)"><span>Client</span><span>Cancel with</span><span>Call</span><span>Booked by</span><span>Status</span></div>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
+<div style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) 168px minmax(0,0.9fr) 128px;gap:14px;align-items:center;min-height:74px;padding:0 22px;border-bottom:1px solid rgba(255,255,255,.07);background:{{r.bg}}">
+<span style="min-width:0"><span style="display:block;font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{r.name}}</span><span style="display:block;margin-top:2px;font-size:12.5px;color:#8697B5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{r.place}}</span></span>
+<span style="font-size:14px;color:#B4C3DE;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{r.carrier}}</span>
+<span style="display:flex;align-items:center;gap:12px;min-width:0"><span style="width:44px;height:48px;flex-shrink:0;box-sizing:border-box;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1"><span style="font-size:10px;font-weight:700;letter-spacing:.06em;color:#60A5FA">OCT</span><span style="margin-top:4px;font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600">{{r.day}}</span></span><span style="min-width:0"><span style="display:block;font-size:14px;font-weight:600;white-space:nowrap">{{r.time}}</span><span style="display:block;margin-top:2px;font-size:12.5px;color:#8697B5;white-space:nowrap">{{r.when}}</span></span></span>
+<span style="font-size:14px;color:#B4C3DE;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{r.agent}}</span>
+<span style="display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;white-space:nowrap;color:{{r.sFg}}"><span style="width:8px;height:8px;border-radius:50%;background:{{r.sFg}};box-shadow:{{r.sRing}}"></span>{{r.status}}</span>
+</div>
+</sc-for>
+</section>
+
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() {
+const item = (label, d, active) => ({ label, d, color: active ? '#FFFFFF' : '#93A6C4', icon: active ? '#7FA6F2' : '#93A6C4', bg: active ? 'rgba(255,255,255,0.08)' : 'transparent', weight: active ? 600 : 500, bar: active ? 'block' : 'none' });
+const nav = [
+{ label: 'Today', items: [item('Overview', 'M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z')] },
+{ label: 'Work', items: [item('My calls', 'M9 4h6a1 1 0 0 1 1 1v1H8V5a1 1 0 0 1 1-1zM6 6h12v15H6zM9.5 11h5M9.5 15h5'), item('Pipeline', 'M4 6h16M7 12h10M10 18h4', true), item('Getting Paid', 'M4 7h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4zM4 7a2 2 0 0 1 2-2h11M16 14h2')] },
+{ label: 'Communications', items: [item('Messages', 'M4 5h16v11H9l-5 4z')] },
+{ label: 'Account', items: [item('Settings', 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 13a7.6 7.6 0 0 0 0-2l2-1.5-2-3.4-2.3.9a7.6 7.6 0 0 0-1.7-1L15 3.5h-4l-.4 2.5a7.6 7.6 0 0 0-1.7 1l-2.3-.9-2 3.4 2 1.5a7.6 7.6 0 0 0 0 2l-2 1.5 2 3.4 2.3-.9c.5.4 1.1.7 1.7 1l.4 2.5h4l.4-2.5c.6-.3 1.2-.6 1.7-1l2.3.9 2-3.4z')] },
+];
+const S = {
+booked: { c: '#60A5FA', tint: 'rgba(59,130,246,0.16)', edge: 'rgba(96,165,250,0.55)' },
+noanswer: { c: '#A3B2CC', tint: 'rgba(148,163,184,0.14)', edge: 'rgba(163,178,204,0.45)' },
+cancelled: { c: '#4ADE80', tint: 'rgba(34,197,94,0.14)', edge: 'rgba(74,222,128,0.5)' },
+};
+const rc = (name, sub, s, hover) => ({ name: 'Test Client Sample Data ' + name, sub, fg: S[s].c, tint: S[s].tint, edge: S[s].edge, hover: hover ? 'rgba(255,255,255,0.08)' : 'transparent' });
+const recent = [rc(14, 'Cancelled · today 2:24 PM', 'cancelled', true), rc(5, 'No answer · today 11:45 AM', 'noanswer'), rc(4, 'Cancelled · today 10:52 AM', 'cancelled'), rc(34, 'No answer · Fri 4:00 PM', 'noanswer')];
+const sumRows = [
+{ l: 'Booked', n: 9, p: '29%', c: S.booked.c, rule: 'none' },
+{ l: 'No answer', n: 4, p: '13%', c: S.noanswer.c, rule: '1px solid rgba(255,255,255,0.07)' },
+{ l: 'Cancelled', n: 18, p: '58%', c: S.cancelled.c, rule: '1px solid rgba(255,255,255,0.07)' },
+];
+const tab = (label, sub, n, s, icon, on) => Object.assign({ label, sub, n, icon, c: S[s].c,
+bg: on ? 'linear-gradient(90deg, ' + S[s].c + '52 0%, ' + S[s].c + '14 100%)' : 'linear-gradient(90deg, ' + S[s].c + '21 0%, rgba(255,255,255,.02) 100%)',
+bd: on ? S[s].c : S[s].c + '4D', glow: on ? '0 0 0 1px ' + S[s].c + ', 0 12px 28px -12px ' + S[s].c : 'none',
+nFg: on ? '#FFFFFF' : S[s].c, subFg: on ? '#C9D4E8' : '#8697B5' });
+const tabs = [
+tab('Booked', 'Waiting for your call', 9, 'booked', 'M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2', true),
+tab('No answer', 'On your calendar to try again', 4, 'noanswer', 'M16 3l5 5M21 3l-5 5M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2'),
+tab('Cancelled', 'Old policy cancelled', 18, 'cancelled', 'M5 12.5l4.5 4.5L19 7.5'),
+];
+const LIVE = { status: 'On a call now', sFg: '#F87171', sRing: '0 0 0 4px rgba(239,68,68,0.2)', bg: 'rgba(239,68,68,0.05)' };
+const BK = { status: 'Booked', sFg: '#60A5FA', sRing: 'none', bg: 'transparent' };
+const R = (n, place, carrier, day, time, when, agent, st) => Object.assign({ name: 'Test Client Sample Data ' + n, place, carrier, day, time, when, agent }, st || BK);
+const rows = [
+R(6, 'Denver, CO · (555) 010-0006', 'Globe Life', 10, '3:30 PM', 'Today · Sat', 'Test Agent', LIVE),
+R(10, 'Wichita, KS · (555) 010-0010', 'Colonial Penn', 10, '4:45 PM', 'Today · Sat', 'Test Agent'),
+R(11, 'Omaha, NE · (555) 010-0011', 'Mutual of Omaha', 10, '6:15 PM', 'Today · Sat', 'Test Agent'),
+R(12, 'Lubbock, TX · (555) 010-0012', 'Aetna', 11, '12:00 PM', 'Tomorrow · Sun', 'Test Agent'),
+R(13, 'Mesa, AZ · (555) 010-0013', 'Transamerica', 11, '3:00 PM', 'Tomorrow · Sun', 'Test Agent'),
+R(15, 'Tampa, FL · (555) 010-0015', 'Globe Life', 12, '9:00 AM', 'Mon, Oct 12', 'Test Agent'),
+R(16, 'Boise, ID · (555) 010-0016', 'Colonial Penn', 12, '10:30 AM', 'Mon, Oct 12', 'Test Agent'),
+R(18, 'Reno, NV · (555) 010-0018', 'Aetna', 13, '1:00 PM', 'Tue, Oct 13', 'Test Agent'),
+];
+return { nav, recent, sumRows, tabs, rows };
+}
+}
+</script>
+</body>
+</html>

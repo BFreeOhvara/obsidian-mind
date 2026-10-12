@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pop-up phone, four stages</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width:2080px;height:780px;box-sizing:border-box;padding:40px;display:flex;gap:40px;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#FFFFFF;background-color:#07080D;background-image:radial-gradient(ellipse 70% 50% at 85% -10%, rgba(75,121,206,0.30) 0%, transparent 70%),radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px);background-size:auto,24px 24px">
+<div style="display:flex;flex-direction:column;gap:14px"><div><b style="font-family:'Space Grotesk',sans-serif;font-size:18px">1 · With the client</b><div style="font-size:13px;color:#8697B5;margin-top:2px">Explain, then ring the carrier</div></div><dc-import name="Phone" stage="Talking to client" hint-size="360px,640px"></dc-import></div>
+<div style="display:flex;flex-direction:column;gap:14px"><div><b style="font-family:'Space Grotesk',sans-serif;font-size:18px">2 · On hold with the carrier</b><div style="font-size:13px;color:#8697B5;margin-top:2px">The client chose a call back</div></div><dc-import name="Phone" stage="On hold with carrier" hint-size="360px,640px"></dc-import></div>
+<div style="display:flex;flex-direction:column;gap:14px"><div><b style="font-family:'Space Grotesk',sans-serif;font-size:18px">3 · Client back on, carrier holding</b><div style="font-size:13px;color:#8697B5;margin-top:2px">Swap between them, or merge</div></div><dc-import name="Phone" stage="Two lines" hint-size="360px,640px"></dc-import></div>
+<div style="display:flex;flex-direction:column;gap:14px"><div><b style="font-family:'Space Grotesk',sans-serif;font-size:18px">4 · Merged</b><div style="font-size:13px;color:#8697B5;margin-top:2px">All three on one call</div></div><dc-import name="Phone" stage="Merged" hint-size="360px,640px"></dc-import></div>
+<div style="display:flex;flex-direction:column;gap:14px"><div><b style="font-family:'Space Grotesk',sans-serif;font-size:18px">5 · The result</b><div style="font-size:13px;color:#8697B5;margin-top:2px">Proof of the cancellation</div></div><dc-import name="Phone" stage="Result" hint-size="360px,640px"></dc-import></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":2080,"height":780}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

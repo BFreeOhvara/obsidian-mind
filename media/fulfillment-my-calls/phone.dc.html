@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pop-up phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="position:relative;width:360px;height:640px;box-sizing:border-box;display:flex;flex-direction:column;border-radius:28px;overflow:hidden;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#FFFFFF;background:{{bg}};border:1px solid rgba(255,255,255,.16);box-shadow:0 30px 70px -20px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.14)">
+
+<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 0">
+<span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:rgba(255,255,255,.7)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15v-3a8 8 0 0 1 16 0v3M4 15h3v5H5a1 1 0 0 1-1-1zM20 15h-3v5h2a1 1 0 0 0 1-1z"/></svg>Headset</span>
+<span style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span>
+</div>
+
+<sc-if value="{{other.show}}" hint-placeholder-val="{{ false }}">
+<div style="margin:12px 16px 0;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:14px;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.10)">
+<span style="width:8px;height:8px;border-radius:50%;background:{{other.dot}}"></span>
+<span style="flex:1;font-size:13px;font-weight:600">{{other.name}}</span>
+<span style="font-size:12px;color:rgba(255,255,255,.7)">{{other.state}}</span>
+</div>
+</sc-if>
+
+<sc-if value="{{inCall}}" hint-placeholder-val="{{ true }}">
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:28px 20px 0">
+<div style="display:flex;align-items:center">
+<sc-for list="{{avatars}}" as="a" hint-placeholder-count="1">
+<span style="width:64px;height:64px;margin-left:{{a.ml}}px;border-radius:50%;box-sizing:border-box;border:3px solid rgba(13,23,48,.9);background:{{a.bg}};color:{{a.fg}};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-size:21px;font-weight:700">{{a.t}}</span>
+</sc-for>
+</div>
+<div style="margin-top:14px;font-family:'JetBrains Mono',monospace;font-size:15px;color:rgba(255,255,255,.72)">{{timer}}</div>
+<div style="margin-top:4px;font-family:'Space Grotesk',sans-serif;font-size:27px;font-weight:600;letter-spacing:-.02em;line-height:1.15">{{name}}</div>
+<div style="margin-top:6px;display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;color:{{subFg}}"><span style="display:{{bars}};align-items:flex-end;gap:2px;height:13px"><span style="width:3px;height:6px;border-radius:2px;background:currentColor"></span><span style="width:3px;height:13px;border-radius:2px;background:currentColor"></span><span style="width:3px;height:9px;border-radius:2px;background:currentColor"></span></span>{{sub}}</div>
+<div style="flex:1"></div>
+</div>
+
+<sc-if value="{{tip.show}}" hint-placeholder-val="{{ false }}">
+<div style="margin:0 16px 14px;display:flex;align-items:center;gap:12px;padding:12px 12px 12px 14px;border-radius:18px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(8px)">
+<span style="flex:1;text-align:left"><span style="display:block;font-size:14px;font-weight:700">{{tip.title}}</span><span style="display:block;margin-top:1px;font-size:12px;color:rgba(255,255,255,.7)">{{tip.text}}</span></span>
+<span style="height:32px;padding:0 14px;border-radius:999px;background:#FFFFFF;color:#0D1730;font-size:13px;font-weight:700;display:flex;align-items:center">{{tip.btn}}</span>
+</div>
+</sc-if>
+
+<div style="display:grid;grid-template-columns:repeat(3,1fr);row-gap:16px;padding:0 22px">
+<sc-for list="{{keys}}" as="k" hint-placeholder-count="6">
+<span style="display:flex;flex-direction:column;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:{{k.lab}};opacity:{{k.op}}"><span style="width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:{{k.bg}};color:{{k.fg}};border:1px solid rgba(255,255,255,.18)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{k.icon}}"/></svg></span>{{k.label}}</span>
+</sc-for>
+</div>
+<div style="display:flex;justify-content:center;padding:18px 0 22px">
+<span style="display:flex;flex-direction:column;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:rgba(255,255,255,.85)"><span style="width:64px;height:64px;border-radius:50%;background:#E5322D;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px -8px rgba(229,50,45,.8)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 15c5-5 13-5 18 0l-2.5 2.5-3-1.5v-3a12 12 0 0 0-5 0v3l-3 1.5z"/></svg></span>{{endLabel}}</span>
+</div>
+</sc-if>
+
+<sc-if value="{{result}}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;padding:22px 18px 20px">
+<div style="text-align:center"><div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:rgba(255,255,255,.7)">Call ended · 22:16</div><div style="margin-top:4px;font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:600;letter-spacing:-.02em">How did it go?</div></div>
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+<span style="height:46px;border-radius:999px;display:flex;align-items:center;justify-content:center;gap:7px;font-size:14.5px;font-weight:800;background:#22C55E;color:#04170B;box-shadow:0 0 0 2px rgba(13,23,48,.8),0 0 0 4px #22C55E">Cancelled</span>
+<span style="height:46px;box-sizing:border-box;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:14.5px;font-weight:600;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.10)">No answer</span>
+</div>
+<label style="display:block"><span style="display:block;font-size:12.5px;font-weight:600;color:rgba(255,255,255,.72);margin-bottom:6px">Confirmation number from Globe Life</span><span style="display:flex;align-items:center;height:44px;box-sizing:border-box;padding:0 14px;border-radius:14px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.4);font-family:'JetBrains Mono',monospace;font-size:14px">GL-2026-884213</span></label>
+<label style="display:block"><span style="display:block;font-size:12.5px;font-weight:600;color:rgba(255,255,255,.72);margin-bottom:6px">Takes effect</span><span style="display:flex;align-items:center;height:44px;box-sizing:border-box;padding:0 14px;border-radius:14px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.16);font-size:14px">Today, Oct 10</span></label>
+<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;background:rgba(34,197,94,.16);border:1px solid rgba(74,222,128,.4);font-size:13px"><span style="width:20px;height:20px;border-radius:6px;background:#22C55E;color:#04170B;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>No more payments will be drafted</div>
+<div style="flex:1"></div>
+<span style="height:50px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;background:#FFFFFF;color:#0D1730">Save</span>
+<span style="text-align:center;font-size:12px;color:rgba(255,255,255,.65)">Picked the wrong one? Change it until the end of the day.</span>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"stage":{"editor":"enum","options":["Talking to client","On hold with carrier","Two lines","Merged","Result"],"default":"On hold with carrier"},"$preview":{"width":360,"height":640}}'>
+class Component extends DCLogic {
+renderVals() {
+const st = this.props.stage ?? 'On hold with carrier';
+const I = {
+mic: 'M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM5 11a7 7 0 0 0 14 0M12 18v3',
+keypad: 'M6 5h.01M12 5h.01M18 5h.01M6 11h.01M12 11h.01M18 11h.01M6 17h.01M12 17h.01M18 17h.01',
+pause: 'M9 5v14M15 5v14',
+add: 'M12 5v14M5 12h14',
+swap: 'M7 7h11l-3-3M17 17H6l3 3',
+merge: 'M7 4v4a5 5 0 0 0 5 5 5 5 0 0 0 5-5V4M12 13v7',
+};
+const GLASS = 'rgba(255,255,255,0.14)';
+const k = (label, icon, on, off) => ({ label, icon, bg: on ? '#FFFFFF' : GLASS, fg: on ? '#0D1730' : '#FFFFFF', lab: 'rgba(255,255,255,0.85)', op: off ? 0.35 : 1 });
+const NAVY = 'radial-gradient(ellipse 90% 60% at 100% 0%, rgba(75,121,206,0.65) 0%, transparent 70%), radial-gradient(ellipse 80% 60% at 0% 100%, rgba(0,191,166,0.45) 0%, transparent 70%), linear-gradient(170deg, #1B3366 0%, #0D1730 55%, #0A2A33 100%)';
+const AMBER = 'radial-gradient(ellipse 90% 60% at 100% 0%, rgba(245,158,11,0.40) 0%, transparent 70%), radial-gradient(ellipse 80% 60% at 0% 100%, rgba(0,191,166,0.30) 0%, transparent 70%), linear-gradient(170deg, #2A2A3E 0%, #121A30 55%, #0A2A33 100%)';
+const GREEN = 'radial-gradient(ellipse 90% 60% at 100% 0%, rgba(34,197,94,0.40) 0%, transparent 70%), radial-gradient(ellipse 80% 60% at 0% 100%, rgba(0,191,166,0.45) 0%, transparent 70%), linear-gradient(170deg, #143B3A 0%, #0D1E30 55%, #0A2A33 100%)';
+const AV = { client: { t: 'TC', bg: 'rgba(96,165,250,0.30)', fg: '#FFFFFF', ml: 0 }, carrier: { t: 'GL', bg: 'rgba(251,191,36,0.32)', fg: '#FFFFFF', ml: 0 } };
+const none = { show: false };
+let v;
+if (st === 'Talking to client') v = {
+bg: NAVY, avatars: [AV.client], timer: '00:46', name: 'Test Client Sample Data 6', sub: 'Client', subFg: 'rgba(255,255,255,0.75)', bars: 'none',
+other: none, tip: { show: true, title: 'Ready for the carrier?', text: 'Ask them to stay on, or offer a call back.', btn: 'Ring Globe Life' },
+keys: [k('Mute', I.mic), k('Keypad', I.keypad), k('Hold', I.pause), k('Ring carrier', I.add), k('Swap', I.swap, false, true), k('Merge', I.merge, false, true)], endLabel: 'End' };
+else if (st === 'On hold with carrier') v = {
+bg: AMBER, avatars: [AV.carrier], timer: '12:40', name: 'Globe Life', sub: 'On hold', subFg: '#FBBF24', bars: 'inline-flex',
+other: { show: true, dot: '#C4B5FD', name: 'Test Client Sample Data 6', state: 'waiting for a call back' },
+tip: { show: true, title: 'Someone picked up?', text: 'Say “one moment, adding the policyholder.”', btn: 'Ring client' },
+keys: [k('Mute', I.mic), k('Keypad', I.keypad), k('Hold', I.pause), k('Ring client', I.add), k('Swap', I.swap, false, true), k('Merge', I.merge, false, true)], endLabel: 'End' };
+else if (st === 'Two lines') v = {
+bg: NAVY, avatars: [AV.client], timer: '00:31', name: 'Test Client Sample Data 6', sub: 'Client · Globe Life is holding', subFg: 'rgba(255,255,255,0.75)', bars: 'none',
+other: { show: true, dot: '#FBBF24', name: 'Globe Life', state: 'on hold · 13:22' },
+tip: { show: true, title: 'Both on the line', text: 'Merge to bring the client in.', btn: 'Merge' },
+keys: [k('Mute', I.mic), k('Keypad', I.keypad), k('Hold', I.pause, true), k('Ring', I.add, false, true), k('Swap', I.swap), k('Merge', I.merge)], endLabel: 'End' };
+else if (st === 'Merged') v = {
+bg: GREEN, avatars: [AV.client, Object.assign({}, AV.carrier, { ml: -16 })], timer: '18:05', name: 'Test Client & Globe Life', sub: 'Merged · all three on', subFg: '#4ADE80', bars: 'none',
+other: none, tip: none,
+keys: [k('Mute', I.mic), k('Keypad', I.keypad), k('Hold', I.pause), k('Ring', I.add, false, true), k('Swap', I.swap, false, true), k('Merge', I.merge, true)], endLabel: 'End all' };
+else v = { bg: NAVY, avatars: [], timer: '', name: '', sub: '', subFg: '#FFFFFF', bars: 'none', other: none, tip: none, keys: [], endLabel: '' };
+return Object.assign(v, { inCall: st !== 'Result', result: st === 'Result' });
+}
+}
+</script>
+</body>
+</html>

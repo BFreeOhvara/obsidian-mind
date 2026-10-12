@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>My calls header, a day ahead</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width:1000px;height:300px;box-sizing:border-box;padding:28px;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#FFFFFF;background-color:#07080D;background-image:radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px);background-size:24px 24px">
+<section style="position:relative;padding:24px 28px 26px;border-radius:24px;overflow:hidden;background:radial-gradient(ellipse 60% 120% at 100% 0%, rgba(75,121,206,0.55) 0%, transparent 65%), radial-gradient(ellipse 40% 90% at 20% 120%, rgba(0,191,166,0.28) 0%, transparent 70%), linear-gradient(135deg, #16294C 0%, #0D1730 60%, #0A1024 100%);border:1px solid rgba(255,255,255,.10);box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 30px 60px -30px rgba(0,0,0,.8)">
+<div style="display:flex;align-items:center;gap:18px">
+<button type="button" aria-label="Previous day" style="width:48px;height:48px;flex-shrink:0;border-radius:50%;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);color:#FFFFFF;display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+<div style="flex:1;min-width:0;display:flex;align-items:center;gap:14px">
+<button type="button" style="display:inline-flex;align-items:center;gap:9px;height:36px;padding:0 6px 0 14px;border-radius:999px;border:1px solid rgba(52,224,196,.55);background:rgba(52,224,196,.14);color:#FFFFFF;font-family:inherit;font-size:13.5px;font-weight:700;box-shadow:0 0 22px -6px rgba(52,224,196,.7)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34E0C4" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>Today<span style="height:26px;padding:0 9px;border-radius:999px;background:rgba(0,0,0,.28);display:inline-flex;align-items:center;font-size:12px;font-weight:600;color:#B4C3DE">Sat 10</span></button>
+<h1 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:34px;font-weight:600;line-height:1.05;letter-spacing:-.035em;white-space:nowrap">Tuesday, October 13</h1>
+<span style="font-size:13px;font-weight:600;color:#B4C3DE">in 3 days</span>
+</div>
+<div style="text-align:right;line-height:1.15"><div style="font-family:'Space Grotesk',sans-serif;font-size:30px;font-weight:700;letter-spacing:-.03em">3<span style="font-size:15px;font-weight:500;color:#B4C3DE;margin-left:6px">booked</span></div><div style="font-size:13px;color:#B4C3DE">first at 9:00 AM</div></div>
+<button type="button" aria-label="Next day" style="width:48px;height:48px;flex-shrink:0;border-radius:50%;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);color:#FFFFFF;display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+</div>
+<div style="position:relative;height:92px;margin-top:26px">
+<sc-for list="{{hours}}" as="h" hint-placeholder-count="11">
+<span style="position:absolute;top:58px;left:{{h.x}}px;width:1px;height:{{h.tick}}px;background:rgba(255,255,255,.22)"></span>
+<span style="position:absolute;top:74px;left:{{h.lx}}px;width:60px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:#8FA3C6;display:{{h.show}}">{{h.label}}</span>
+</sc-for>
+<span style="position:absolute;left:0;right:0;top:44px;height:8px;border-radius:4px;background:rgba(255,255,255,.08)"></span>
+<sc-for list="{{pins}}" as="q" hint-placeholder-count="3">
+<span style="position:absolute;top:39px;left:{{q.x}}px;width:18px;height:18px;box-sizing:border-box;border-radius:50%;background:#0D1730;border:2.5px solid #60A5FA"></span>
+</sc-for>
+<span style="position:absolute;top:0;left:-6px;height:26px;padding:0 10px;border-radius:999px;display:flex;align-items:center;white-space:nowrap;font-size:12px;font-weight:700;background:rgba(255,255,255,.14);color:#FFFFFF">First · 9:00 Sample Data 15</span>
+</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1000,"height":300}}'>
+class Component extends DCLogic {
+renderVals() {
+const W = 888, x = h => Math.round((h - 9) / 10 * W);
+const hours = Array.from({ length: 11 }, (_, i) => { const h = 9 + i; return { x: x(h), lx: x(h) - 30, tick: h % 2 ? 6 : 10, show: h % 2 ? 'block' : 'none', label: (h > 12 ? h - 12 : h) + (h >= 12 ? ' PM' : ' AM') }; });
+const pins = [9, 10.5, 13].map(h => ({ x: x(h) - 9 }));
+return { hours, pins };
+}
+}
+</script>
+</body>
+</html>
