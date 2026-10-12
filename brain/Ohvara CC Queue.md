@@ -61,65 +61,6 @@ tags:
 
 Scope note: still layers on top of Prompt 695's No answer status/color/layout work, which stands as-is — this prompt is the automated recovery behavior running underneath that same status.
 
-## Prompt 749 — Fulfillment Pipeline = the agent's My Pipeline layout (Find any client, Your pipeline, three status tabs), scoped to the rep, rows open the My calls drawer
-
-> **✅ APPROVED by Brayden 2026-10-11 (Eagle session):** "I want the pipeline to stay like that" and "the pipeline should look kind of like how the pipeline does on the agent side … I don't know why we would do it differently". **Port** `media/fulfillment-my-calls/fulfillment-pipeline.dc.html` literally. **Run after P748** (it reuses P748's call drawer). **Run on Opus 5.5:** it parametrises shared agent components, and the agent's My Pipeline must stay pixel-identical. No migration.
-
-### 1. Layout: the agent My Pipeline (P726/P729), same CSS (`pl-*`, fit mode)
-
-Rebuild `src/pages/fulfillment/Pipeline.jsx` on the same components as `src/pages/agent/Clients.jsx`. Add props instead of forking; defaults keep the agent side unchanged.
-
-**Left rail (400px, two equal boxes):**
-1. **Find any client** (`ClientSearch` in the `pl-find` hero box): sub-line **"Name, phone or agent, across every status"**, the `/` hotkey, and results across every status.
-   - Instead of "Recently booked", show **"Recently worked · by you"**: the rep's rows ordered by `last_call_at`, with a status avatar and a sub-line like "Cancelled · today 2:24 PM" / "No answer · Fri 4:00 PM".
-2. **Your pipeline** (`PipelineSummary`), from top to bottom:
-   - total ("31 clients · 18 cancelled")
-   - an **All agents** `OvSelect` (filters by the booking agent)
-   - the This week / This month / All time switch (by booking date, as on the agent side)
-   - the proportional bar
-   - **three** rows (Booked, No answer, Cancelled) with count and %
-   - **"Your next call · {time}"**, the client, and an **Open** button that opens the P748 drawer
-
-**Right: the list box** (`PipelineList` / `StatusList`):
-- **Three tabs, no Needs attention:**
-  - **Booked**: "Waiting for your call"
-  - **No answer**: "On your calendar to try again"
-  - **Cancelled**: "Old policy cancelled"
-
-  Same tab look, phone chips and arrow-key behavior.
-- **Columns:**
-
-  | Tab | Columns |
-  |---|---|
-  | Booked | Client (City, ST · phone) · **Cancel with** · **Call** (date tile + time + "Today · Sat" / "Mon, Oct 12") · **Booked by** · Status |
-  | No answer | Client · Cancel with · **Next try** · Booked by · Status ("No answer · try {n}") |
-  | Cancelled | Client · Carrier cancelled · **Cancelled** (date) · Booked by · Status |
-
-  Status shows as "Booked" or the live label "**On a call now**" (red dot), and "Time passed" (amber) for a booked call past its time.
-- **Rows open the P748 call drawer** (`?open=<id>`) on this page. The inline `Summary` expander goes away.
-- URL state as the agent side: `?stage=` (`booked` / `noAnswer` / `cancelled`; the Overview links `?stage=cancelled`) and `?range=`. The page opens on Booked.
-
-### 2. Scope
-
-- A rep sees **their own** rows (`assigned_fulfillment_id = me`).
-- Admin sees everyone, with a **rep** `OvSelect` above the agent one. Keep it to that; flag it in the ship note.
-- No Needs attention anywhere: remove the `attention` stage, the `needsAttention` import on this page and the "Needs attention" pill.
-
-### 3. Verify and log
-
-- eslint clean, `vite build` passes.
-- Harness as P748. Test the three tabs, the search hotkey, recent rows, the agent filter, ranges, `?stage=cancelled` from the Overview, a row opening the drawer, and the live row.
-- Compare 1440 dark and light against the mockup.
-- **Agent My Pipeline before/after crops must be identical** (all four tabs).
-- Delete the harness. Ship note ("not seen logged in").
-- **Brayden checks:** Pipeline looks like the agent's with three tabs; search finds any client; a row opens the call drawer.
-- Update `DESIGN.md`.
-
-**P749: Opus 5.5**
-
-
----
-
 ## Prompt 750 — Fix a wrong call result: a quick "Change to …" right after the click, and "Change result" in the call drawer (Cancelled ↔ No answer), with a correction notice to the agent
 
 > **✅ ASKED FOR by Brayden 2026-10-11 (Eagle session):** "let's say they click no answer or they click canceled when they meant to click no answer, is there a way that they can change that … just make sure that it is fixed." **Run after P748 and P749** (it lives in P748's drawer and focus card). **Run on Opus 5.5.** It adds one migration (security-definer RPC + notification); take the next free number after 135.
