@@ -8,9 +8,9 @@ Inherits the vault root `CLAUDE.md`'s "Manager Chat Identity & Logging" section 
 
 ## Session Start
 
-1. Read [[Restorix CC Queue]] FIRST — the live task queue; execute top to bottom, delete each item the moment it ships, full record to [[Restorix Memories]]
-2. Read [[Restorix LIVE_STATE]] for current state (what's true right now, recently-shipped archive)
-3. Read [[Restorix North Star]] and [[Restorix Memories]] before every session — never repeat a logged mistake
+1. Read the TOP item of [[Restorix CC Queue]] only (root CLAUDE.md "Token Budget" #1) — the live task queue; execute that one item, delete it the moment it ships, short ship note (15 lines max) to [[Restorix Memories]]; one item per session
+2. `grep` [[Restorix LIVE_STATE]] for the item's keywords (what's true right now); don't read it in full
+3. Read [[Restorix North Star]] only where the item touches strategy or pricing; `grep` [[Restorix Memories]] for the item's keywords (never in full) — never repeat a logged mistake
 4. State what's relevant before writing code
 
 ## Session End (backstop only — most logging should already have happened during the session per the rule above)

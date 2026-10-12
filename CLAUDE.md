@@ -21,6 +21,19 @@ This vault hosts **two independent businesses**: **Ohvara** (below, rooted at `b
 - **Prompt numbers have one source of truth: the real files on disk.** The next number is one past the highest referenced in `Restorix LIVE_STATE.md` + `Restorix Memories.md` (or Ohvara's `LIVE_STATE.md` + `Memories.md`). Never privately reserve a number in a working copy or in a chat — a number is not taken until it is written into the real queue file.
 - **Ownership split, to avoid clobbering shared files:** manager/Cowork chats write **queue items** (Restorix → [[Restorix CC Queue]]; Ohvara → [[Ohvara CC Queue]]); CC writes the **"shipped" logs and current-state**. Don't both edit the same file in the same window.
 
+## Token Budget (CC and managers, both verticals — added 2026-10-12, Brayden: "CC is spending way too much")
+
+Cost = context size x number of turns, plus thinking/output. These rules cut both. Nothing here relaxes logging, verification of money/auth/RLS/migrations, or the blocker exception.
+
+1. **Read the top queue item only.** The queue file holds many items. `grep -n '^## Prompt' <queue>` and read just the first item's line range (plus any item it names as a dependency). Never read the whole queue, `Memories.md` (~500 KB), `LIVE_STATE.md` (~130 KB) or `DESIGN.md` (~75 KB) in full: `grep -n` them for the prompt number, the page/component names and keywords in the item, then read only those entries/sections. [[Gotchas]] is the curated list of past mistakes; read it instead of the whole Memories log.
+2. **No chat between tool calls.** No "Let me...", no recon/debug narrative, no restating the spec. Only the blocker/decision rule and the Opus-tier flag may interrupt.
+3. **Final chat message: 5 lines max**, shaped `P### shipped <hash>. Checked: <what was run/measured>. Not checked: <what, e.g. not seen logged in on live>. Brayden checks: <one line>.` Add `Next: new session for the next item.` Everything else goes in the ship note, not chat.
+4. **Ship note in Memories/LIVE_STATE: 15 lines max** — what changed, key files, hash, decisions made, what was not verified. Don't re-copy the spec or paste per-viewport tables; link shots in `media/`.
+5. **Measure, don't look.** Use Playwright `evaluate` (sizes, overflow, computed colours, counts, text) for anything a number can answer; take a screenshot only where the look is the question. One shot per view the spec names, viewed once and downscaled (<=1280 px wide); after a fix, retake only the failing view. If a spec's verify grid is wider than the change can differ across (e.g. a logic-only change at 4 widths x 2 themes), run the subset that can differ and say which you skipped in one line. Money, auth/RLS, migrations and edge functions keep their full checks.
+6. **Keep bulky output out of context.** Pipe build/lint/test through `| tail -30`; `grep` rather than `cat`; read big files with offset/limit; hand log-heavy or search-heavy sweeps to a subagent on a smaller model so only the summary returns.
+7. **One queue item per session.** Finish, post the 5-line message, stop. Don't start the next item in the same context unless Brayden says "continue" (every later turn re-reads the whole history; Brayden starts a fresh session for each prompt).
+8. **Managers (Eagle/Falcon) write lean specs** — what, why, acceptance; no copied-in code, no verify grid longer than the risk needs. Tag **Opus 5.5 only** for money, auth/RLS/migrations, Twilio/voice, or an unresolved design call; ports of approved mockups and UI-only items are **Sonnet 5.5**.
+
 **Before doing anything else, determine which vertical the session's request is about.** If it's Restorix (or genuinely ambiguous), stop reading here and read `restorix/CLAUDE.md` instead — everything below this point (Session Start/End, Pricing, Infrastructure, Rules) is Ohvara-specific and does not apply to Restorix work; the Manager Chat Identity & Logging rule above still applies regardless. If it's Ohvara, continue below as normal.
 
 # Ohvara Vault
@@ -33,10 +46,10 @@ See "Manager Chat Identity & Logging" at the top of this file (shared across bot
 
 ## Session Start
 
-1. Read [[Ohvara CC Queue]] FIRST — if non-empty, that's the live task queue from Eagle/Falcon; execute top to bottom, delete each item when done, log to [[Memories]]
-2. Read [[North Star]] and [[Memories]] before every session — never repeat a logged mistake
-3. Read [[DESIGN]] before touching any UI
-4. Load all skills from the `skills/` folder ([[skills/Index]])
+1. Read the TOP item of [[Ohvara CC Queue]] only (Token Budget #1) — it is the live task queue from Eagle/Falcon; execute that one item, delete it when done, log a short ship note to [[Memories]] (Token Budget #4); one item per session
+2. Read [[Gotchas]]; `grep` [[Memories]] and [[LIVE_STATE]] for the item's prompt number and keywords (never read them in full); from [[North Star]] read only "Rules Claude Always Follows" — never repeat a logged mistake
+3. Before touching UI, read only the [[DESIGN]] sections for the pages/components you touch (`grep -n` the headings; the v16 tokens section once)
+4. Load only the skills the item needs ([[skills/Index]] lists them)
 5. Follow all rules in [[North Star]] section "Rules Claude Always Follows"
 6. State what's relevant before writing code
 
