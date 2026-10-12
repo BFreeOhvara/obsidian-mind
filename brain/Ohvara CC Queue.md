@@ -61,45 +61,6 @@ tags:
 
 Scope note: still layers on top of Prompt 695's No answer status/color/layout work, which stands as-is — this prompt is the automated recovery behavior running underneath that same status.
 
-## Prompt 752 — Fulfillment gets the agent portal's header search (clients, carriers and pages, ⌘K / "/")
-
-> **✅ ASKED FOR by Brayden 2026-10-11 (Eagle session):** "I want the fulfillment to have that same search bar in the header like the agent does." This is a small change, so no mockup. **Run after P748 and P749** (results open the P748 call drawer). **Run on Sonnet 5.5.** UI only.
-
-### What changes
-
-- `src/components/layout/DashboardLayout.jsx` (~line 283) shows `<GlobalSearch />` for the agent and admin roles only. **Show it for `fulfillment` too.** Same box, same width, same ⌘K / Ctrl K / "/" hotkeys, and the same phone icon that opens the full-screen sheet.
-- `src/components/layout/GlobalSearch.jsx`: when `role === 'fulfillment'`:
-  - **Rows:** `useFulfillmentQueue()` filtered to `assigned_fulfillment_id === profile.id` (not `useAgentBookings`). Admin is unchanged.
-  - **Matching:** client name, phone, the carrier being cancelled, and the booking agent's name. Reuse `matchClients` with the agent name added for this role.
-  - **Each result** shows the name, a Fulfillment status pill (`CALL_TONE` from `lib/fulfillmentDay.js`: Booked / On a call / No answer / Cancelled; no "Needs attention" or "Confirm number" wording), and a meta line:
-    - "Call Sat, Oct 10 · 3:30 PM · Globe Life"
-    - "On a call now · Globe Life"
-    - "No answer · try 2 · next Mon 9:00 AM"
-    - "Cancelled Oct 10 · Globe Life"
-  - **Opening a client** goes to `/fulfillment/desk?open=<id>` (P748's drawer, on that call's day).
-  - **"Go to"** lists the Fulfillment nav pages (Overview, My calls, Pipeline, Getting Paid, Messages, Settings).
-  - **Placeholder:** "Search clients, carriers, pages".
-- **My calls (P748):** remove the "Find a client" pill from the page header, because the header search replaces it. On the Fulfillment Pipeline, "/" stays with the page's own Find any client, the same as the agent's My Pipeline.
-- **The agent and admin search must be unchanged** (before/after crops).
-
-### Verify and log
-
-- eslint clean, `vite build` passes.
-- Harness:
-  - search as a rep by name, phone, carrier and agent
-  - the result opens the drawer on the right day
-  - "Go to" pages work
-  - ⌘K and "/" work, and "/" on Pipeline stays with the page
-  - the sheet works at 390
-  - the agent search is unchanged
-- Ship note ("not seen logged in").
-- **Brayden checks** as Test Fulfill: the search bar is in the header and finds a client.
-
-**P752: Sonnet 5.5**
-
-
----
-
 ## Prompt 753 — "My pay" (was Getting Paid): this week's pay, hours by day, your shifts, payouts, and in-portal Payout settings on Stripe Connect
 
 > **✅ APPROVED by Brayden 2026-10-11 (Eagle session):** "that is perfect, and that should be queued now." He wants reps to **receive money** (a bank account; PayPal later), with **all payout settings inside the portal**, "like we built for Manage billing on the agent side", not a jump to Stripe. **Port literally** (ignore `/_blob/`):
