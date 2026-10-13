@@ -1830,3 +1830,12 @@ Status: 724 shipped and removed from [[Ohvara CC Queue]] (re-read right before r
 - **Brayden steps:** (a) Stripe → Connect → enable **Express**; (b) add `transfer.reversed` to the existing webhook, and add a **Connect** endpoint (events on connected accounts: `account.updated`, `account.external_account.*`) at the same URL `.../functions/v1/agent-billing/webhook`, save its secret as `STRIPE_CONNECT_WEBHOOK_SECRET`; (c) `npx.cmd supabase functions deploy fulfillment-connect-session fulfillment-pay-week --project-ref jjextitmbptoaolacocs` and redeploy `agent-billing --no-verify-jwt`; (d) decide contractor (1099, Stripe fits) vs employee (W-2, needs payroll), then flip Payouts on.
 - **Brayden checks** as Test Fulfill: My pay loads with the amber "Connect a bank account" card; Payout settings opens (Stripe form needs step a first).
 - Queue: P696 (A2P), **P754 next**.
+
+[CC | 2026-10-12 — P754 shipped: Fulfillment reps get an Admin line]
+- **Shipped** `ohvara-dashboard` `b96ec03`, **migration 139 applied live** (`139_rep_admin_line.sql`). A rep owns an Admin line `(agent_id = rep, peer_id = NULL)`; the column keeps its name (comment in the migration says it means "line owner" on Admin lines).
+- `can_dm_thread`: + rep on their own Admin line; admin's Admin-line rule now accepts an owner who is agent or fulfillment. `my_standing_threads()` (drop + recreate): rep gets their Admin line, admin gets reps' Admin lines, new last column `agent_role`. Notify trigger unchanged (rep write → every active admin; admin reply → the rep).
+- `Messages.jsx`: rep's Admin line pinned top as "Ohvara team" / sub "Admin · questions about your pay, schedule or anything else", chips "Question about my pay / Schedule change / Problem with a call". Admin's inbox labels reps' lines Fulfillment (headset badge, "Fulfillment · Admin line"). Header subtitle untouched.
+- **Checked:** 26 rolled-back DO checks on live as rep A, a temp rep B, the agent and admin — rep A reads/writes/marks own line; rep B and the agent can't read or write it; admin reads, sees it as `fulfillment` with 1 unread, replies; agent↔rep and agent↔Admin unchanged; admin still can't read/write agent↔rep; notifications land on admin and rep. Node harness on `buildItems` (rep pinned line, chips, admin labels, agent view unchanged). eslint + vite build clean.
+- **Not checked:** not seen logged in on live; pinned row not rendered in a browser.
+- **Brayden checks:** as Test Fulfill, message the Ohvara team; as admin, see it labelled Fulfillment and reply.
+- Queue: P696 (A2P) only.
