@@ -63,3 +63,25 @@ Scope note: still layers on top of Prompt 695's No answer status/color/layout wo
 
 ---
 
+---
+
+## Prompt 757 — Fulfillment Overview and My calls count calls BOOKED this week (not "calls made") next to Cancelled
+
+> **✅ ASKED FOR by Brayden 2026-10-13 (Eagle session)** with a screenshot of the Fulfillment Overview. Small change, no mockup. **Run on Sonnet 5.5.** Labels and one count only. Run after P756 (it touches the same My calls tile).
+
+Brayden: "instead of calls made this week, it should be calls booked on their calendar this week ... I would rather it be booked and cancelled." Comparing calls made against cancelled is the wrong pair; he wants **booked vs cancelled**.
+
+### Change
+1. **Define the number once.** "Booked this week" = the number of calls on this person's Fulfillment calendar whose scheduled time falls in the current Mon to Sun week, whether already done, no answer, or still to come. Same source `buildCalls` / `useFulfillmentQueue` use for the calendar, so it matches what My calls shows. Put it in one helper in `lib/fulfillmentDay.js` and reuse it everywhere below. Do not change how "Cancelled this week" is counted.
+2. **Overview, top-left card** (currently "Calls made this week"): rename to **Calls booked this week**, show the booked count, and make its "N more than last week" comparison and its little 7-day bars use booked counts (last week's booked count for the comparison). Keep the phone icon, arrow, spacing and styling exactly as they are.
+3. **Overview, "Last week" chart** (legend "Calls" / "Cancelled", subtitle "calls you made and old policies confirmed cancelled"): change the first series to **Booked** and the subtitle to "calls booked on your calendar and old policies confirmed cancelled". The left-side numbers become "booked" and "cancelled".
+4. **My calls side tile** (added in P756, currently "This week / calls so far"): label it **Booked this week**, with the sub-label "on your calendar", using the same helper. "Cancel rate" stays as is.
+5. Admin's team-wide Overview view (if it shares these cards) uses the same wording, counting across the selected rep or the whole team. Do not change anything on the Agent portal.
+
+### Verify
+- A week with 7 scheduled calls, 2 done and 5 to come, shows **7** booked on the Overview card, the Last week chart and the My calls tile.
+- Cancelled still counts only calls that ended Cancelled.
+- A week with nothing scheduled shows 0 and "—" for any comparison, not a divide-by-zero.
+- Screenshot the Overview and My calls at 1440. `eslint` clean on touched files, `vite build` passes.
+
+**P757: Sonnet 5.5**

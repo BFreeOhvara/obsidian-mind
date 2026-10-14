@@ -1854,3 +1854,25 @@ Status: 724 shipped and removed from [[Ohvara CC Queue]] (re-read right before r
 - Checked: `vite build` passes; eslint's only error in DashboardLayout is the old setState-in-effect baseline (line 245).
 - Not checked: no rendered screenshots or measured edges at 1440/1920/390 (page needs a logged-in fulfillment session; no harness built for a one-line CSS change).
 - Brayden checks: Overview, My calls (still narrow on purpose) and My pay edges; My pay shows the dot grid and glow.
+
+
+[Eagle | 2026-10-13 — P756 queued: My calls wide layout + call button unlocks 5 min before call time]
+- Brayden approved the wide My calls mock (timeline left, 340px side column: Today's score, This week + Cancel rate tiles, Tomorrow). Rejected: pay, average call time, 'Before you dial'. Up next card simplified (no ring, no agent chip). New rule: Call client unlocks 5 minutes before the call time everywhere, enforced server-side in fulfillment_start_call (`too_early`). Reference: media/fulfillment-my-calls/my-calls-wide.dc.html. Model: Opus 5.5.
+
+[Eagle | 2026-10-13 — P757 queued: Overview + My calls count calls BOOKED this week instead of calls made]
+- Brayden wants booked vs cancelled (not made vs cancelled). Booked = calls on this rep's calendar Mon to Sun, done or to come. Applies to the Overview card, Last week chart, and the P756 My calls tile (P756 text updated). Model: Sonnet 5.5.
+
+[Falcon | 2026-10-13 — Twilio profile approved, number bought: +1 (469) 896-8416]
+- Brayden bought a Local Dallas number in Twilio (Voice enabled; Messaging disabled until A2P registration). Profile review therefore passed. Queue now: P696 (SMS, blocked on A2P), P756 (Opus), P757 (Sonnet); P750 to P755 already shipped.
+- Calling (P751) is built but off. Brayden's steps, in order, one at a time: (1) Twilio API key (Standard), (2) TwiML App with Voice URL .../functions/v1/fulfillment-voice, (3) Supabase secrets TWILIO_API_KEY_SID / TWILIO_API_KEY_SECRET / TWILIO_TWIML_APP_SID and set the from-number secret to the new number, (4) deploy fulfillment-voice, fulfillment-call, twilio-token, (5) flip "Calling in the portal" on and make one test call. Texting: A2P 10DLC registration after calling is live (uses ohvara.com + /terms#text-messaging).
+
+[CC | 2026-10-13 — P756 built (`ohvara-dashboard` `eb08292`); migration 140 waits on Brayden]
+- My calls (`MyCalls.jsx`, `index.css` `.mc-*`): `.mc-page` no max-width; `.mc-cols` timeline + 340px `.mc-side` (stack <1100px). Up next card: tag + "in …" / mm:ss, time 38 + name 24, one "Cancel with" chip, no ring/agent chip/dial note/client-zone line. Later rows drop "From <agent>" ("Second try", "Next", "Time passed" only). "Then tomorrow" line, legend and mini ring removed. Page tick 15 s. Design record: [[DESIGN]] v16 "P756".
+- Side column: Today's score (day shown), Booked this week + Cancel rate from new `thisWeek` / `weekScore` in `lib/fulfillmentDay.js` (buildCalls over Mon–Sun with that week's policy_events; P757 can reuse `weekScore().booked`), next-day card with See {day}.
+- Unlock rule: `CALL_UNLOCK_LEAD_MIN = 5`, `canStartCall(p, now, tz)` (time passed = open, later zone day = locked, no time = open), `unlockAt`, `tooEarlyText`. `useCallLock` (15 s tick) in `useCallActions.js`; `CallButton` renders `.mc-locked` (lock icon, aria-disabled, toast on tap); `act.start` and `PortalPhoneContext.open` refuse early too; `useStartCall` maps `too_early` (detail = opens-at) to the same toast. Toast lives in PortalPhoneProvider (`toast`, `tz` added to the phone context).
+- Migration `140_call_unlock.sql`: `fulfillment_start_call` raises `too_early` when `now() < scheduled_call_at - 5 min`; rest unchanged. **apply_migration denied by the auto-mode classifier → not on live.** Live function verified identical to 117 before writing 140.
+- Gap: the bridged caller-ID path (`start-agent-caller-id-call`) rings before `fulfillment_start_call`; only the client lock guards it until P751's phone replaces it.
+- Checked: 16 helper tests with frozen clock (6 min locked, exactly 5 open, after open, tomorrow locked, midnight edge, week/rate maths); Playwright harness (fake supabase + auth, frozen clock, deleted) 28/28: locked look + note + toast with no call, unlocks by itself at 3:25, server too_early → toast, drawer + Pipeline drawer locked, ON A CALL card, edges = Overview at 1280/1440/1920, track scales, See Wednesday, stacked at 1080 and 390, light theme. Outbound blocked 0. eslint clean on touched files (usePolicies' 3 old unused-var errors remain), `vite build` passes. Shots: `media/fulfillment-my-calls/p756/`.
+- Not checked: SQL test of `too_early` on live (migration not applied), not seen logged in.
+- Brayden checks: apply migration 140, then as Test Fulfill a call >5 min out shows the grey lock and toast; at 5 min it turns white.
+
