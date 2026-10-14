@@ -67,31 +67,6 @@ Scope note: still layers on top of Prompt 695's No answer status/color/layout wo
 
 ---
 
-## Prompt 759 — Admin side, part 2 of 5: Admin Pipeline (everyone's clients, view only, enforced on the server)
-
-> **✅ APPROVED by Brayden 2026-10-14 (Eagle).** Reference: `media/admin-redesign/admin-pipeline.dc.html`. Same rules as P758. **Run on Opus 5.5** (server-side read-only rule).
-
-Brayden: "the admin pipeline would just be everyone's pipelines put together. I could just see the status of everything, but only the certain people can interact with it." He also wants **Needs attention** kept.
-
-### Build
-- The agent-style Pipeline layout from the mockup: left column with the colored **"Find any client"** search box (name, phone, agent or carrier, across every client and every status) and **Latest activity** (everyone's last few changes, each showing the agent); below it the **Everyone's pipeline** summary (client count, cancelled count, an **All agents** filter dropdown, the colored split bar, rows per status with count and percent) and a **View only** note at the bottom ("Only the agent and Fulfillment can change a client's status.").
-- Right: four status tabs **Needs attention** (first, amber, selected by default), **Booked**, **No answer**, **Cancelled**, each with its count, then the table: Client (name, city/state, phone), Cancel with, Call (date tile + time + when), Booked by, Status. A live call shows "On a call now" in red; Needs attention rows show their reason ("Past call time", "Stuck 48h+") using the existing `lib/fulfillmentFlags.js` rules.
-- The agent filter narrows everything on the page (tabs, counts, summary, table). Users (P762) links here with the agent already filtered (`?agent=<id>`).
-- Clicking a row opens the client's details **read-only**: no status buttons, no edit controls, no booking changes.
-
-### Enforce it on the server
-- Admin can read every client. Admin must **not** be able to change a client's status or booking: check every path that changes a policy's status/booking (direct `policies` updates under RLS, `fulfillment_start_call`, `fulfillment_end_call`, `fulfillment_correct_result`, booking/move/cancel RPCs) and make them refuse when the caller's role is admin and they are not the assigned agent/Fulfillment rep. Keep admin's existing powers that are not client status (users, settings, payouts, reassigning a Fulfillment call in P760).
-- This overlaps the open agent-portal QA finding "server-side guards for policies update/delete". Do the admin part here and note in Memories what is left of that finding.
-
-### Verify
-- Logged in as admin: search finds any client by name, phone, agent and carrier; tabs and counts match the data; the agent filter works and the `?agent=` link works; no control on the page or in the drawer changes anything.
-- Direct calls as admin to each status-changing path for a policy that isn't theirs are refused (test on rolled-back rows); the agent and Fulfillment rep can still do their normal actions.
-- Screenshots at 1440/1920 against the mockup; `eslint`, `vite build`.
-
-**P759: Opus 5.5**
-
----
-
 ## Prompt 760 — Admin side, part 3 of 5: Admin Fulfillment (the whole desk, live)
 
 > **✅ APPROVED by Brayden 2026-10-14 (Eagle).** Reference: `media/admin-redesign/admin-fulfillment.dc.html` (1440×900). Same rules as P758. **Run on Opus 5.5** (reassign RPC and live data).
