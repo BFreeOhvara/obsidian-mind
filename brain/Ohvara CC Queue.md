@@ -67,34 +67,6 @@ Scope note: still layers on top of Prompt 695's No answer status/color/layout wo
 
 ---
 
-## Prompt 760 — Admin side, part 3 of 5: Admin Fulfillment (the whole desk, live)
-
-> **🟡 BUILT 2026-10-14 (CC, `3a948d6`) — waiting on migration 142 being applied** (CC's apply was blocked by the auto-mode classifier), then the server refusal tests. Detail: [[Memories]] 2026-10-14 "P760".
->
-> **✅ APPROVED by Brayden 2026-10-14 (Eagle).** Reference: `media/admin-redesign/admin-fulfillment.dc.html` (1440×900). Same rules as P758. **Run on Opus 5.5** (reassign RPC and live data).
-
-Brayden wants to see "calls on each day and who's making those calls each day and at what time." Who they're calling doesn't matter on this page: **dots, not client names**.
-
-### Build
-1. **Header (colored, thick):** previous/next day arrows (flip through days like Activity), "Today" chip when on today, the big date, "{N} calls today" and "{N} people on the desk" on the right. Under it, **today's track**: one thick bar from the desk's first to last hour with the part up to now glowing teal, **every call on the desk that day as a colored dot** (cancelled green, no answer grey, live red with white ring, stuck amber, still to call blue ring), a white now line and a red bubble "Now 3:42 · N live" (just "Now 3:42" when nobody is live). A key under the bar with a count per color. On another day the track shows that day's calls; no now line on other days.
-2. **Four boxes** under the header, always four:
-   - **Done today:** finished calls of total, with a segmented bar (cancelled / no answer / live / remaining).
-   - **Cancelled today:** count, "{x}% of finished calls", and the no-answer count under it.
-   - **On a call now:** who is on a call and for how long (the Fulfillment person, not the client); "Nobody is on a call" otherwise, plus how many others are free.
-   - **Need a hand:** count of calls past their time and not started (amber) with a **"Give them to"** button. When the count is 0 the box stays and turns green: "All calls on time".
-3. **The schedule:** an hour header with a teal "Now" label, then one row per Fulfillment person who has calls that day. Left cell: avatar with a status dot, status line ("On a call · 12 min", "Next at 4:45 PM", "Free until 5:30 PM", "Off today"), a small segmented bar with one piece per call in its result color, and "N calls · N cancelled". Right: hour grid lines, the teal now line, and **each call as a dot at its time with the time under it** (no names).
-4. Clicking a dot opens that call read-only (who booked it, carrier, result), with **Give to** if it is stuck or not started yet.
-
-### Give to (the only change admin can make here)
-- "Give them to" / "Give to" opens a picker of Fulfillment people, showing who is free at that time (shift and calendar), and moves the call's `assigned_fulfillment_id`. Reuse the admin Reassign that exists today if it fits; otherwise a new admin-only security-definer RPC. It must refuse non-admins, refuse calls that are live or finished, avoid double-booking the new person's slot, log a `policy_events` entry, and notify the new assignee (and the old one) in-app.
-
-### Verify
-Frozen clock: dots, now line, counts and the four boxes match the data; the Need a hand box shows green at 0; other days have no now line; Give to moves a stuck call and is refused for a non-admin and for a live call (rolled-back test rows). Screenshots 1440/1920 against the mockup; `eslint`, `vite build`.
-
-**P760: Opus 5.5**
-
----
-
 ## Prompt 761 — Admin side, part 4 of 5: Admin Payouts (approve Fulfillment's weekly pay)
 
 > **✅ APPROVED by Brayden 2026-10-14 (Eagle).** Reference: `media/admin-redesign/admin-payouts.dc.html` (1440×900). Same rules as P758. **Run on Opus 5.5** (money). Builds on P753 (`fulfillment_payouts`, `fulfillment_payout_accounts`, `fulfillment_week_figures`, `fulfillment-pay-week`, `payouts_live`).
