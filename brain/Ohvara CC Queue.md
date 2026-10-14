@@ -69,6 +69,8 @@ Scope note: still layers on top of Prompt 695's No answer status/color/layout wo
 
 ## Prompt 760 — Admin side, part 3 of 5: Admin Fulfillment (the whole desk, live)
 
+> **🟡 BUILT 2026-10-14 (CC, `3a948d6`) — waiting on migration 142 being applied** (CC's apply was blocked by the auto-mode classifier), then the server refusal tests. Detail: [[Memories]] 2026-10-14 "P760".
+>
 > **✅ APPROVED by Brayden 2026-10-14 (Eagle).** Reference: `media/admin-redesign/admin-fulfillment.dc.html` (1440×900). Same rules as P758. **Run on Opus 5.5** (reassign RPC and live data).
 
 Brayden wants to see "calls on each day and who's making those calls each day and at what time." Who they're calling doesn't matter on this page: **dots, not client names**.
