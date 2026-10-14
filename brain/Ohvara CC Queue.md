@@ -62,3 +62,4 @@ tags:
 Scope note: still layers on top of Prompt 695's No answer status/color/layout work, which stands as-is — this prompt is the automated recovery behavior running underneath that same status.
 
 ---
+

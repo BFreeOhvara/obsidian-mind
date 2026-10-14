@@ -1839,3 +1839,18 @@ Status: 724 shipped and removed from [[Ohvara CC Queue]] (re-read right before r
 - **Not checked:** not seen logged in on live; pinned row not rendered in a browser.
 - **Brayden checks:** as Test Fulfill, message the Ohvara team; as admin, see it labelled Fulfillment and reply.
 - Queue: P696 (A2P) only.
+
+[Eagle | 2026-10-12 — Queued P755: page width + My pay background (Sonnet)]
+- CC shipped P748–P754 (b96ec03 last). Brayden: My calls and My pay are much narrower than the Overview, and My pay lacks the v16 background. Cause: Eagle's own specs capped `.mc-page` at 944px and `.mp-page` at 1060px; `/fulfillment/pay` was missing from the `app-backdrop--v2` list. **Lesson: don't give a page its own narrower max-width. Use the layout's container (1280) like the Overview** (Brayden's earlier "gap on each side" meant matching the other pages, not narrower).
+- **Queue:** P696 (blocked), P755.
+
+- Eagle 2026-10-12: P755 narrowed to My pay width + backdrop only. My calls NOT widened: Brayden thinks one wide timeline under the hero looks choppy. Eagle to mock a wide My calls layout, then queue separately.
+
+[CC | 2026-10-13 — P755 (queue item: My pay width + backdrop) shipped `3e58a97` (ohvara-dashboard, pushed)]
+- Note: the number P755 was also used for the ohvara-site ship on 2026-10-12 (`c0da77f`); this entry is the dashboard width/backdrop item.
+- `src/index.css`: removed `max-width: 1060px` from `.mp-page` only (My pay). `.mc-page` (My calls) untouched per spec. `DashboardLayout.jsx`: added `/fulfillment/pay` and `/fulfillment/getting-paid` to the `app-backdrop--v2` list; `/fulfillment`, `/desk`, `/pipeline` were already in it.
+- `/messages` not added: it is shared with agents and the spec said not to change agent pages (reps' Messages keeps its current backdrop).
+- `.mp-page` now fills the layout main (1280 max, `px-4 md:px-6`) exactly like the Overview's `.ov-grid`. Hero chart (`.mp-chart`) is a fixed 380px flex column and the right column is `minmax(0,1fr) 380px`, so they hold and the hero's left side grows.
+- Checked: `vite build` passes; eslint's only error in DashboardLayout is the old setState-in-effect baseline (line 245).
+- Not checked: no rendered screenshots or measured edges at 1440/1920/390 (page needs a logged-in fulfillment session; no harness built for a one-line CSS change).
+- Brayden checks: Overview, My calls (still narrow on purpose) and My pay edges; My pay shows the dot grid and glow.
