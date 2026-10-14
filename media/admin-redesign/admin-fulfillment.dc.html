@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin fulfillment</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="position:relative;width:1440px;height:900px;box-sizing:border-box;display:flex;overflow:hidden;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#FFFFFF;background-color:#07080D;background-image:radial-gradient(ellipse 70% 50% at 85% -10%, rgba(75,121,206,0.30) 0%, transparent 70%),radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px);background-size:auto,24px 24px">
+
+<aside style="width:256px;flex:none;box-sizing:border-box;background:linear-gradient(180deg,#1A2C4E 0%,#132241 100%);display:flex;flex-direction:column;padding:0 14px 12px">
+<div style="height:72px;display:flex;align-items:center;gap:11px;padding:0 4px">
+<span style="flex:1;display:flex;align-items:center;gap:9px">
+<svg width="30" height="26" viewBox="0 0 30 26" aria-hidden="true"><path d="M2 8 L13 13 L6 22 Q9 12 2 8Z" fill="#FFFFFF"/><path d="M22 1 L21 17 L28 20 L7 25 Q19 14 22 1Z" fill="#34E0C4"/></svg>
+<span style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.035em;white-space:nowrap">Ohvara Portal</span>
+</span>
+<span style="width:32px;height:32px;box-sizing:border-box;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;color:#93A6C4"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></span>
+</div>
+<sc-for list="{{nav}}" as="sec" hint-placeholder-count="4">
+<div>
+<p style="margin:0;padding:18px 12px 6px;font-size:12px;font-weight:600;color:#6F84A8">{{sec.label}}</p>
+<div style="display:flex;flex-direction:column;gap:2px">
+<sc-for list="{{sec.items}}" as="it" hint-placeholder-count="2">
+<a href="#" style="position:relative;display:flex;align-items:center;gap:12px;height:40px;padding:0 12px;border-radius:12px;font-size:14.5px;text-decoration:none;font-weight:{{it.weight}};color:{{it.color}};background:{{it.bg}}">
+<span style="position:absolute;left:-12px;top:10px;bottom:10px;width:3px;border-radius:0 3px 3px 0;background:#7FA6F2;display:{{it.bar}}"></span>
+<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="{{it.icon}}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{it.d}}"/></svg>
+<span style="flex:1">{{it.label}}</span>
+</a>
+</sc-for>
+</div>
+</div>
+</sc-for>
+<div style="flex:1"></div>
+<button type="button" style="display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;border:none;border-radius:16px;background:rgba(255,255,255,.05);text-align:left;font-family:inherit">
+<span style="width:36px;height:36px;border-radius:50%;background:#34E0C4;color:#04201B;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px rgba(255,255,255,.18)">BF</span>
+<span style="flex:1;min-width:0"><span style="display:block;font-size:14.5px;font-weight:600;color:#FFFFFF">Brayden Freeman</span><span style="display:block;font-size:12.5px;color:#93A6C4">Admin</span></span>
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#93A6C4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 9l4-4 4 4M8 15l4 4 4-4"/></svg>
+</button>
+</aside>
+
+<main style="flex:1;min-width:0;display:flex;flex-direction:column">
+<header style="height:72px;flex:none;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:0 28px;border-bottom:1px solid rgba(255,255,255,.07)">
+<span style="width:42px;height:42px;box-sizing:border-box;border-radius:13px;background:rgba(75,121,206,.18);border:1px solid rgba(127,166,242,.30);display:flex;align-items:center;justify-content:center;color:#7FA6F2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></span>
+<div style="flex:1"><div style="font-size:14px;color:#8697B5">Work <span style="margin:0 5px">/</span><span style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:600;letter-spacing:-.01em;color:#FFFFFF">Fulfillment</span></div><div style="font-size:13px;color:#8697B5;margin-top:1px">The whole desk, live</div></div>
+<span style="display:flex;align-items:center;gap:10px;height:42px;width:300px;box-sizing:border-box;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:#8697B5;font-size:13.5px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Search clients, agents, pages<span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px;padding:2px 7px;border-radius:6px;background:rgba(255,255,255,.07)">Ctrl K</span></span>
+<span style="width:42px;height:42px;box-sizing:border-box;border-radius:13px;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;color:#C9D4E8"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7M10 20a2 2 0 0 0 4 0"/></svg></span>
+</header>
+
+<div style="flex:1;min-height:0;box-sizing:border-box;padding:24px 32px 28px;display:flex;flex-direction:column;gap:14px">
+
+<section style="flex:none;display:flex;flex-direction:column;gap:16px;padding:22px 24px;border-radius:24px;overflow:hidden;color:#FFFFFF;background:radial-gradient(ellipse 45% 160% at 100% 0%, rgba(52,224,196,0.32) 0%, transparent 65%), radial-gradient(ellipse 40% 140% at 0% 100%, rgba(75,121,206,0.55) 0%, transparent 70%), linear-gradient(135deg,#132A4D 0%,#0D1A33 100%);border:1px solid rgba(127,166,242,.30)">
+<div style="display:flex;align-items:center;gap:16px">
+<button type="button" aria-label="Previous day" style="width:48px;height:48px;flex-shrink:0;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#FFFFFF;display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+<span style="display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.12);font-size:13px;font-weight:600"><span style="width:7px;height:7px;border-radius:50%;background:#34E0C4"></span>Today</span>
+<h1 style="margin:0;flex:1;font-family:'Space Grotesk',sans-serif;font-size:36px;font-weight:600;letter-spacing:-.035em;line-height:1.05">Tuesday, October 13</h1>
+<div style="text-align:right;line-height:1.15"><div style="font-family:'Space Grotesk',sans-serif;font-size:30px;font-weight:700;letter-spacing:-.03em">15<span style="font-size:15px;font-weight:500;color:#B4C3DE;margin-left:6px">calls today</span></div><div style="font-size:13px;color:#9FB0CF">3 people on the desk</div></div>
+<button type="button" aria-label="Next day" style="width:48px;height:48px;flex-shrink:0;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#FFFFFF;display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+</div>
+<div style="position:relative;height:84px;margin:4px 6px 0">
+<span style="position:absolute;left:0;right:0;top:34px;height:10px;border-radius:5px;background:rgba(255,255,255,.09)"></span>
+<span style="position:absolute;left:0;top:34px;height:10px;width:{{nowX}}%;border-radius:5px;background:linear-gradient(90deg, rgba(52,224,196,.20) 0%, #34E0C4 100%);box-shadow:0 0 22px rgba(52,224,196,.55)"></span>
+<sc-for list="{{hours}}" as="h" hint-placeholder-count="11"><span style="position:absolute;left:{{h.x}}%;top:52px;width:1px;height:8px;background:rgba(255,255,255,.25)"></span><span style="position:absolute;left:{{h.x}}%;top:64px;width:40px;margin-left:-20px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:#9FB0CF">{{h.l}}</span></sc-for>
+<sc-for list="{{tdots}}" as="c" hint-placeholder-count="15"><span style="position:absolute;left:{{c.x}}%;top:39px;width:{{c.s}}px;height:{{c.s}}px;margin-left:{{c.m}}px;margin-top:{{c.m}}px;box-sizing:border-box;border-radius:50%;background:{{c.bg}};border:2.5px solid {{c.hb}};box-shadow:{{c.glow}}"></span></sc-for>
+<span style="position:absolute;left:{{nowX}}%;top:22px;width:3px;height:34px;margin-left:-1.5px;border-radius:2px;background:#FFFFFF;box-shadow:0 0 12px rgba(255,255,255,.9)"></span>
+<span style="position:absolute;left:{{nowX}}%;top:-6px;transform:translateX(-50%);height:26px;padding:0 11px;border-radius:999px;background:#F87171;color:#2A0A0A;font-size:12px;font-weight:800;display:flex;align-items:center;gap:6px;white-space:nowrap;box-shadow:0 8px 20px -6px rgba(248,113,113,.9)">● Now 3:42 · 1 live</span>
+</div>
+<div style="display:flex;gap:18px;font-size:12.5px;color:#C9D4E8;margin:0 6px"><span style="display:inline-flex;align-items:center;gap:7px"><span style="width:10px;height:10px;border-radius:50%;background:#4ADE80"></span>Cancelled 6</span><span style="display:inline-flex;align-items:center;gap:7px"><span style="width:10px;height:10px;border-radius:50%;background:#A3B2CC"></span>No answer 2</span><span style="display:inline-flex;align-items:center;gap:7px"><span style="width:10px;height:10px;border-radius:50%;background:#F87171"></span>Live 1</span><span style="display:inline-flex;align-items:center;gap:7px"><span style="width:10px;height:10px;border-radius:50%;background:#FBBF24"></span>Stuck 2</span><span style="display:inline-flex;align-items:center;gap:7px"><span style="width:10px;height:10px;border-radius:50%;border:2px solid #60A5FA;box-sizing:border-box"></span>Still to call 4</span><span style="flex:1"></span><span style="color:#9FB0CF">Every call on the desk today</span></div>
+</section>
+
+<div style="flex:none;height:140px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px"><section style="box-sizing:border-box;border-radius:20px;background:radial-gradient(120% 70% at 0% 0%, rgba(255,255,255,0.045) 0%, transparent 60%), linear-gradient(180deg, #161922 0%, #10121A 100%);border:1px solid rgba(255,255,255,.09);box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 24px 48px -28px rgba(0,0,0,.8);padding:16px 18px;display:flex;flex-direction:column;justify-content:space-between"><span style="font-size:13px;font-weight:600;color:#8697B5">Done today</span><span style="display:flex;align-items:baseline;gap:8px"><b style="font-family:'Space Grotesk',sans-serif;font-size:34px;font-weight:700;letter-spacing:-.035em;line-height:1;color:#FFFFFF">8</b><span style="font-size:13px;color:#8697B5">of 15 calls</span></span><span style="display:flex;gap:3px"><span style="flex:6;height:6px;border-radius:3px;background:#4ADE80"></span><span style="flex:2;height:6px;border-radius:3px;background:#A3B2CC"></span><span style="flex:1;height:6px;border-radius:3px;background:#F87171"></span><span style="flex:6;height:6px;border-radius:3px;background:rgba(255,255,255,.08)"></span></span></section><section style="box-sizing:border-box;border-radius:20px;background:radial-gradient(120% 70% at 0% 0%, rgba(255,255,255,0.045) 0%, transparent 60%), linear-gradient(180deg, #161922 0%, #10121A 100%);border:1px solid rgba(255,255,255,.09);box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 24px 48px -28px rgba(0,0,0,.8);padding:16px 18px;display:flex;flex-direction:column;justify-content:space-between"><span style="font-size:13px;font-weight:600;color:#8697B5">Cancelled today</span><span style="display:flex;align-items:baseline;gap:8px"><b style="font-family:'Space Grotesk',sans-serif;font-size:34px;font-weight:700;letter-spacing:-.035em;line-height:1;color:#4ADE80">6</b><span style="font-size:13px;color:#8697B5">75% of finished calls</span></span><span style="font-size:12px;color:#5E7195">2 no answer · tried again tomorrow</span></section><section style="box-sizing:border-box;border-radius:20px;background:radial-gradient(120% 70% at 0% 0%, rgba(255,255,255,0.045) 0%, transparent 60%), linear-gradient(180deg, #161922 0%, #10121A 100%);border:1px solid rgba(255,255,255,.09);box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 24px 48px -28px rgba(0,0,0,.8);padding:16px 18px;display:flex;flex-direction:column;justify-content:space-between"><span style="font-size:13px;font-weight:600;color:#8697B5">On a call now</span><span style="display:flex;align-items:center;gap:10px"><span style="width:34px;height:34px;border-radius:50%;background:#F59E0B;color:#1A1203;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px rgba(248,113,113,.55)">TF</span><span><b style="display:block;font-size:15px;font-weight:600">Test Fulfill</b><span style="display:block;font-size:12.5px;font-weight:600;color:#F87171">Live · 12 min</span></span></span><span style="font-size:12px;color:#5E7195">2 others free or between calls</span></section><section style="box-sizing:border-box;border-radius:20px;background:radial-gradient(120% 70% at 0% 0%, rgba(255,255,255,0.045) 0%, transparent 60%), linear-gradient(180deg, #161922 0%, #10121A 100%);border:1px solid rgba(255,255,255,.09);box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 24px 48px -28px rgba(0,0,0,.8);padding:16px 18px;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(180deg, rgba(245,158,11,0.14), rgba(245,158,11,0.05));border-color:rgba(251,191,36,.40)"><span style="font-size:13px;font-weight:600;color:#FDE68A">Need a hand</span><span style="display:flex;align-items:baseline;gap:8px"><b style="font-family:'Space Grotesk',sans-serif;font-size:34px;font-weight:700;letter-spacing:-.035em;line-height:1;color:#FBBF24">2</b><span style="font-size:13px;color:#8697B5">past their time</span></span><span style="display:flex;gap:8px"><span style="flex:1;height:34px;border-radius:999px;background:#FFFFFF;color:#0D1730;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:5px">Give them to<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span></span></section></div>
+
+<section style="box-sizing:border-box;border-radius:20px;background:radial-gradient(120% 70% at 0% 0%, rgba(255,255,255,0.045) 0%, transparent 60%), linear-gradient(180deg, #161922 0%, #10121A 100%);border:1px solid rgba(255,255,255,.09);box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 24px 48px -28px rgba(0,0,0,.8);flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden">
+<div style="flex:none;display:flex;height:44px;border-bottom:1px solid rgba(255,255,255,.07);background:#14161E">
+<div style="width:220px;flex:none;display:flex;align-items:center;padding-left:20px;font-size:12.5px;font-weight:600;color:#8697B5">On the desk · 3</div>
+<div style="flex:1;position:relative;margin-right:20px">
+<sc-for list="{{hours}}" as="h" hint-placeholder-count="11"><span style="position:absolute;left:{{h.x}}%;top:0;bottom:0;display:flex;align-items:center;padding-left:6px;border-left:1px solid rgba(255,255,255,.07);font-family:'JetBrains Mono',monospace;font-size:11px;color:#8FA3C6">{{h.l}}</span></sc-for>
+<span style="position:absolute;left:{{nowX}}%;top:9px;height:26px;padding:0 10px;transform:translateX(-50%);border-radius:999px;background:#34E0C4;color:#04201B;font-size:12px;font-weight:800;display:flex;align-items:center;white-space:nowrap;box-shadow:0 0 16px rgba(52,224,196,.6)">Now 3:42</span>
+</div>
+</div>
+<div style="flex:1;min-height:0;display:flex;flex-direction:column">
+<sc-for list="{{lanes}}" as="p" hint-placeholder-count="3">
+<div style="flex:1;min-height:0;display:flex;border-bottom:{{p.rule}}">
+<div style="width:220px;flex:none;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:10px;padding:0 16px 0 20px;border-right:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.015)">
+<div style="display:flex;align-items:center;gap:11px"><span style="position:relative;width:42px;height:42px;flex-shrink:0;border-radius:50%;background:{{p.col}};color:#0B1220;font-weight:800;font-size:13.5px;display:flex;align-items:center;justify-content:center">{{p.init}}<span style="position:absolute;right:-1px;bottom:-1px;width:12px;height:12px;border-radius:50%;background:{{p.sc}};border:2.5px solid #12141C"></span></span><span style="min-width:0"><span style="display:block;font-size:15px;font-weight:600">{{p.name}}</span><span style="display:block;margin-top:2px;font-size:12px;font-weight:600;color:{{p.sc}}">{{p.status}}</span></span></div>
+<div style="display:flex;gap:4px"><sc-for list="{{p.seg}}" as="g" hint-placeholder-count="5"><span style="flex:1;height:6px;border-radius:3px;background:{{g.c}}"></span></sc-for></div>
+<span style="font-size:12px;color:#8697B5">{{p.tally}}</span>
+</div>
+<div style="flex:1;position:relative;margin-right:20px">
+<sc-for list="{{grid}}" as="g" hint-placeholder-count="11"><span style="position:absolute;left:{{g.x}}%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.05)"></span></sc-for>
+<span style="position:absolute;left:{{nowX}}%;top:0;bottom:0;width:2px;margin-left:-1px;background:#34E0C4;box-shadow:0 0 12px rgba(52,224,196,.7)"></span>
+<span style="position:absolute;left:0;right:0;top:50%;height:4px;margin-top:-2px;border-radius:2px;background:rgba(255,255,255,.07)"></span>
+<sc-for list="{{p.calls}}" as="c" hint-placeholder-count="5">
+<span style="position:absolute;left:{{c.x}}%;top:50%;width:{{c.s}}px;height:{{c.s}}px;margin-left:{{c.m}}px;margin-top:{{c.m}}px;box-sizing:border-box;border-radius:50%;background:{{c.bg}};border:2.5px solid {{c.bd}};box-shadow:{{c.glow}}"></span>
+<span style="position:absolute;left:{{c.x}}%;top:50%;margin-top:18px;width:64px;margin-left:-32px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:600;color:{{c.tfg}}">{{c.time}}</span>
+</sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+</section>
+
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() {
+const ACT = 'f';
+const item = (label, d, active) => ({ label, d, color: active ? '#FFFFFF' : '#93A6C4', icon: active ? '#7FA6F2' : '#93A6C4', bg: active ? 'rgba(255,255,255,0.08)' : 'transparent', weight: active ? 600 : 500, bar: active ? 'block' : 'none' });
+const nav = [
+{ label: 'Today', items: [item('Overview', 'M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z')] },
+{ label: 'Work', items: [item('Pipeline', 'M4 6h16M7 12h10M10 18h4'), item('Fulfillment', 'M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2', ACT === 'f'), item('Payouts', 'M4 7h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4zM4 7a2 2 0 0 1 2-2h11M16 14h2', ACT === 'p')] },
+{ label: 'Communications', items: [item('Messages', 'M4 5h16v11H9l-5 4z')] },
+{ label: 'Account', items: [item('Users', 'M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M21 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8'), item('Settings', 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 13a7.6 7.6 0 0 0 0-2l2-1.5-2-3.4-2.3.9a7.6 7.6 0 0 0-1.7-1L15 3.5h-4l-.4 2.5a7.6 7.6 0 0 0-1.7 1l-2.3-.9-2 3.4 2 1.5a7.6 7.6 0 0 0 0 2l-2 1.5 2 3.4 2.3-.9c.5.4 1.1.7 1.7 1l.4 2.5h4l.4-2.5c.6-.3 1.2-.6 1.7-1l2.3.9 2-3.4z')] },
+];
+const START = 9, END = 19.5, pct = h => ((h - START) / (END - START)) * 100, DUR = 0.95;
+const fmt = h => { const H = Math.floor(h), M = Math.round((h - H) * 60); return (H > 12 ? H - 12 : H) + ':' + (M < 10 ? '0' + M : M) + (H >= 12 ? ' PM' : ' AM'); };
+const K = {
+cx: { bg: '#4ADE80', bd: '#0D1730', glow: 'none', s: 22, seg: '#4ADE80', tfg: '#8697B5' },
+na: { bg: '#A3B2CC', bd: '#0D1730', glow: 'none', s: 20, seg: '#A3B2CC', tfg: '#8697B5' },
+bk: { bg: '#10121A', bd: '#60A5FA', glow: 'none', s: 20, seg: 'rgba(96,165,250,0.35)', tfg: '#7FA6F2' },
+live: { bg: '#F87171', bd: '#FFFFFF', glow: '0 0 0 6px rgba(248,113,113,0.25), 0 0 20px rgba(248,113,113,0.85)', s: 26, seg: '#F87171', tfg: '#F87171' },
+stuck: { bg: '#FBBF24', bd: '#0D1730', glow: '0 0 0 5px rgba(251,191,36,0.22)', s: 22, seg: '#FBBF24', tfg: '#FBBF24' },
+};
+const C = (h, k) => Object.assign({}, K[k], { k, x: pct(h), m: -K[k].s / 2, time: k === 'live' ? 'LIVE' : fmt(h).replace(' AM', 'a').replace(' PM', 'p') });
+const lane = (name, init, col, status, sc, calls, rule) => {
+const done = calls.filter(c => c.k === 'cx').length;
+return { name, init, col, status, sc, calls, rule, seg: calls.map(c => ({ c: c.seg })), tally: calls.length + ' calls · ' + done + ' cancelled' };
+};
+const R = '1px solid rgba(255,255,255,0.07)';
+const lanes = [
+lane('Test Fulfill', 'TF', '#F59E0B', 'On a call · 12 min', '#F87171', [C(9.5, 'cx'), C(11, 'na'), C(13.5, 'cx'), C(15.5, 'live'), C(17.25, 'bk')], R),
+lane('Nina Alvarez', 'NA', '#C084FC', 'Next at 4:45 PM', '#7FA6F2', [C(9, 'stuck'), C(10.5, 'stuck'), C(12.25, 'cx'), C(14.5, 'cx'), C(16.75, 'bk'), C(18.25, 'bk')], R),
+lane('Marcus Hale', 'MH', '#34E0C4', 'Free until 5:30 PM', '#4ADE80', [C(10, 'cx'), C(12, 'cx'), C(14, 'na'), C(17.5, 'bk')], 'none'),
+];
+const hours = Array.from({ length: 11 }, (_, i) => { const h = 9 + i; return { x: pct(h), l: (h > 12 ? h - 12 : h) + (h >= 12 ? 'p' : 'a') }; });
+const grid = Array.from({ length: 11 }, (_, i) => ({ x: pct(9 + i) }));
+const stuck = [{ t: '9:00 AM', name: 'Walter Briggs', who: 'Nina' }, { t: '10:30 AM', name: 'Carol Nguyen', who: 'Nina' }];
+const W = [['MON', 12, 13, 'past'], ['TUE', 13, 15, 'today'], ['WED', 14, 11], ['THU', 15, 9], ['FRI', 16, 7], ['SAT', 17, 0], ['SUN', 18, 0]];
+const dd = (k, n) => k === 'past' ? [{ c: '#4ADE80' }, { c: '#4ADE80' }, { c: '#A3B2CC' }] : k === 'today' ? [{ c: '#4ADE80' }, { c: '#F87171' }, { c: '#FBBF24' }, { c: '#60A5FA' }] : (n ? [{ c: '#60A5FA' }] : []);
+const week = W.map(([dow, date, n, k]) => k === 'today'
+? { dow, date, n, dots: dd(k, n), bg: '#FFFFFF', bd: '#FFFFFF', fg: '#0D1730', glow: '0 14px 30px -14px rgba(127,166,242,0.9)' }
+: { dow, date, n, dots: dd(k, n), bg: k === 'past' ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.08)', bd: 'rgba(255,255,255,0.12)', fg: k === 'past' ? '#9FB0CF' : '#FFFFFF', glow: 'none' });
+const tdots = lanes.flatMap(l => l.calls).map(c => Object.assign({}, c, { hb: c.k === 'live' ? '#FFFFFF' : (c.k === 'bk' ? '#60A5FA' : '#13284A'), bg: c.k === 'bk' ? '#13284A' : c.bg }));
+return { nav, lanes, hours, grid, stuck, week, tdots, nowX: pct(15.7) };
+}
+}
+</script>
+</body>
+</html>

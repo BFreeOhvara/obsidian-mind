@@ -67,33 +67,6 @@ Scope note: still layers on top of Prompt 695's No answer status/color/layout wo
 
 ---
 
-## Prompt 761 — Admin side, part 4 of 5: Admin Payouts (approve Fulfillment's weekly pay)
-
-> **✅ APPROVED by Brayden 2026-10-14 (Eagle).** Reference: `media/admin-redesign/admin-payouts.dc.html` (1440×900). Same rules as P758. **Run on Opus 5.5** (money). Builds on P753 (`fulfillment_payouts`, `fulfillment_payout_accounts`, `fulfillment_week_figures`, `fulfillment-pay-week`, `payouts_live`).
-
-Brayden wanted this page to read **left to right**, not as tall stacks. Keep the approved layout exactly.
-
-### Build
-1. **Top row:**
-   - Left (420px) **colored box**: "Week of {Mon} to {Sun}", the amount waiting ("$1,240 waiting on you"), a "2 of 3" chip (people waiting / people that week), a white **"Approve and pay both"** (or "Approve and pay all N") button, and "Through Stripe, lands in 1 to 2 days".
-   - Right **Pay by week** chart: one bar per week for the last 8 weeks plus the current week, amount on top, week start under. Paid = green, waiting = amber with a glow and white outline, the current (still open) week = dashed blue "So far". Clicking a bar selects that week for everything below.
-2. **Section title** "{Mon} to {Sun}" + "Hours come from each person's shifts. Check them, then approve."
-3. **One wide strip per Fulfillment person** for that week: avatar, name, bank name + last 4 (from `fulfillment_payout_accounts`), then **Mon to Sun boxes** each showing that day's hours and filled to match (8 h = full; days off dashed with "—"), then the pay amount and "{hours} hrs × ${rate}", then the actions: **Fix hours** + **Approve** while waiting; a green "Paid {date}" pill once paid; "Held · bank not connected" in amber when their account isn't ready; "Failed" in red with the reason.
-
-### Rules
-- Amounts always come from the server (`fulfillment_week_figures`); the page never sends an amount.
-- **Approve** calls `fulfillment-pay-week` for that person and week. **Approve and pay all** does each waiting person (same function, one per person, idempotent).
-- **Fix hours** opens a small editor for that person's days that week with a required reason. Save writes an adjustment the figures function uses (new admin-only table or columns with an audit trail: who, when, reason, before/after). Approved or paid weeks can't be edited.
-- While `payouts_live` is **off**, keep the page fully usable but show a slim banner "Payouts aren't live yet. Approving marks the week approved; no money moves." and make sure nothing calls Stripe. Brayden turns it on only after his accountant confirms contractor vs employee.
-- Admin only (RLS + function checks already in P753; re-check them).
-
-### Verify
-Mocked Stripe tests for approve one / approve all / held / failed / idempotency; Fix hours audit row and recomputed amount; nothing reaches Stripe while `payouts_live` is off; chart week selection drives the strips. Screenshots 1440/1920 against the mockup; `eslint`, `vite build`. **Do not move real money.**
-
-**P761: Opus 5.5**
-
----
-
 ## Prompt 762 — Admin side, part 5 of 5: Admin Users (agents and Fulfillment, a person's numbers, invites and access)
 
 > **✅ APPROVED by Brayden 2026-10-14 (Eagle).** Reference: `media/admin-redesign/admin-users.dc.html` (1440×900). Same rules as P758. **Run on Opus 5.5** (role and access changes). Replaces the current Users & Access page.
