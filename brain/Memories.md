@@ -1875,4 +1875,5 @@ Status: 724 shipped and removed from [[Ohvara CC Queue]] (re-read right before r
 - Checked: 16 helper tests with frozen clock (6 min locked, exactly 5 open, after open, tomorrow locked, midnight edge, week/rate maths); Playwright harness (fake supabase + auth, frozen clock, deleted) 28/28: locked look + note + toast with no call, unlocks by itself at 3:25, server too_early → toast, drawer + Pipeline drawer locked, ON A CALL card, edges = Overview at 1280/1440/1920, track scales, See Wednesday, stacked at 1080 and 390, light theme. Outbound blocked 0. eslint clean on touched files (usePolicies' 3 old unused-var errors remain), `vite build` passes. Shots: `media/fulfillment-my-calls/p756/`.
 - Not checked: SQL test of `too_early` on live (migration not applied), not seen logged in.
 - Brayden checks: apply migration 140, then as Test Fulfill a call >5 min out shows the grey lock and toast; at 5 min it turns white.
+- Update 2026-10-13: Brayden said "apply 140"; applied via MCP. Rolled-back DO block on live as the assigned rep: 6 min out → `too_early` (detail = opens-at UTC ISO), 4 min out → live, time passed → live. Nothing persisted.
 
