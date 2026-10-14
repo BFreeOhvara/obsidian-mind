@@ -1877,3 +1877,9 @@ Status: 724 shipped and removed from [[Ohvara CC Queue]] (re-read right before r
 - Brayden checks: apply migration 140, then as Test Fulfill a call >5 min out shows the grey lock and toast; at 5 min it turns white.
 - Update 2026-10-13: Brayden said "apply 140"; applied via MCP. Rolled-back DO block on live as the assigned rep: 6 min out → `too_early` (detail = opens-at UTC ISO), 4 min out → live, time passed → live. Nothing persisted.
 
+
+[CC | 2026-10-13 — P757 shipped (`ohvara-dashboard` `ac939bb`, pushed, no migration)]
+- Fulfillment Overview now compares **booked vs cancelled**, not calls made. One definition: `bookedByDay(frame, calls)` in `lib/fulfillmentDay.js` counts `buildCalls` entries per day (done or to come), the same source My calls' "Booked this week" (`weekScore`) uses. `weekStats` now takes those calls instead of `in_progress` timestamps.
+- `Overview.jsx`: card "Calls booked this week" (value, "N more than last week", 7-day bars all booked counts); Last week chart legend Booked, subtitle "calls booked on your calendar and old policies confirmed cancelled" (team: "...on the calendar..."); data now from `useCallOutcomes` over last Mon to this Sun, scoped by the rep's `rows` (admin = whole team). `useRepCallEvents` is now unused (left in place). Cancelled counting untouched. My calls tile already read "Booked this week / on your calendar" from P756, left as is. Agent portal untouched.
+- Checked: bundled harness with frozen week: 7 calls (2,2,2,1) → 7 booked, diff +7, bars 2,2,2,1,0,0,0; empty week → 0, diff 0 (TrendChip shows "Same as last week", unchanged shared behaviour, no divide). eslint clean on touched files, `vite build` passes.
+- Not checked: no screenshots at 1440, not seen logged in. Brayden checks (as Test Fulfill): Overview card + Last week chart show booked; My calls tile matches the card.
