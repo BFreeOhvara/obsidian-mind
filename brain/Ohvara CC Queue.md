@@ -67,20 +67,6 @@ Scope note: still layers on top of Prompt 695's No answer status/color/layout wo
 
 ---
 
-## Prompt 766 — One-tap theme switch (all roles) + "Invite someone" in the Admin user menu
-
-Two small UI changes. No mockup, no migration.
-
-**1. Theme: one tap switches it.** In the user menu (bottom-left, opens above the name), the **Theme** row currently has a two-button moon/sun switch you must aim at. Make the **whole Theme row one button**: tap anywhere on it and the theme flips to the other one (dark to light, light to dark). Keep the small moon/sun pill on the right as the indicator of the current theme, not as two click targets. Add a short change animation on the pill. Applies to every role (Agent, Fulfillment, Admin), since it's the same menu. Keep the saved-preference behavior as is. Keyboard: Enter/Space works, with a proper `aria-label` ("Switch to light theme" / "Switch to dark theme").
-
-**2. Admin: "Invite someone" in the user menu.** Add an **Invite someone** item to the Admin user menu (between Theme and Get the phone app, with a user-plus icon) that opens the same **Add someone** dialog already built on the Users page in P762 (role Agent or Fulfillment, name, email, send, copy link). Reuse that component and its server function. Do not build a second invite flow. Admins only, never shown to other roles. Confirm the Users page's Add someone still works too. Never send a real invite while testing, use the fake harness. If `send-agent-invite` isn't deployed yet, the dialog should still show the Copy a link path and a clear note about sending.
-
-**Checks:** harness screenshot of the menu in dark and light at 1440, the Invite dialog opened from the menu, theme flips on a single click and on keyboard. eslint and vite build clean. Log in Memories and clear this item from the queue.
-
-**Model: Sonnet 5.5**
-
----
-
 ## Prompt 767 — Notifications: new bell panel for every role + the approved notification list (bell + email)
 
 **What:** redo the notifications bell panel (all roles) from the approved mockup, and wire up the notifications Brayden approved for each role. The full list, word for word, is in [[Ohvara Notifications Plan]]. Read it first; it's the source of truth.
