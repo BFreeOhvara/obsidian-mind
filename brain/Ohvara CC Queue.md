@@ -67,54 +67,6 @@ Scope note: still layers on top of Prompt 695's No answer status/color/layout wo
 
 ---
 
-## Prompt 770 — Admin portal hardening: admin powers only for admins, and safe even for the admin
-
-**Why:** same as P768 (agents) and P769 (Fulfillment). The Admin side (P758–P766) gives powerful actions: pay decisions, Give to, role and access changes, invites, settings switches, recordings. Each must be enforced on the server: only a real admin can use them, and some must be safe even for the admin. Normal use must not change.
-
-**How:** a security and acceptance pass. Report to `brain/Admin Portal QA Report.md` (Pass / Fixed / Fail / Can't test). **Fix server-side gaps directly** in focused migrations, one per area, committed separately (`P770-n`). Anything that changes how Brayden works goes under **Findings for Brayden**. Rolled-back SQL as Admin, Test Agent and a test rep against live, plus the P743 harness pattern. **Never use Brayden's real admin login** (no test admin exists, so check with SQL and the harness). No real invites, calls, emails or Stripe transfers. Leave nothing in the live database.
-
-### What to check, and fix if open
-**1. Admin-only, everywhere**
-- Every admin RPC and edge function refuses non-admins and signed-out callers on the server, not just by hiding the page. That covers:
-  - Give to, `fulfillment_decide_cancel`, role/access changes and invites;
-  - the settings switches (`voice_live`, `recording_live`, `sms_live`, `payouts_live`, Pause payouts, rate, minimum, cap, recording notice);
-  - recording playback, Users data, Payouts data and the admin views of Pipeline / Fulfillment.
-- An agent or rep calling them directly gets refused.
-
-**2. Safe even for the admin**
-- Admin can't change a client's status (P759 view-only) or set fulfillment results.
-- Admin can't edit pay amounts by hand. Pay is computed only from cancels and settings.
-- A cancel can't be paid twice. A paid cancel can't be un-paid without a record.
-- Admin can't turn off their own access or change their own role (P762), and the last admin can never be removed.
-- Every decision, role change, access change, Give to and settings change is written to an append-only log with who and when, and nobody can edit or delete that log.
-
-**3. Who becomes an admin**
-- No path gives the admin role except an existing admin, through the role RPC, with a log entry. That includes invites (P762 allows only agent or fulfillment), sign-up, profile updates and RPCs.
-- Check that `profiles.role` can't be set by its owner.
-
-**4. Secrets and data exposure**
-- No service-role key, Stripe key, Twilio secret, Deepgram or Anthropic key, or Vault secret ever reaches the browser bundle or an API response.
-- Search the built bundle to confirm.
-- Admin views don't leak data to other roles through shared views or RPCs.
-
-**5. Sign-in and sessions**
-- A turned-off user is signed out and can't refresh their session.
-- Password reset and invite links are single-use and expire.
-- Admin pages redirect away for non-admins, and on the server the data calls fail anyway.
-
-**6. Advisors and edge functions**
-- Run the Supabase security advisors before and after, and paste both summaries.
-- List every edge function with its `verify_jwt` setting and say whether that's correct. Fix code-side checks. Anything that needs a dashboard change goes in Brayden's steps.
-
-### Rules
-- Small clear UI bugs can be fixed. Anything bigger goes in Findings.
-- eslint and vite build clean.
-- Log in Memories with the report link and Brayden's steps, and clear this item.
-
-**Model: Opus 5.5**
-
----
-
 ## Prompt 771 — When a rep misses a call: apologize, hold a retry, then hand to the No answer flow
 
 **What:** today, if a rep never starts a booked call, it just sits "past its time" (the "14 calls past their time" on the Admin Overview). Nothing happens for the client. Brayden's flow (Oct 16) fixes that by reusing the No answer recovery from **P696** (built, waiting on `sms_live`). Read P696 in the queue and its Memories entry first; reuse its pieces (reschedule link, slot-locking retry, texts, attempt tracking). Don't rebuild them.

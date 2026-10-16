@@ -2055,3 +2055,14 @@ Status: 724 shipped and removed from [[Ohvara CC Queue]] (re-read right before r
 - **Brayden steps:** (1) do the 10-minute live pass in [[Fulfillment Portal QA Report]]; (2) P764 deploys when ready; (3) decide whether reps should see old team-chat channels (Finding 2).
 
 [CC | 2026-10-16 — P769 shipped] — Fulfillment rep reads/writes locked to own calls via RPCs, double-pay after a failed transfer closed, access-off enforced in the DB. dashboard `cb123be`, migrations 148–151. Report: [[Fulfillment Portal QA Report]]. Next: P770.
+
+### 2026-10-16 — CC shipped P770: admin powers enforced on the server (`ohvara-dashboard` `e1cb028`/`151110f`/`b09ba14`/`1f0146d`/`d803bb8`, migrations 152–154 live, 21 functions redeployed — on Brayden's in-session go)
+- **Open before (proved live, rolled back):** public sign-up is on and `handle_new_user` took `role` from user_metadata → **anyone could sign up as admin**. Admin could also insert an admin invite, change own role/access by writing `profiles`, turn off the last admin; history rows were editable.
+- **152:** role only from `app_metadata` (agent/fulfillment), plain sign-ups refused; invite role check; role/access never by direct write (RPCs only); no profile inserts; last active admin can't be demoted/off/deleted by any path; `is_admin()` needs `is_active`. `claim-invite` sets app_metadata and takes the invite atomically (no double-claim).
+- **153:** append-only `admin_audit_log` (roles, access, settings, tiers, pay rates, invites w/o token, cancel paid/un-paid, payout status, call deletes); `policy_events` + `fulfillment_cancel_events` append-only too (cascade + same-tx annotate allowed). **154:** TRUNCATE revoked from API roles.
+- **Functions:** `admin-create/toggle/delete-user` → 404 (unused, bypassed every check); hooks removed. **Found: verify_jwt doesn't stop signed-out callers (publishable key in `apikey` reaches the code)** → 17 unused pre-pivot functions with no caller check retired to 404 (Brayden's go).
+- Checked: ~60 rolled-back checks on live as Admin (claims) / Test Agent / Test Fulfill / throwaway users + anon grants, all as expected; real `/auth/v1/signup` with role admin → refused, 0 users; stubs 404 signed-out. Advisors unchanged (5/40/23/2/1/1). eslint = HEAD (16 old errors), vite build passes, bundle has no secrets. 0 test rows left.
+- Not checked: not seen logged in on live; no real invite claimed after the redeploy; admin pages not clicked through.
+- **Brayden steps:** (1) Auth → turn off "Allow new users to sign up"; (2) delete the 21 stub functions + 5 pre-pivot ones; (3) Auth → Email OTP expiry; (4) 10-minute pass in [[Admin Portal QA Report]].
+
+[CC | 2026-10-16 — P770 shipped] — sign-up-as-admin closed, last admin protected, append-only admin audit log, 20 dead/open functions retired. dashboard `d803bb8`, migrations 152–154. Report: [[Admin Portal QA Report]]. Next: P771.
