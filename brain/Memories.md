@@ -1969,3 +1969,39 @@ Status: 724 shipped and removed from [[Ohvara CC Queue]] (re-read right before r
 - Not checked: no real call, recording, Deepgram/Claude call or Stripe transfer; not seen logged in on live; the phone pill not seen rendered.
 - **Brayden steps:** (1) Supabase secret `DEEPGRAM_API_KEY` (`ANTHROPIC_API_KEY` already set). (2) Deploy `fulfillment-cancel-check --no-verify-jwt`, `fulfillment-pay-week --no-verify-jwt` (was with JWT), `fulfillment-recording`, redeploy `fulfillment-voice --no-verify-jwt`; voice also needs `CALLER_ID_TWILIO_ACCOUNT_SID` (set). Recording callback URL is set in code. (3) Lawyer on call-recording consent for your states before turning on Record calls. (4) `payouts_live` stays off until the accountant confirms contractor vs employee.
 - Found in passing: crons `recovery-sms`, `redistribute-no-answers`, `process-reminders`, `trigger-re-engagement` fail every run (`app.supabase_url` isn't set) — P696's texts won't send when it goes live until fixed.
+
+[Eagle | 2026-10-15 — P765 queued: Admin Payouts, simple version (Sonnet)]
+- Brayden approved the simple Payouts mockup (media/admin-redesign/admin-payouts-simple.dc.html). UI port only, built on P764's server pieces. Next up (not queued): agent-portal hardening incl. the 4 failing crons (Opus); bench + days off + booking openings; notifications + missed-call flow; mobile.
+
+[Eagle | 2026-10-16 — Notification lists approved for all three roles]
+- Brayden approved the per-role lists (Agent 9, Fulfillment 7, Admin 10 + daily problems email). Saved in [[Ohvara Notifications Plan]]. Not queued yet: needs hardening prompt first, push needs mobile. Next: hardening (Opus), then bench/days off/booking limit mockups, then notifications + missed-call flow, then mobile.
+
+[Eagle | 2026-10-16 — P766 queued: one-tap theme switch + Invite someone in Admin user menu (Sonnet)]
+- Brayden also wants the Notifications bell panel redone for all roles (same refresh as the sidebar/header), using the approved lists in [[Ohvara Notifications Plan]]. Needs a mockup first (Opus). The current panel shows stale items like "X just joined the team".
+
+[Eagle | 2026-10-16 — P767 queued: Notifications panel + per-role notifications (Opus)]
+- Brayden approved the new bell panel (media/notifications/): same 64px rows, no buttons in rows, click a row to go there; Needs you / Everything tabs; red money banner. P767 also wires the approved list from [[Ohvara Notifications Plan]] (bell + email now, push later with mobile) and fixes the shared cause of the 4 failing crons first.
+
+[Eagle | 2026-10-16 — P768 queued: agent portal hardening (Opus)]
+- Covers P743 Findings 1-3 (server-side: no direct policy edits/deletes by agents, cap can't be dodged, notice/double-book/time/carrier-hours enforced), 8-9 (resolve_login_email leak, anon pre-pivot RPCs, public run-migration-034, dead appointment crons) and small 4-7,10. Runs after P767 (cron fix). Next: bench + days off + booking openings (mockups), missed-call flow, then mobile.
+
+[Eagle | 2026-10-16 — P769 queued: Fulfillment portal hardening + QA report (Opus)]
+- Same idea as P768 for reps: visibility, what a rep can change (only via RPCs, own calls only, Give to admin-only), pay/money safety, Twilio/recording access, messages/notifications, access-off, zones/DST, advisors. Fixes server-side gaps directly; bigger items go to Findings in brain/Fulfillment Portal QA Report.md.
+
+[Eagle | 2026-10-16 — P770 queued: Admin portal hardening + QA report (Opus)]
+- Admin-only enforced server side for every admin action/switch; safe-even-for-admin rules (no status/result edits, no hand-edited pay, no double pay, self/last-admin protection, append-only audit log); no path to become admin except via an admin; no secrets in the bundle; sessions/links; advisors + verify_jwt list. Report: brain/Admin Portal QA Report.md. Queue now P765-P770 (+P696 blocked).
+
+[Eagle | 2026-10-16 — P771 queued: rep missed a call -> apology text + held retry -> P696 (Opus)]
+- Brayden's flow: miss at 10 min -> retry held same time tomorrow -> apology text ~15 min after -> morning apology only if not rebooked -> priority retry (looks like a new booking to the rep, goes to a different rep) -> if no answer, P696 starts from the beginning. Strikes (30-day rolling, alert at 3), agent not charged, texts skipped while sms_live off. Bench/days-off dropped (Jahandad keeps people on standby). Next: Agent mobile mockup.
+
+[Eagle | 2026-10-16 — P772 queued: Agent phone layout (Opus)]
+- Mockups approved on the new "Mobile redesign" canvas (media/mobile-agent/). Brayden's rules: no sideways scrolling anywhere; status filter = one 4-part card with the status NAME colored; Apple-level polish. He also wants the portal in the App Store / Play Store with a QR code from "Get the phone app" (Capacitor wrapper idea; not queued yet).
+
+[CC | 2026-10-16 — P765 shipped (`ohvara-dashboard` `44e30af`, pushed, no migration)]
+- Admin Payouts rebuilt from `admin-payouts-simple.dc.html`: Next pay run box (Monday date, amount so far, cancel count, **Pays automatically** badge, gray **Paused** / **Not live yet** with a one-line reason; no Approve/Pay anywhere), one row per rep (Bank ready / No bank yet / Held), Past pay runs (from `fulfillment_pay_runs` where paid, "paid since" total), Needs a listen cards (play + waveform starting at the AI's suggested second, streamed through `fulfillment-recording` as a blob with the admin's session; Pay it / Don't pay via `fulfillment_decide_cancel`), Payout settings (bank row + Change, Stripe balance, Pay per cancel linking to Settings, Automatic payouts switch = Pause switch). Old chart, per-day boxes, cost table, Fix hours removed from the page (data/functions untouched).
+- Files: `src/pages/admin/Payouts.jsx` (wiring), `src/components/admin/PayoutsView.jsx` (view), `src/lib/adminPayouts.js` (numbers), new hooks at the end of `useFulfillmentPayouts.js`, `.ap2-*` CSS replaces the old `.ap-*` block.
+- **Server pieces added (small, say so):** (1) new read-only `fulfillment-stripe-balance` (admin-only, returns available USD cents) so the page can say Covers / Not enough for Monday; until it is deployed the row says "Balance unavailable". (2) `fulfillment-connect-session` now also accepts role `admin` (own account only, same as reps) so Brayden's **Change** opens the same Stripe bank form; test added, 9/9 pass.
+- Decisions: "Don't pay" needs a reason because the DB function requires one (3+ chars); the card asks for it inline. Held pill = a rep with over-cap cancels waiting. Rep amounts are cancels x rate (the optional weekly-minimum top-up isn't added to the per-rep row).
+- Checked: fake-data harness (deleted) at 1440 and 1920, dark and light, phone width: full, empty, paused, live-off, balance short, balance unavailable, no banks, over-cap; Pay it / Don't pay (empty reason refused, then saved), fake-audio play, switch toggles pause, bank modal opens in `<body>` and Escape closes; a refused decision shows "Only an admin can decide a cancel"; no page overflow; eslint clean on touched files (only the old DashboardLayout set-state-in-effect error remains); vite build. Shots: `media/admin-redesign/p765-payouts-1440|1920.jpg`.
+- Not checked: not seen logged in on live; no real recording played, no money moved; the phone-width rep-row wrap tweak was made after the harness was deleted; the real Stripe bank form (stubbed). Route is still admin-only through ProtectedRoute (unchanged).
+- **Brayden steps:** deploy `fulfillment-stripe-balance` (with JWT) and redeploy `fulfillment-connect-session`: `npx.cmd supabase functions deploy fulfillment-stripe-balance --project-ref jjextitmbptoaolacocs` and the same for `fulfillment-connect-session`. Caveat: Change connects an Express account for you like a rep's; the Stripe balance that funds Monday comes from your Stripe dashboard bank, so top it up there.
