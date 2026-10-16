@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Overview with notifications open</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="position:relative;width:1440px;height:1080px;overflow:hidden">
+<dc-import name="Main" hint-size="1440px,1080px"></dc-import>
+<div style="position:absolute;inset:72px 0 0 256px;background:rgba(3,5,10,.35)"></div>
+<div style="position:absolute;right:27px;top:14px;width:44px;height:44px;box-sizing:border-box;border-radius:13px;border:2px solid #7FA6F2;box-shadow:0 0 0 4px rgba(127,166,242,.25)"></div>
+<div style="position:absolute;right:42px;top:66px;width:14px;height:14px;transform:rotate(45deg);background:#172036;border-left:1px solid rgba(255,255,255,.13);border-top:1px solid rgba(255,255,255,.13)"></div>
+<div style="position:absolute;right:20px;top:72px">
+<dc-import name="Panel" role="Admin" tab="Everything" hint-size="420px,720px"></dc-import>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1080}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -67,54 +67,6 @@ Scope note: still layers on top of Prompt 695's No answer status/color/layout wo
 
 ---
 
-## Prompt 767 — Notifications: new bell panel for every role + the approved notification list (bell + email)
-
-**What:** redo the notifications bell panel (all roles) from the approved mockup, and wire up the notifications Brayden approved for each role. The full list, word for word, is in [[Ohvara Notifications Plan]]. Read it first; it's the source of truth.
-
-**Mockups:** `media/notifications/panel.dc.html` (the panel component; Tweaks: role, tab), `on-page.dc.html` (Admin Overview with the bell clicked, how it sits on the page) and `all-roles.dc.html` (the three roles side by side). Copy them exactly.
-
-### 1. The panel (same for all roles, contents differ by role)
-- Opens under the bell as a dropdown with a small pointer. The bell gets a highlighted ring while open and an unread-count badge. The page behind dims slightly. Click outside or Esc closes it.
-- **Header:** "Notifications", an unread count, and "Mark all read".
-- **Two tabs:**
-  - **Needs you**, with an amber count. Only items that need the person to do something.
-  - **Everything.**
-- **Red banner at the top** for money problems only (Admin: payout short / failed. Agent: weekly payment failed. Fulfillment: no bank connected / transfer failed). Icon, title, one line and a fix button that goes to the right page. It stays until the problem is fixed, and can't be dismissed.
-- **Rows:**
-  - Every row is **exactly the same height (64px)**, no buttons inside rows.
-  - Each row has a colored icon tile by type, a one-line title (bold if unread), a one-line detail, the time, an unread dot, a left accent edge when unread, and a chevron.
-  - Long text is cut with "…".
-  - **Clicking a row marks it read and takes you straight to the thing**: the client, the call, Payouts, the message thread, the user, and so on.
-- **Groups:** Today, Yesterday, Earlier, newest first. The list scrolls inside the panel.
-- **Footer:**
-  - **Notification settings**, which opens a simple Settings section where each person can turn email on or off per notification type.
-  - A phone-alert status line: "Phone alerts off · Get the app" until the mobile phase.
-- Remove the old panel and its old items, such as "X just joined the team" for non-admins.
-
-### 2. The notifications themselves
-- One `notifications` table: recipient, type, title, detail, link, created, read_at, needs_action, and a dedupe key so the same event never notifies twice. Recipients read and mark only their own (RLS). Rows are created **only server side** (triggers / functions), never from the client.
-- **Channels now:** bell, plus email (Resend) where the plan says email. Phone push comes with the mobile phase. Store which types are push-eligible now, so mobile only has to deliver them. Quiet hours (9 PM–8 AM, money failures excepted) apply to push later and to non-urgent emails now.
-- **Wire every type whose feature exists today:**
-  - Agent: policy cancelled, client didn't answer, couldn't reach after retries, needs attention, weekly limit reached, weekly payment failed, new message, Monday summary.
-  - Fulfillment: new call booked (including calls given to them), 5 minutes before, call time now and not started, paid, payout problem, new message.
-  - Admin: needs a listen, payout problem, agent payment failed, background job failed, invite accepted, new message, Monday summary, and the **daily 8 AM "anything that went wrong" email** (not sent when there's nothing).
-- **Types whose feature isn't built yet** (missed-call rebooking and strikes, "not enough reps" capacity): create the type, the wording and the link now, but don't fire them. List them in Memories so the bench/booking and missed-call prompts wire them up.
-- **Scheduled ones** (5 minutes before, call time now, Monday summaries, the 8 AM email) need working crons. Falcon found that four existing crons fail every run because `app.supabase_url` isn't set (`recovery-sms`, `redistribute-no-answers`, `process-reminders`, `trigger-re-engagement`). **Fix that shared cause first**, the same way P764's crons authenticate (Vault secret, nothing hard-coded), then confirm all four now succeed. Don't change what those four jobs do.
-
-### Checks before shipping
-- Fake data harness for all three roles at 1440 and 1920:
-  - both tabs, the money banner on and off, an empty state ("You're all caught up"), and long text cut with "…";
-  - every row exactly 64px, measured;
-  - a row click goes to the right page and marks it read;
-  - mark all read.
-- SQL tests (rolled back): each wired trigger creates exactly one notification for the right person, no duplicates on retry, users can't read other people's notifications or insert their own, and the email toggle is respected.
-- Never send real emails while testing; mock Resend.
-- Screenshots in `media/notifications/p767-*.jpg`. eslint and vite build clean. Log in Memories, including the not-yet-fired types and the cron fix, and clear this item.
-
-**Model: Opus 5.5**
-
----
-
 ## Prompt 768 — Agent portal hardening: enforce the booking rules on the server, close the open doors
 
 **Why:** the P743 QA ([[Agent Portal QA Report]]) found that several agent rules live only in the UI. Someone calling the database directly could get around them. Real agents pay $350–$500 a week and payouts are about to go live, so these must be enforced server side **before real agents use the portal**. No screens to design. Behavior for a normal agent clicking normally must not change at all.

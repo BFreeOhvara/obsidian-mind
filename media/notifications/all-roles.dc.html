@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Notifications, all three roles</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width:1480px;height:860px;box-sizing:border-box;padding:40px;display:flex;gap:50px;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#FFFFFF;background-color:#07080D;background-image:radial-gradient(ellipse 70% 50% at 85% -10%, rgba(75,121,206,0.30) 0%, transparent 70%),radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px);background-size:auto,24px 24px">
+<div style="display:flex;flex-direction:column;gap:14px"><div><b style="font-family:'Space Grotesk',sans-serif;font-size:18px">Admin</b><div style="font-size:13px;color:#8697B5;margin-top:2px">Everything · newest first, grouped by day</div></div><dc-import name="Panel" role="Admin" tab="Everything" hint-size="420px,720px"></dc-import></div>
+<div style="display:flex;flex-direction:column;gap:14px"><div><b style="font-family:'Space Grotesk',sans-serif;font-size:18px">Agent</b><div style="font-size:13px;color:#8697B5;margin-top:2px">Needs you · only things to act on</div></div><dc-import name="Panel" role="Agent" tab="Needs you" hint-size="420px,720px"></dc-import></div>
+<div style="display:flex;flex-direction:column;gap:14px"><div><b style="font-family:'Space Grotesk',sans-serif;font-size:18px">Fulfillment</b><div style="font-size:13px;color:#8697B5;margin-top:2px">Everything</div></div><dc-import name="Panel" role="Fulfillment" tab="Everything" hint-size="420px,720px"></dc-import></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1480,"height":860}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

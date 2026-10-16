@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Book a call (phone)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="position:relative;width:390px;height:844px;overflow:hidden;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#FFFFFF;background-color:#07080D;background-image:radial-gradient(ellipse 90% 40% at 90% -5%, rgba(52,224,196,0.22) 0%, transparent 70%),radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);background-size:auto,22px 22px">
+
+<header style="height:64px;box-sizing:border-box;padding:0 12px;display:flex;align-items:center;gap:8px">
+<a href="Main.dc.html" aria-label="Back" style="width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;color:#E3EAF6;text-decoration:none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></a>
+<h1 style="margin:0;flex:1;font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:600;letter-spacing:-.015em">Book a call</h1>
+<span style="display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 11px;border-radius:999px;background:rgba(52,224,196,.12);border:1px solid rgba(52,224,196,.35);font-size:12px;font-weight:700;color:#5EEAD4"><span style="width:6px;height:6px;border-radius:50%;background:#34E0C4"></span>4 of 16 used</span>
+</header>
+
+<div style="padding:4px 16px 0;display:flex;flex-direction:column;gap:14px">
+
+<section style="display:flex;align-items:center;gap:12px;padding:14px;border-radius:20px;background:linear-gradient(180deg,#151A26 0%,#10131C 100%);border:1px solid rgba(255,255,255,.09)">
+<span style="width:28px;height:28px;flex:none;border-radius:50%;background:#34E0C4;color:#04201B;display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+<span style="flex:1;min-width:0"><span style="display:block;font-size:12px;font-weight:600;color:#8697B5">1 · The client</span><span style="display:block;margin-top:2px;font-size:15px;font-weight:700">Dana Whitfield</span><span style="display:block;font-size:12.5px;color:#9FB0CF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">(602) 555-0184 · Pensacola, FL · Aetna</span></span>
+<a href="#" style="height:34px;padding:0 13px;border-radius:999px;border:1px solid rgba(255,255,255,.16);display:flex;align-items:center;font-size:13px;font-weight:600;color:#E3EAF6;text-decoration:none">Edit</a>
+</section>
+
+<section style="padding:16px 14px;border-radius:22px;background:linear-gradient(180deg,#151A26 0%,#10131C 100%);border:1px solid rgba(127,166,242,.35)">
+<div style="font-size:12px;font-weight:600;color:#7FA6F2">2 · When should Fulfillment call?</div>
+<div style="margin-top:2px;font-size:12.5px;color:#8697B5">Times are the client’s local time (Central)</div>
+
+<div style="margin-top:14px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px">
+<sc-for list="{{days}}" as="d" hint-placeholder-count="5">
+<span style="height:70px;box-sizing:border-box;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:{{d.bg}};border:1px solid {{d.bd}};color:{{d.fg}}"><small style="font-size:11px;font-weight:700;letter-spacing:.04em;opacity:.85">{{d.dow}}</small><b style="font-family:'Space Grotesk',sans-serif;font-size:21px">{{d.n}}</b></span>
+</sc-for>
+</div>
+
+<sc-for list="{{groups}}" as="g" hint-placeholder-count="2">
+<div style="margin-top:16px">
+<div style="display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:#8697B5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{g.icon}}"/></svg>{{g.label}}</div>
+<div style="margin-top:8px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+<sc-for list="{{g.slots}}" as="s" hint-placeholder-count="6">
+<span style="height:52px;box-sizing:border-box;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:{{s.bg}};border:1px solid {{s.bd}};color:{{s.fg}};box-shadow:{{s.glow}}"><span style="font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700">{{s.t}}<small style="margin-left:3px;font-size:10.5px;font-weight:600;opacity:.75">{{s.ap}}</small></span><small style="font-size:10px;font-weight:700;color:{{s.nfg}};display:{{s.nshow}}">{{s.note}}</small></span>
+</sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+</section>
+</div>
+
+<div style="position:absolute;left:0;right:0;bottom:0;box-sizing:border-box;padding:14px 16px 26px;background:linear-gradient(180deg, rgba(7,8,13,0) 0%, rgba(7,8,13,.96) 22%);">
+<div style="display:flex;align-items:center;gap:12px;padding:12px 12px 12px 16px;border-radius:22px;background:radial-gradient(ellipse 70% 120% at 100% 0%, rgba(52,224,196,0.3) 0%, transparent 65%), linear-gradient(135deg,#16294C 0%,#0D1730 100%);border:1px solid rgba(255,255,255,.14);box-shadow:0 20px 40px -16px rgba(0,0,0,.9)">
+<span style="flex:1;min-width:0"><span style="display:block;font-size:12px;color:#B4C3DE">Fulfillment calls Dana</span><span style="display:block;font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;letter-spacing:-.02em">Today, 2:00 PM</span></span>
+<a href="Clients.dc.html" style="height:50px;padding:0 20px;border-radius:999px;background:#FFFFFF;color:#0D1730;font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;text-decoration:none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Book it</a>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+const days = [['TODAY', '16', true], ['SAT', '17'], ['SUN', '18'], ['MON', '19'], ['PICK', '···']].map(([dow, n, on]) => ({ dow, n, bg: on ? 'linear-gradient(180deg,#7FA6F2,#4B79CE)' : 'rgba(255,255,255,0.04)', bd: on ? '#A9C2F5' : 'rgba(255,255,255,0.10)', fg: on ? '#FFFFFF' : '#C9D4E8' }));
+const S = (t, ap, st) => {
+const base = { t, ap, note: '', nshow: 'none', nfg: '#FBBF24', glow: 'none' };
+if (st === 'past') return Object.assign(base, { bg: 'rgba(255,255,255,0.02)', bd: 'rgba(255,255,255,0.05)', fg: '#4A5A78' });
+if (st === 'soon') return Object.assign(base, { bg: 'rgba(255,255,255,0.02)', bd: 'rgba(255,255,255,0.06)', fg: '#5E7195', note: 'Too soon', nshow: 'block', nfg: '#8697B5' });
+if (st === 'full') return Object.assign(base, { bg: 'rgba(251,191,36,0.05)', bd: 'rgba(251,191,36,0.18)', fg: '#6F7A92', note: 'Full', nshow: 'block' });
+if (st === 'pick') return Object.assign(base, { bg: 'linear-gradient(180deg,#7FA6F2,#4B79CE)', bd: '#A9C2F5', fg: '#FFFFFF', glow: '0 10px 24px -10px rgba(127,166,242,.9)' });
+return Object.assign(base, { bg: 'rgba(255,255,255,0.05)', bd: 'rgba(255,255,255,0.12)', fg: '#FFFFFF' });
+};
+const groups = [
+{ label: 'Morning', icon: 'M12 4v2M12 18v2M4 12h2M18 12h2M6.3 6.3l1.4 1.4M16.3 16.3l1.4 1.4M6.3 17.7l1.4-1.4M16.3 7.7l1.4-1.4M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8z', slots: [S('9:00', 'AM', 'past'), S('9:30', 'AM', 'past'), S('10:00', 'AM', 'past'), S('10:30', 'AM', 'soon'), S('11:00', 'AM', 'full'), S('11:30', 'AM')] },
+{ label: 'Afternoon', icon: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2', slots: [S('12:00', 'PM'), S('12:30', 'PM'), S('1:00', 'PM'), S('1:30', 'PM'), S('2:00', 'PM', 'pick'), S('2:30', 'PM'), S('3:00', 'PM'), S('3:30', 'PM', 'full'), S('4:00', 'PM')] },
+];
+return { days, groups };
+}
+}
+</script>
+</body>
+</html>
