@@ -2041,3 +2041,17 @@ Status: 724 shipped and removed from [[Ohvara CC Queue]] (re-read right before r
 - **Brayden steps:** (1) delete `run-migration-034` in Supabase → Edge Functions; (2) turn on leaked-password protection in Auth if the plan allows; (3) do the 15-minute live pass from [[Agent Portal QA Report]].
 
 [CC | 2026-10-16 — P768 shipped] — agent booking rules + cap on the server, direct edits/deletes closed, username login no longer leaks email, anon RPCs revoked, dead cron off, small agent UI fixes. dashboard `6feddfa`, migration 147, functions username-sign-in + run-migration-034 (stub). Next: P769.
+
+
+### 2026-10-16 — CC shipped P769: Fulfillment rules enforced on the server (`ohvara-dashboard` `b0dcf87`/`2f6164f`/`b86be7a`/`cb123be`, migrations 148–151 live, on Brayden's in-session go)
+- **Open before (proved live as a throwaway Rep B):** any rep saw all 26 of Test Fulfill's calls + all agents' commission rows, could post in others' threads, edit/steal another rep's call and mark it Cancelled → a $10 cancel in their own name.
+- **148 reads:** `fulfillment_select_assigned` = assigned to me; `policy_events` = visible calls + my own results; `can_message_policy` = agent / admin / assigned rep; `team_performance_policies` agents+admin only (and revoked in 150, unused).
+- **149 writes:** dropped `fulfillment_update_assigned` (no rep direct UPDATE on policies); new RPCs `fulfillment_mark_cancelled` + `fulfillment_save_notes` used by `useCallActions` and `PortalPhone`; `policies_insert` needs agent/admin.
+- **150 pay once:** real double-pay — a failed transfer's cancels kept the old payout_id, next week's payout counted them but never stamped them paid → paid again. `fulfillment_claim_payout` now re-points every counted cancel. Revoked dead `fulfillment_sync_payouts`/`fix_hours`/`cancel_locked`.
+- **151 access off:** `is_fulfillment()` needs `is_active`; `a0_block_inactive_writer` trigger on policies, details, policy/direct/old messages, reads, shifts refuses writes by a turned-off user (closes the ≤1 h token window).
+- Checked: ~60 rolled-back SQL checks on live as Rep B / Test Fulfill / Test Agent / Admin (all cross-rep paths 42501 or 0 rows; own-call notes/mark-cancelled/too-early/correct-after-paid OK; pay-once simulation W1 fail → W2 pays + stamps both, W3 = 0, repeat claims safe; access off → 0 calls, writes refused, call re-picked). DST/LA zone maths via real `fulfillmentDay.js` + SQL. Advisors: authenticated-definer 42 → 40, rest unchanged. 0 test rows left. eslint: only the 3 old `usePolicies` unused-var errors; vite build passes.
+- Not checked: not seen logged in on live; no Playwright run (no visible change); live HTTP probes of functions were blocked (signatures checked in code). Migrations landed minutes before Vercel built `2f6164f` — Mark cancelled could have errored in that window.
+- Found: `fulfillment-cancel-check`, `fulfillment-pay-week`, `fulfillment-recording` are **not deployed** (P764 step still open); `fulfillment-voice` still v1.
+- **Brayden steps:** (1) do the 10-minute live pass in [[Fulfillment Portal QA Report]]; (2) P764 deploys when ready; (3) decide whether reps should see old team-chat channels (Finding 2).
+
+[CC | 2026-10-16 — P769 shipped] — Fulfillment rep reads/writes locked to own calls via RPCs, double-pay after a failed transfer closed, access-off enforced in the DB. dashboard `cb123be`, migrations 148–151. Report: [[Fulfillment Portal QA Report]]. Next: P770.

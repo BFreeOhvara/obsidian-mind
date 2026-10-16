@@ -67,57 +67,6 @@ Scope note: still layers on top of Prompt 695's No answer status/color/layout wo
 
 ---
 
-## Prompt 769 — Fulfillment portal hardening: check every rep rule on the server, fix what's open
-
-**Why:** same reason as P768 for agents. The Fulfillment side (P745–P757, P764, P767) was built fast and mostly tested on fake data. Before real reps are paid per cancel, every rule a rep relies on must be enforced in the database or edge functions, not just the UI. A normal rep clicking normally must see no change.
-
-**How:** a security and acceptance pass like P743, but this time **fix server-side gaps directly** (that's the point of this prompt). Write the report to `brain/Fulfillment Portal QA Report.md` with Pass / Fixed / Fail / Can't test per check. No real calls, texts, emails, recordings or Stripe transfers. Use rolled-back SQL as a test rep, Test Agent and Admin against live, plus the Playwright harness pattern from P743 (swapped `supabase.js`, frozen clock). Leave nothing in the live database.
-
-### What to check, and fix if open
-**1. What a rep can see**
-- A rep can read only their own calls and the clients on them. They can't see other reps' calls, other reps' pay, other agents' clients, recordings, transcripts or AI check results.
-- Pipeline and search return only what they're allowed to see.
-
-**2. What a rep can change**
-- A rep can change results only on calls assigned to them, and only through `fulfillment_start_call` / `fulfillment_end_call` / `fulfillment_correct_result`. No direct UPDATE or DELETE on `policies`, `policy_events`, `fulfillment_cancels`, payouts or pay settings.
-- A rep can't start a call more than 5 minutes early (P756 `too_early`), can't end or correct another rep's call, and can't correct a result after it's been paid.
-- A rep can't mark their own cancel verified or verified by admin, can't change its amount, and can't reassign calls. **Give to** is admin only.
-- A rep can't change their own role, access, or another person's profile.
-
-**3. Pay and money (P753, P764)**
-- Amounts are always computed on the server. A rep's Connect session can only open their own account.
-- The pay run refuses any caller except the cron or an admin.
-- `payouts_live` off and Pause both block every path.
-- A cancel is paid once, even with two runs or a retry.
-- Webhook signatures (Stripe, and Connect) are checked.
-
-**4. Calls and recordings (P751, P764)**
-- The Twilio voice token gives access only to the rep's own conference.
-- `fulfillment-voice`, `fulfillment-call`, `fulfillment-cancel-check` and `fulfillment-recording` check Twilio signatures or JWTs as intended.
-- `fulfillment-recording` streams only to admins and never exposes a public URL.
-- With `voice_live` / `recording_live` off, nothing dials or records.
-
-**5. Messages and notifications (P754, P767)**
-- A rep reads only their own threads and notifications, and can't create notifications or messages as someone else.
-
-**6. Edge cases**
-- A rep turned off (P762 access off) is signed out, can't use any RPC, and their future calls are released.
-- Time zones: a rep outside Central sees the right day and the right unlock time.
-- The day of a DST change (Nov 1 2026).
-
-**7. Advisors**
-- Run the Supabase security advisors before and after, and paste both summaries.
-
-### Rules
-- Fix server-side gaps in focused migrations, one per area, and commit each one separately (`P769-n`).
-- Small clear UI bugs can be fixed too.
-- Anything bigger, or anything that changes how a rep works, goes under **Findings for Brayden**, not built.
-- eslint and vite build clean. Log in Memories, with the report link and Brayden's steps, and clear this item.
-
-**Model: Opus 5.5**
-
----
-
 ## Prompt 770 — Admin portal hardening: admin powers only for admins, and safe even for the admin
 
 **Why:** same as P768 (agents) and P769 (Fulfillment). The Admin side (P758–P766) gives powerful actions: pay decisions, Give to, role and access changes, invites, settings switches, recordings. Each must be enforced on the server: only a real admin can use them, and some must be safe even for the admin. Normal use must not change.
