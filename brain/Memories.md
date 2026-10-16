@@ -2026,3 +2026,5 @@ Status: 724 shipped and removed from [[Ohvara CC Queue]] (re-read right before r
 - Kept: admin-only `notify_live_room()` RPC + `live_room` type (the old client hook was unused).
 
 [CC | 2026-10-16 — P767 shipped] — notifications bell (all roles) + triggers + email queue + the 4 cron fixes. dashboard `ec4e7dc`, migration 146, functions notify-email/recovery-sms/redistribute-no-answers/process-reminders/trigger-re-engagement deployed. Next: P768.
+
+[CC | 2026-10-16 — P767 vault commit] — Ship note + queue clear for P767 committed and pushed (vault `3d8910e`, also swept up the untracked media/mobile-agent and media/notifications mockups). No new work after the P767 entry above. Next: P768.
