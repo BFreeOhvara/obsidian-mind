@@ -61,61 +61,6 @@ tags:
 
 Scope note: still layers on top of Prompt 695's No answer status/color/layout work, which stands as-is — this prompt is the automated recovery behavior running underneath that same status.
 
-## Prompt 774 — Admin phone layout (same phone shell as P772/P773)
-
-**Model: Opus 5.5** (layout work + the listen player)
-
-**Mockups:** `media/mobile-admin/`: `AdmHome`, `AdmDesk`, `AdmPay`, `AdmListen`, `AdmAdd`, `AdmMore` (`.dc.html`). Also on the Mobile redesign canvas, row "Admin · phone". Brayden approved them 2026-10-17. Tweaks: Pay `run` (Automatic / Paused / Stripe balance short), Add `role` (Agent / Fulfillment).
-
-**Same rules as P772/P773:** phone layout at ≤767px, desktop at 768px+ stays **pixel-identical** (0 px diff on every Admin page, dark + light). Reuse the shared phone shell (tab bar, bell full screen with the P767 panel, bottom sheet, `--ov-st-*` tokens). No sideways scrolling, tap targets 44px+, inputs 16px, dark + light. **UI only:** reuse the existing admin data, the P764/P765 pay RPCs (`fulfillment_decide_cancel`, `fulfillment-recording` admin stream), and the P762/P766 Add someone invite. If a server change is truly needed, stop and flag it.
-
-**Tab bar:** Home · Desk · raised **+ (Add someone)** in the center · Pay · More.
-- A small amber dot on Pay whenever something needs a listen, or the next run won't pay (paused / Stripe short).
-
-**1. Home**
-- Header: date pill, bell (badge), BF avatar → More.
-- "Good afternoon, Brayden" + "N things need you today." (N = amber items only).
-- **Needs you** list: 66px rows (icon tile, title, one-line sub, chevron), the whole row tappable. Same sources as desktop Overview: cancels that need a listen → Listen sheet; calls past their time → Desk; invites not accepted → person; calling not live → Calling & texting. Amber items get a faint amber row tint.
-- **The desk right now** card (taps to Desk): red line "<name> is on a call · mm" if anyone is live, then To call / Done / Past time (colored names, white numbers).
-- **This week** card: Booked / Cancelled / Cancel rate, plus a small 7-day paired bar chart (booked blue, cancelled green, today bold, future days faded).
-
-**2. The desk** (the phone version of admin Fulfillment)
-- Title + "N calls today · N people".
-- 4-part card: Live / Past time / To call / Done (red / amber / blue / green names). Tap filters, tap again clears.
-- **Past their time** card (amber, only when there are any): the stuck calls (time, client, carrier · for agent) + one button "Give both to <name> · free". It picks whoever is free soonest, using the same reassign logic as desktop. If nobody is free, the button says "Pick who" and opens a chooser sheet.
-- **On the desk:** one card per Fulfillment person. Avatar, name, status in color (On a call · 12 min red, N past their time amber, Free until X green, Next at X blue), "N calls · N cancelled", and a segmented bar of their calls today in status colors. A live person's card gets the red tint. Tap → their day (reuse the desktop lane data as a vertical list).
-
-**3. Pay**
-- Hero: "Next pay run · Mon, <date>", big total, "N verified cancels · N people", status badge + note line. 3 states:
-  - Automatic (teal): "Pays automatically". Note: "Monday 8 AM. Nothing for you to do."
-  - Paused (amber): note says nobody gets paid until it's turned back on.
-  - Stripe short (red): "Won't pay". Note says how much to add and by when.
-- **Needs a listen** row (amber card, play circle) → Listen sheet. One row per waiting cancel, or a count row if more than 2.
-- In this run: people, cancels · bank, amount, Bank ready / No bank (amber, held).
-- Past pay runs list.
-
-**4. Needs a listen sheet**
-- Header: client · $amount, carrier · rep · when, close X.
-- Amber note: "AI couldn't hear <carrier> confirm the cancel. Listen, then decide."
-- Player: big waveform (played part amber), elapsed / total time, −15 / play-pause / +15. Streams from `fulfillment-recording` (admin only).
-- **Jump to** chips from the AI check's timestamps (carrier picks up, cancel asked). Hide the section if the AI gave none.
-- Buttons: **Pay it · $X** (white) / **Don't pay** (outline) → same RPC as desktop. Footer: "<rep> sees your choice on their pay page." Sheet closes, the row disappears, the Pay dot updates.
-
-**5. Add someone sheet** (the raised + button)
-- Role choice: Agent ("Books calls") / Fulfillment ("Makes the calls"). Full name, Email (16px inputs).
-- Blue note changes by role (Agent: set password → pick a plan → pay before booking; Fulfillment: set password → add a bank).
-- **Send invite** uses the existing P762 invite exactly. Success toast, sheet closes. Show the existing error text if the email is already used.
-
-**6. More**
-- Profile card (BF, "Admin · owner").
-- Group 1: People (count + invites → Users list as a phone list + person sheet), Pipeline (view only), Messages (unread), Payout settings ("On" teal / "Paused" amber).
-- Group 2: Calling & texting ("Not live" amber until `voice_live`/`sms_live`), Notifications, Theme (P766 one-tap), Settings.
-- Sign out.
-
-**Check before shipping:** fake-Supabase Playwright harness like P772 at 390×844 and 360×780, dark + light. Cover every screen, all 3 Pay states, the Listen sheet (play, jump, both decisions, without sending real money), Add someone both roles (no real email sent), desk filter + reassign, no sideways overflow, desktop 0 px diff. **No real calls, texts, emails or money in tests; never use Brayden's real admin login for QA.** Shots → `media/mobile-admin/p774-*.jpg`.
-
-**Not in this prompt:** the app-store wrapper (Capacitor + Codemagic, Apple Unlisted, account deletion, QR code). That's queued after Apple approves Brayden's developer account.
-
 ## Prompt 775 — Phone apps: iPhone + Android store builds, account deletion, push, QR code
 
 **Model: Opus 5.5** (logins, account deletion, push, build/signing setup)
