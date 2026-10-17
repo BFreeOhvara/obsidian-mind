@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Fulfillment · On a call (phone)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="position:relative;width:390px;height:844px;box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#FFFFFF;background:{{bg}}">
+
+<div style="display:flex;align-items:center;justify-content:space-between;padding:18px 16px 0">
+<a href="FulToday.dc.html" aria-label="Minimize the call" style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;color:#FFFFFF;text-decoration:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></a>
+<span style="display:{{recShow}};align-items:center;gap:6px;height:28px;padding:0 12px;border-radius:999px;background:rgba(229,50,45,.18);border:1px solid rgba(248,113,113,.45);font-size:12.5px;font-weight:700;color:#FCA5A5"><span style="width:7px;height:7px;border-radius:50%;background:#EF4444"></span>Recording</span>
+<span style="width:44px"></span>
+</div>
+
+<sc-if value="{{other.show}}" hint-placeholder-val="{{ false }}">
+<div style="margin:14px 16px 0;display:flex;align-items:center;gap:10px;height:48px;box-sizing:border-box;padding:0 14px;border-radius:16px;background:rgba(0,0,0,.24);border:1px solid rgba(255,255,255,.10)">
+<span style="width:8px;height:8px;border-radius:50%;background:{{other.dot}}"></span>
+<span style="flex:1;font-size:14px;font-weight:600">{{other.name}}</span>
+<span style="font-size:12.5px;color:rgba(255,255,255,.7)">{{other.state}}</span>
+</div>
+</sc-if>
+
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:{{topPad}}px 20px 0">
+<div style="display:flex;align-items:center">
+<sc-for list="{{avatars}}" as="a" hint-placeholder-count="1">
+<span style="width:84px;height:84px;margin-left:{{a.ml}}px;border-radius:50%;box-sizing:border-box;border:3px solid rgba(13,23,48,.9);background:{{a.bg}};color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-size:27px;font-weight:700">{{a.t}}</span>
+</sc-for>
+</div>
+<div style="margin-top:16px;font-family:'JetBrains Mono',monospace;font-size:16px;color:rgba(255,255,255,.72)">{{timer}}</div>
+<div style="margin-top:4px;font-family:'Space Grotesk',sans-serif;font-size:31px;font-weight:600;letter-spacing:-.025em;line-height:1.15">{{name}}</div>
+<div style="margin-top:6px;display:inline-flex;align-items:center;gap:7px;font-size:14.5px;font-weight:600;color:{{subFg}}"><span style="display:{{bars}};align-items:flex-end;gap:2px;height:13px"><span style="width:3px;height:6px;border-radius:2px;background:currentColor"></span><span style="width:3px;height:13px;border-radius:2px;background:currentColor"></span><span style="width:3px;height:9px;border-radius:2px;background:currentColor"></span></span>{{sub}}</div>
+</div>
+
+<sc-if value="{{tip.show}}" hint-placeholder-val="{{ false }}">
+<div style="margin:0 16px 20px;display:flex;align-items:center;gap:12px;padding:14px 14px 14px 16px;border-radius:20px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16)">
+<span style="flex:1;text-align:left"><span style="display:block;font-size:15px;font-weight:700">{{tip.title}}</span><span style="display:block;margin-top:2px;font-size:12.5px;line-height:1.35;color:rgba(255,255,255,.72)">{{tip.text}}</span></span>
+<span style="height:40px;padding:0 16px;border-radius:999px;background:#FFFFFF;color:#0D1730;font-size:14px;font-weight:700;display:flex;align-items:center;white-space:nowrap">{{tip.btn}}</span>
+</div>
+</sc-if>
+
+<sc-if value="{{conf.show}}" hint-placeholder-val="{{ false }}">
+<div style="margin:0 16px 10px;box-sizing:border-box;padding:18px;border-radius:22px;background:rgba(0,0,0,.28);border:1px solid rgba(52,224,196,.45);display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;background:#34E0C4;box-shadow:0 0 0 4px rgba(52,224,196,.25)"></span><span style="font-size:16px;font-weight:700;flex:1;text-align:left">Get the confirmation number</span></div>
+<label style="display:block;text-align:left"><span style="display:block;font-size:12.5px;font-weight:600;color:rgba(255,255,255,.72);margin-bottom:6px">Confirmation number from Globe Life</span><span style="display:flex;align-items:center;height:50px;box-sizing:border-box;padding:0 14px;border-radius:14px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.4);font-family:'JetBrains Mono',monospace;font-size:16px">GL-2026-884213</span></label>
+<div style="text-align:left;font-size:13.5px;line-height:1.45;color:rgba(255,255,255,.8)">Ask Globe Life to read it out loud: “Could you read me the confirmation number?” The recording is the proof, so it has to be said on the call.</div>
+<span style="height:52px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:15.5px;font-weight:700;background:#FFFFFF;color:#0D1730">Number saved · carrier can go</span>
+</div>
+</sc-if>
+
+<div style="display:{{keysShow}};grid-template-columns:repeat(3,1fr);row-gap:20px;padding:0 26px">
+<sc-for list="{{keys}}" as="k" hint-placeholder-count="6">
+<span style="display:flex;flex-direction:column;align-items:center;gap:8px;font-size:13px;font-weight:600;color:rgba(255,255,255,.85);opacity:{{k.op}}"><span style="width:74px;height:74px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:{{k.bg}};color:{{k.fg}};border:1px solid rgba(255,255,255,.18)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{k.icon}}"/></svg></span>{{k.label}}</span>
+</sc-for>
+</div>
+<div style="display:flex;justify-content:center;padding:24px 0 40px">
+<a href="FulResult.dc.html" style="display:flex;flex-direction:column;align-items:center;gap:8px;font-size:13px;font-weight:600;color:rgba(255,255,255,.85);text-decoration:none"><span style="width:74px;height:74px;border-radius:50%;background:#E5322D;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px -8px rgba(229,50,45,.8)"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 15c5-5 13-5 18 0l-2.5 2.5-3-1.5v-3a12 12 0 0 0-5 0v3l-3 1.5z"/></svg></span>{{endLabel}}</a>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"stage":{"editor":"enum","options":["Talking to client","On hold with carrier","Two lines","Merged","Confirm cancel"],"default":"On hold with carrier"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+const st = this.props.stage ?? 'On hold with carrier';
+const I = {
+mic: 'M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM5 11a7 7 0 0 0 14 0M12 18v3',
+keypad: 'M6 5h.01M12 5h.01M18 5h.01M6 11h.01M12 11h.01M18 11h.01M6 17h.01M12 17h.01M18 17h.01',
+pause: 'M9 5v14M15 5v14',
+add: 'M12 5v14M5 12h14',
+swap: 'M7 7h11l-3-3M17 17H6l3 3',
+merge: 'M7 4v4a5 5 0 0 0 5 5 5 5 0 0 0 5-5V4M12 13v7',
+};
+const k = (label, icon, on, off) => ({ label, icon, bg: on ? '#FFFFFF' : 'rgba(255,255,255,0.14)', fg: on ? '#0D1730' : '#FFFFFF', op: off ? 0.35 : 1 });
+const NAVY = 'radial-gradient(ellipse 90% 50% at 100% 0%, rgba(75,121,206,0.65) 0%, transparent 70%), radial-gradient(ellipse 80% 50% at 0% 100%, rgba(0,191,166,0.45) 0%, transparent 70%), linear-gradient(170deg, #1B3366 0%, #0D1730 55%, #0A2A33 100%)';
+const AMBER = 'radial-gradient(ellipse 90% 50% at 100% 0%, rgba(245,158,11,0.40) 0%, transparent 70%), radial-gradient(ellipse 80% 50% at 0% 100%, rgba(0,191,166,0.30) 0%, transparent 70%), linear-gradient(170deg, #2A2A3E 0%, #121A30 55%, #0A2A33 100%)';
+const GREEN = 'radial-gradient(ellipse 90% 50% at 100% 0%, rgba(34,197,94,0.40) 0%, transparent 70%), radial-gradient(ellipse 80% 50% at 0% 100%, rgba(0,191,166,0.45) 0%, transparent 70%), linear-gradient(170deg, #143B3A 0%, #0D1E30 55%, #0A2A33 100%)';
+const C = { t: 'LO', bg: 'rgba(96,165,250,0.30)', ml: 0 }, G = { t: 'GL', bg: 'rgba(251,191,36,0.32)', ml: 0 };
+const both = [C, Object.assign({}, G, { ml: -20 })];
+const none = { show: false };
+let v;
+if (st === 'Talking to client') v = { bg: NAVY, avatars: [C], timer: '00:46', name: 'Linda Okafor', sub: 'Client', subFg: 'rgba(255,255,255,0.75)', bars: 'none', other: none,
+tip: { show: true, title: 'Ready for the carrier?', text: 'Ask Linda to stay on, or offer a call back.', btn: 'Ring Globe Life' },
+keys: [k('Mute', I.mic), k('Keypad', I.keypad), k('Hold', I.pause), k('Ring carrier', I.add), k('Swap', I.swap, false, true), k('Merge', I.merge, false, true)], endLabel: 'End' };
+else if (st === 'On hold with carrier') v = { bg: AMBER, avatars: [G], timer: '12:40', name: 'Globe Life', sub: 'On hold', subFg: '#FBBF24', bars: 'inline-flex',
+other: { show: true, dot: '#C4B5FD', name: 'Linda Okafor', state: 'waiting for a call back' },
+tip: { show: true, title: 'Someone picked up?', text: 'Say “one moment, adding the policyholder.”', btn: 'Ring Linda' },
+keys: [k('Mute', I.mic), k('Keypad', I.keypad), k('Hold', I.pause), k('Ring client', I.add), k('Swap', I.swap, false, true), k('Merge', I.merge, false, true)], endLabel: 'End' };
+else if (st === 'Two lines') v = { bg: NAVY, avatars: [C], timer: '00:31', name: 'Linda Okafor', sub: 'Client · Globe Life is holding', subFg: 'rgba(255,255,255,0.75)', bars: 'none',
+other: { show: true, dot: '#FBBF24', name: 'Globe Life', state: 'on hold · 13:22' },
+tip: { show: true, title: 'Both on the line', text: 'Merge to bring Linda in.', btn: 'Merge' },
+keys: [k('Mute', I.mic), k('Keypad', I.keypad), k('Hold', I.pause, true), k('Ring', I.add, false, true), k('Swap', I.swap), k('Merge', I.merge)], endLabel: 'End' };
+else if (st === 'Merged') v = { bg: GREEN, avatars: both, timer: '18:05', name: 'Linda & Globe Life', sub: 'Merged · all three on', subFg: '#4ADE80', bars: 'none', other: none, tip: none,
+keys: [k('Mute', I.mic), k('Keypad', I.keypad), k('Hold', I.pause), k('Ring', I.add, false, true), k('Swap', I.swap, false, true), k('Merge', I.merge, true)], endLabel: 'End all' };
+else v = { bg: GREEN, avatars: both, timer: '18:31', name: 'Linda & Globe Life', sub: 'Merged · all three on', subFg: '#4ADE80', bars: 'none', other: none, tip: none, keys: [], endLabel: 'End all', confirm: true };
+const conf = { show: !!v.confirm };
+return Object.assign(v, { conf, keysShow: conf.show ? 'none' : 'grid', recShow: 'inline-flex', topPad: conf.show ? 24 : (v.other.show ? 44 : 70) });
+}
+}
+</script>
+</body>
+</html>

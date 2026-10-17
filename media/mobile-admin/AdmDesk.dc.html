@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin · The desk (phone)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="position:relative;width:390px;height:844px;overflow:hidden;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#FFFFFF;background-color:#07080D;background-image:radial-gradient(ellipse 90% 40% at 90% -5%, rgba(75,121,206,0.34) 0%, transparent 70%),radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);background-size:auto,22px 22px">
+<div style="padding:18px 16px 110px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:baseline;gap:10px"><h1 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;letter-spacing:-.03em">The desk</h1><span style="font-size:14px;color:#8697B5">15 calls today · 3 people</span></div>
+
+<div role="group" aria-label="Filter calls" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:5px;gap:4px;border-radius:20px;background:linear-gradient(180deg,#151A26 0%,#10131C 100%);border:1px solid rgba(255,255,255,.09)">
+<sc-for list="{{stats}}" as="s" hint-placeholder-count="4">
+<button type="button" aria-pressed="false" style="height:70px;border:none;border-radius:15px;background:transparent;font-family:inherit;color:#FFFFFF;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px"><span style="font-size:13px;font-weight:700;color:{{s.c}};white-space:nowrap">{{s.l}}</span><span style="font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:600;line-height:1;color:#C9D4E8">{{s.n}}</span></button>
+</sc-for>
+</div>
+
+<section style="padding:16px;border-radius:22px;background:radial-gradient(120% 90% at 100% 0%, rgba(245,158,11,0.16) 0%, transparent 60%), linear-gradient(180deg,#171820 0%,#111219 100%);border:1px solid rgba(251,191,36,.35)">
+<div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;background:#FBBF24;box-shadow:0 0 0 4px rgba(251,191,36,.2)"></span><span style="font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:600;flex:1">2 calls past their time</span></div>
+<div style="margin-top:4px;font-size:13px;color:#9FB0CF">Nina hasn’t started these. Give them to someone free.</div>
+<div style="margin-top:12px;border-radius:16px;overflow:hidden;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.07)">
+<sc-for list="{{stuck}}" as="s" hint-placeholder-count="2">
+<div style="display:flex;align-items:center;gap:12px;height:56px;padding:0 12px;border-top:{{s.rule}}"><span style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:#FCD34D;width:72px">{{s.t}}</span><span style="flex:1;min-width:0"><span style="display:block;font-size:14.5px;font-weight:700">{{s.name}}</span><span style="display:block;font-size:12px;color:#8697B5">{{s.sub}}</span></span></div>
+</sc-for>
+</div>
+<a href="#" style="margin-top:12px;height:48px;border-radius:999px;background:#FFFFFF;color:#0D1730;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg>Give both to Marcus · free</a>
+</section>
+
+<section>
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><h2 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:600;letter-spacing:-.015em">On the desk</h2><span style="flex:1"></span><span style="font-size:13px;color:#8697B5">Now 3:42 PM</span></div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<sc-for list="{{people}}" as="p" hint-placeholder-count="3">
+<a href="#" style="display:block;padding:14px;border-radius:20px;text-decoration:none;color:#FFFFFF;background:{{p.bg}};border:1px solid {{p.bd}}">
+<div style="display:flex;align-items:center;gap:12px">
+<span style="width:40px;height:40px;flex:none;border-radius:50%;background:{{p.col}};color:#0B0D14;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">{{p.init}}</span>
+<span style="flex:1;min-width:0"><span style="display:block;font-size:15px;font-weight:700">{{p.name}}</span><span style="display:block;margin-top:2px;font-size:12.5px;font-weight:700;color:{{p.sc}}">{{p.status}}</span></span>
+<span style="font-size:12.5px;color:#8697B5;text-align:right">{{p.tally}}</span>
+</div>
+<div style="margin-top:12px;display:flex;gap:3px;height:6px">
+<sc-for list="{{p.seg}}" as="g" hint-placeholder-count="5"><span style="flex:1;border-radius:3px;background:{{g.c}}"></span></sc-for>
+</div>
+</a>
+</sc-for>
+</div>
+</section>
+</div>
+<nav aria-label="Main" style="position:absolute;left:0;right:0;bottom:0;height:86px;box-sizing:border-box;padding:8px 10px 22px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:center;background:rgba(10,13,22,.94);border-top:1px solid rgba(255,255,255,.09);box-shadow:0 -20px 40px -20px rgba(0,0,0,.9)">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="5">
+<a href="{{t.href}}" aria-label="{{t.l}}" style="position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;color:{{t.fg}};font-size:11px;font-weight:{{t.w}}">
+<span style="width:{{t.size}}px;height:{{t.size}}px;margin-top:{{t.mt}}px;border-radius:{{t.r}};display:flex;align-items:center;justify-content:center;background:{{t.bg}};color:{{t.ic}};box-shadow:{{t.glow}}"><svg width="{{t.isz}}" height="{{t.isz}}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{t.sw}}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{t.icon}}"/></svg></span>
+<span style="display:{{t.lshow}}">{{t.l}}</span>
+<span style="display:{{t.dot}};position:absolute;top:-2px;left:calc(50% + 7px);width:9px;height:9px;border-radius:50%;background:#FBBF24;box-shadow:0 0 0 2px #0A0D16"></span>
+</a>
+</sc-for>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+const TABS = [
+['Home', 'AdmHome.dc.html', 'M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z'],
+['Desk', 'AdmDesk.dc.html', 'M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2'],
+['Add someone', 'AdmAdd.dc.html', 'M12 5v14M5 12h14'],
+['Pay', 'AdmPay.dc.html', 'M4 7h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4zM4 7a2 2 0 0 1 2-2h11M16 14h2'],
+['More', 'AdmMore.dc.html', 'M4 6h16M4 12h16M4 18h10'],
+];
+const active = 'Desk';
+const tabs = TABS.map(([l, href, icon]) => {
+const big = l === 'Add someone', on = l === active;
+return big
+? { l, href, icon, size: 56, mt: -26, r: '50%', bg: 'linear-gradient(135deg,#34E0C4 0%,#4B79CE 100%)', ic: '#FFFFFF', glow: '0 12px 28px -8px rgba(52,224,196,.8), 0 0 0 5px #0A0D16', isz: 26, sw: 2.6, lshow: 'none', fg: '#FFFFFF', w: 700, dot: 'none' }
+: { l, href, icon, size: 30, mt: 0, r: '10px', bg: 'transparent', ic: on ? '#7FA6F2' : '#8697B5', glow: 'none', isz: 22, sw: on ? 2.2 : 1.9, lshow: 'block', fg: on ? '#FFFFFF' : '#8697B5', w: on ? 700 : 600, dot: l === 'Pay' ? 'block' : 'none' };
+});
+const stats = [['Live', '1', '#FCA5A5'], ['Past time', '2', '#FCD34D'], ['To call', '4', '#93C5FD'], ['Done', '8', '#86EFAC']].map(([l, n, c]) => ({ l, n, c }));
+const R = '1px solid rgba(255,255,255,0.07)';
+const stuck = [{ t: '9:00 AM', name: 'Walter Briggs', sub: 'Aetna · for Jordan Reyes', rule: 'none' }, { t: '10:30 AM', name: 'Carol Nguyen', sub: 'Globe Life · for Maya Patel', rule: R }];
+const K = { cx: '#4ADE80', na: '#A3B2CC', bk: 'rgba(96,165,250,0.35)', live: '#F87171', stuck: '#FBBF24' };
+const P = (name, init, col, status, sc, ks, tally, live) => ({ name, init, col, status, sc, tally, seg: ks.map(k => ({ c: K[k] })), bg: live ? 'linear-gradient(180deg, rgba(239,68,68,0.10) 0%, #10131C 100%)' : 'linear-gradient(180deg,#151A26 0%,#10131C 100%)', bd: live ? 'rgba(248,113,113,0.4)' : 'rgba(255,255,255,0.09)' });
+const people = [
+P('Test Fulfill', 'TF', '#F59E0B', 'On a call · 12 min', '#FCA5A5', ['cx', 'na', 'cx', 'live', 'bk'], '5 calls\n2 cancelled', true),
+P('Nina Alvarez', 'NA', '#C084FC', '2 past their time', '#FCD34D', ['stuck', 'stuck', 'cx', 'cx', 'bk', 'bk'], '6 calls\n2 cancelled'),
+P('Marcus Hale', 'MH', '#34E0C4', 'Free until 5:30 PM', '#86EFAC', ['cx', 'cx', 'na', 'bk'], '4 calls\n2 cancelled'),
+];
+people.forEach(p => { p.tally = p.tally.replace('\n', ' · '); });
+return { tabs, stats, stuck, people };
+}
+}
+</script>
+</body>
+</html>
