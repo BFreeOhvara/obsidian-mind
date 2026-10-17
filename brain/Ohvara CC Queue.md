@@ -67,48 +67,6 @@ Scope note: still layers on top of Prompt 695's No answer status/color/layout wo
 
 ---
 
-## Prompt 771 — When a rep misses a call: apologize, hold a retry, then hand to the No answer flow
-
-**What:** today, if a rep never starts a booked call, it just sits "past its time" (the "14 calls past their time" on the Admin Overview). Nothing happens for the client. Brayden's flow (Oct 16) fixes that by reusing the No answer recovery from **P696** (built, waiting on `sms_live`). Read P696 in the queue and its Memories entry first; reuse its pieces (reschedule link, slot-locking retry, texts, attempt tracking). Don't rebuild them.
-
-### The flow
-1. **Missed.** A booked call counts as **missed by us** when its time passes and the assigned rep hasn't started it within **10 minutes**. Make the 10 a setting. The lead shows a new badge, **"Missed by us · rebooking"**, in the agent's and admin's Pipeline and the rep's calendar.
-2. **Hold a retry right away.** Lock the **same time tomorrow** with the slot-blocking logic P696 uses. If that time is outside carrier hours, on a weekend, or full, take the nearest open time that day, then the next business day.
-3. **About 15 minutes after the miss** (setting): text the client an apology with the reschedule link: *sorry we missed your call, pick a new time so we can get your old policy cancelled; if you don't, we'll call you tomorrow at <time>*. Use the P696 link (specific times plus ASAP).
-4. **If they rebook with the link:** release the held retry, book their new time, done. The badge goes back to Booked.
-5. **The next morning** (~9 AM their time, same setting as P696), **only if they haven't rebooked:** a second apology text with the same link.
-6. **The held retry call:**
-   - It's **marked priority**.
-   - To the rep it simply looks like a **new booking**, and the P767 "new call booked" notification fires.
-   - It goes to a **different rep** than the one who missed, whenever another rep can take that time. Use the original rep only if nobody else can.
-   - If the original rep is turned off, it always goes to someone else.
-7. **If the client answers:** normal call. **If not:** this counts as the client's first No answer, and the **P696 flow starts from the beginning** (text, retry tomorrow, morning text, retry, confirm the number, AM/PM texts, hand to the agent).
-
-### Rules
-- **The agent isn't charged** a weekly booking for our miss or the held retry. It's the same booking moved, not a new one. Check this against the cap rules (and P768's server-side cap).
-- **Strikes:** each miss logs a strike on the rep who missed, with call, time and client.
-  - Show the rep's count on the Admin Users person panel ("Missed calls: N in 30 days").
-  - Strikes clear after a rolling 30 days.
-  - Wire the P767 types that waited for this feature: rep "Missed call strike" (warning at strike 2), admin "A rep missed a call" and "A rep hit 3 strikes", agent "We missed the call, rebooking underway". No automatic penalty beyond notifying Brayden.
-- **Texting off (`sms_live` false, until A2P):** skip the texts but still hold and make the retry call, so nothing gets lost. Flag that texts start when `sms_live` turns on.
-- **Caps:** at most 2 apology texts per miss. A client never gets texts from both flows on the same day.
-- All of it runs on the server (cron or trigger), using the cron auth P764/P767 use. It's idempotent and never double-books or double-texts.
-
-### Checks before shipping
-- Frozen-clock tests against live with rolled-back SQL. Cover:
-  - **Misses:** a miss at 10 minutes; a call started at 9 minutes isn't a miss.
-  - **Rebooking:** rebook through the link releases the hold; no rebook leads to the morning text, then the priority retry going to another rep.
-  - **When the retry falls:** an outside-hours or weekend retry time; the retry slot is full.
-  - **Retry outcome:** retry answered vs not answered (P696 starts fresh).
-  - **Strikes and charges:** strike counts and the 30-day expiry; the agent's cap not charged.
-  - **Texting and duplicates:** `sms_live` off (no texts, retry still happens); duplicates on cron retries.
-- Never send a real text or place a real call.
-- eslint and vite build clean. Log in Memories and clear this item.
-
-**Model: Opus 5.5**
-
----
-
 ## Prompt 772 — Agent phone layout: a real app-style phone version of the agent portal
 
 **What:** on phones (under 768px wide), the agent portal stops being the desktop page squeezed down (hamburger + stacked desktop cards) and becomes an app-style layout, copied from the approved mockups in `media/mobile-agent/`:
