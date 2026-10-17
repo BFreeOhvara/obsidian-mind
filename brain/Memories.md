@@ -2075,6 +2075,6 @@ Status: 724 shipped and removed from [[Ohvara CC Queue]] (re-read right before r
 - **Notifications fired (P767 types flipped on):** rep `missed_strike` (warning from strike 2), admin `rep_missed_call` + `rep_strikes` at 3 in 30 days, agent `call_missed_rebooking`. Admin Users panel line shows "Missed calls: N in 30 days". Settings → Text follow-up admin card has the two minute settings.
 - **Decision:** only calls booked for after the migration are swept (`missed_since`), so the 17 old test calls already past their time weren't struck or moved; they stay "past their time".
 - Checked: 52 frozen-clock checks on live in rolled-back transactions (temp 2nd rep): 9 vs 10 min, live/called at 9 min, weekend + after-hours, full slot, only-original-free, rep off, link rebook, morning text, cap 2, 3-failure skip, quiet hours, retry answered/not, same-day rule, created_at kept, inserts can't set fields, RLS/grants, cron dedupe. Live after apply: sweep job succeeded, 0 rows touched. eslint: only 3 old errors in usePolicies; vite build passes. No real text or call.
-- Not checked: UI not rendered (labels only; no harness), not seen logged in on live, recovery-sms v12 not yet seen running post-deploy (v11 returned 200 every 5 min).
+- Not checked: UI not rendered (labels only; no harness), not seen logged in on live. recovery-sms v12 ran on cron after deploy: 200, claimed 0.
 
 [CC | 2026-10-17 — P771 shipped] — missed-by-us: strike, held retry to another rep, apology texts (off until A2P), P696 after. dashboard `2f94e4a`, migration 155. Next: P772.
